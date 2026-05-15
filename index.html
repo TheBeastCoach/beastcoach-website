@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beast Coach — We All Have a Beast in Us</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">BEAST<span>COACH</span></a>
+      <div class="nav-links">
+        <a href="features.html">Features</a>
+        <a href="about.html">Our Story</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="#early-access" class="nav-cta">Get Early Access</a>
+      </div>
+      <button class="nav-hamburger" onclick="toggleMenu()">&#9776;</button>
+    </div>
+    <div class="nav-mobile" id="mobileMenu">
+      <a href="features.html">Features</a>
+      <a href="about.html">Our Story</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="#early-access">Get Early Access</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <!-- Replace src with your gym photo -->
+      <img src="hero.jpg" alt="Beast Coach" class="hero-img" onerror="this.style.display='none'" />
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <p class="hero-pre">Launching July — August 2025</p>
+      <h1 class="hero-title">We All Have<br/>A Beast In Us</h1>
+      <p class="hero-sub">Beast Coach is the fitness companion that builds your personalised meal plan, workout program and tracks everything — from your fridge to the finish line.</p>
+      <div class="hero-btns">
+        <a href="#early-access" class="btn-primary">Claim Your Free Pro Spot</a>
+        <a href="features.html" class="btn-ghost">See All Features</a>
+      </div>
+      <div class="hero-spots">
+        <div class="spots-counter">
+          <span class="spots-number" id="spotsLeft">50</span>
+          <span class="spots-label">free Pro spots remaining</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- FEATURES STRIP -->
+  <section class="features-strip">
+    <div class="container">
+      <div class="strip-grid">
+        <div class="strip-item">
+          <div class="strip-icon">🏋️</div>
+          <h3>Built For You</h3>
+          <p>From total beginner to progressive overload bodybuilder — your plan adapts to you.</p>
+        </div>
+        <div class="strip-item">
+          <div class="strip-icon">🍳</div>
+          <h3>Meals From Your Fridge</h3>
+          <p>Your meal plan is built from what you actually have. Real ingredients, real meals.</p>
+        </div>
+        <div class="strip-item">
+          <div class="strip-icon">🤝</div>
+          <h3>Train Together</h3>
+          <p>Connect with your partner. Share your journey, your cycle and your shopping list.</p>
+        </div>
+        <div class="strip-item">
+          <div class="strip-icon">🏆</div>
+          <h3>Compete & Conquer</h3>
+          <p>Monthly challenges. Live leaderboards. Walk from Melbourne to Sydney. Push-up battles.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 1 — WORKOUT -->
+  <section class="feature-block">
+    <div class="container feature-grid">
+      <div class="feature-text">
+        <span class="feature-label">Workout Planning</span>
+        <h2>From First Rep to Personal Best</h2>
+        <p>Whether you've never lifted a weight or you're chasing a new deadlift record — Beast Coach builds a progressive workout plan tailored to your goals, your equipment and your schedule.</p>
+        <ul class="feature-list">
+          <li>Personalised weekly workout plans</li>
+          <li>Beginner to advanced progressive overload</li>
+          <li>Rest day optimisation</li>
+          <li>Streak tracking and consistency scores</li>
+          <li>Exercise swaps and alternatives</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="phone-mock">
+          <img src="screen-workout.jpg" alt="Workout screen" onerror="this.parentElement.classList.add('mock-placeholder')" />
+          <div class="mock-label">Workout Plan</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 2 — MEALS -->
+  <section class="feature-block feature-block--dark">
+    <div class="container feature-grid feature-grid--reverse">
+      <div class="feature-text">
+        <span class="feature-label">Meal Planning</span>
+        <h2>Meals Made From What You Actually Have</h2>
+        <p>Most apps suggest random meals. Beast Coach builds your plan from your virtual pantry — the ingredients you have at home. Your shopping list fills the gaps. Your partner can access it all.</p>
+        <ul class="feature-list">
+          <li>Virtual pantry tracks what you own</li>
+          <li>Physical pantry tracks what's in stock</li>
+          <li>Shared shopping list with your partner</li>
+          <li>AI logs any meal instantly — just describe it</li>
+          <li>Full macro and calorie tracking</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="phone-mock">
+          <img src="screen-meals.jpg" alt="Meals screen" onerror="this.parentElement.classList.add('mock-placeholder')" />
+          <div class="mock-label">Meal Planning</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 3 — AI LOGGING -->
+  <section class="feature-block">
+    <div class="container feature-grid">
+      <div class="feature-text">
+        <span class="feature-label">AI Powered</span>
+        <h2>Just Tell It What You Ate</h2>
+        <p>No barcode scanning. No searching databases. Just say "chicken breast with broccoli and rice" and Beast Coach calculates your macros instantly — with remarkable accuracy.</p>
+        <div class="ai-demo">
+          <div class="ai-bubble user">"I had a chicken caesar salad with croutons and a sparkling water"</div>
+          <div class="ai-bubble beast">Logged ✓ — 485 kcal · P 38g · C 28g · F 22g</div>
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="phone-mock">
+          <img src="screen-ai.jpg" alt="AI logging screen" onerror="this.parentElement.classList.add('mock-placeholder')" />
+          <div class="mock-label">AI Logging</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUPLES SECTION -->
+  <section class="couples-section">
+    <div class="container">
+      <div class="couples-header">
+        <span class="feature-label">For Couples</span>
+        <h2>Fitness Is Better Together</h2>
+        <p>Beast Coach connects partners in a way no fitness app has before. Share your journey, understand each other's cycle, sync your shopping and take on challenges side by side.</p>
+      </div>
+      <div class="couples-grid">
+        <div class="couples-card">
+          <div class="couples-icon">🔗</div>
+          <h3>Connect Your Journey</h3>
+          <p>Link accounts with a simple code. See each other's progress, streak and energy levels.</p>
+        </div>
+        <div class="couples-card">
+          <div class="couples-icon">🌙</div>
+          <h3>Cycle Awareness</h3>
+          <p>Partners receive daily personalised notes on how to best support their partner through each phase of the cycle.</p>
+        </div>
+        <div class="couples-card">
+          <div class="couples-icon">🛒</div>
+          <h3>Shared Shopping</h3>
+          <p>One shared shopping list. Add from the pantry, build from meals, check off together.</p>
+        </div>
+        <div class="couples-card">
+          <div class="couples-icon">🏅</div>
+          <h3>Compete Together</h3>
+          <p>Join the same challenges, track each other on the leaderboard and push each other further.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHALLENGES SECTION -->
+  <section class="challenges-section">
+    <div class="container">
+      <div class="challenges-inner">
+        <div class="challenges-text">
+          <span class="feature-label">Monthly Challenges</span>
+          <h2>Make Fitness Competitive and Fun</h2>
+          <p>Every month Beast Coach drops new community challenges. Track your progress, climb the leaderboard and push each other to new limits.</p>
+          <div class="challenge-examples">
+            <div class="challenge-pill">💪 3,500 Push-ups in June</div>
+            <div class="challenge-pill">🚶 Walk Melbourne to Sydney</div>
+            <div class="challenge-pill">🏃 1,500 Sit-ups Challenge</div>
+            <div class="challenge-pill">⚡ 30 Days No Missed Workouts</div>
+          </div>
+        </div>
+        <div class="leaderboard-preview">
+          <div class="lb-header">June Challenge — 3,500 Push-ups</div>
+          <div class="lb-row lb-row--gold">
+            <span class="lb-rank">🥇</span>
+            <span class="lb-name">Alex M.</span>
+            <div class="lb-bar-wrap"><div class="lb-bar" style="width:81%"></div></div>
+            <span class="lb-count">2,840</span>
+          </div>
+          <div class="lb-row lb-row--silver">
+            <span class="lb-rank">🥈</span>
+            <span class="lb-name">Sarah K.</span>
+            <div class="lb-bar-wrap"><div class="lb-bar" style="width:76%"></div></div>
+            <span class="lb-count">2,650</span>
+          </div>
+          <div class="lb-row lb-row--bronze">
+            <span class="lb-rank">🥉</span>
+            <span class="lb-name">James T.</span>
+            <div class="lb-bar-wrap"><div class="lb-bar" style="width:60%"></div></div>
+            <span class="lb-count">2,100</span>
+          </div>
+          <div class="lb-row lb-row--you">
+            <span class="lb-rank">4</span>
+            <span class="lb-name">You</span>
+            <div class="lb-bar-wrap"><div class="lb-bar" style="width:47%"></div></div>
+            <span class="lb-count">1,653</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section">
+    <div class="container">
+      <div class="pricing-header">
+        <span class="feature-label">Pricing</span>
+        <h2>Start Free. Unlock Everything.</h2>
+        <p>Beast Coach is free to use. The Pro version unlocks AI-powered logging, advanced analytics and the full partner experience.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-tier">Free</div>
+          <div class="pricing-price">$0<span>/month</span></div>
+          <ul class="pricing-features">
+            <li>✓ Personalised workout plan</li>
+            <li>✓ Weekly meal plan</li>
+            <li>✓ Basic calorie tracking</li>
+            <li>✓ Pantry management</li>
+            <li>✓ Monthly challenges</li>
+            <li>✓ Partner connection</li>
+          </ul>
+          <a href="#early-access" class="btn-outline">Get Started Free</a>
+        </div>
+        <div class="pricing-card pricing-card--pro">
+          <div class="pricing-badge">Most Popular</div>
+          <div class="pricing-tier">Pro</div>
+          <div class="pricing-price">Coming Soon<span></span></div>
+          <ul class="pricing-features">
+            <li>✓ Everything in Free</li>
+            <li>✓ AI text meal logging</li>
+            <li>✓ AI photo meal logging</li>
+            <li>✓ Advanced energy scoring</li>
+            <li>✓ Full cycle insights</li>
+            <li>✓ Detailed analytics</li>
+            <li>✓ Priority support</li>
+          </ul>
+          <a href="#early-access" class="btn-primary">Claim Free Pro Spot</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EARLY ACCESS -->
+  <section class="early-access" id="early-access">
+    <div class="container">
+      <div class="ea-inner">
+        <div class="ea-text">
+          <span class="feature-label">Early Access</span>
+          <h2>50 People Get Pro for Free. Forever.</h2>
+          <p>We are launching between July and August 2025. The first 50 people to sign up get the Pro version completely free — for life. No catch.</p>
+          <div class="ea-counter">
+            <div class="ea-spots">
+              <span class="ea-number" id="spotsLeftBottom">50</span>
+              <span class="ea-label">spots remaining</span>
+            </div>
+            <div class="ea-progress-wrap">
+              <div class="ea-progress" id="eaProgress"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ea-form">
+          <div class="ea-form-inner" id="eaFormWrap">
+            <h3>Claim Your Spot</h3>
+            <p>Enter your email and we will reach out when Beast Coach launches.</p>
+            <div class="form-group">
+              <input type="email" id="emailInput" placeholder="your@email.com" class="form-input" />
+            </div>
+            <button class="btn-primary btn-full" onclick="submitEarlyAccess()">Claim My Free Pro Spot →</button>
+            <p class="form-note">No spam. No credit card. Just early access.</p>
+            <div id="formMessage" class="form-message"></div>
+          </div>
+          <div class="ea-success" id="eaSuccess" style="display:none">
+            <div class="success-icon">🎉</div>
+            <h3>You're In!</h3>
+            <p>We'll reach out when Beast Coach launches. Get ready to unleash your beast.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logo">BEAST<span>COACH</span></div>
+          <p>We all have a beast in us.</p>
+        </div>
+        <div class="footer-links">
+          <a href="features.html">Features</a>
+          <a href="about.html">Our Story</a>
+          <a href="privacy.html">Privacy Policy</a>
+        </div>
+        <div class="footer-legal">
+          <p>© 2025 Beast Coach. All rights reserved.</p>
+          <p>Coming to iOS and Android — July/August 2025</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://jgbcgbdbmqtsozwlllfj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnYmNnYmRibXF0c296d2xsbGZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MTg3NDQsImV4cCI6MjA5MTE5NDc0NH0.-PRu40SKWrUDvfONjOCad9Ti2K8ViE2tz1uBCeaJvck';
+    const MAX_SPOTS = 50;
+
+    async function getSpotCount() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/early_access?select=id`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Prefer': 'count=exact'
+          }
+        });
+        const count = parseInt(res.headers.get('content-range')?.split('/')[1] || '0');
+        return count;
+      } catch (e) { return 0; }
+    }
+
+    async function updateCounters() {
+      const count = await getSpotCount();
+      const remaining = Math.max(0, MAX_SPOTS - count);
+      const pct = (count / MAX_SPOTS) * 100;
+      document.getElementById('spotsLeft').textContent = remaining;
+      document.getElementById('spotsLeftBottom').textContent = remaining;
+      document.getElementById('eaProgress').style.width = pct + '%';
+      if (remaining === 0) {
+        document.getElementById('eaFormWrap').innerHTML = '<div class="sold-out"><h3>All 50 spots claimed!</h3><p>Join the waitlist below and we will let you know if a spot opens up.</p></div>';
+      }
+    }
+
+    async function submitEarlyAccess() {
+      const email = document.getElementById('emailInput').value.trim();
+      const msg = document.getElementById('formMessage');
+      if (!email || !email.includes('@')) {
+        msg.textContent = 'Please enter a valid email address.';
+        msg.className = 'form-message form-message--error';
+        return;
+      }
+      const count = await getSpotCount();
+      if (count >= MAX_SPOTS) {
+        msg.textContent = 'Sorry — all 50 spots have been claimed.';
+        msg.className = 'form-message form-message--error';
+        return;
+      }
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/early_access`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ email })
+        });
+        if (res.status === 201 || res.ok) {
+          document.getElementById('eaFormWrap').style.display = 'none';
+          document.getElementById('eaSuccess').style.display = 'block';
+          updateCounters();
+        } else if (res.status === 409) {
+          msg.textContent = 'This email is already registered.';
+          msg.className = 'form-message form-message--error';
+        } else {
+          msg.textContent = 'Something went wrong. Please try again.';
+          msg.className = 'form-message form-message--error';
+        }
+      } catch (e) {
+        msg.textContent = 'Something went wrong. Please try again.';
+        msg.className = 'form-message form-message--error';
+      }
+    }
+
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    }
+
+    document.getElementById('emailInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitEarlyAccess();
+    });
+
+    updateCounters();
+  </script>
+</body>
+</html>

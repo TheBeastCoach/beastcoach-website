@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Story — Beast Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">BEAST<span>COACH</span></a>
+      <div class="nav-links">
+        <a href="features.html">Features</a>
+        <a href="about.html">Our Story</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="index.html#early-access" class="nav-cta">Get Early Access</a>
+      </div>
+      <button class="nav-hamburger" onclick="toggleMenu()">&#9776;</button>
+    </div>
+    <div class="nav-mobile" id="mobileMenu">
+      <a href="features.html">Features</a>
+      <a href="about.html">Our Story</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="index.html#early-access">Get Early Access</a>
+    </div>
+  </nav>
+
+  <section class="page-hero">
+    <div class="container">
+      <span class="feature-label" style="background:rgba(82,183,136,0.2);color:#52B788">The Story</span>
+      <h1>Me the Beast</h1>
+      <p>Beast Coach was built by someone who has lived the frustration of fitness apps that don't actually understand how real life works.</p>
+    </div>
+  </section>
+
+  <!-- FOUNDER STORY -->
+  <section class="about-section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-img">
+          <!-- Replace with your actual photo -->
+          <img src="founder.jpg" alt="The Beast" onerror="this.parentElement.style.background='#1B3022';this.style.display='none'" />
+        </div>
+        <div class="about-text">
+          <span class="feature-label">The Founder</span>
+          <h2>Built by Someone Who Needed It</h2>
+          <p>I built Beast Coach because I got tired of fitness apps that suggested meals I didn't have ingredients for, workout plans that ignored my schedule and tools that treated nutrition like a spreadsheet.</p>
+          <p>I wanted something that felt like a personal coach — one that knew what was in my fridge, understood my goals and adapted to real life. Not a perfect week. Not an ideal scenario. Real life.</p>
+          <p>I also wanted something I could share with my partner. Fitness is genuinely more sustainable when someone else is on the journey with you. That meant building features that didn't exist anywhere else — a shared shopping list, a cycle tracker that both partners could see, and challenges you could compete on together.</p>
+          <p>That's Beast Coach. Built for real people. Built for couples. Built by someone who needed exactly this.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION -->
+  <section class="mission-section">
+    <div class="container">
+      <span class="feature-label" style="background:rgba(82,183,136,0.2);color:#52B788;margin-bottom:24px;display:inline-block">Our Mission</span>
+      <h2>Make Fitness Accessible, Personal and Worth Sticking To</h2>
+      <p>We believe fitness should work around your life — not the other way around. Beast Coach is built on the idea that the right tools, the right plan and the right support make all the difference between starting and actually finishing.</p>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section style="padding:100px 0;background:var(--white)">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:64px">
+        <span class="feature-label">What We Stand For</span>
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,60px);color:var(--text);letter-spacing:1px;margin-top:8px">Our Values</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px">
+        <div style="padding:40px 32px;border:1.5px solid var(--border);border-radius:24px;text-align:center">
+          <div style="font-size:48px;margin-bottom:20px">🎯</div>
+          <h3 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">Personalisation Over Templates</h3>
+          <p style="font-size:14px;color:var(--muted);line-height:1.7">Your plan should be yours. We don't do one size fits all. Every meal, every workout, every recommendation is built around your specific goals, body and life.</p>
+        </div>
+        <div style="padding:40px 32px;background:var(--green-dark);border-radius:24px;text-align:center">
+          <div style="font-size:48px;margin-bottom:20px">🤝</div>
+          <h3 style="font-size:18px;font-weight:700;color:white;margin-bottom:12px">Connection Drives Consistency</h3>
+          <p style="font-size:14px;color:rgba(255,255,255,0.65);line-height:1.7">The research is clear — people who train with support stick with it longer. Beast Coach is built for pairs, partners and communities, not solo journeys.</p>
+        </div>
+        <div style="padding:40px 32px;border:1.5px solid var(--border);border-radius:24px;text-align:center">
+          <div style="font-size:48px;margin-bottom:20px">🔬</div>
+          <h3 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">Trust Comes From Accuracy</h3>
+          <p style="font-size:14px;color:var(--muted);line-height:1.7">We only show data we can actually calculate. Every score, every recommendation, every metric is backed by real data you've logged — not guesses.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="timeline">
+    <div class="container">
+      <h2>The Road to Launch</h2>
+      <div class="timeline-items">
+        <div class="timeline-item">
+          <div class="timeline-dot">💡</div>
+          <div class="timeline-content">
+            <h3>The Idea</h3>
+            <p>Frustrated with apps that didn't work for real life. Started building something different.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">🏗️</div>
+          <div class="timeline-content">
+            <h3>Building Beast Coach</h3>
+            <p>Designed and built the full app — workout planning, meal planning, pantry management, AI logging, partner features and monthly challenges.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">🧪</div>
+          <div class="timeline-content">
+            <h3>Testing & Refining</h3>
+            <p>Real world testing with early users. Refining the experience based on how people actually use it.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">🚀</div>
+          <div class="timeline-content">
+            <h3>Launch — July/August 2025</h3>
+            <p>iOS and Android. Free tier available to everyone. 50 Pro spots going to early access signups — for free, forever.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="background:var(--green-dark);padding:80px 0;text-align:center">
+    <div class="container">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);color:white;letter-spacing:2px;margin-bottom:16px">Join the Journey</h2>
+      <p style="font-size:16px;color:rgba(255,255,255,0.65);margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.8">Be one of 50 people to get Beast Coach Pro completely free. Help shape the product and be part of what this becomes.</p>
+      <a href="index.html#early-access" class="btn-primary">Claim My Free Pro Spot</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logo">BEAST<span>COACH</span></div>
+          <p>We all have a beast in us.</p>
+        </div>
+        <div class="footer-links">
+          <a href="features.html">Features</a>
+          <a href="about.html">Our Story</a>
+          <a href="privacy.html">Privacy Policy</a>
+        </div>
+        <div class="footer-legal">
+          <p>© 2025 Beast Coach. All rights reserved.</p>
+          <p>Coming to iOS and Android — July/August 2025</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById('mobileMenu').classList.toggle('active');
+    }
+  </script>
+</body>
+</html>
