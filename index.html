@@ -3,395 +3,1394 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Beast Coach — We All Have a Beast in Us</title>
+  <title>Beast Coach — We All Have A Beast In Us</title>
+  <meta name="description" content="5 apps in one. AI-powered meal planning, workout building, smart pantry, shopping list and performance tracking. Built by Stefan Botha, aka The Beast." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --dark: #0A1A12;
+      --primary: #2D6A4F;
+      --accent: #52B788;
+      --light-accent: #B7E4C7;
+      --bg: #F7F9F8;
+      --white: #FFFFFF;
+      --muted: #707973;
+      --border: #E4E8E6;
+      --text: #1B1B1B;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--white);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(10,26,18,0.96);
+      backdrop-filter: blur(12px);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(82,183,136,0.15);
+    }
+
+    .nav-logo {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    .nav-social {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-social a {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-social a:hover { color: var(--accent); }
+
+    .nav-social svg { width: 20px; height: 20px; fill: currentColor; }
+
+    .nav-cta {
+      background: var(--accent);
+      color: var(--dark) !important;
+      font-weight: 700 !important;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px !important;
+      transition: background 0.2s !important;
+    }
+
+    .nav-cta:hover { background: var(--light-accent) !important; color: var(--dark) !important; }
+
+    .nav-hamburger { display: none; background: none; border: none; cursor: pointer; }
+    .nav-hamburger span { display: block; width: 24px; height: 2px; background: white; margin: 5px 0; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: var(--dark);
+      display: flex;
+      align-items: center;
+      padding: 120px 32px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(82,183,136,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; left: -100px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(45,106,79,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-label {
+      display: inline-block;
+      background: rgba(82,183,136,0.15);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(82,183,136,0.3);
+    }
+
+    .hero h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: clamp(40px, 5vw, 68px);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: 18px;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 32px;
+      line-height: 1.6;
+      max-width: 480px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--dark);
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: transform 0.2s, background 0.2s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { background: var(--light-accent); transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      font-family: 'Manrope', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: background 0.2s;
+      display: inline-block;
+    }
+
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+    }
+
+    .hero-stat { }
+    .hero-stat-num {
+      font-family: 'Manrope', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .hero-stat-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .hero-image {
+      position: relative;
+    }
+
+    .screen-placeholder {
+      background: rgba(45,106,79,0.2);
+      border: 1px solid rgba(82,183,136,0.2);
+      border-radius: 32px;
+      width: 100%;
+      aspect-ratio: 9/19;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: rgba(82,183,136,0.5);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      padding: 20px;
+      max-width: 260px;
+      margin: 0 auto;
+    }
+
+    .screen-placeholder .ph-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.5; }
+    .screen-placeholder .ph-name { font-weight: 600; font-size: 12px; color: var(--accent); opacity: 0.7; }
+
+    .screen-img {
+      width: 100%;
+      max-width: 260px;
+      border-radius: 32px;
+      display: block;
+      margin: 0 auto;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    }
+
+    /* ── SECTION BASE ── */
+    section { padding: 100px 32px; }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      background: rgba(45,106,79,0.1);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(45,106,79,0.2);
+    }
+
+    .section-label.light {
+      background: rgba(82,183,136,0.15);
+      color: var(--accent);
+      border-color: rgba(82,183,136,0.3);
+    }
+
+    h2 {
+      font-family: 'Manrope', sans-serif;
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .section-body {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 640px;
+      margin-bottom: 40px;
+    }
+
+    /* ── FOUNDER ── */
+    .founder { background: var(--dark); }
+
+    .founder h2 { color: var(--white); }
+
+    .founder-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .founder-image-wrap {
+      position: relative;
+    }
+
+    .founder-img {
+      width: 100%;
+      max-width: 420px;
+      border-radius: 24px;
+      display: block;
+      filter: grayscale(20%);
+    }
+
+    .founder-quote {
+      position: absolute;
+      bottom: -24px;
+      right: -24px;
+      background: var(--accent);
+      color: var(--dark);
+      padding: 20px 24px;
+      border-radius: 16px;
+      max-width: 260px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .founder-body { color: rgba(255,255,255,0.65); font-size: 17px; line-height: 1.8; }
+
+    .founder-stat-row {
+      display: flex;
+      gap: 32px;
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .founder-stat-num {
+      font-family: 'Manrope', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .founder-stat-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+    }
+
+    /* ── 5 APPS INTRO ── */
+    .apps-intro { background: var(--bg); }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .app-pill {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 16px;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .app-pill:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    .app-pill-num {
+      font-family: 'Manrope', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .app-pill-name {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .app-pill-icon { font-size: 28px; margin-bottom: 12px; }
+
+    /* ── APP SECTIONS ── */
+    .app-section { background: var(--white); }
+    .app-section.dark { background: var(--dark); }
+    .app-section.tinted { background: var(--bg); }
+
+    .app-section-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .app-section-inner.reverse { direction: rtl; }
+    .app-section-inner.reverse > * { direction: ltr; }
+
+    .app-num {
+      font-family: 'Manrope', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .app-section.dark h2 { color: var(--white); }
+    .app-section.dark .section-body { color: rgba(255,255,255,0.6); }
+    .app-section.dark .app-num { color: var(--accent); }
+
+    .features-list {
+      list-style: none;
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .features-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .app-section.dark .features-list li { color: rgba(255,255,255,0.75); }
+
+    .features-list li::before {
+      content: '';
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      background: var(--accent);
+      border-radius: 50%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%230A1A12'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-size: 12px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    /* ── PROTEIN ANALYSER ── */
+    .protein { background: var(--dark); }
+    .protein h2 { color: var(--white); }
+    .protein .section-body { color: rgba(255,255,255,0.6); }
+
+    .protein-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .protein-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .protein-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(82,183,136,0.2);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .protein-card-icon { font-size: 24px; margin-bottom: 10px; }
+    .protein-card-title {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+    .protein-card-body { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+    /* ── VITALITY ── */
+    .vitality { background: var(--bg); }
+
+    .vitality-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .vitality-score-display {
+      background: var(--dark);
+      border-radius: 24px;
+      padding: 48px;
+      text-align: center;
+    }
+
+    .vitality-score-num {
+      font-family: 'Manrope', sans-serif;
+      font-size: 80px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .vitality-score-label {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .vitality-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .vitality-metric {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: left;
+    }
+
+    .vitality-metric-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+    .vitality-metric-val { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 18px; color: var(--accent); margin-top: 4px; }
+
+    /* ── HEALTH INTEGRATIONS ── */
+    .integrations { background: var(--white); text-align: center; }
+
+    .integrations h2 { margin-bottom: 16px; }
+
+    .integration-badges {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 48px;
+      flex-wrap: wrap;
+    }
+
+    .integration-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 32px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .integration-badge svg { width: 32px; height: 32px; }
+
+    /* ── DEMO ── */
+    .demo-section { background: var(--dark); text-align: center; }
+    .demo-section h2 { color: var(--white); }
+    .demo-section .section-body { color: rgba(255,255,255,0.6); margin: 0 auto 48px; }
+
+    .demo-cta-btn {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--dark);
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 18px 40px;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .demo-cta-btn:hover { background: var(--light-accent); transform: translateY(-2px); }
+
+    /* ── PRICING ── */
+    .pricing { background: var(--bg); }
+    .pricing h2 { text-align: center; margin-bottom: 8px; }
+    .pricing-sub { text-align: center; color: var(--muted); font-size: 17px; margin-bottom: 48px; }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+    }
+
+    .pricing-card.featured {
+      background: var(--dark);
+      border-color: var(--accent);
+    }
+
+    .pricing-tier {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .pricing-card.featured .pricing-tier { color: var(--white); }
+
+    .pricing-price {
+      font-family: 'Manrope', sans-serif;
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .pricing-card.featured .pricing-price { color: var(--accent); }
+
+    .pricing-period { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+    .pricing-card.featured .pricing-period { color: rgba(255,255,255,0.5); }
+
+    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+    }
+
+    .pricing-card.featured .pricing-features li { color: rgba(255,255,255,0.8); }
+
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .pricing-btn {
+      display: block;
+      text-align: center;
+      padding: 14px;
+      border-radius: 12px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+
+    .pricing-btn:hover { transform: translateY(-1px); }
+
+    .pricing-btn-free { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .pricing-btn-pro { background: var(--accent); color: var(--dark); }
+
+    /* ── EARLY ACCESS ── */
+    .early-access {
+      background: var(--dark);
+      text-align: center;
+      padding: 120px 32px;
+    }
+
+    .early-access h2 { color: var(--white); margin-bottom: 16px; }
+    .early-access .section-body { color: rgba(255,255,255,0.6); margin: 0 auto 48px; max-width: 500px; }
+
+    .signup-form {
+      display: flex;
+      gap: 12px;
+      max-width: 440px;
+      margin: 0 auto 24px;
+    }
+
+    .signup-input {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+
+    .signup-input::placeholder { color: rgba(255,255,255,0.35); }
+    .signup-input:focus { border-color: var(--accent); }
+
+    .signup-submit {
+      background: var(--accent);
+      color: var(--dark);
+      border: none;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .signup-submit:hover { background: var(--light-accent); }
+
+    .spots-remaining {
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
+      margin-bottom: 32px;
+    }
+
+    .spots-remaining span { color: var(--accent); font-weight: 700; }
+
+    .signup-success { display: none; }
+    .signup-success.visible { display: block; }
+
+    .store-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+
+    .store-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .store-btn:hover { background: rgba(255,255,255,0.12); }
+    .store-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #060F09;
+      padding: 48px 32px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-logo {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    .footer-social {
+      display: flex;
+      gap: 16px;
+    }
+
+    .footer-social a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-social a:hover { color: var(--accent); }
+    .footer-social svg { width: 20px; height: 20px; fill: currentColor; }
+
+    .footer-copy {
+      width: 100%;
+      text-align: center;
+      color: rgba(255,255,255,0.2);
+      font-size: 12px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: block; }
+
+      .hero { padding: 100px 20px 60px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+      .hero-image { order: -1; }
+      .screen-img, .screen-placeholder { max-width: 200px; }
+
+      section { padding: 60px 20px; }
+
+      .founder-inner,
+      .app-section-inner,
+      .protein-inner,
+      .vitality-inner,
+      .pricing-grid { grid-template-columns: 1fr; gap: 40px; }
+
+      .app-section-inner.reverse { direction: ltr; }
+
+      .apps-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .signup-form { flex-direction: column; }
+
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links, .footer-social { justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="nav-inner">
-      <a href="index.html" class="nav-logo">BEAST<span>COACH</span></a>
-      <div class="nav-links">
-        <a href="features.html">Features</a>
-        <a href="about.html">Our Story</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="#early-access" class="nav-cta">Get Early Access</a>
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">BEASTCOACH</a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#demo">Try It</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="/about.html">Our Story</a></li>
+    <li>
+      <div class="nav-social">
+        <a href="https://www.tiktok.com/@beast_health_app" target="_blank" rel="noopener" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.79 1.53V6.77a4.85 4.85 0 01-1.02-.08z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/beast.health.app" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
       </div>
-      <button class="nav-hamburger" onclick="toggleMenu()">&#9776;</button>
-    </div>
-    <div class="nav-mobile" id="mobileMenu">
-      <a href="features.html">Features</a>
-      <a href="about.html">Our Story</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="#early-access">Get Early Access</a>
-    </div>
-  </nav>
+    </li>
+    <li><a href="#early-access" class="nav-cta">Get Early Access</a></li>
+  </ul>
+  <button class="nav-hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-bg">
-      <img src="hero.png" alt="" />
-      <div class="hero-overlay"></div>
-      <div class="hero-overlay-tb"></div>
-    </div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
     <div class="hero-content">
-      <p class="hero-pre">Launching July — August 2026</p>
-      <h1 class="hero-title">We All Have<br/>A Beast In Us</h1>
-      <p class="hero-sub">Most people that go to the gym can't make an app. Most people that can code never see the inside of a gym. Beast Coach was the rare exception he does both, Beast Coach is a fitness companion that builds your personalised meal plan, workout program and tracks everything from your fridge to the finish line.</p>
-      <div class="hero-quote-row">
-        <img src="founder-avatar.jpg" alt="The Beast" class="hero-avatar" />
-        <div class="hero-quote-text">
-          "No one was born knowing their way around the gym."
-          <strong>THE BEAST, BEAST COACH</strong>
-        </div>
-      </div>
-      <div class="hero-btns">
+      <div class="hero-label">Launching July — August 2026</div>
+      <h1>We All Have<br><span>A Beast</span><br>In Us</h1>
+      <p class="hero-sub">At 48 I rebuilt my body from the ground up. Then I built the app I wish I had. 5 connected apps in one — built for people who are serious about their health.</p>
+      <div class="hero-buttons">
         <a href="#early-access" class="btn-primary">Claim Your Free Pro Spot</a>
-        <a href="features.html" class="btn-ghost">See All Features</a>
+        <a href="#features" class="btn-secondary">See All Features</a>
       </div>
-      <div class="spots-row">
-        <span class="spots-number" id="spotsLeft">50</span>
-        <span class="spots-label">free Pro spots remaining</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- STRIP -->
-  <section class="strip">
-    <div class="container">
-      <div class="strip-grid">
-        <div class="strip-item">
-          <h3>Built For You</h3>
-          <p>From total beginner to progressive overload bodybuilder. Your plan adapts to your life, schedule and goals.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">5</div>
+          <div class="hero-stat-label">Apps in One</div>
         </div>
-        <div class="strip-item">
-          <h3>Meals From Your Fridge</h3>
-          <p>Your meal plan is built from what you actually have at home. Real ingredients, real meals, not random suggestions.</p>
+        <div class="hero-stat">
+          <div class="hero-stat-num">50</div>
+          <div class="hero-stat-label">Free Pro Spots</div>
         </div>
-        <div class="strip-item">
-          <h3>Train Together</h3>
-          <p>Connect with your partner. Share your journey, your cycle and your shopping list.</p>
-        </div>
-        <div class="strip-item">
-          <h3>Compete and Conquer</h3>
-          <p>Monthly challenges. Live leaderboards. Push-up battles. Walk from Melbourne to Sydney.</p>
+        <div class="hero-stat">
+          <div class="hero-stat-num">AI</div>
+          <div class="hero-stat-label">Powered</div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- WORKOUT FEATURE -->
-  <section class="feature-row">
-    <div class="container">
-      <div class="feature-row-inner">
-        <div class="feature-copy">
-          <span class="feature-label">Workout Planning</span>
-          <h2>From First Rep to Personal Best</h2>
-          <p>Whether you have never lifted a weight or you are chasing a new personal best, Beast Coach builds a progressive workout plan tailored to your goals, your equipment and your schedule. We are mindful of health conditions including mental health and your plan is designed around that.</p>
-          <ul class="feature-list">
-            <li>Personalised weekly workout plans <span class="badge-free">FREE</span></li>
-            <li>Beginner to advanced progressive overload <span class="badge-free">FREE</span></li>
-            <li>Rest day optimisation and streak tracking <span class="badge-free">FREE</span></li>
-            <li>Exercise swaps and alternatives <span class="badge-free">FREE</span></li>
-            <li>AI workout logging, just describe your session <span class="badge-pro">PRO</span></li>
-            <li>Ask Beast Coach how to perform any exercise <span class="badge-pro">PRO</span></li>
-            <li>Apple Health and Google Fit sync <span class="badge-free">FREE</span></li>
-          </ul>
-        </div>
-        <div class="feature-img">
-          <img src="screen-workout.png" alt="Beast Coach Workout Plan" />
-        </div>
+    <div class="hero-image">
+      <!-- REPLACE WITH: screen-sanctuary.jpg -->
+      <div class="screen-placeholder">
+        <div class="ph-icon">📱</div>
+        <div class="ph-name">screen-sanctuary.jpg</div>
+        <div style="margin-top:8px;font-size:11px;opacity:0.5">Sanctuary home screen</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- MEAL FEATURE -->
-  <section class="feature-row feature-row--dark">
-    <div class="container">
-      <div class="feature-row-inner feature-row-inner--flip">
-        <div class="feature-copy">
-          <span class="feature-label">Meal Planning</span>
-          <h2>Meals Made From What You Actually Have</h2>
-          <p>Most apps suggest random meals. Beast Coach builds your plan from your virtual pantry. Your shopping list fills the gaps automatically. When you create a meal the ingredients are added to your pantry so your shopping list stays accurate as your stock depletes.</p>
-          <ul class="feature-list">
-            <li>Weekly meal plan built around your goals <span class="badge-free">FREE</span></li>
-            <li>Virtual pantry tracks your ingredients <span class="badge-free">FREE</span></li>
-            <li>Physical pantry tracks real stock levels <span class="badge-free">FREE</span></li>
-            <li>Auto-add pantry items when meals are created <span class="badge-free">FREE</span></li>
-            <li>Shared shopping list with your partner <span class="badge-free">FREE</span></li>
-            <li>Full calorie and macro tracking <span class="badge-free">FREE</span></li>
-            <li>AI meal plan generation and regeneration <span class="badge-pro">PRO</span></li>
-          </ul>
-        </div>
-        <div class="feature-img">
-          <img src="screen-meals.png" alt="Beast Coach Meal Planning" />
+<!-- FOUNDER -->
+<section class="founder" id="story">
+  <div class="section-inner">
+    <div class="founder-inner">
+      <div class="founder-image-wrap">
+        <img src="founder.jpg" alt="Stefan Botha — The Beast" class="founder-img" />
+        <div class="founder-quote">
+          "No one was born knowing their way around the gym. But everyone has the capacity to become their best self."
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- AI FEATURE -->
-  <section class="feature-row">
-    <div class="container">
-      <div class="feature-row-inner">
-        <div class="feature-copy">
-          <span class="feature-label">AI Powered</span>
-          <h2>Your AI Coach. Always On.</h2>
-          <p>Beast Coach Pro gives you an AI assistant that handles the heavy lifting. Log a meal by describing it in plain language. Add groceries to your pantry by describing what you bought. Ask how to perform any exercise. Get answers to any fitness or nutrition question instantly.</p>
-          <p>Every interaction is fast, accurate and built around your profile. No searching, no guessing, no generic answers. This is the feature that sets Beast Coach apart.</p>
-          <div class="ai-demo">
-            <p class="ai-demo-label">SEE IT IN ACTION</p>
-            <div class="ai-msg ai-msg--user">"I had a chicken caesar salad with croutons and a sparkling water"</div>
-            <div class="ai-msg ai-msg--beast">Logged: 485 kcal, P 38g, C 28g, F 22g</div>
-            <div class="ai-msg ai-msg--user">"Add 2kg chicken breast and 12 eggs to my pantry"</div>
-            <div class="ai-msg ai-msg--beast">Added to pantry with macros calculated automatically</div>
-            <div class="ai-msg ai-msg--user">"How do I perform a Romanian deadlift correctly?"</div>
-            <div class="ai-msg ai-msg--beast">Here is your step by step guide based on your current program...</div>
+      <div>
+        <div class="section-label light">The Founder</div>
+        <h2>Built By Someone Who Has Been Where You Are</h2>
+        <div style="height:24px"></div>
+        <p class="founder-body">In 2003 Stefan Botha weighed close to 150kg. He lost a significant amount but for years remained stuck at around 25% body fat — training hard, eating reasonably well, but not moving the needle.</p>
+        <br>
+        <p class="founder-body">Six months ago he decided to make himself the priority. He studied labels, tracked everything, rebuilt his training from scratch and transformed his body at 48.</p>
+        <br>
+        <p class="founder-body">What he couldn't find was an app precise enough to match his exact preferences — one that connected his meal plan to his pantry to his shopping list and actually understood his goals. So he built it.</p>
+        <div class="founder-stat-row">
+          <div>
+            <div class="founder-stat-num">48</div>
+            <div class="founder-stat-label">Age when he transformed</div>
           </div>
-        </div>
-        <div class="feature-img">
-          <img src="screen-quicklog.png" alt="Beast Coach AI Logging" />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- QUOTE -->
-  <section class="quote-section">
-    <div class="container">
-      <div class="quote-inner">
-        <img src="founder-avatar.jpg" alt="The Beast" class="quote-avatar" />
-        <div class="quote-text">
-          <blockquote>"Manifest is a powerful tool. Conquer your mind and the rest will flow."</blockquote>
-          <cite>Beast Coach</cite>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- COUPLES -->
-  <section class="couples">
-    <div class="container">
-      <div class="section-header">
-        <span class="feature-label" style="background:rgba(82,183,136,0.15);color:#52B788">For Couples</span>
-        <h2>Fitness Is Better Together</h2>
-        <p>Beast Coach connects partners in a way no fitness app has before. Share your journey, understand each other's cycle, sync your shopping and compete on challenges side by side.</p>
-      </div>
-      <div class="couples-grid">
-        <div class="couples-card">
-          <h3>Connect Your Journey</h3>
-          <p>Link accounts with a simple code. See each other's progress, streak and energy levels in real time.</p>
-        </div>
-        <div class="couples-card">
-          <h3>Cycle Awareness</h3>
-          <p>Partners receive daily personalised notes on how to best support their partner through each phase of the cycle.</p>
-        </div>
-        <div class="couples-card">
-          <h3>Shared Shopping</h3>
-          <p>One shared shopping list. Add from the pantry, build from meals, check off together at the store.</p>
-        </div>
-        <div class="couples-card">
-          <h3>Compete Together</h3>
-          <p>Join the same monthly challenges, track each other on the leaderboard and push each other further.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CHALLENGES -->
-  <section class="challenges">
-    <div class="container">
-      <div class="challenges-inner">
-        <div class="challenges-copy">
-          <span class="feature-label">Monthly Challenges</span>
-          <h2>Make Fitness Competitive and Fun</h2>
-          <p>Every month Beast Coach drops new community challenges. Track your progress, climb the leaderboard and push each other to new limits. Something for every fitness level.</p>
-          <div class="challenge-list">
-            <div class="challenge-item">3,500 Push-ups in June</div>
-            <div class="challenge-item">Walk Melbourne to Sydney</div>
-            <div class="challenge-item">1,500 Sit-ups Challenge</div>
-            <div class="challenge-item">30 Days No Missed Workouts</div>
+          <div>
+            <div class="founder-stat-num">150kg</div>
+            <div class="founder-stat-label">Starting weight in 2003</div>
           </div>
-        </div>
-        <div class="leaderboard">
-          <div class="lb-title">June Challenge — 3,500 Push-ups</div>
-          <div class="lb-row">
-            <div class="lb-av lb-av--1">AM</div>
-            <span class="lb-name">Stefan B.</span>
-            <div class="lb-bar-wrap"><div class="lb-bar" style="width:81%"></div></div>
-            <span class="lb-count">2,840</span>
-            <span class="lb-like">24 likes</span>
-          </div>
-          <div class="lb-row">
-            <div class="lb-av lb-av--2">SK</div>
-            <span class="lb-name">Issy A.</span>
-            <div class="lb-bar-wrap"><div class="lb-bar" style="width:76%"></div></div>
-            <span class="lb-count">2,650</span>
-            <span class="lb-like">18 likes</span>
-          </div>
-          <div class="lb-row">
-            <div class="lb-av lb-av--3">JT</div>
-            <span class="lb-name">Nikki B.</span>
-            <div class="lb-bar-wrap"><div class="lb-bar" style="width:60%"></div></div>
-            <span class="lb-count">2,100</span>
-            <span class="lb-like">15 likes</span>
-          </div>
-          <div class="lb-row">
-            <div class="lb-av lb-av--you">ME</div>
-            <span class="lb-name lb-name--you">You</span>
-            <div class="lb-bar-wrap"><div class="lb-bar lb-bar--you" style="width:47%"></div></div>
-            <span class="lb-count">1,653</span>
-            <span class="lb-like"></span>
-          </div>
-          <div class="lb-row">
-            <div class="lb-av lb-av--other">MR</div>
-            <span class="lb-name">Sophie S.</span>
-            <div class="lb-bar-wrap"><div class="lb-bar" style="width:54%"></div></div>
-            <span class="lb-count">1,890</span>
-            <span class="lb-like">9 likes</span>
+          <div>
+            <div class="founder-stat-num">6mo</div>
+            <div class="founder-stat-label">To transform his body</div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- PRICING -->
-  <section class="pricing">
-    <div class="container">
-      <div class="pricing-header">
-        <span class="feature-label">Pricing</span>
-        <h2>Start Free. Unlock Everything.</h2>
-        <p>Beast Coach is free with every feature included. The Pro version adds AI. No feature is locked behind Pro except AI.</p>
+<!-- 5 APPS INTRO -->
+<section class="apps-intro" id="features">
+  <div class="section-inner">
+    <div class="section-label">The Platform</div>
+    <h2>5 Apps. One Goal.<br>Your Best Body.</h2>
+    <p class="section-body">Most people pay for a meal planner, a workout app, a pantry tracker, a shopping app and a supplement tool separately. Beast Coach replaces all of them — and connects them in ways no other app does. Your pantry feeds your meal plan. Your meal plan builds your shopping list. Everything works together so you don't have to think about it.</p>
+    <div class="apps-grid">
+      <div class="app-pill">
+        <div class="app-pill-icon">🥗</div>
+        <div class="app-pill-num">App 01</div>
+        <div class="app-pill-name">Meal Planner</div>
       </div>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-tier">Free</div>
-          <div class="pricing-price">$0<span>/month (ever)</span></div>
-          <ul class="pricing-features">
-            <li>Personalised workout plan</li>
-            <li>Weekly meal plan</li>
-            <li>Calorie and macro tracking</li>
-            <li>Pantry management</li>
-            <li>Shopping list</li>
-            <li>Monthly challenges</li>
-            <li>Partner connection</li>
-            <li>Cycle tracker</li>
-          </ul>
-          <a href="#early-access" class="btn-outline">Get Started Free</a>
-        </div>
-        <div class="pricing-card pricing-card--pro">
-          <div class="pricing-badge">Most Popular</div>
-          <div class="pricing-tier">Pro</div>
-          <div class="pricing-price">Coming Soon</div>
-          <ul class="pricing-features">
-            <li>Everything in Free</li>
-            <li>AI text meal logging</li>
-            <li>AI photo meal logging</li>
-            <li>AI pantry management</li>
-            <li>Beast Coach AI assistant</li>
-            <li>Advanced energy scoring</li>
-            <li>Annual subscription — cost of one good restaurant meal</li>
-          </ul>
-          <a href="#early-access" class="btn-primary">Claim Free Pro Spot</a>
+      <div class="app-pill">
+        <div class="app-pill-icon">💪</div>
+        <div class="app-pill-num">App 02</div>
+        <div class="app-pill-name">Workout Builder</div>
+      </div>
+      <div class="app-pill">
+        <div class="app-pill-icon">🧺</div>
+        <div class="app-pill-num">App 03</div>
+        <div class="app-pill-name">Smart Pantry</div>
+      </div>
+      <div class="app-pill">
+        <div class="app-pill-icon">🛒</div>
+        <div class="app-pill-num">App 04</div>
+        <div class="app-pill-name">Shopping</div>
+      </div>
+      <div class="app-pill">
+        <div class="app-pill-icon">🏆</div>
+        <div class="app-pill-num">App 05</div>
+        <div class="app-pill-name">Beast Hub</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APP 1: MEAL PLANNER -->
+<section class="app-section">
+  <div class="section-inner">
+    <div class="app-section-inner">
+      <div>
+        <div class="app-num">App 01 of 05</div>
+        <div class="section-label">Meal Planner & AI Logger</div>
+        <h2>Precision Meal Planning. Down To The Last Gram.</h2>
+        <p class="section-body">Beast Coach doesn't hand you a generic meal plan. It learns your exact preferences — your cooking oil, protein sources, intolerances, how long you have to cook on weekdays. Your plan rebuilds every two days around your real life. Not happy? Tell it what you want changed in plain language and it regenerates instantly.</p>
+        <ul class="features-list">
+          <li>AI text and photo meal logging with confirmation</li>
+          <li>Barcode scanning for packaged foods</li>
+          <li>Build a meal from your pantry ingredients</li>
+          <li>Calorie and macro tracking to the gram</li>
+          <li>Favourite meals — save and re-log in one tap</li>
+          <li>Meal plan regeneration in plain language</li>
+        </ul>
+      </div>
+      <div>
+        <!-- REPLACE WITH: screen-nourish.jpg -->
+        <div class="screen-placeholder">
+          <div class="ph-icon">🥗</div>
+          <div class="ph-name">screen-nourish.jpg</div>
+          <div style="margin-top:8px;font-size:11px;opacity:0.5">Quick Log screen</div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- EARLY ACCESS -->
-  <section class="early-access" id="early-access">
-    <div class="container">
-      <div class="ea-inner">
-        <div class="ea-copy">
-          <span class="feature-label" style="background:rgba(82,183,136,0.15);color:#52B788">Early Access</span>
-          <h2>50 People Get Pro for Free. Forever.</h2>
-          <p>We are launching between July and August 2026. The first 50 people to sign up get the Pro version completely free for life. No catch.</p>
-          <div class="ea-spots-row">
-            <span class="ea-num" id="spotsLeftBottom">50</span>
-            <span class="ea-label">spots remaining</span>
+<!-- APP 2: WORKOUT -->
+<section class="app-section tinted">
+  <div class="section-inner">
+    <div class="app-section-inner reverse">
+      <div>
+        <div class="app-num">App 02 of 05</div>
+        <div class="section-label">Workout Builder & AI Logger</div>
+        <h2>Your Workout Plan. Built For Your Life.</h2>
+        <p class="section-body">Your workout plan is generated around your schedule, equipment, experience level, training location and any injuries or health conditions. Not happy with an exercise? Swap it. Want to change your whole programme? Tell Beast Coach and it rebuilds instantly.</p>
+        <ul class="features-list">
+          <li>Personalised weekly workout plan</li>
+          <li>AI workout logging — just describe your session</li>
+          <li>Exercise swap and alternatives</li>
+          <li>Redesign your plan anytime in plain language</li>
+          <li>Rest day optimisation and streak tracking</li>
+          <li>Apple Health and Google Fit sync</li>
+        </ul>
+      </div>
+      <div>
+        <!-- REPLACE WITH: screen-workout.jpg -->
+        <div class="screen-placeholder">
+          <div class="ph-icon">💪</div>
+          <div class="ph-name">screen-workout.jpg</div>
+          <div style="margin-top:8px;font-size:11px;opacity:0.5">Workout Plan screen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APP 3: PANTRY -->
+<section class="app-section dark">
+  <div class="section-inner">
+    <div class="app-section-inner">
+      <div>
+        <div class="app-num">App 03 of 05</div>
+        <div class="section-label light">Smart Pantry</div>
+        <h2>Everything Starts In Your Pantry.</h2>
+        <p class="section-body">The pantry is the engine of Beast Coach. Add ingredients and the app knows what you have. Your meal plan is built from what's actually in your kitchen. When you log a meal the ingredients are deducted automatically. When stock runs low it goes straight onto your shopping list.</p>
+        <ul class="features-list">
+          <li>Virtual pantry with full macro data per item</li>
+          <li>Physical pantry with low stock alerts</li>
+          <li>AI text, photo and barcode scanning to add items</li>
+          <li>Build a meal directly from pantry ingredients</li>
+          <li>Automatic stock deduction when meals are logged</li>
+          <li>Connects directly to your shopping list</li>
+        </ul>
+      </div>
+      <div>
+        <!-- REPLACE WITH: screen-pantry.jpg -->
+        <div class="screen-placeholder" style="border-color:rgba(82,183,136,0.3)">
+          <div class="ph-icon">🧺</div>
+          <div class="ph-name">screen-pantry.jpg</div>
+          <div style="margin-top:8px;font-size:11px;opacity:0.5">Pantry screen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APP 4: SHOPPING -->
+<section class="app-section">
+  <div class="section-inner">
+    <div class="app-section-inner reverse">
+      <div>
+        <div class="app-num">App 04 of 05</div>
+        <div class="section-label">Smart Shopping</div>
+        <h2>The Shopping App That Keeps You Honest.</h2>
+        <p class="section-body">Your shopping list builds automatically from your meal plan and pantry stock levels, organised by aisle. Every item carries a health star rating. As you tick things off you can see the overall health score of your basket in real time. Use it at the checkout to see exactly what you're putting in your body before it gets home.</p>
+        <ul class="features-list">
+          <li>Auto-generated from meal plan and pantry</li>
+          <li>Organised by aisle — produce, meat, dairy, frozen</li>
+          <li>Live health score for your entire basket</li>
+          <li>Scan any item in store to add instantly</li>
+          <li>Tick off as you shop</li>
+          <li>Share the list with your partner</li>
+        </ul>
+      </div>
+      <div>
+        <!-- REPLACE WITH: screen-shopping.jpg -->
+        <div class="screen-placeholder">
+          <div class="ph-icon">🛒</div>
+          <div class="ph-name">screen-shopping.jpg</div>
+          <div style="margin-top:8px;font-size:11px;opacity:0.5">Shopping List screen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APP 5: BEAST HUB -->
+<section class="app-section tinted">
+  <div class="section-inner">
+    <div class="app-num">App 05 of 05</div>
+    <div class="section-label">Beast Hub</div>
+    <h2>Your Community. Your Challenges.<br>Your Partner.</h2>
+    <p class="section-body">Beast Hub is where Beast Coach becomes more than a tracker.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:40px">
+
+      <div style="background:white;border:1px solid var(--border);border-radius:20px;padding:32px">
+        <div style="font-size:32px;margin-bottom:16px">👫</div>
+        <div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:18px;margin-bottom:12px">Partner Connection</div>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6">Connect with your partner using a simple code. See each other's progress, streaks and energy in real time. Share your shopping list, cycle awareness and compete on the same challenges together.</p>
+      </div>
+
+      <div style="background:white;border:1px solid var(--border);border-radius:20px;padding:32px">
+        <div style="font-size:32px;margin-bottom:16px">🏆</div>
+        <div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:18px;margin-bottom:12px">Monthly Challenges</div>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6">Walk from Las Vegas to New York. Complete 3,500 push-ups. Your daily steps and workouts translate to real progress on the leaderboard. New challenges every month. See exactly where you rank against everyone in the app.</p>
+      </div>
+
+      <div style="background:white;border:1px solid var(--border);border-radius:20px;padding:32px">
+        <div style="font-size:32px;margin-bottom:16px">🔗</div>
+        <div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:18px;margin-bottom:12px">Recipe Scanner</div>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6">Paste any recipe URL and Beast Coach analyses it instantly — full macro breakdown, calorie count and health score. Add it to your meal plan in one tap. Want to know what a cheat meal costs you before you commit? Now you can.</p>
+      </div>
+
+    </div>
+    <div style="margin-top:40px;text-align:center">
+      <!-- REPLACE WITH: screen-beast.jpg -->
+      <div class="screen-placeholder" style="margin:0 auto;max-width:220px">
+        <div class="ph-icon">🏆</div>
+        <div class="ph-name">screen-beast.jpg</div>
+        <div style="margin-top:8px;font-size:11px;opacity:0.5">Beast Hub screen</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROTEIN ANALYSER -->
+<section class="app-section dark protein">
+  <div class="section-inner">
+    <div class="protein-inner">
+      <div>
+        <div class="section-label light">Unique Feature</div>
+        <h2>The World's First AI Protein Scanner Built Around You.</h2>
+        <p class="section-body">Most people pick a protein powder by looking for the one with the most protein on the label. Stefan did the same — until he realised some have enormous amounts of hidden sugar, some use cheap filler ingredients, and the same powder that works for one person can cause bloating for another.</p>
+        <br>
+        <p class="section-body">Scan the label or paste a product URL. Beast Coach produces a full research dossier scored specifically against your body, goals and sensitivities. The same powder scores differently for every user.</p>
+        <div class="protein-cards" style="margin-top:32px">
+          <div class="protein-card">
+            <div class="protein-card-icon">📸</div>
+            <div class="protein-card-title">Scan or Paste URL</div>
+            <div class="protein-card-body">Photo the label or paste a product link from any website</div>
           </div>
-          <div class="ea-progress-wrap">
-            <div class="ea-progress" id="eaProgress"></div>
+          <div class="protein-card">
+            <div class="protein-card-icon">🧬</div>
+            <div class="protein-card-title">Ingredient Analysis</div>
+            <div class="protein-card-body">Every ingredient flagged for quality, fillers and hidden sugar</div>
+          </div>
+          <div class="protein-card">
+            <div class="protein-card-icon">🎯</div>
+            <div class="protein-card-title">Your Match Score</div>
+            <div class="protein-card-body">Scored against your goals, sensitivities and dietary style</div>
+          </div>
+          <div class="protein-card">
+            <div class="protein-card-icon">⚠️</div>
+            <div class="protein-card-title">Sensitivity Flags</div>
+            <div class="protein-card-body">Dairy, lactose, artificial sweeteners and allergens flagged automatically</div>
           </div>
         </div>
-        <div class="ea-form-box">
-          <div id="eaFormWrap">
-            <h3>Claim Your Spot</h3>
-            <p>Enter your email and we will reach out when Beast Coach launches.</p>
-            <input type="email" id="emailInput" placeholder="your@email.com" class="form-input" />
-            <button class="btn-primary btn-full" onclick="submitEarlyAccess()">Claim My Free Pro Spot</button>
-            <p class="form-note">No spam. No credit card. Just early access.</p>
-            <div id="formMessage" class="form-msg"></div>
+      </div>
+      <div>
+        <!-- REPLACE WITH: screen-protein.jpg -->
+        <div class="screen-placeholder" style="border-color:rgba(82,183,136,0.3)">
+          <div class="ph-icon">🧪</div>
+          <div class="ph-name">screen-protein.jpg</div>
+          <div style="margin-top:8px;font-size:11px;opacity:0.5">Protein Analyser screen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VITALITY HUB -->
+<section class="vitality">
+  <div class="section-inner">
+    <div class="vitality-inner">
+      <div>
+        <div class="section-label">Performance</div>
+        <h2>Why Are You Flat?<br>Now You Can Find Out.</h2>
+        <p class="section-body">The Vitality Hub takes all the data Beast Coach collects — your nutrition, movement, sleep, recovery, hydration and cycle phase — and turns it into a single daily score that tells you how your body is actually performing. Not just calories. Not just steps. Everything.</p>
+        <br>
+        <p class="section-body">Feeling flat but can't explain why? Low sleep combined with under-eating and a high-intensity training week creates a specific pattern. Beast Coach identifies it and tells you what to do about it.</p>
+      </div>
+      <div class="vitality-score-display">
+        <div class="vitality-score-num">78</div>
+        <div class="vitality-score-label">Your Vitality Score</div>
+        <div class="vitality-metrics">
+          <div class="vitality-metric">
+            <div class="vitality-metric-label">Nutrition</div>
+            <div class="vitality-metric-val">85%</div>
           </div>
-          <div class="ea-success" id="eaSuccess">
-            <h3>You are In!</h3>
-            <p>We will reach out when Beast Coach launches. Get ready to unleash your beast.</p>
+          <div class="vitality-metric">
+            <div class="vitality-metric-label">Movement</div>
+            <div class="vitality-metric-val">72%</div>
+          </div>
+          <div class="vitality-metric">
+            <div class="vitality-metric-label">Recovery</div>
+            <div class="vitality-metric-val">68%</div>
+          </div>
+          <div class="vitality-metric">
+            <div class="vitality-metric-label">Hydration</div>
+            <div class="vitality-metric-val">90%</div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <div class="footer-logo">BEAST<span>COACH</span></div>
-          <p>We all have a beast in us.</p>
-        </div>
-        <div class="footer-links">
-          <a href="features.html">Features</a>
-          <a href="about.html">Our Story</a>
-          <a href="privacy.html">Privacy Policy</a>
-        </div>
-        <div class="footer-legal">
-          <p>2025 Beast Coach. All rights reserved.</p>
-          <p>Coming to iOS and Android — July/August 2026</p>
-        </div>
+<!-- HEALTH INTEGRATIONS -->
+<section class="integrations">
+  <div class="section-inner">
+    <div class="section-label" style="display:block;text-align:center">Integrations</div>
+    <h2>Syncs With Everything<br>You Already Use.</h2>
+    <p class="section-body" style="margin:16px auto 0;text-align:center">Beast Coach connects with Apple Health on iOS and Google Health Connect on Android. Steps, calories, sleep, HRV and body weight all flow in automatically. Both integrations live at launch.</p>
+    <div class="integration-badges">
+      <div class="integration-badge">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z" fill="#E74C3C"/>
+        </svg>
+        Apple Health
+      </div>
+      <div class="integration-badge">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" fill="#4CAF50"/>
+        </svg>
+        Google Health Connect
       </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <script>
-    const SB_URL = 'https://jgbcgbdbmqtsozwlllfj.supabase.co';
-    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnYmNnYmRibXF0c296d2xsbGZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MTg3NDQsImV4cCI6MjA5MTE5NDc0NH0.-PRu40SKWrUDvfONjOCad9Ti2K8ViE2tz1uBCeaJvck';
-    const MAX = 50;
+<!-- DEMO -->
+<section class="demo-section" id="demo">
+  <div class="section-inner">
+    <div class="section-label light" style="display:inline-block">Try It Now</div>
+    <h2 style="color:white;margin-bottom:16px">See Beast Coach In Action</h2>
+    <p class="section-body">Log a meal the way you would in the real app. No login required.</p>
+    <a href="/demo.html" class="demo-cta-btn">Launch Interactive Demo →</a>
+  </div>
+</section>
 
-    async function getCount() {
-      try {
-        const r = await fetch(`${SB_URL}/rest/v1/early_access?select=id`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: 'count=exact' } });
-        return parseInt(r.headers.get('content-range')?.split('/')[1] || '0');
-      } catch { return 0; }
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-inner">
+    <div class="section-label" style="display:block;text-align:center">Pricing</div>
+    <h2>Start Free. Unlock Everything.</h2>
+    <p class="pricing-sub">No feature is locked behind Pro except AI. Beast Coach is free with every core feature included.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-price">$0</div>
+        <div class="pricing-period">forever</div>
+        <ul class="pricing-features">
+          <li>Personalised workout plan</li>
+          <li>Weekly meal plan</li>
+          <li>Calorie and macro tracking</li>
+          <li>Pantry management</li>
+          <li>Shopping list</li>
+          <li>Monthly challenges</li>
+          <li>Partner connection</li>
+          <li>Cycle tracker</li>
+        </ul>
+        <a href="#early-access" class="pricing-btn pricing-btn-free">Get Started Free</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-price">TBA</div>
+        <div class="pricing-period">Monthly, Annual or Lifetime — announced at launch</div>
+        <ul class="pricing-features">
+          <li>Everything in Free</li>
+          <li>AI text meal logging</li>
+          <li>AI photo meal logging</li>
+          <li>AI pantry management</li>
+          <li>Protein Analyser</li>
+          <li>Beast Coach AI assistant</li>
+          <li>Vitality Hub</li>
+          <li>Recipe Scanner</li>
+        </ul>
+        <a href="#early-access" class="pricing-btn pricing-btn-pro">Claim Free Pro Spot</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EARLY ACCESS -->
+<section class="early-access" id="early-access">
+  <div class="section-inner">
+    <div class="section-label light" style="display:inline-block">Early Access</div>
+    <h2>50 People Get Pro For Free. Forever.</h2>
+    <p class="section-body">We are launching between July and August 2026. The first 50 people to sign up get the Pro version completely free for life. No catch.</p>
+    <div class="spots-remaining"><span>50</span> free Pro spots remaining</div>
+    <div class="signup-form" id="signup-form">
+      <input type="email" class="signup-input" placeholder="your@email.com" id="signup-email" />
+      <button class="signup-submit" onclick="handleSignup()">Claim My Spot</button>
+    </div>
+    <div class="signup-success" id="signup-success" style="color:var(--accent);font-family:'Manrope',sans-serif;font-weight:700;font-size:18px;margin-bottom:24px">
+      You're in! We'll reach out when Beast Coach launches. Get ready to unleash your beast. 🔥
+    </div>
+    <p style="color:rgba(255,255,255,0.3);font-size:13px;margin-bottom:48px">No spam. No credit card. Just early access.</p>
+    <div class="store-buttons">
+      <a href="#early-access" class="store-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Coming to App Store
+      </a>
+      <a href="#early-access" class="store-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3.18 23.76c.3.17.64.22.99.14l12.6-7.27-2.72-2.72-10.87 9.85zM.48 2.06C.18 2.4 0 2.91 0 3.57v16.86c0 .66.18 1.17.48 1.51l.08.08 9.44-9.44v-.22L.56 1.98l-.08.08zM20.12 10.5l-2.68-1.55-3.03 3.03 3.03 3.03 2.7-1.56c.77-.44.77-1.16-.02-1.95zM3.18.24l12.6 7.27-2.72 2.72L2.18.37c.35-.2.71-.21 1-.13z"/></svg>
+        Coming to Google Play
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="/" class="footer-logo">BEASTCOACH</a>
+    <div class="footer-links">
+      <a href="/features.html">Features</a>
+      <a href="/about.html">Our Story</a>
+      <a href="/privacy-policy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms & Conditions</a>
+      <a href="/privacy.html">Privacy</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://www.tiktok.com/@beast_health_app" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.79 1.53V6.77a4.85 4.85 0 01-1.02-.08z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/beast.health.app" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </a>
+    </div>
+    <div class="footer-copy">© 2026 Beast Coach. All rights reserved. Coming to iOS and Android — July/August 2026</div>
+  </div>
+</footer>
+
+<script>
+  function handleSignup() {
+    const email = document.getElementById('signup-email').value;
+    if (!email || !email.includes('@')) {
+      alert('Please enter a valid email address.');
+      return;
     }
+    document.getElementById('signup-form').style.display = 'none';
+    document.getElementById('signup-success').classList.add('visible');
+  }
 
-    async function updateCounters() {
-      const n = await getCount();
-      const rem = Math.max(0, MAX - n);
-      document.getElementById('spotsLeft').textContent = rem;
-      document.getElementById('spotsLeftBottom').textContent = rem;
-      document.getElementById('eaProgress').style.width = (n / MAX * 100) + '%';
-    }
+  document.getElementById('signup-email').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') handleSignup();
+  });
+</script>
 
-    async function submitEarlyAccess() {
-      const email = document.getElementById('emailInput').value.trim();
-      const msg = document.getElementById('formMessage');
-      if (!email || !email.includes('@')) { msg.textContent = 'Please enter a valid email address.'; msg.className = 'form-msg form-msg--err'; return; }
-      try {
-        const r = await fetch(`${SB_URL}/rest/v1/early_access`, { method: 'POST', headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ email }) });
-        if (r.status === 201 || r.ok) { document.getElementById('eaFormWrap').style.display = 'none'; document.getElementById('eaSuccess').style.display = 'block'; updateCounters(); }
-        else if (r.status === 409) { msg.textContent = 'This email is already registered.'; msg.className = 'form-msg form-msg--err'; }
-        else { msg.textContent = 'Something went wrong. Please try again.'; msg.className = 'form-msg form-msg--err'; }
-      } catch { msg.textContent = 'Something went wrong. Please try again.'; msg.className = 'form-msg form-msg--err'; }
-    }
-
-    function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('active'); }
-    document.getElementById('emailInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') submitEarlyAccess(); });
-    updateCounters();
-  </script>
 </body>
 </html>
