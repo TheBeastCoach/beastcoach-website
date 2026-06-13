@@ -18,10 +18,21 @@ Rules:
 - Never include markdown, code blocks or any text outside the JSON object`;
 
 export default async function handler(req) {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    });
+  }
+
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 
@@ -29,7 +40,7 @@ export default async function handler(req) {
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'API not configured' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 
@@ -39,7 +50,7 @@ export default async function handler(req) {
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid request' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 
@@ -47,7 +58,7 @@ export default async function handler(req) {
   if (!meal || typeof meal !== 'string' || meal.trim().length < 2) {
     return new Response(JSON.stringify({ error: 'Please describe a meal' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 
@@ -68,7 +79,8 @@ export default async function handler(req) {
     });
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      const errText = await response.text();
+      throw new Error(`API error: ${response.status} - ${errText}`);
     }
 
     const data = await response.json();
@@ -95,9 +107,9 @@ export default async function handler(req) {
     });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Analysis failed. Please try again.' }), {
+    return new Response(JSON.stringify({ error: err.message || 'Analysis failed. Please try again.' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 }
