@@ -914,7 +914,7 @@
           <div class="hero-stat-label">Apps in One</div>
         </div>
         <div class="hero-stat">
-          <div class="hero-stat-num">50</div>
+          <div class="hero-stat-num spots-count">43</div>
           <div class="hero-stat-label">Free Pro Spots</div>
         </div>
         <div class="hero-stat">
@@ -924,11 +924,9 @@
       </div>
     </div>
     <div class="hero-image">
-      <!-- REPLACE WITH: screen-sanctuary.jpg -->
-      <div class="screen-placeholder">
-        <div class="ph-icon">📱</div>
-        <div class="ph-name">screen-sanctuary.jpg</div>
-        <div style="margin-top:8px;font-size:11px;opacity:0.5">Sanctuary home screen</div>
+      <div style="position:relative;width:280px;margin:0 auto">
+        <iframe src="/demo.html" style="width:390px;height:760px;border:none;border-radius:48px;transform:scale(0.72);transform-origin:top left;pointer-events:auto;box-shadow:0 40px 80px rgba(0,0,0,0.5);" scrolling="no" title="Beast Coach Live Demo"></iframe>
+        <div style="position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;color:rgba(255,255,255,0.4);font-size:11px">↑ Interactive — try it</div>
       </div>
     </div>
   </div>
@@ -1331,7 +1329,7 @@
     <div class="section-label light" style="display:inline-block">Early Access</div>
     <h2>50 People Get Pro For Free. Forever.</h2>
     <p class="section-body">We are launching between July and August 2026. The first 50 people to sign up get the Pro version completely free for life. No catch.</p>
-    <div class="spots-remaining"><span>50</span> free Pro spots remaining</div>
+    <div class="spots-remaining"><span class="spots-count">43</span> free Pro spots remaining</div>
     <div class="signup-form" id="signup-form">
       <input type="email" class="signup-input" placeholder="your@email.com" id="signup-email" />
       <button class="signup-submit" onclick="handleSignup()">Claim My Spot</button>
@@ -1377,19 +1375,97 @@
 </footer>
 
 <script>
-  function handleSignup() {
-    const email = document.getElementById('signup-email').value;
+  const SUPABASE_URL = 'https://jgbcgbdbmqtsozwlllfj.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnYmNnYmRibXF0c296d2xsbGZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MTg3NDQsImV4cCI6MjA5MTE5NDc0NH0.-PRu40SKWrUDvfONjOCad9Ti2K8ViE2tz1uBCeaJvck';
+  const MAX_SPOTS = 50;
+
+  // Load live spot count
+  async function loadSpots() {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/early_access?select=id`, {
+        headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON }
+      });
+      const data = await res.json();
+      const taken = Array.isArray(data) ? data.length : 0;
+      const remaining = Math.max(MAX_SPOTS - taken, 0);
+      document.querySelectorAll('.spots-count').forEach(el => el.textContent = remaining);
+    } catch (e) {
+      document.querySelectorAll('.spots-count').forEach(el => el.textContent = '43');
+    }
+  }
+  loadSpots();
+
+  async function handleSignup() {
+    const emailEl = document.getElementById('signup-email');
+    const email = emailEl.value.trim();
     if (!email || !email.includes('@')) {
-      alert('Please enter a valid email address.');
+      emailEl.style.borderColor = '#E74C3C';
       return;
     }
-    document.getElementById('signup-form').style.display = 'none';
-    document.getElementById('signup-success').classList.add('visible');
+    emailEl.style.borderColor = '';
+
+    const btn = document.querySelector('.signup-submit');
+    btn.disabled = true;
+    btn.textContent = 'Claiming...';
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/early_access`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON,
+          'Authorization': 'Bearer ' + SUPABASE_ANON,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ email })
+      });
+
+      if (res.status === 409) {
+        document.getElementById('signup-form').style.display = 'none';
+        document.getElementById('signup-success').classList.add('visible');
+        document.getElementById('signup-success').innerHTML = "You're already on the list! We'll be in touch. 🔥";
+        return;
+      }
+
+      document.getElementById('signup-form').style.display = 'none';
+      document.getElementById('signup-success').classList.add('visible');
+      loadSpots();
+
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = 'Claim My Spot';
+      alert('Something went wrong. Please try again.');
+    }
   }
 
   document.getElementById('signup-email').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') handleSignup();
   });
+
+  // Mobile menu
+  const hamburger = document.querySelector('.nav-hamburger');
+  const navLinks = document.querySelector('.nav-links');
+  if (hamburger && navLinks) {
+    hamburger.addEventListener('click', function() {
+      const isOpen = navLinks.style.display === 'flex';
+      navLinks.style.display = isOpen ? 'none' : 'flex';
+      navLinks.style.flexDirection = 'column';
+      navLinks.style.position = 'fixed';
+      navLinks.style.top = '64px';
+      navLinks.style.left = '0';
+      navLinks.style.right = '0';
+      navLinks.style.background = 'rgba(10,26,18,0.98)';
+      navLinks.style.padding = '20px 32px';
+      navLinks.style.gap = '20px';
+      navLinks.style.zIndex = '99';
+      navLinks.style.borderBottom = '1px solid rgba(82,183,136,0.15)';
+    });
+    document.addEventListener('click', function(e) {
+      if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+        navLinks.style.display = 'none';
+      }
+    });
+  }
 </script>
 
 </body>
