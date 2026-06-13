@@ -1,5 +1,3 @@
-export const config = { runtime: 'edge' };
-
 const SYSTEM_PROMPT = `You are a precise nutritionist AI for Beast Coach app. 
 Analyse the meal described and return ONLY valid JSON in this exact format:
 {
@@ -17,49 +15,20 @@ Rules:
 - If multiple items described, sum all macros
 - Never include markdown, code blocks or any text outside the JSON object`;
 
-export default async function handler(req) {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      }
-    });
-  }
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
-  }
+  if (req.method === 'OPTIONS') { return res.status(200).end(); }
+  if (req.method !== 'POST') { return res.status(405).json({ error: 'Method not allowed' }); }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'API not configured' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
-  }
+  if (!apiKey) { return res.status(500).json({ error: 'API not configured' }); }
 
-  let body;
-  try {
-    body = await req.json();
-  } catch {
-    return new Response(JSON.stringify({ error: 'Invalid request' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
-  }
-
-  const { meal } = body;
+  const { meal } = req.body || {};
   if (!meal || typeof meal !== 'string' || meal.trim().length < 2) {
-    return new Response(JSON.stringify({ error: 'Please describe a meal' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
+    return res.status(400).json({ error: 'Please describe a meal' });
   }
 
   try {
@@ -79,37 +48,25 @@ export default async function handler(req) {
     });
 
     if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`API error: ${response.status} - ${errText}`);
+      const err = await response.text();
+      throw new Error(`API error: ${response.status} - ${err}`);
     }
 
     const data = await response.json();
     const text = data.content?.[0]?.text || '';
-    
+
     let parsed;
     try {
       parsed = JSON.parse(text);
     } catch {
       const match = text.match(/\{[\s\S]*\}/);
-      if (match) {
-        parsed = JSON.parse(match[0]);
-      } else {
-        throw new Error('Could not parse response');
-      }
+      if (match) parsed = JSON.parse(match[0]);
+      else throw new Error('Could not parse response');
     }
 
-    return new Response(JSON.stringify(parsed), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    return res.status(200).json(parsed);
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message || 'Analysis failed. Please try again.' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
+    return res.status(500).json({ error: err.message || 'Analysis failed. Please try again.' });
   }
-}
+};
