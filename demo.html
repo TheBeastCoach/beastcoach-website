@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --dark: #0A1A12;
       --primary: #2D6A4F;
@@ -17,57 +16,35 @@
       --muted: #707973;
       --border: #E4E8E6;
       --text: #1B1B1B;
-      --calories-color: #FF2D55;
-      --protein-color: #00A854;
-      --carbs-color: #0099BB;
-      --fat-color: #FF6B00;
+      --cal: #FF2D55;
+      --protein: #00A854;
+      --carbs: #0099BB;
+      --fat: #FF6B00;
     }
-
     body {
       font-family: 'Inter', sans-serif;
-      background: #1A1A1A;
+      background: #111;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      padding: 40px 20px;
+      padding: 32px 20px 60px;
     }
+    .demo-header { text-align: center; margin-bottom: 28px; }
+    .demo-header h1 { font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800; color: white; margin-bottom: 6px; }
+    .demo-header p { color: rgba(255,255,255,0.45); font-size: 14px; }
+    .demo-header a { color: var(--accent); text-decoration: none; font-weight: 600; }
 
-    .demo-header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .demo-header h1 {
-      font-family: 'Manrope', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      color: white;
-      margin-bottom: 8px;
-    }
-
-    .demo-header p {
-      color: rgba(255,255,255,0.5);
-      font-size: 15px;
-    }
-
-    .demo-header a {
-      color: var(--accent);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    /* PHONE FRAME */
+    /* PHONE */
     .phone {
       width: 390px;
-      min-height: 844px;
+      height: 844px;
       background: var(--bg);
       border-radius: 48px;
       overflow: hidden;
       position: relative;
-      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 2px rgba(255,255,255,0.1);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 2px rgba(255,255,255,0.08);
+      flex-shrink: 0;
     }
 
     /* STATUS BAR */
@@ -78,31 +55,22 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 24px;
+      position: relative;
+      z-index: 5;
     }
-
-    .status-time {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--text);
-    }
-
-    .status-icons {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      font-size: 12px;
-      color: var(--text);
-    }
+    .status-time { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); }
+    .status-icons { display: flex; gap: 5px; align-items: center; }
 
     /* SCREENS */
     .screen {
       display: none;
       flex-direction: column;
-      height: calc(844px - 44px - 83px);
+      position: absolute;
+      top: 44px; left: 0; right: 0;
+      bottom: 83px;
       overflow-y: auto;
+      overflow-x: hidden;
     }
-
     .screen.active { display: flex; }
 
     /* TAB BAR */
@@ -114,612 +82,175 @@
       border-top: 1px solid var(--border);
       display: flex;
       align-items: flex-start;
-      padding-top: 12px;
+      padding-top: 10px;
+      z-index: 10;
     }
-
     .tab {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       cursor: pointer;
       background: none;
       border: none;
       padding: 0;
     }
-
-    .tab-icon { font-size: 22px; }
     .tab-label { font-size: 10px; font-weight: 600; color: var(--muted); }
     .tab.active .tab-label { color: var(--primary); }
+    .tab svg { width: 24px; height: 24px; }
+    .tab.active svg { color: var(--primary); }
+    .tab svg { color: var(--muted); }
 
-    /* ── SANCTUARY SCREEN ── */
+    /* ── SANCTUARY ── */
     .sanctuary-header {
       background: var(--bg);
-      padding: 16px 20px 8px;
+      padding: 12px 20px 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
-    .sanctuary-logo {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 18px;
-      color: var(--primary);
-      letter-spacing: 0.5px;
-    }
-
+    .sanctuary-logo { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 17px; color: var(--primary); letter-spacing: 0.5px; }
     .streak-badge {
-      background: var(--bg);
+      background: var(--white);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 6px 14px;
+      padding: 5px 12px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-family: 'Manrope', sans-serif;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
+      color: var(--text);
     }
 
     /* DATE SELECTOR */
-    .date-selector {
-      padding: 8px 20px;
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-    }
-
-    .date-pill {
-      flex-shrink: 0;
-      padding: 8px 14px;
-      border-radius: 20px;
-      text-align: center;
-      cursor: pointer;
-    }
-
-    .date-pill.today {
-      background: var(--primary);
-      color: white;
-    }
-
-    .date-pill-day { font-size: 11px; font-weight: 600; }
-    .date-pill-num { font-size: 16px; font-weight: 800; font-family: 'Manrope', sans-serif; }
+    .date-selector { padding: 8px 20px; display: flex; gap: 6px; overflow-x: auto; }
+    .date-pill { flex-shrink: 0; padding: 6px 12px; border-radius: 20px; text-align: center; color: var(--muted); }
+    .date-pill.today { background: var(--primary); color: white; }
+    .date-pill-day { font-size: 10px; font-weight: 600; }
+    .date-pill-num { font-size: 15px; font-weight: 800; font-family: 'Manrope', sans-serif; }
 
     /* GREETING */
-    .greeting {
-      padding: 16px 20px 8px;
-    }
-
-    .greeting-sub { font-size: 14px; color: var(--muted); }
-    .greeting-name {
-      font-family: 'Manrope', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    .cal-remaining {
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .cal-remaining span {
-      font-weight: 700;
-      color: var(--text);
-    }
+    .greeting { padding: 12px 20px 4px; }
+    .greeting-sub { font-size: 13px; color: var(--muted); }
+    .greeting-name { font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800; color: var(--primary); }
+    .cal-remaining { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .cal-remaining span { font-weight: 700; color: var(--text); }
 
     /* RINGS */
-    .rings-container {
-      display: flex;
-      align-items: center;
-      padding: 16px 20px;
-      gap: 20px;
-    }
+    .rings-container { display: flex; align-items: center; padding: 12px 20px; gap: 16px; }
+    .ring-wrap { position: relative; width: 150px; height: 150px; flex-shrink: 0; }
+    .ring-wrap svg { width: 150px; height: 150px; transform: rotate(-90deg); }
+    .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+    .ring-pct { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; color: var(--text); }
+    .ring-pct-label { font-size: 10px; color: var(--muted); }
+    .macros-side { flex: 1; }
+    .macro-row { margin-bottom: 10px; }
+    .macro-label { font-size: 11px; color: var(--muted); margin-bottom: 1px; }
+    .macro-val { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; }
+    .macro-target { font-size: 11px; color: var(--muted); }
 
-    .ring-wrap {
-      position: relative;
-      width: 160px;
-      height: 160px;
-      flex-shrink: 0;
-    }
+    /* CAL BAR */
+    .calorie-bar-section { padding: 0 20px 12px; }
+    .calorie-bar-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .calorie-bar-label { font-size: 12px; font-weight: 600; color: var(--text); }
+    .calorie-bar-val { font-size: 12px; font-weight: 700; color: var(--cal); }
+    .calorie-bar-track { height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; }
+    .calorie-bar-fill { height: 100%; background: linear-gradient(to right, #FF6B6B, var(--cal)); border-radius: 7px; transition: width 0.5s ease; }
 
-    .ring-wrap svg {
-      width: 160px;
-      height: 160px;
-      transform: rotate(-90deg);
-    }
+    /* HINT */
+    .tap-hint { margin: 4px 20px 0; background: rgba(45,106,79,0.08); border-radius: 12px; padding: 12px 14px; text-align: center; color: var(--muted); font-size: 12px; }
+    .tap-hint strong { color: var(--primary); }
 
-    .ring-center {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-    }
+    /* ── NOURISH ── */
+    .nourish-header { background: var(--white); padding: 14px 20px 0; flex-shrink: 0; }
+    .nourish-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; color: var(--text); margin-bottom: 10px; }
+    .nourish-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .nourish-tab { padding: 7px 12px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; }
+    .nourish-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-    .ring-pct {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 22px;
-      color: var(--text);
-    }
+    .nourish-content { padding: 14px 20px; flex: 1; overflow-y: auto; }
 
-    .ring-pct-label {
-      font-size: 10px;
-      color: var(--muted);
-    }
+    .cal-summary { background: var(--white); border-radius: 14px; padding: 14px; margin-bottom: 14px; border: 1px solid var(--border); }
+    .cal-summary-label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+    .cal-summary-num { font-family: 'Manrope', sans-serif; font-size: 36px; font-weight: 800; color: var(--text); line-height: 1; }
+    .cal-summary-num span { font-size: 14px; color: var(--muted); font-weight: 400; }
+    .cal-summary-bar { height: 7px; background: var(--border); border-radius: 4px; margin: 8px 0 5px; overflow: hidden; }
+    .cal-summary-fill { height: 100%; background: linear-gradient(to right, #74C69D, var(--accent)); border-radius: 4px; transition: width 0.5s; }
+    .cal-summary-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
 
-    .macros-side {
-      flex: 1;
-    }
-
-    .macro-row {
-      margin-bottom: 12px;
-    }
-
-    .macro-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
-
-    .macro-val {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    .macro-target { font-size: 12px; color: var(--muted); }
-
-    /* CALORIE BAR */
-    .calorie-bar-section {
-      padding: 0 20px 16px;
-    }
-
-    .calorie-bar-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
-
-    .calorie-bar-label { font-size: 13px; font-weight: 600; color: var(--text); }
-    .calorie-bar-val { font-size: 13px; font-weight: 700; color: var(--calories-color); }
-
-    .calorie-bar-track {
-      height: 16px;
-      background: var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .calorie-bar-fill {
-      height: 100%;
-      background: linear-gradient(to right, #FF6B6B, var(--calories-color));
-      border-radius: 8px;
-      transition: width 0.5s ease;
-    }
-
-    /* ── NOURISH SCREEN ── */
-    .nourish-header {
-      background: var(--white);
-      padding: 16px 20px 0;
-    }
-
-    .nourish-title {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 22px;
-      color: var(--text);
-      margin-bottom: 12px;
-    }
-
-    .nourish-tabs {
-      display: flex;
-      gap: 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nourish-tab {
-      padding: 8px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      background: none;
-      border-top: none;
-      border-left: none;
-      border-right: none;
-    }
-
-    .nourish-tab.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    .nourish-content { padding: 16px 20px; flex: 1; }
-
-    /* CALORIE SUMMARY */
-    .cal-summary {
-      background: var(--white);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
-      border: 1px solid var(--border);
-    }
-
-    .cal-summary-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .cal-summary-num {
-      font-family: 'Manrope', sans-serif;
-      font-size: 40px;
-      font-weight: 800;
-      color: var(--text);
-      line-height: 1;
-    }
-
-    .cal-summary-num span { font-size: 16px; color: var(--muted); font-weight: 400; }
-
-    .cal-summary-bar {
-      height: 8px;
-      background: var(--border);
-      border-radius: 4px;
-      margin: 10px 0 6px;
-      overflow: hidden;
-    }
-
-    .cal-summary-fill {
-      height: 100%;
-      background: linear-gradient(to right, #74C69D, var(--accent));
-      border-radius: 4px;
-      transition: width 0.5s;
-    }
-
-    .cal-summary-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    /* LOG CARDS */
-    .log-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px 20px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      cursor: pointer;
-      transition: border-color 0.2s, transform 0.15s;
-    }
-
+    .log-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: border-color 0.2s, transform 0.15s; }
     .log-card:hover { border-color: var(--accent); transform: translateX(2px); }
-    .log-card:active { transform: scale(0.98); }
-
-    .log-card-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: rgba(45,106,79,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-
-    .log-card-title {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--text);
-    }
-
-    .log-card-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
-
+    .log-card-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(45,106,79,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .log-card-icon svg { width: 22px; height: 22px; color: var(--primary); }
+    .log-card-title { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; color: var(--text); }
+    .log-card-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
     .log-card-arrow { margin-left: auto; color: var(--muted); font-size: 16px; }
 
-    /* AI TEXT INPUT */
-    .ai-text-screen {
-      padding: 20px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
+    /* ── AI TEXT ── */
+    .ai-screen { padding: 16px 20px; flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    .back-btn { display: flex; align-items: center; gap: 6px; color: var(--primary); font-weight: 600; font-size: 14px; cursor: pointer; background: none; border: none; margin-bottom: 16px; padding: 0; }
+    .ai-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; margin-bottom: 6px; }
+    .ai-subtitle { color: var(--muted); font-size: 13px; margin-bottom: 16px; line-height: 1.5; }
 
-    .ai-text-back {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--primary);
-      font-weight: 600;
-      font-size: 15px;
-      cursor: pointer;
-      margin-bottom: 20px;
-      background: none;
-      border: none;
-    }
-
-    .ai-text-title {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 22px;
-      margin-bottom: 8px;
-    }
-
-    .ai-text-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
-
-    .ai-textarea {
-      width: 100%;
-      min-height: 100px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      color: var(--text);
-      background: var(--bg);
-      resize: none;
-      outline: none;
-      margin-bottom: 16px;
-    }
-
+    .ai-textarea { width: 100%; min-height: 90px; border: 1px solid var(--border); border-radius: 14px; padding: 14px; font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); resize: none; outline: none; margin-bottom: 12px; }
     .ai-textarea:focus { border-color: var(--accent); }
 
-    .ai-examples {
-      margin-bottom: 20px;
-    }
+    .examples-label { font-size: 11px; color: var(--muted); margin-bottom: 7px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .example-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .example-pill { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 5px 10px; font-size: 11px; color: var(--muted); cursor: pointer; transition: border-color 0.2s; }
+    .example-pill:hover { border-color: var(--accent); color: var(--primary); }
 
-    .ai-examples-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
-
-    .ai-example-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-
-    .ai-example-pill {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 12px;
-      color: var(--muted);
-      cursor: pointer;
-      transition: border-color 0.2s;
-    }
-
-    .ai-example-pill:hover { border-color: var(--accent); color: var(--primary); }
-
-    .ai-analyse-btn {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      padding: 16px;
-      font-family: 'Manrope', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      margin-top: auto;
-    }
-
-    .ai-analyse-btn:hover:not(:disabled) { background: var(--accent); color: var(--dark); }
-    .ai-analyse-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .ai-analyse-btn:active:not(:disabled) { transform: scale(0.98); }
-
-    /* LOADING */
-    .ai-loading {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      padding: 16px;
-      background: rgba(45,106,79,0.08);
-      border-radius: 12px;
-      margin-bottom: 16px;
-    }
-
+    .ai-loading { display: none; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(45,106,79,0.08); border-radius: 10px; margin-bottom: 12px; }
     .ai-loading.visible { display: flex; }
+    .dots { display: flex; gap: 4px; }
+    .dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: bounce 1.2s infinite; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
 
-    .loading-dots { display: flex; gap: 4px; }
-    .loading-dot {
-      width: 8px; height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: bounce 1.2s infinite;
-    }
-    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-6px); }
-    }
-
-    /* CONFIRMATION SCREEN */
-    .confirm-screen {
-      padding: 20px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .confirm-back {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--primary);
-      font-weight: 600;
-      font-size: 15px;
-      cursor: pointer;
-      margin-bottom: 20px;
-      background: none;
-      border: none;
-    }
-
-    .confirm-meal-name {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 22px;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .confirm-meal-desc {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-
-    .confirm-macros {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .confirm-macro {
-      background: var(--bg);
-      border-radius: 16px;
-      padding: 16px 8px;
-      text-align: center;
-    }
-
-    .confirm-macro-val {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 22px;
-      margin-bottom: 4px;
-    }
-
-    .confirm-macro-label { font-size: 11px; color: var(--muted); }
-
-    .confirm-meal-type {
-      margin-bottom: 24px;
-    }
-
-    .confirm-meal-type-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 10px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .meal-type-pills { display: flex; gap: 8px; }
-
-    .meal-type-pill {
-      flex: 1;
-      padding: 10px 8px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s;
-    }
-
-    .meal-type-pill.selected {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
-
-    .confirm-add-btn {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      padding: 18px;
-      font-family: 'Manrope', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      margin-top: auto;
-    }
-
-    .confirm-add-btn:hover { background: var(--accent); color: var(--dark); }
-    .confirm-add-btn:active { transform: scale(0.98); }
-
-    .confirm-confidence {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-
-    .confidence-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-
-    /* TOAST */
-    .toast {
-      position: absolute;
-      bottom: 100px;
-      left: 20px; right: 20px;
-      background: var(--primary);
-      color: white;
-      padding: 14px 20px;
-      border-radius: 14px;
-      font-family: 'Manrope', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      text-align: center;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.3s, transform 0.3s;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .toast.visible { opacity: 1; transform: translateY(0); }
-
-    /* ERROR */
-    .error-msg {
-      background: rgba(231,76,60,0.1);
-      border: 1px solid rgba(231,76,60,0.3);
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 14px;
-      color: #E74C3C;
-      margin-bottom: 16px;
-      display: none;
-    }
-
+    .error-msg { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #E74C3C; margin-bottom: 12px; display: none; }
     .error-msg.visible { display: block; }
 
-    /* DEMO NOTE */
-    .demo-note {
-      margin-top: 24px;
-      text-align: center;
-      color: rgba(255,255,255,0.3);
-      font-size: 12px;
-      max-width: 390px;
-    }
+    .analyse-btn { width: 100%; background: var(--primary); color: white; border: none; border-radius: 12px; padding: 15px; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: background 0.2s; margin-top: auto; }
+    .analyse-btn:hover:not(:disabled) { background: var(--accent); color: var(--dark); }
+    .analyse-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── CONFIRM ── */
+    .confirm-screen { padding: 16px 20px; flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    .confirm-name { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; color: var(--text); margin-bottom: 4px; }
+    .confirm-desc { font-size: 13px; color: var(--muted); margin-bottom: 6px; line-height: 1.5; }
+    .confidence { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+    .confidence-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+    .confirm-macros { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; }
+    .confirm-macro { background: var(--bg); border-radius: 12px; padding: 12px 6px; text-align: center; }
+    .confirm-macro-val { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; margin-bottom: 3px; }
+    .confirm-macro-label { font-size: 10px; color: var(--muted); }
+
+    .meal-type-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .meal-type-pills { display: flex; gap: 6px; margin-bottom: 16px; }
+    .meal-type-pill { flex: 1; padding: 8px 4px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; text-align: center; transition: all 0.2s; }
+    .meal-type-pill.selected { background: var(--primary); border-color: var(--primary); color: white; }
+
+    .add-btn { width: 100%; background: var(--primary); color: white; border: none; border-radius: 12px; padding: 16px; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: background 0.2s; margin-top: auto; }
+    .add-btn:hover { background: var(--accent); color: var(--dark); }
+
+    /* TOAST */
+    .toast { position: absolute; bottom: 95px; left: 16px; right: 16px; background: var(--primary); color: white; padding: 12px 16px; border-radius: 12px; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; text-align: center; opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 20; }
+    .toast.visible { opacity: 1; transform: translateY(0); }
+
+    /* DISCLAIMER */
+    .disclaimer { margin-top: 20px; max-width: 390px; text-align: center; color: rgba(255,255,255,0.25); font-size: 11px; line-height: 1.6; }
   </style>
 </head>
 <body>
 
 <div class="demo-header">
   <h1>Try Beast Coach Live</h1>
-  <p>Log a meal the way you would in the real app. Powered by real AI. No login required. <a href="/">← Back to site</a></p>
+  <p>Real AI. No login required. <a href="/">← Back to site</a></p>
 </div>
 
 <div class="phone">
@@ -728,118 +259,106 @@
   <div class="status-bar">
     <div class="status-time" id="clock">9:41</div>
     <div class="status-icons">
-      <span>●●●●</span>
-      <span>5G</span>
-      <span>⬛</span>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#1B1B1B"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#1B1B1B"><text x="0" y="10" font-size="10" font-weight="700" font-family="Inter">5G</text></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1B1B1B" stroke-opacity="0.35"/><rect x="1.5" y="1.5" width="17" height="9" rx="2.5" fill="#1B1B1B"/><path d="M23 4v4a2 2 0 000-4z" fill="#1B1B1B" fill-opacity="0.4"/></svg>
     </div>
   </div>
 
-  <!-- SANCTUARY SCREEN -->
+  <!-- ── SANCTUARY ── -->
   <div class="screen active" id="screen-sanctuary">
     <div class="sanctuary-header">
       <div class="sanctuary-logo">BEAST COACH</div>
-      <div class="streak-badge">🔥 <span>13 day streak</span></div>
+      <div class="streak-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF6B00"><path d="M13.5 0.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5 0.67z"/></svg>
+        13 day streak
+      </div>
     </div>
 
-    <!-- Date selector -->
     <div class="date-selector">
-      <div class="date-pill" style="color:var(--muted)"><div class="date-pill-day">WED</div><div class="date-pill-num">11</div></div>
-      <div class="date-pill" style="color:var(--muted)"><div class="date-pill-day">THU</div><div class="date-pill-num">12</div></div>
-      <div class="date-pill today"><div class="date-pill-day">TODAY</div><div class="date-pill-num" id="today-date">13</div></div>
-      <div class="date-pill" style="color:var(--muted)"><div class="date-pill-day">FRI</div><div class="date-pill-num">14</div></div>
-      <div class="date-pill" style="color:var(--muted)"><div class="date-pill-day">SAT</div><div class="date-pill-num">15</div></div>
+      <div class="date-pill"><div class="date-pill-day">WED</div><div class="date-pill-num">11</div></div>
+      <div class="date-pill"><div class="date-pill-day">THU</div><div class="date-pill-num">12</div></div>
+      <div class="date-pill today"><div class="date-pill-day">TODAY</div><div class="date-pill-num" id="today-num">13</div></div>
+      <div class="date-pill"><div class="date-pill-day">FRI</div><div class="date-pill-num">14</div></div>
+      <div class="date-pill"><div class="date-pill-day">SAT</div><div class="date-pill-num">15</div></div>
     </div>
 
     <div class="greeting">
       <div class="greeting-sub">Good evening</div>
       <div class="greeting-name">Stefan!</div>
-      <div class="cal-remaining" id="cal-remaining-text"><span id="cal-remaining">1,740</span> calories remaining today.</div>
+      <div class="cal-remaining"><span id="cal-remaining">613</span> calories remaining today.</div>
     </div>
 
-    <!-- Rings -->
     <div class="rings-container">
       <div class="ring-wrap">
-        <svg viewBox="0 0 160 160">
-          <!-- Calories ring -->
-          <circle cx="80" cy="80" r="72" fill="none" stroke="#E8ECEA" stroke-width="16"/>
-          <circle id="ring-cal" cx="80" cy="80" r="72" fill="none" stroke="#FF2D55" stroke-width="16" stroke-linecap="round" stroke-dasharray="452.39" stroke-dashoffset="452.39"/>
-          <!-- Protein ring -->
-          <circle cx="80" cy="80" r="50" fill="none" stroke="#E8ECEA" stroke-width="16"/>
-          <circle id="ring-protein" cx="80" cy="80" r="50" fill="none" stroke="#00FF7F" stroke-width="16" stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
-          <!-- Carbs ring -->
-          <circle cx="80" cy="80" r="28" fill="none" stroke="#E8ECEA" stroke-width="16"/>
-          <circle id="ring-carbs" cx="80" cy="80" r="28" fill="none" stroke="#00E5FF" stroke-width="16" stroke-linecap="round" stroke-dasharray="175.93" stroke-dashoffset="175.93"/>
+        <svg viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="67" fill="none" stroke="#E8ECEA" stroke-width="15"/>
+          <circle id="ring-cal" cx="75" cy="75" r="67" fill="none" stroke="#FF2D55" stroke-width="15" stroke-linecap="round" stroke-dasharray="420.97" stroke-dashoffset="116.67"/>
+          <circle cx="75" cy="75" r="47" fill="none" stroke="#E8ECEA" stroke-width="15"/>
+          <circle id="ring-protein" cx="75" cy="75" r="47" fill="none" stroke="#00FF7F" stroke-width="15" stroke-linecap="round" stroke-dasharray="295.31" stroke-dashoffset="123.05"/>
+          <circle cx="75" cy="75" r="27" fill="none" stroke="#E8ECEA" stroke-width="15"/>
+          <circle id="ring-carbs" cx="75" cy="75" r="27" fill="none" stroke="#00E5FF" stroke-width="15" stroke-linecap="round" stroke-dasharray="169.65" stroke-dashoffset="67.86"/>
         </svg>
         <div class="ring-center">
-          <div class="ring-pct" id="ring-pct">0%</div>
+          <div class="ring-pct" id="ring-pct">65%</div>
           <div class="ring-pct-label">calories</div>
         </div>
       </div>
       <div class="macros-side">
         <div class="macro-row">
           <div class="macro-label">Calories</div>
-          <div class="macro-val" style="color:var(--calories-color)"><span id="macro-cal">0</span> <span class="macro-target">/ 1,740</span></div>
+          <div class="macro-val" style="color:var(--cal)"><span id="macro-cal">1127</span> <span class="macro-target">/ 1,740</span></div>
         </div>
         <div class="macro-row">
           <div class="macro-label">Protein</div>
-          <div class="macro-val" style="color:var(--protein-color)"><span id="macro-protein">0</span>g <span class="macro-target">/ 190g</span></div>
+          <div class="macro-val" style="color:var(--protein)"><span id="macro-protein">104</span>g <span class="macro-target">/ 190g</span></div>
         </div>
         <div class="macro-row">
           <div class="macro-label">Carbs</div>
-          <div class="macro-val" style="color:var(--carbs-color)"><span id="macro-carbs">0</span>g <span class="macro-target">/ 200g</span></div>
+          <div class="macro-val" style="color:var(--carbs)"><span id="macro-carbs">120</span>g <span class="macro-target">/ 200g</span></div>
         </div>
         <div class="macro-row">
           <div class="macro-label">Fat</div>
-          <div class="macro-val" style="color:var(--fat-color)"><span id="macro-fat">0</span>g <span class="macro-target">/ 65g</span></div>
+          <div class="macro-val" style="color:var(--fat)"><span id="macro-fat">34</span>g <span class="macro-target">/ 65g</span></div>
         </div>
       </div>
     </div>
 
-    <!-- Calorie bar -->
     <div class="calorie-bar-section">
       <div class="calorie-bar-header">
         <span class="calorie-bar-label">Calories Consumed</span>
-        <span class="calorie-bar-val"><span id="bar-cal">0</span> kcal / 1,740</span>
+        <span class="calorie-bar-val"><span id="bar-cal">1,127</span> kcal / 1,740</span>
       </div>
       <div class="calorie-bar-track">
-        <div class="calorie-bar-fill" id="cal-bar-fill" style="width:0%"></div>
+        <div class="calorie-bar-fill" id="cal-bar-fill" style="width:64.8%"></div>
       </div>
     </div>
 
-    <div style="padding:8px 20px">
-      <div style="background:rgba(45,106,79,0.08);border-radius:14px;padding:14px 16px;text-align:center;color:var(--muted);font-size:13px">
-        Tap <strong style="color:var(--primary)">Nourish</strong> below to log a meal ↓
-      </div>
-    </div>
+    <div class="tap-hint">Tap <strong>Nourish</strong> below to log a meal ↓</div>
   </div>
 
-  <!-- NOURISH SCREEN -->
+  <!-- ── NOURISH ── -->
   <div class="screen" id="screen-nourish">
     <div class="nourish-header">
       <div class="nourish-title">Nutrition Tracker</div>
       <div class="nourish-tabs">
         <button class="nourish-tab active">Quick Log</button>
-        <button class="nourish-tab" style="cursor:default;opacity:0.5">Meal Planner</button>
-        <button class="nourish-tab" style="cursor:default;opacity:0.5">Recipes</button>
+        <button class="nourish-tab" style="cursor:default;opacity:0.4">Meal Planner</button>
+        <button class="nourish-tab" style="cursor:default;opacity:0.4">Recipes</button>
       </div>
     </div>
     <div class="nourish-content">
-      <!-- Calorie summary -->
       <div class="cal-summary">
         <div class="cal-summary-label">Remaining Calories</div>
-        <div class="cal-summary-num"><span id="nourish-remaining">1,740</span> <span>kcal</span></div>
-        <div class="cal-summary-bar">
-          <div class="cal-summary-fill" id="nourish-bar" style="width:0%"></div>
-        </div>
-        <div class="cal-summary-meta">
-          <span id="nourish-pct">0% consumed</span>
-          <span>Target: 1,740 kcal</span>
-        </div>
+        <div class="cal-summary-num"><span id="nourish-remaining">613</span> <span>kcal</span></div>
+        <div class="cal-summary-bar"><div class="cal-summary-fill" id="nourish-bar" style="width:64.8%"></div></div>
+        <div class="cal-summary-meta"><span id="nourish-pct">65% consumed</span><span>Target: 1,740 kcal</span></div>
       </div>
 
-      <!-- Log cards -->
       <div class="log-card" onclick="showAiText()">
-        <div class="log-card-icon">✨</div>
+        <div class="log-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 3 3.5.5-2.5 2.5.5 3.5L12 11l-3 1.5.5-3.5L7 6.5l3.5-.5L12 3z"/><path d="M5 20h14M8 17h8"/></svg>
+        </div>
         <div>
           <div class="log-card-title">AI Text</div>
           <div class="log-card-sub">Describe your meal in words</div>
@@ -847,211 +366,199 @@
         <div class="log-card-arrow">›</div>
       </div>
 
-      <div class="log-card" style="opacity:0.5;cursor:default">
-        <div class="log-card-icon">📷</div>
-        <div>
-          <div class="log-card-title">AI Photo</div>
-          <div class="log-card-sub">Snap and analyse instantly</div>
+      <div class="log-card" style="opacity:0.45;cursor:default">
+        <div class="log-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="15" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8 6V5a2 2 0 012-2h4a2 2 0 012 2v1"/></svg>
         </div>
+        <div><div class="log-card-title">AI Photo</div><div class="log-card-sub">Snap and analyse instantly</div></div>
         <div class="log-card-arrow">›</div>
       </div>
 
-      <div class="log-card" style="opacity:0.5;cursor:default">
-        <div class="log-card-icon">❤️</div>
-        <div>
-          <div class="log-card-title">Favourite Meals</div>
-          <div class="log-card-sub">Log a meal you love</div>
+      <div class="log-card" style="opacity:0.45;cursor:default">
+        <div class="log-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
         </div>
+        <div><div class="log-card-title">Favourite Meals</div><div class="log-card-sub">Log a meal you love</div></div>
         <div class="log-card-arrow">›</div>
       </div>
 
-      <div class="log-card" style="opacity:0.5;cursor:default">
-        <div class="log-card-icon">📊</div>
-        <div>
-          <div class="log-card-title">Scan Barcode</div>
-          <div class="log-card-sub">Log packaged goods</div>
+      <div class="log-card" style="opacity:0.45;cursor:default">
+        <div class="log-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 8h1M7 12h1M7 16h1M11 8h6M11 12h6M11 16h4"/></svg>
         </div>
+        <div><div class="log-card-title">Scan Barcode</div><div class="log-card-sub">Log packaged goods</div></div>
         <div class="log-card-arrow">›</div>
       </div>
     </div>
   </div>
 
-  <!-- AI TEXT SCREEN -->
+  <!-- ── AI TEXT ── -->
   <div class="screen" id="screen-ai-text">
-    <div class="ai-text-screen">
-      <button class="ai-text-back" onclick="showNourish()">‹ Back</button>
-      <div class="ai-text-title">What did you eat?</div>
-      <div class="ai-text-subtitle">Describe your meal in plain language. Beast Coach will analyse the calories and macros instantly.</div>
+    <div class="ai-screen">
+      <button class="back-btn" onclick="showNourish()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </button>
+      <div class="ai-title">What did you eat?</div>
+      <div class="ai-subtitle">Describe your meal in plain language — Beast Coach analyses it instantly.</div>
 
       <div class="error-msg" id="error-msg"></div>
+      <div class="ai-loading" id="ai-loading">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span style="font-size:12px;color:var(--muted)">Analysing your meal...</span>
+      </div>
 
       <textarea class="ai-textarea" id="meal-input" placeholder="e.g. 2 scrambled eggs on wholegrain toast with a coffee and a banana"></textarea>
 
-      <div class="ai-examples">
-        <div class="ai-examples-label">Try an example</div>
-        <div class="ai-example-pills">
-          <div class="ai-example-pill" onclick="setExample('Chicken caesar salad with croutons and parmesan')">Chicken caesar salad</div>
-          <div class="ai-example-pill" onclick="setExample('Protein shake with 1 scoop whey, 300ml oat milk and a banana')">Protein shake</div>
-          <div class="ai-example-pill" onclick="setExample('200g grilled salmon with steamed broccoli and brown rice')">Salmon & rice</div>
-          <div class="ai-example-pill" onclick="setExample('Big mac meal with large fries and a Coke')">Big Mac meal</div>
-        </div>
+      <div class="examples-label">Try an example</div>
+      <div class="example-pills">
+        <div class="example-pill" onclick="setExample('Chicken caesar salad with croutons and parmesan')">Chicken caesar salad</div>
+        <div class="example-pill" onclick="setExample('Protein shake with 1 scoop whey, 300ml oat milk and a banana')">Protein shake</div>
+        <div class="example-pill" onclick="setExample('200g grilled salmon with steamed broccoli and brown rice')">Salmon & rice</div>
+        <div class="example-pill" onclick="setExample('Big mac meal with large fries and a Coke')">Big Mac meal</div>
+        <div class="example-pill" onclick="setExample('Bowl of oats with blueberries, honey and Greek yoghurt')">Oat bowl</div>
       </div>
 
-      <div class="ai-loading" id="ai-loading">
-        <div class="loading-dots">
-          <div class="loading-dot"></div>
-          <div class="loading-dot"></div>
-          <div class="loading-dot"></div>
-        </div>
-        <span style="font-size:13px;color:var(--muted)">Beast Coach is analysing your meal...</span>
-      </div>
-
-      <button class="ai-analyse-btn" id="analyse-btn" onclick="analyseMeal()">Analyse My Meal</button>
+      <button class="analyse-btn" id="analyse-btn" onclick="analyseMeal()">Analyse My Meal</button>
     </div>
   </div>
 
-  <!-- CONFIRMATION SCREEN -->
+  <!-- ── CONFIRM ── -->
   <div class="screen" id="screen-confirm">
     <div class="confirm-screen">
-      <button class="confirm-back" onclick="showAiText()">‹ Edit</button>
-
-      <div class="confirm-meal-name" id="confirm-name">Chicken Caesar Salad</div>
-      <div class="confirm-meal-desc" id="confirm-desc">A classic caesar salad with chicken breast, romaine lettuce, croutons and parmesan.</div>
-
-      <div class="confirm-confidence">
-        <div class="confidence-dot"></div>
-        <span id="confirm-confidence">High confidence estimate</span>
-      </div>
+      <button class="back-btn" onclick="showAiText()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Edit
+      </button>
+      <div class="confirm-name" id="confirm-name">Chicken Caesar Salad</div>
+      <div class="confirm-desc" id="confirm-desc">Classic caesar with chicken breast, romaine, croutons and parmesan.</div>
+      <div class="confidence"><div class="confidence-dot"></div><span id="confirm-confidence">High confidence estimate</span></div>
 
       <div class="confirm-macros">
         <div class="confirm-macro">
-          <div class="confirm-macro-val" style="color:var(--calories-color)" id="confirm-cal">485</div>
+          <div class="confirm-macro-val" style="color:var(--cal)" id="confirm-cal">485</div>
           <div class="confirm-macro-label">kcal</div>
         </div>
         <div class="confirm-macro">
-          <div class="confirm-macro-val" style="color:var(--protein-color)" id="confirm-protein">38</div>
+          <div class="confirm-macro-val" style="color:var(--protein)" id="confirm-protein">38</div>
           <div class="confirm-macro-label">protein</div>
         </div>
         <div class="confirm-macro">
-          <div class="confirm-macro-val" style="color:var(--carbs-color)" id="confirm-carbs">28</div>
+          <div class="confirm-macro-val" style="color:var(--carbs)" id="confirm-carbs">28</div>
           <div class="confirm-macro-label">carbs</div>
         </div>
         <div class="confirm-macro">
-          <div class="confirm-macro-val" style="color:var(--fat-color)" id="confirm-fat">22</div>
+          <div class="confirm-macro-val" style="color:var(--fat)" id="confirm-fat">22</div>
           <div class="confirm-macro-label">fat</div>
         </div>
       </div>
 
-      <div class="confirm-meal-type">
-        <div class="confirm-meal-type-label">Meal Type</div>
-        <div class="meal-type-pills">
-          <div class="meal-type-pill" onclick="selectMealType(this)">Breakfast</div>
-          <div class="meal-type-pill" onclick="selectMealType(this)">Lunch</div>
-          <div class="meal-type-pill selected" onclick="selectMealType(this)">Dinner</div>
-          <div class="meal-type-pill" onclick="selectMealType(this)">Snack</div>
-        </div>
+      <div class="meal-type-label">Meal Type</div>
+      <div class="meal-type-pills">
+        <div class="meal-type-pill" onclick="selectType(this)">Breakfast</div>
+        <div class="meal-type-pill" onclick="selectType(this)">Lunch</div>
+        <div class="meal-type-pill selected" onclick="selectType(this)">Dinner</div>
+        <div class="meal-type-pill" onclick="selectType(this)">Snack</div>
       </div>
 
-      <button class="confirm-add-btn" onclick="addMeal()">Add to Today ✓</button>
+      <button class="add-btn" onclick="addMeal()">Add to Today ✓</button>
     </div>
   </div>
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <button class="tab" onclick="showSanctuary()">
-      <div class="tab-icon">🏠</div>
-      <div class="tab-label" id="tab-sanctuary">Sanctuary</div>
+    <button class="tab active" onclick="showSanctuary()" id="tab-sanctuary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+      <div class="tab-label">Sanctuary</div>
     </button>
-    <button class="tab" onclick="showNourish()">
-      <div class="tab-icon">🥗</div>
-      <div class="tab-label" id="tab-nourish">Nourish</div>
+    <button class="tab" onclick="showNourish()" id="tab-nourish">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+      <div class="tab-label">Nourish</div>
     </button>
-    <button class="tab" style="opacity:0.4;cursor:default">
-      <div class="tab-icon">💪</div>
+    <button class="tab" style="opacity:0.35;cursor:default">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11M6.5 17.5h11M12 3v18"/><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
       <div class="tab-label">Practice</div>
     </button>
-    <button class="tab" style="opacity:0.4;cursor:default">
-      <div class="tab-icon">🧺</div>
+    <button class="tab" style="opacity:0.35;cursor:default">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       <div class="tab-label">Harvest</div>
     </button>
-    <button class="tab" style="opacity:0.4;cursor:default">
-      <div class="tab-icon">🔥</div>
+    <button class="tab" style="opacity:0.35;cursor:default">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 0.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5 0.67z"/></svg>
       <div class="tab-label">Beast</div>
     </button>
   </div>
 
-  <!-- TOAST -->
   <div class="toast" id="toast"></div>
-
 </div>
 
-<div class="demo-note">
-  This is a live demo powered by real AI. Macros are estimates based on standard portions.
-  <br>Data resets when you reload the page.
+<div class="disclaimer">
+  ⚠ This is a visual representation of the Beast Coach app experience and is not the final design.<br>
+  AI macro estimates are based on standard portion sizes. Data resets on page reload.
 </div>
 
 <script>
-  // State
-  let totalCals = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+  // State — pre-populated with dummy data
+  let totalCals = 1127, totalProtein = 104, totalCarbs = 120, totalFat = 34;
   const TARGET_CAL = 1740, TARGET_PROTEIN = 190, TARGET_CARBS = 200, TARGET_FAT = 65;
   let pendingMeal = null;
 
   // Clock
   function updateClock() {
     const now = new Date();
-    const h = now.getHours();
+    const h = now.getHours() % 12 || 12;
     const m = now.getMinutes().toString().padStart(2,'0');
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    const h12 = h % 12 || 12;
-    document.getElementById('clock').textContent = `${h12}:${m}`;
+    document.getElementById('clock').textContent = h + ':' + m;
   }
   updateClock();
   setInterval(updateClock, 10000);
+  document.getElementById('today-num').textContent = new Date().getDate();
 
-  // Today date
-  document.getElementById('today-date').textContent = new Date().getDate();
-
-  // Screen management
+  // Screens
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
 
-  function showSanctuary() { showScreen('screen-sanctuary'); setActiveTab('tab-sanctuary'); }
-  function showNourish() { showScreen('screen-nourish'); setActiveTab('tab-nourish'); }
-  function showAiText() { showScreen('screen-ai-text'); document.getElementById('error-msg').classList.remove('visible'); }
-  function showConfirm() { showScreen('screen-confirm'); }
-
-  function setActiveTab(id) {
-    document.querySelectorAll('.tab-label').forEach(t => t.style.color = '');
-    const el = document.getElementById(id);
-    if (el) el.style.color = 'var(--primary)';
+  function showSanctuary() {
+    showScreen('screen-sanctuary');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-sanctuary').classList.add('active');
   }
 
-  // Examples
+  function showNourish() {
+    showScreen('screen-nourish');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-nourish').classList.add('active');
+  }
+
+  function showAiText() {
+    showScreen('screen-ai-text');
+    document.getElementById('error-msg').classList.remove('visible');
+    setTimeout(() => document.getElementById('meal-input').focus(), 100);
+  }
+
+  function showConfirm() { showScreen('screen-confirm'); }
+
   function setExample(text) {
     document.getElementById('meal-input').value = text;
     document.getElementById('meal-input').focus();
   }
 
-  // Meal type selection
-  function selectMealType(el) {
+  function selectType(el) {
     document.querySelectorAll('.meal-type-pill').forEach(p => p.classList.remove('selected'));
     el.classList.add('selected');
   }
 
-  // Analyse meal
   async function analyseMeal() {
     const meal = document.getElementById('meal-input').value.trim();
-    if (!meal) {
-      showError('Please describe what you ate.');
-      return;
-    }
+    if (!meal) { showError('Please describe what you ate.'); return; }
 
     document.getElementById('error-msg').classList.remove('visible');
     document.getElementById('ai-loading').classList.add('visible');
-    document.getElementById('analyse-btn').disabled = true;
-    document.getElementById('analyse-btn').textContent = 'Analysing...';
+    const btn = document.getElementById('analyse-btn');
+    btn.disabled = true;
+    btn.textContent = 'Analysing...';
 
     try {
       const res = await fetch('/api/analyse-meal', {
@@ -1059,34 +566,26 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ meal })
       });
-
       const data = await res.json();
-
-      if (!res.ok || data.error) {
-        throw new Error(data.error || 'Analysis failed');
-      }
+      if (!res.ok || data.error) throw new Error(data.error || 'Analysis failed');
 
       pendingMeal = data;
-
       document.getElementById('confirm-name').textContent = data.name || meal;
       document.getElementById('confirm-desc').textContent = data.description || '';
       document.getElementById('confirm-cal').textContent = data.calories || 0;
       document.getElementById('confirm-protein').textContent = data.protein || 0;
       document.getElementById('confirm-carbs').textContent = data.carbs || 0;
       document.getElementById('confirm-fat').textContent = data.fat || 0;
-
-      const conf = data.confidence || 'medium';
-      const confMap = { high: '✓ High confidence estimate', medium: '~ Medium confidence estimate', low: '⚠ Low confidence — check portions' };
-      document.getElementById('confirm-confidence').textContent = confMap[conf] || confMap.medium;
-
+      const confMap = { high: '✓ High confidence estimate', medium: '~ Medium confidence', low: '⚠ Low confidence — check portions' };
+      document.getElementById('confirm-confidence').textContent = confMap[data.confidence] || confMap.medium;
       showConfirm();
 
     } catch (err) {
       showError(err.message || 'Something went wrong. Please try again.');
     } finally {
       document.getElementById('ai-loading').classList.remove('visible');
-      document.getElementById('analyse-btn').disabled = false;
-      document.getElementById('analyse-btn').textContent = 'Analyse My Meal';
+      btn.disabled = false;
+      btn.textContent = 'Analyse My Meal';
     }
   }
 
@@ -1096,80 +595,56 @@
     el.classList.add('visible');
   }
 
-  // Add meal and update sanctuary
   function addMeal() {
     if (!pendingMeal) return;
-
+    const name = pendingMeal.name || 'Meal';
     totalCals += pendingMeal.calories || 0;
     totalProtein += pendingMeal.protein || 0;
     totalCarbs += pendingMeal.carbs || 0;
     totalFat += pendingMeal.fat || 0;
-
-    updateSanctuary();
-
-    // Reset input
-    document.getElementById('meal-input').value = '';
     pendingMeal = null;
-
+    updateSanctuary();
+    document.getElementById('meal-input').value = '';
     showSanctuary();
-    showToast(`${pendingMeal?.name || 'Meal'} logged! 🎉`);
-
-    setTimeout(() => {
-      showToast((totalCals > 0 ? `${totalCals} kcal logged today` : 'Meal added!') + ' 🔥');
-    }, 100);
+    showToast(name + ' added! 🔥');
   }
 
   function updateSanctuary() {
     const calPct = Math.min(totalCals / TARGET_CAL, 1);
-    const proteinPct = Math.min(totalProtein / TARGET_PROTEIN, 1);
-    const carbsPct = Math.min(totalCarbs / TARGET_CARBS, 1);
+    const protPct = Math.min(totalProtein / TARGET_PROTEIN, 1);
+    const carbPct = Math.min(totalCarbs / TARGET_CARBS, 1);
 
-    // Rings
-    const calCirc = 2 * Math.PI * 72;
-    const protCirc = 2 * Math.PI * 50;
-    const carbCirc = 2 * Math.PI * 28;
+    const calCirc = 2 * Math.PI * 67;
+    const protCirc = 2 * Math.PI * 47;
+    const carbCirc = 2 * Math.PI * 27;
 
     document.getElementById('ring-cal').style.strokeDashoffset = calCirc * (1 - calPct);
-    document.getElementById('ring-protein').style.strokeDashoffset = protCirc * (1 - proteinPct);
-    document.getElementById('ring-carbs').style.strokeDashoffset = carbCirc * (1 - carbsPct);
+    document.getElementById('ring-protein').style.strokeDashoffset = protCirc * (1 - protPct);
+    document.getElementById('ring-carbs').style.strokeDashoffset = carbCirc * (1 - carbPct);
     document.getElementById('ring-pct').textContent = Math.round(calPct * 100) + '%';
 
-    // Macros
     document.getElementById('macro-cal').textContent = totalCals;
     document.getElementById('macro-protein').textContent = totalProtein;
     document.getElementById('macro-carbs').textContent = totalCarbs;
     document.getElementById('macro-fat').textContent = totalFat;
 
-    // Calorie bar
     const barPct = Math.min(calPct * 100, 100);
     document.getElementById('cal-bar-fill').style.width = barPct + '%';
-    document.getElementById('bar-cal').textContent = totalCals;
+    document.getElementById('bar-cal').textContent = totalCals.toLocaleString();
 
-    // Remaining text
     const remaining = Math.max(TARGET_CAL - totalCals, 0);
     document.getElementById('cal-remaining').textContent = remaining.toLocaleString();
-
-    // Nourish bar
     document.getElementById('nourish-remaining').textContent = remaining.toLocaleString();
     document.getElementById('nourish-bar').style.width = barPct + '%';
     document.getElementById('nourish-pct').textContent = Math.round(calPct * 100) + '% consumed';
   }
 
   function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('visible');
-    setTimeout(() => toast.classList.remove('visible'), 2500);
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('visible');
+    setTimeout(() => t.classList.remove('visible'), 2500);
   }
-
-  // Enter key
-  document.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter' && document.getElementById('screen-ai-text').classList.contains('active')) {
-      const ta = document.getElementById('meal-input');
-      if (document.activeElement !== ta) analyseMeal();
-    }
-  });
 </script>
-
 </body>
 </html>
