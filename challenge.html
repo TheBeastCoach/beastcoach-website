@@ -22,7 +22,7 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body { font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); line-height: 1.6; }
+  body { font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); line-height: 1.6; overflow-x: hidden; }
   .container { max-width: 640px; margin: 0 auto; padding: 0 24px; }
   a { color: inherit; }
 
@@ -35,7 +35,18 @@
   .nav-back:hover { color: var(--white); }
 
   /* PAGE HERO — matches site's .page-hero */
-  .page-hero { background: var(--green-dark); padding: 72px 0 56px; text-align: center; }
+  .page-hero {
+    background: var(--green-dark);
+    padding: 72px 0 56px;
+    text-align: center;
+    border-radius: 0 0 24px 24px;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
   .page-hero-pre { display: inline-block; background: rgba(82,183,136,0.2); border: 1px solid rgba(82,183,136,0.4); color: var(--green-light); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 6px 16px; border-radius: 24px; margin-bottom: 20px; }
   .page-hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(38px, 8vw, 56px); line-height: 1.02; color: var(--white); letter-spacing: 1.5px; margin-bottom: 16px; }
   .page-hero p { font-size: 16px; color: rgba(255,255,255,0.75); max-width: 46ch; margin: 0 auto; line-height: 1.8; }
@@ -121,6 +132,7 @@
 
   @media (max-width: 480px) {
     form.signup { flex-direction: column; }
+    form.signup .form-input { flex: none; width: 100%; }
     form.signup button { width: 100%; }
     .signup-box { margin-top: -40px; }
   }
@@ -139,7 +151,7 @@
 
   <!-- ===================== LANDING / SIGNUP ===================== -->
   <section id="landing">
-    <div class="page-hero" style="margin: 0 -24px; border-radius: 0 0 24px 24px;">
+    <div class="page-hero">
       <span class="page-hero-pre">30-Day Challenge</span>
       <h1>Day 1 doesn't feel like anything. That's the point.</h1>
       <p>
