@@ -445,9 +445,17 @@ entryForm.addEventListener("submit", async (e) => {
   const text = document.getElementById("entry-text").value.trim();
   if (!text) return;
 
-  const dayNumber = await getDayNumber(user);
   const btn = entryForm.querySelector("button");
   btn.disabled = true;
+
+  const profileOk = await ensureProfile(user);
+  if (!profileOk) {
+    btn.disabled = false;
+    showStatus(entryStatus, "Couldn't set up your profile — please try again in a moment.", true);
+    return;
+  }
+
+  const dayNumber = await getDayNumber(user);
 
   const { error } = await sb.from("challenge_entries").insert({
     user_id: user.id,
@@ -457,6 +465,7 @@ entryForm.addEventListener("submit", async (e) => {
 
   btn.disabled = false;
   if (error) {
+    console.error("Failed to save entry:", error);
     showStatus(entryStatus, "Couldn't save that entry — try again.", true);
   } else {
     document.getElementById("entry-text").value = "";
@@ -466,10 +475,14 @@ entryForm.addEventListener("submit", async (e) => {
 });
 
 async function ensureProfile(user) {
-  const { data } = await sb.from("challenge_users").select("id").eq("id", user.id).maybeSingle();
-  if (!data) {
-    await sb.from("challenge_users").insert({ id: user.id, email: user.email });
+  const { error } = await sb.from("challenge_users").upsert(
+    { id: user.id, email: user.email },
+    { onConflict: "id", ignoreDuplicates: true }
+  );
+  if (error) {
+    console.error("Failed to create/find profile row:", error);
   }
+  return !error;
 }
 
 async function getDayNumber(user) {
