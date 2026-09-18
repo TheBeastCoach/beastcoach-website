@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 30-Day Challenge — Beast Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2D6A4F;
+    --green-light: #52B788;
+    --green-dark: #1B3022;
+    --off-white: #F7F9F8;
+    --text: #1B2E24;
+    --muted: #707973;
+    --border: #E4E8E6;
+    --white: #FFFFFF;
+    --footer-bg: #111A14;
+    --err: #E24B4A;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); line-height: 1.6; }
+  .container { max-width: 640px; margin: 0 auto; padding: 0 24px; }
+  a { color: inherit; }
+
+  /* NAV — matches site nav */
+  .nav { position: sticky; top: 0; z-index: 100; background: rgba(27,46,36,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .nav-inner { max-width: 640px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--white); text-decoration: none; }
+  .nav-logo span { color: var(--green-light); }
+  .nav-back { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-back:hover { color: var(--white); }
+
+  /* PAGE HERO — matches site's .page-hero */
+  .page-hero { background: var(--green-dark); padding: 72px 0 56px; text-align: center; }
+  .page-hero-pre { display: inline-block; background: rgba(82,183,136,0.2); border: 1px solid rgba(82,183,136,0.4); color: var(--green-light); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 6px 16px; border-radius: 24px; margin-bottom: 20px; }
+  .page-hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(38px, 8vw, 56px); line-height: 1.02; color: var(--white); letter-spacing: 1.5px; margin-bottom: 16px; }
+  .page-hero p { font-size: 16px; color: rgba(255,255,255,0.75); max-width: 46ch; margin: 0 auto; line-height: 1.8; }
+
+  main.container { padding: 48px 24px 96px; }
+
+  /* SIGNUP FORM — matches site's .ea-form-box treatment */
+  .signup-box { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 22px; padding: 28px; margin-top: -64px; position: relative; z-index: 2; }
+  .signup-box h3 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--text); letter-spacing: 1px; margin-bottom: 6px; }
+  .signup-box > p { font-size: 14px; color: var(--muted); margin-bottom: 18px; }
+  form.signup { display: flex; gap: 10px; flex-wrap: wrap; }
+  .form-input { flex: 1 1 220px; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); outline: none; }
+  .form-input:focus { border-color: var(--green); }
+
+  /* BUTTONS — matches site exactly */
+  .btn-primary { display: inline-block; background: var(--green); color: var(--white); padding: 14px 28px; border-radius: 32px; font-weight: 700; font-size: 15px; text-decoration: none; transition: background 0.2s; cursor: pointer; border: none; font-family: 'Manrope', sans-serif; white-space: nowrap; }
+  .btn-primary:hover { background: var(--green-light); }
+  .btn-primary:disabled { opacity: 0.6; cursor: default; }
+  .btn-outline { display: inline-block; background: transparent; color: var(--green); padding: 12px 22px; border-radius: 32px; font-weight: 700; font-size: 14px; text-decoration: none; border: 2px solid var(--green); cursor: pointer; font-family: 'Manrope', sans-serif; }
+  .btn-outline:hover { background: var(--green); color: var(--white); }
+
+  .form-msg { margin-top: 12px; font-size: 13px; text-align: left; min-height: 18px; display: none; color: var(--green); }
+  .form-msg.visible { display: block; }
+  .form-msg.form-msg--err { color: var(--err); }
+
+  /* IDEAS ACCORDION — styled as a rounded card matching site's card language */
+  details.ideas { margin-top: 32px; background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 20px 24px; }
+  details.ideas > summary { cursor: pointer; list-style: none; font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--text); display: flex; align-items: center; justify-content: space-between; }
+  details.ideas > summary::-webkit-details-marker { display: none; }
+  details.ideas > summary .plus { color: var(--green); font-size: 1.6rem; line-height: 1; transition: transform 0.15s ease; display: inline-block; }
+  details.ideas[open] > summary .plus { transform: rotate(45deg); }
+  details.ideas p.intro { color: var(--muted); font-size: 14px; margin: 14px 0 20px 0; max-width: 50ch; line-height: 1.7; }
+
+  .idea-group { margin-bottom: 22px; }
+  .idea-group h3 { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--green); margin-bottom: 10px; }
+  .idea-group ul { list-style: none; }
+  .idea-group li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
+  .idea-group li:last-child { border-bottom: none; }
+
+  /* DASHBOARD */
+  #dashboard { display: none; }
+  #dashboard.visible { display: block; }
+  #landing.hidden { display: none; }
+
+  .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 16px; flex-wrap: wrap; }
+  .day-counter { display: inline-block; background: rgba(45,106,79,0.1); color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 10px; margin-bottom: 10px; }
+  .dash-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 1px; color: var(--text); }
+
+  .signout { font-size: 13px; color: var(--muted); background: none; border: none; text-decoration: underline; cursor: pointer; font-family: 'Manrope', sans-serif; }
+
+  .community-banner { background: var(--green-dark); border-radius: 18px; padding: 20px 22px; margin: 24px 0 8px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .community-banner p { margin: 0; font-size: 14px; color: rgba(255,255,255,0.8); font-weight: 500; }
+  .community-banner a.join { background: var(--green-light); color: var(--white); text-decoration: none; font-size: 13px; font-weight: 700; padding: 10px 18px; border-radius: 24px; white-space: nowrap; }
+  .community-banner a.join:hover { background: var(--white); color: var(--green-dark); }
+
+  .entry-card { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px; margin-top: 28px; }
+  .entry-card label { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 600; color: var(--text); }
+  textarea.entry-box { width: 100%; min-height: 90px; resize: vertical; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); outline: none; margin-bottom: 12px; }
+  textarea.entry-box:focus { border-color: var(--green); }
+  .privacy-note { color: var(--muted); font-size: 13px; margin-top: 12px; }
+
+  .entries { margin-top: 36px; }
+  .entries-title { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .entry { padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .entry:last-child { border-bottom: none; }
+  .entry .meta { font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 0.5px; margin-bottom: 4px; }
+  .entry .body { font-size: 15px; color: var(--text); line-height: 1.6; }
+
+  .empty-state { color: var(--muted); font-size: 14px; padding: 20px 0; }
+
+  /* APP PROMO — cross-promotes the Beast Coach beta signup on the homepage */
+  .app-promo { background: var(--green-dark); border-radius: 18px; padding: 26px 24px; margin-top: 24px; }
+  .app-promo h3 { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; color: var(--white); margin-bottom: 10px; }
+  .app-promo p { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 16px; }
+  .app-promo .spots-remaining { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 16px; }
+  .app-promo .spots-remaining .spots-count { color: var(--green-light); font-weight: 700; }
+  .app-promo a.btn-primary { background: var(--green-light); }
+  .app-promo a.btn-primary:hover { background: var(--white); color: var(--green-dark); }
+
+  footer.site { background: var(--footer-bg); padding: 40px 0; margin-top: 64px; }
+  footer.site .container { text-align: center; }
+  footer.site p { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+  @media (max-width: 480px) {
+    form.signup { flex-direction: column; }
+    form.signup button { width: 100%; }
+    .signup-box { margin-top: -40px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">BEAST<span>COACH</span></a>
+    <a class="nav-back" href="/">&larr; Back to site</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- ===================== LANDING / SIGNUP ===================== -->
+  <section id="landing">
+    <div class="page-hero" style="margin: 0 -24px; border-radius: 0 0 24px 24px;">
+      <span class="page-hero-pre">30-Day Challenge</span>
+      <h1>Day 1 doesn't feel like anything. That's the point.</h1>
+      <p>
+        30 days to become someone new — not with a workout plan, but with proof you can change.
+        Notice your steps. Read a food label before you buy. Small actions, new small rules in your
+        life repeated daily, that quietly rewrite who you think you are. Log one a day and watch it
+        add up. Keep each one small enough to commit to — over time, the shift changes your identity.
+      </p>
+    </div>
+
+    <div class="signup-box">
+      <h3>Start the Challenge</h3>
+      <p>Enter your email to get your private login link.</p>
+      <form class="signup" id="signup-form">
+        <input type="email" class="form-input" id="signup-email" placeholder="you@email.com" required autocomplete="email">
+        <button type="submit" class="btn-primary">Start the challenge</button>
+      </form>
+      <p class="form-msg" id="signup-status"></p>
+    </div>
+
+    <details class="ideas">
+      <summary><span>Stuck for an idea? 100 ways to start</span><span class="plus">+</span></summary>
+      <p class="intro">This isn't a checklist — pick one, do it your way, or use it to spark your own idea.</p>
+      <div id="ideas-list-landing"></div>
+    </details>
+
+    <div class="app-promo">
+      <h3>Did you know I'm building an app?</h3>
+      <p>
+        I've been working on this for the last six months and it's unlike any other app out there.
+        During this initial phase, I'm inviting a small group of people to test it. All I want in
+        return is feedback so I can build something solid — bugs, thoughts, even suggestions if you
+        want to add them in. To thank you for taking part, you get access to the app free for life.
+      </p>
+      <div class="spots-remaining"><span class="spots-count">&hellip;</span> free Pro spots remaining</div>
+      <a class="btn-primary" href="https://beastcoach.fit/#early-access">I'm interested — claim my spot</a>
+    </div>
+  </section>
+
+  <!-- ===================== DASHBOARD (shown after login) ===================== -->
+  <section id="dashboard">
+    <div class="dash-header">
+      <div>
+        <span class="day-counter" id="day-counter">Day 1 of 30</span>
+        <h1>Your Challenge Log</h1>
+      </div>
+      <button class="signout" id="signout-btn">Sign out</button>
+    </div>
+
+    <div class="community-banner">
+      <p>Want to swap ideas with others doing the challenge?</p>
+      <!-- Replace # with your WhatsApp or Telegram group link once you've picked one -->
+      <a class="join" href="#" target="_blank" rel="noopener">Join the group</a>
+    </div>
+
+    <div class="entry-card">
+      <form id="entry-form">
+        <label for="entry-text">What did you do today?</label>
+        <textarea class="entry-box" id="entry-text" placeholder="e.g. Made my bed, read a label before breakfast, walked to the shop instead of driving." required></textarea>
+        <button type="submit" class="btn-primary">Log today</button>
+        <p class="privacy-note">Only you can see these entries — this is your private log.</p>
+        <p class="form-msg" id="entry-status"></p>
+      </form>
+    </div>
+
+    <details class="ideas" style="margin-top: 20px;">
+      <summary><span>Need an idea for today?</span><span class="plus">+</span></summary>
+      <p class="intro">Pick one, do it your way, or use it to spark your own idea.</p>
+      <div id="ideas-list-dashboard"></div>
+    </details>
+
+    <div class="entries">
+      <div class="entries-title">Your entries</div>
+      <div id="entries-container">
+        <div class="empty-state">Loading your entries&hellip;</div>
+      </div>
+    </div>
+
+    <div class="app-promo">
+      <h3>Did you know I'm building an app?</h3>
+      <p>
+        I've been working on this for the last six months and it's unlike any other app out there.
+        During this initial phase, I'm inviting a small group of people to test it. All I want in
+        return is feedback so I can build something solid — bugs, thoughts, even suggestions if you
+        want to add them in. To thank you for taking part, you get access to the app free for life.
+      </p>
+      <div class="spots-remaining"><span class="spots-count">&hellip;</span> free Pro spots remaining</div>
+      <a class="btn-primary" href="https://beastcoach.fit/#early-access">I'm interested — claim my spot</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="container">
+    <p>Beast Coach &mdash; 30-Day Challenge</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   100 IDEAS DATA — rendered first, independent of Supabase,
+   so the accordion always works even if Supabase fails to load
+   ============================================================ */
+const IDEA_GROUPS = [
+  {
+    title: "Environment & mornings",
+    items: [
+      "Make your bed", "Open the curtains within 5 minutes of waking",
+      "Drink a glass of water before coffee", "Lay out tomorrow's clothes tonight",
+      "Clear one surface in your room before bed", "Do 5 minutes of tidying before you sit down in the morning",
+      "Put your phone in another room while getting ready", "Get dressed properly even if you're not leaving the house",
+      "Air out your room for 5 minutes", "Write down one thing you're doing today before checking your phone",
+      "Set out your gym clothes the night before", "Keep your kitchen counter clear overnight",
+      "Make your bed before you leave for work, not after", "Put shoes by the door ready to go",
+      "Prep tomorrow's lunch or snack tonight"
+    ]
+  },
+  {
+    title: "Movement",
+    items: [
+      "Count your steps for the day (no target, just notice)", "Take the stairs once today",
+      "Walk for 10 minutes after a meal", "Park further away than you need to",
+      "Stand up once an hour", "Stretch for 2 minutes before bed",
+      "Walk while on a phone call instead of sitting", "Do 10 bodyweight squats before showering",
+      "Take a walk without your phone", "Try one new form of movement you haven't done in a while",
+      "Carry your own shopping bags instead of using a trolley", "Get off public transport one stop early and walk",
+      "Do a short walk first thing, before anything else", "Stretch your neck and shoulders at your desk",
+      "Take the long way home once"
+    ]
+  },
+  {
+    title: "Food awareness (noticing, not restricting)",
+    items: [
+      "Read the ingredients list on one packaged food today", "Notice how many ingredients are in something you usually eat",
+      "Eat one meal without a screen in front of you", "Add one vegetable to a meal you wouldn't normally",
+      "Drink a glass of water before a meal", "Notice if you're actually hungry before eating something",
+      "Look at the sugar content on one label", "Cook one meal from raw ingredients instead of packaged",
+      "Eat slower for one meal — put your fork down between bites", "Swap one sugary drink for water today",
+      "Plan tomorrow's meals for 5 minutes tonight", "Notice what \"low fat\" or \"sugar free\" actually means on one label",
+      "Eat protein with your first meal of the day", "Pack a snack instead of buying one",
+      "Notice your portion size before adding more", "Try one meal with no added sauce or dressing",
+      "Buy one less processed swap at the shop (e.g. plain yoghurt vs flavoured)", "Skip the vending machine once",
+      "Have a proper sit-down meal instead of eating standing up", "Notice how you feel an hour after eating something"
+    ]
+  },
+  {
+    title: "Mindset & reflection",
+    items: [
+      "Write one sentence about how today went", "Name one thing you did well today, however small",
+      "Notice one thought pattern you repeated today", "Say one honest thing to yourself instead of the usual excuse",
+      "Write down one thing you're avoiding", "Ask yourself \"would the person I want to be do this?\" once today",
+      "Notice when you talk yourself out of something", "Write down tomorrow's one non-negotiable",
+      "Reflect on one moment you felt proud of yourself", "Notice one excuse you used today and name it",
+      "Write one thing you're grateful for that isn't a person or thing", "Ask \"why does this matter to me\" about one goal",
+      "Notice a moment you chose comfort over growth, without judging it", "Write your future self a one-line note",
+      "Reflect on what \"day 1 you\" would think of today"
+    ]
+  },
+  {
+    title: "Digital & focus habits",
+    items: [
+      "Check your phone 10 minutes later than usual after waking", "Turn off one non-essential notification",
+      "Have one meal with your phone out of reach", "Set a time limit on one app today",
+      "Take a 30-minute break from your phone", "Read one page of a book instead of scrolling",
+      "Charge your phone outside the bedroom tonight", "Notice how many times you unlock your phone without needing to",
+      "Do one task with your phone on silent, in another room", "Replace one scrolling break with a stretch or walk"
+    ]
+  },
+  {
+    title: "Sleep & recovery",
+    items: [
+      "Go to bed 15 minutes earlier than usual", "Stop screens 20 minutes before bed",
+      "Notice what time you actually fell asleep", "Do a wind-down activity instead of scrolling before bed",
+      "Keep a consistent wake-up time, even on a day off", "Dim the lights an hour before bed",
+      "Avoid caffeine after a set time today", "Do a short breathing exercise before sleep",
+      "Notice how rested you feel on waking", "Take a 10-minute rest without your phone during the day"
+    ]
+  },
+  {
+    title: "Small discipline & self-respect",
+    items: [
+      "Do the thing you've been putting off for under 2 minutes", "Reply to one message you've been avoiding",
+      "Keep one promise you made to yourself", "Say no to one thing that doesn't serve you",
+      "Finish one small task fully instead of half-doing it", "Do one uncomfortable thing on purpose",
+      "Show up to one commitment even when you don't feel like it", "Clean up after yourself immediately instead of leaving it",
+      "Speak to yourself the way you'd speak to someone you respect", "Do one thing today because it's right, not because it's easy",
+      "Notice a moment you wanted to quit, and don't", "Choose the harder, better option once today",
+      "Follow through on one thing without telling anyone", "Do one small act of discipline nobody will see or know about",
+      "Notice how today's version of you is different from day 1"
+    ]
+  }
+];
+
+function renderIdeas(containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = IDEA_GROUPS.map(group => `
+    <div class="idea-group">
+      <h3>${group.title}</h3>
+      <ul>${group.items.map(item => `<li>${item}</li>`).join("")}</ul>
+    </div>
+  `).join("");
+}
+renderIdeas("ideas-list-landing");
+renderIdeas("ideas-list-dashboard");
+
+/* ============================================================
+   LIVE SPOTS COUNTER — mirrors the same logic as beastcoach.fit's
+   homepage early-access section, reading the same early_access
+   table. Plain REST fetch (not the SDK) so it works even if the
+   Supabase JS library fails to load.
+   ============================================================ */
+const SPOTS_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
+const SPOTS_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
+const MAX_SPOTS = 50;
+
+async function loadSpots() {
+  try {
+    const res = await fetch(`${SPOTS_URL}/rest/v1/early_access?select=id`, {
+      headers: { apikey: SPOTS_KEY, Authorization: "Bearer " + SPOTS_KEY }
+    });
+    const data = await res.json();
+    const taken = Array.isArray(data) ? data.length : 0;
+    const remaining = Math.max(MAX_SPOTS - taken, 0);
+    document.querySelectorAll(".spots-count").forEach(el => (el.textContent = remaining));
+  } catch (e) {
+    document.querySelectorAll(".spots-count").forEach(el => (el.textContent = "a few"));
+  }
+}
+loadSpots();
+
+/* ============================================================
+   CONFIG + AUTH FLOW
+   Wrapped in a guard so a Supabase CDN load failure never
+   breaks the ideas accordion or the rest of the page above.
+   ============================================================ */
+const SUPABASE_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
+
+let sb = null;
+try {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (e) {
+  console.error("Supabase failed to load — signup/login will not work:", e);
+}
+
+const landing = document.getElementById("landing");
+const dashboard = document.getElementById("dashboard");
+const signupForm = document.getElementById("signup-form");
+const signupStatus = document.getElementById("signup-status");
+const entryForm = document.getElementById("entry-form");
+const entryStatus = document.getElementById("entry-status");
+const signoutBtn = document.getElementById("signout-btn");
+
+if (sb) {
+
+function showStatus(el, msg, isError) {
+  el.textContent = msg;
+  el.classList.add("visible");
+  el.classList.toggle("form-msg--err", !!isError);
+}
+
+signupForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("signup-email").value.trim();
+  const btn = signupForm.querySelector("button");
+  btn.disabled = true;
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
+  btn.disabled = false;
+  if (error) {
+    showStatus(signupStatus, "Something went wrong — try again.", true);
+  } else {
+    showStatus(signupStatus, "Check your email for a login link to start.", false);
+  }
+});
+
+signoutBtn.addEventListener("click", async () => {
+  await sb.auth.signOut();
+  window.location.reload();
+});
+
+entryForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+
+  const text = document.getElementById("entry-text").value.trim();
+  if (!text) return;
+
+  const dayNumber = await getDayNumber(user);
+  const btn = entryForm.querySelector("button");
+  btn.disabled = true;
+
+  const { error } = await sb.from("challenge_entries").insert({
+    user_id: user.id,
+    entry_text: text,
+    day_number: dayNumber
+  });
+
+  btn.disabled = false;
+  if (error) {
+    showStatus(entryStatus, "Couldn't save that entry — try again.", true);
+  } else {
+    document.getElementById("entry-text").value = "";
+    showStatus(entryStatus, "Logged.", false);
+    loadEntries(user.id);
+  }
+});
+
+async function ensureProfile(user) {
+  const { data } = await sb.from("challenge_users").select("id").eq("id", user.id).maybeSingle();
+  if (!data) {
+    await sb.from("challenge_users").insert({ id: user.id, email: user.email });
+  }
+}
+
+async function getDayNumber(user) {
+  const { data } = await sb.from("challenge_users").select("created_at").eq("id", user.id).maybeSingle();
+  const start = data ? new Date(data.created_at) : new Date();
+  const diffDays = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
+  return Math.max(1, diffDays);
+}
+
+async function loadEntries(userId) {
+  const container = document.getElementById("entries-container");
+  const { data, error } = await sb
+    .from("challenge_entries")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error || !data || data.length === 0) {
+    container.innerHTML = `<div class="empty-state">No entries yet — log your first one above.</div>`;
+    return;
+  }
+
+  container.innerHTML = data.map(entry => {
+    const date = new Date(entry.created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+    return `
+      <div class="entry">
+        <div class="meta">Day ${entry.day_number} — ${date}</div>
+        <div class="body">${escapeHtml(entry.entry_text)}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+async function showDashboard(user) {
+  landing.classList.add("hidden");
+  dashboard.classList.add("visible");
+  await ensureProfile(user);
+  const dayNumber = await getDayNumber(user);
+  document.getElementById("day-counter").textContent = `Day ${Math.min(dayNumber, 30)} of 30`;
+  loadEntries(user.id);
+}
+
+/* On load, check for an existing session (handles magic-link redirect too) */
+sb.auth.onAuthStateChange((_event, session) => {
+  if (session && session.user) {
+    showDashboard(session.user);
+  }
+});
+
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session && session.user) {
+    showDashboard(session.user);
+  }
+});
+
+} // end if (sb)
+</script>
+
+</body>
+</html>
