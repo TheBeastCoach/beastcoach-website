@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Portal — Beast Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2D6A4F; --green-light: #52B788; --green-dark: #1B3022;
+    --off-white: #F7F9F8; --text: #1B2E24; --muted: #707973;
+    --border: #E4E8E6; --white: #FFFFFF; --footer-bg: #111A14; --err: #E24B4A;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); line-height: 1.6; overflow-x: hidden; }
+  .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+  a { color: inherit; }
+
+  .nav { position: sticky; top: 0; z-index: 100; background: rgba(27,46,36,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .nav-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--white); text-decoration: none; }
+  .nav-logo span { color: var(--green-light); }
+  .nav-back { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .nav-back:hover { color: var(--white); }
+
+  main.container { padding: 48px 24px 96px; }
+
+  h1.page-title { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 1px; margin-bottom: 6px; }
+  p.page-sub { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+
+  .card { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px; margin-bottom: 20px; }
+  .card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+
+  .form-input, select.form-input, textarea.form-input { width: 100%; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); outline: none; margin-bottom: 12px; }
+  .form-input:focus { border-color: var(--green); }
+  label.field-label { display: block; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+
+  .btn-primary { display: inline-block; background: var(--green); color: var(--white); padding: 14px 28px; border-radius: 32px; font-weight: 700; font-size: 15px; text-decoration: none; cursor: pointer; border: none; font-family: 'Manrope', sans-serif; }
+  .btn-primary:hover { background: var(--green-light); }
+  .btn-primary:disabled { opacity: 0.6; cursor: default; }
+
+  .form-msg { margin-top: 12px; font-size: 13px; min-height: 18px; display: none; color: var(--green); }
+  .form-msg.visible { display: block; }
+  .form-msg.form-msg--err { color: var(--err); }
+
+  .auth-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+  .auth-tab { flex: 1; background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px; font-weight: 700; font-size: 14px; color: var(--muted); cursor: pointer; font-family: 'Manrope', sans-serif; }
+  .auth-tab.active { background: var(--green); border-color: var(--green); color: var(--white); }
+  form.auth-form { display: flex; flex-direction: column; }
+
+  .signout { font-size: 13px; color: var(--muted); background: none; border: none; text-decoration: underline; cursor: pointer; font-family: 'Manrope', sans-serif; }
+
+  .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 480px) { .tile-grid { grid-template-columns: 1fr; } }
+  .tile { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px; cursor: pointer; text-decoration: none; display: block; }
+  .tile:hover { border-color: var(--green); }
+  .tile h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 6px; color: var(--text); }
+  .tile p { color: var(--muted); font-size: 13px; }
+
+  .back-link { display: inline-block; margin-bottom: 20px; font-size: 14px; color: var(--green); text-decoration: none; font-weight: 600; cursor: pointer; background: none; border: none; font-family: 'Manrope', sans-serif; }
+
+  /* Challenge (embedded) */
+  .day-counter { display: inline-block; background: rgba(45,106,79,0.1); color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 10px; margin-bottom: 10px; }
+  textarea.entry-box { width: 100%; min-height: 90px; resize: vertical; margin-bottom: 12px; }
+  .privacy-note { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .entries { margin-top: 28px; }
+  .entries-title { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .entry { padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .entry:last-child { border-bottom: none; }
+  .entry .meta { font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 0.5px; margin-bottom: 4px; }
+  .entry .body { font-size: 15px; color: var(--text); line-height: 1.6; }
+  .empty-state { color: var(--muted); font-size: 14px; padding: 20px 0; }
+
+  details.ideas { margin-top: 24px; background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 20px 24px; }
+  details.ideas > summary { cursor: pointer; list-style: none; font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; color: var(--text); display: flex; align-items: center; justify-content: space-between; }
+  details.ideas > summary::-webkit-details-marker { display: none; }
+  details.ideas > summary .plus { color: var(--green); font-size: 1.4rem; line-height: 1; transition: transform 0.15s ease; display: inline-block; }
+  details.ideas[open] > summary .plus { transform: rotate(45deg); }
+  details.ideas p.intro { color: var(--muted); font-size: 13px; margin: 12px 0 16px 0; }
+  .idea-group { margin-bottom: 18px; }
+  .idea-group h4 { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--green); margin-bottom: 8px; }
+  .idea-group ul { list-style: none; }
+  .idea-group li { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text); }
+  .idea-group li:last-child { border-bottom: none; }
+
+  /* Calculator (embedded) */
+  .toggle-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .toggle-btn { flex: 1; min-width: 90px; padding: 10px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--white); font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; color: var(--muted); cursor: pointer; }
+  .toggle-btn.active { background: var(--green); border-color: var(--green); color: var(--white); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
+  .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 20px 0; }
+  @media (max-width: 480px) { .result-grid { grid-template-columns: repeat(2, 1fr); } }
+  .result-box { background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+  .result-box .val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--green); }
+  .result-box .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .bar-track { background: var(--border); border-radius: 6px; height: 8px; overflow: hidden; margin: 4px 0 12px; }
+  .bar-fill { height: 100%; border-radius: 6px; }
+  .bar-fill.protein { background: var(--green); }
+  .bar-fill.carbs { background: var(--green-light); }
+  .bar-fill.fat { background: var(--muted); }
+
+  footer.site { background: var(--footer-bg); padding: 40px 0; margin-top: 64px; }
+  footer.site .container { text-align: center; }
+  footer.site p { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+  .view { display: none; }
+  .view.visible { display: block; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">BEAST<span>COACH</span></a>
+    <a class="nav-back" href="/">&larr; Back to site</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- ===================== AUTH ===================== -->
+  <section class="view visible" id="view-auth">
+    <h1 class="page-title">Member Portal</h1>
+    <p class="page-sub">Create an account for the 30-Day Challenge, the calculator, and more.</p>
+    <div class="card">
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tab-signup">Sign Up</button>
+        <button type="button" class="auth-tab" id="tab-signin">Log In</button>
+      </div>
+      <form class="auth-form" id="signup-form">
+        <input type="text" class="form-input" id="signup-name" placeholder="Your name" required autocomplete="name">
+        <input type="email" class="form-input" id="signup-email" placeholder="you@email.com" required autocomplete="email">
+        <input type="password" class="form-input" id="signup-password" placeholder="Create a password" required autocomplete="new-password" minlength="6">
+        <button type="submit" class="btn-primary">Create Account</button>
+      </form>
+      <form class="auth-form" id="signin-form" style="display:none;">
+        <input type="email" class="form-input" id="signin-email" placeholder="you@email.com" required autocomplete="email">
+        <input type="password" class="form-input" id="signin-password" placeholder="Password" required autocomplete="current-password">
+        <button type="submit" class="btn-primary">Log In</button>
+      </form>
+      <p class="form-msg" id="auth-status"></p>
+    </div>
+  </section>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <section class="view" id="view-dashboard">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px;">
+      <div>
+        <h1 class="page-title" id="dash-greeting">Welcome back</h1>
+        <p class="page-sub" style="margin-bottom:0;">What do you want to do?</p>
+      </div>
+      <button class="signout" id="signout-btn">Sign out</button>
+    </div>
+    <div class="tile-grid">
+      <a class="tile" data-nav="challenge"><h3>30-Day Challenge</h3><p>Log today's entry and see your progress.</p></a>
+      <a class="tile" data-nav="calculator"><h3>BMI &amp; Macro Calculator</h3><p>Your calories, macros, and BMI.</p></a>
+      <a class="tile" data-nav="shop"><h3>Shop</h3><p>Coming soon.</p></a>
+      <a class="tile" href="/#early-access"><h3>App Beta</h3><p>Get free lifetime access, early.</p></a>
+    </div>
+  </section>
+
+  <!-- ===================== 30-DAY CHALLENGE (embedded) ===================== -->
+  <section class="view" id="view-challenge">
+    <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
+    <span class="day-counter" id="day-counter">Day 1 of 30</span>
+    <h1 class="page-title">30-Day Challenge</h1>
+    <div class="card">
+      <form id="entry-form">
+        <label class="field-label">What did you do today?</label>
+        <textarea class="form-input entry-box" id="entry-text" placeholder="e.g. Made my bed, read a label before breakfast, walked to the shop instead of driving." required></textarea>
+        <button type="submit" class="btn-primary">Log today</button>
+        <p class="privacy-note">Only you can see these entries &mdash; this is your private log.</p>
+        <p class="form-msg" id="entry-status"></p>
+      </form>
+    </div>
+
+    <details class="ideas">
+      <summary><span>Need an idea for today? 100 ways to start</span><span class="plus">+</span></summary>
+      <p class="intro">This isn't a checklist &mdash; pick one, do it your way, or use it to spark your own idea.</p>
+      <div id="ideas-list"></div>
+    </details>
+
+    <div class="entries">
+      <div class="entries-title">Your entries</div>
+      <div id="entries-container"><div class="empty-state">Loading&hellip;</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== CALCULATOR (embedded) ===================== -->
+  <section class="view" id="view-calculator">
+    <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
+    <h1 class="page-title">BMI &amp; Macro Calculator</h1>
+    <p class="page-sub">Enter your stats, get your BMI, maintenance calories, and macros.</p>
+
+    <div class="card">
+      <label class="field-label">Sex</label>
+      <div class="toggle-row">
+        <button type="button" class="toggle-btn active" data-sex="male">Male</button>
+        <button type="button" class="toggle-btn" data-sex="female">Female</button>
+      </div>
+
+      <div class="row2">
+        <div><label class="field-label">Age</label><input type="number" class="form-input" id="calc-age" min="13" max="100"></div>
+        <div><label class="field-label">Weight (kg)</label><input type="number" class="form-input" id="calc-weight" step="0.1"></div>
+      </div>
+      <label class="field-label">Height (cm)</label>
+      <input type="number" class="form-input" id="calc-height" step="0.1">
+
+      <label class="field-label">Daily activity (job / lifestyle, no training)</label>
+      <select class="form-input" id="calc-activity">
+        <option value="1.15">Desk job &mdash; mostly sitting</option>
+        <option value="1.25" selected>On your feet sometimes &mdash; teaching, service, errands</option>
+        <option value="1.35">Physically demanding job &mdash; trades, labour, delivery</option>
+      </select>
+
+      <div class="row2">
+        <div><label class="field-label">Steps per day</label><input type="number" class="form-input" id="calc-steps" value="8000"></div>
+        <div><label class="field-label">Training sessions / week</label><input type="number" class="form-input" id="calc-sessions" min="0" max="14" value="3"></div>
+      </div>
+      <label class="field-label">Session intensity</label>
+      <select class="form-input" id="calc-intensity">
+        <option value="200">Light</option>
+        <option value="350" selected>Moderate</option>
+        <option value="500">Intense</option>
+      </select>
+
+      <label class="field-label">Goal</label>
+      <div class="toggle-row">
+        <button type="button" class="toggle-btn active" data-goal="fatloss">Fat loss</button>
+        <button type="button" class="toggle-btn" data-goal="recomp">Tone / Recomp</button>
+        <button type="button" class="toggle-btn" data-goal="muscle">Muscle</button>
+      </div>
+
+      <button type="button" class="btn-primary" id="calc-btn">Calculate</button>
+    </div>
+
+    <div class="card" id="calc-results" style="display:none;">
+      <h3>Your Numbers</h3>
+      <p id="calc-explainer" style="margin-bottom:14px;"></p>
+      <div class="result-grid">
+        <div class="result-box"><div class="val" id="res-bmi">&mdash;</div><div class="lbl">BMI</div></div>
+        <div class="result-box"><div class="val" id="res-calories">&mdash;</div><div class="lbl">Target kcal</div></div>
+        <div class="result-box"><div class="val" id="res-fibre">&mdash;</div><div class="lbl">Fibre</div></div>
+      </div>
+      <label class="field-label">Protein <span id="res-protein"></span></label>
+      <div class="bar-track"><div class="bar-fill protein" id="bar-protein"></div></div>
+      <label class="field-label">Carbs <span id="res-carbs"></span></label>
+      <div class="bar-track"><div class="bar-fill carbs" id="bar-carbs"></div></div>
+      <label class="field-label">Fat <span id="res-fat"></span></label>
+      <div class="bar-track"><div class="bar-fill fat" id="bar-fat"></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== SHOP ===================== -->
+  <section class="view" id="view-shop">
+    <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
+    <h1 class="page-title">Shop</h1>
+    <div class="card"><p>Nothing here yet &mdash; merch and products are coming soon. Check back later.</p></div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="container"><p>Beast Coach &mdash; Member Portal</p></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
+
+let sb = null;
+try {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (e) {
+  console.error("Supabase failed to load:", e);
+}
+
+/* ---------- 100 ideas (same list as the standalone challenge page) ---------- */
+const IDEA_GROUPS = [
+  { title: "Environment & mornings", items: ["Make your bed","Open the curtains within 5 minutes of waking","Drink a glass of water before coffee","Lay out tomorrow's clothes tonight","Clear one surface in your room before bed","Do 5 minutes of tidying before you sit down in the morning","Put your phone in another room while getting ready","Get dressed properly even if you're not leaving the house","Air out your room for 5 minutes","Write down one thing you're doing today before checking your phone","Set out your gym clothes the night before","Keep your kitchen counter clear overnight","Make your bed before you leave for work, not after","Put shoes by the door ready to go","Prep tomorrow's lunch or snack tonight"] },
+  { title: "Movement", items: ["Count your steps for the day (no target, just notice)","Take the stairs once today","Walk for 10 minutes after a meal","Park further away than you need to","Stand up once an hour","Stretch for 2 minutes before bed","Walk while on a phone call instead of sitting","Do 10 bodyweight squats before showering","Take a walk without your phone","Try one new form of movement you haven't done in a while","Carry your own shopping bags instead of using a trolley","Get off public transport one stop early and walk","Do a short walk first thing, before anything else","Stretch your neck and shoulders at your desk","Take the long way home once"] },
+  { title: "Food awareness", items: ["Read the ingredients list on one packaged food today","Notice how many ingredients are in something you usually eat","Eat one meal without a screen in front of you","Add one vegetable to a meal you wouldn't normally","Drink a glass of water before a meal","Notice if you're actually hungry before eating something","Look at the sugar content on one label","Cook one meal from raw ingredients instead of packaged","Eat slower for one meal — put your fork down between bites","Swap one sugary drink for water today","Plan tomorrow's meals for 5 minutes tonight","Eat protein with your first meal of the day","Pack a snack instead of buying one","Notice your portion size before adding more","Skip the vending machine once"] },
+  { title: "Mindset & reflection", items: ["Write one sentence about how today went","Name one thing you did well today, however small","Notice one thought pattern you repeated today","Say one honest thing to yourself instead of the usual excuse","Write down one thing you're avoiding","Ask yourself \"would the person I want to be do this?\" once today","Notice when you talk yourself out of something","Write down tomorrow's one non-negotiable","Reflect on one moment you felt proud of yourself","Notice one excuse you used today and name it","Write one thing you're grateful for that isn't a person or thing","Reflect on what \"day 1 you\" would think of today"] },
+  { title: "Digital & focus habits", items: ["Check your phone 10 minutes later than usual after waking","Turn off one non-essential notification","Have one meal with your phone out of reach","Set a time limit on one app today","Take a 30-minute break from your phone","Read one page of a book instead of scrolling","Charge your phone outside the bedroom tonight","Do one task with your phone on silent, in another room","Replace one scrolling break with a stretch or walk"] },
+  { title: "Sleep & recovery", items: ["Go to bed 15 minutes earlier than usual","Stop screens 20 minutes before bed","Notice what time you actually fell asleep","Do a wind-down activity instead of scrolling before bed","Keep a consistent wake-up time, even on a day off","Dim the lights an hour before bed","Avoid caffeine after a set time today","Do a short breathing exercise before sleep","Take a 10-minute rest without your phone during the day"] },
+  { title: "Small discipline & self-respect", items: ["Do the thing you've been putting off for under 2 minutes","Reply to one message you've been avoiding","Keep one promise you made to yourself","Say no to one thing that doesn't serve you","Finish one small task fully instead of half-doing it","Do one uncomfortable thing on purpose","Show up to one commitment even when you don't feel like it","Speak to yourself the way you'd speak to someone you respect","Choose the harder, better option once today","Notice how today's version of you is different from day 1"] }
+];
+function renderIdeas() {
+  document.getElementById("ideas-list").innerHTML = IDEA_GROUPS.map(g => `
+    <div class="idea-group"><h4>${g.title}</h4><ul>${g.items.map(i => `<li>${i}</li>`).join("")}</ul></div>
+  `).join("");
+}
+renderIdeas();
+
+/* ---------- View switching ---------- */
+function showView(name) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("visible"));
+  document.getElementById("view-" + name).classList.add("visible");
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll("[data-nav]").forEach(el => {
+  el.addEventListener("click", () => {
+    const target = el.getAttribute("data-nav");
+    showView(target);
+    if (target === "challenge") loadChallenge();
+  });
+});
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+if (sb) {
+
+/* ---------- Auth ---------- */
+const tabSignup = document.getElementById("tab-signup");
+const tabSignin = document.getElementById("tab-signin");
+const signupForm = document.getElementById("signup-form");
+const signinForm = document.getElementById("signin-form");
+const authStatus = document.getElementById("auth-status");
+const signoutBtn = document.getElementById("signout-btn");
+const entryForm = document.getElementById("entry-form");
+const entryStatus = document.getElementById("entry-status");
+
+function showStatus(el, msg, isError) {
+  el.textContent = msg;
+  el.classList.add("visible");
+  el.classList.toggle("form-msg--err", !!isError);
+}
+
+tabSignup.addEventListener("click", () => {
+  tabSignup.classList.add("active"); tabSignin.classList.remove("active");
+  signupForm.style.display = "flex"; signinForm.style.display = "none";
+});
+tabSignin.addEventListener("click", () => {
+  tabSignin.classList.add("active"); tabSignup.classList.remove("active");
+  signinForm.style.display = "flex"; signupForm.style.display = "none";
+});
+
+signupForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("signup-name").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const password = document.getElementById("signup-password").value;
+  const btn = signupForm.querySelector("button");
+  btn.disabled = true;
+  const { data, error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name } } });
+  btn.disabled = false;
+  if (error) {
+    showStatus(authStatus, error.message || "Something went wrong.", true);
+  } else if (data.session) {
+    enterPortal(data.user);
+  } else {
+    showStatus(authStatus, "Check your email to confirm your account, then log in.", false);
+  }
+});
+
+signinForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("signin-email").value.trim();
+  const password = document.getElementById("signin-password").value;
+  const btn = signinForm.querySelector("button");
+  btn.disabled = true;
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  btn.disabled = false;
+  if (error) {
+    showStatus(authStatus, error.message || "Couldn't log in.", true);
+  } else if (data.user) {
+    enterPortal(data.user);
+  }
+});
+
+signoutBtn.addEventListener("click", async () => {
+  await sb.auth.signOut();
+  window.location.reload();
+});
+
+function enterPortal(user) {
+  const name = user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : user.email;
+  document.getElementById("dash-greeting").textContent = "Welcome back, " + name;
+  showView("dashboard");
+  const hash = window.location.hash.replace("#", "");
+  if (hash === "challenge" || hash === "calculator" || hash === "shop") {
+    showView(hash);
+    if (hash === "challenge") loadChallenge();
+  }
+}
+
+sb.auth.onAuthStateChange((_e, session) => { if (session && session.user) enterPortal(session.user); });
+sb.auth.getSession().then(({ data: { session } }) => { if (session && session.user) enterPortal(session.user); });
+
+/* ---------- 30-Day Challenge (embedded, same tables as challenge.html) ---------- */
+async function ensureChallengeProfile(user) {
+  const { error } = await sb.from("challenge_users").upsert(
+    { id: user.id, email: user.email },
+    { onConflict: "id", ignoreDuplicates: true }
+  );
+  if (error) console.error("Failed to create/find challenge profile:", error);
+  return !error;
+}
+
+async function getDayNumber(user) {
+  const { data } = await sb.from("challenge_users").select("created_at").eq("id", user.id).maybeSingle();
+  const start = data ? new Date(data.created_at) : new Date();
+  const diffDays = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
+  return Math.max(1, diffDays);
+}
+
+async function loadEntries(userId) {
+  const container = document.getElementById("entries-container");
+  const { data, error } = await sb.from("challenge_entries").select("*").eq("user_id", userId).order("created_at", { ascending: false });
+  if (error || !data || data.length === 0) {
+    container.innerHTML = `<div class="empty-state">No entries yet &mdash; log your first one above.</div>`;
+    return;
+  }
+  container.innerHTML = data.map(entry => {
+    const date = new Date(entry.created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+    return `<div class="entry"><div class="meta">Day ${entry.day_number} &mdash; ${date}</div><div class="body">${escapeHtml(entry.entry_text)}</div></div>`;
+  }).join("");
+}
+
+async function loadChallenge() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  await ensureChallengeProfile(user);
+  const dayNumber = await getDayNumber(user);
+  document.getElementById("day-counter").textContent = `Day ${Math.min(dayNumber, 30)} of 30`;
+  loadEntries(user.id);
+}
+
+entryForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  const text = document.getElementById("entry-text").value.trim();
+  if (!text) return;
+  const btn = entryForm.querySelector("button");
+  btn.disabled = true;
+
+  const profileOk = await ensureChallengeProfile(user);
+  if (!profileOk) {
+    btn.disabled = false;
+    showStatus(entryStatus, "Couldn't set up your profile — try again in a moment.", true);
+    return;
+  }
+  const dayNumber = await getDayNumber(user);
+  const { error } = await sb.from("challenge_entries").insert({ user_id: user.id, entry_text: text, day_number: dayNumber });
+  btn.disabled = false;
+  if (error) {
+    console.error(error);
+    showStatus(entryStatus, "Couldn't save that entry — try again.", true);
+  } else {
+    document.getElementById("entry-text").value = "";
+    showStatus(entryStatus, "Logged.", false);
+    loadEntries(user.id);
+  }
+});
+
+} // end if (sb)
+
+/* ---------- Calculator (same formulas as calculator.html) ---------- */
+const CALC_GOALS = {
+  fatloss: { label: "Fat loss",       proteinPerKg: 2.2, delta: -500, fatPct: 0.25 },
+  recomp:  { label: "Tone / Recomp",  proteinPerKg: 2.0, delta: -250, fatPct: 0.27 },
+  muscle:  { label: "Muscle / Strength", proteinPerKg: 1.8, delta: 300, fatPct: 0.25 }
+};
+let calcSex = "male";
+let calcGoal = "fatloss";
+
+document.querySelectorAll("[data-sex]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("[data-sex]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    calcSex = btn.getAttribute("data-sex");
+  });
+});
+document.querySelectorAll("[data-goal]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("[data-goal]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    calcGoal = btn.getAttribute("data-goal");
+  });
+});
+
+document.getElementById("calc-btn").addEventListener("click", () => {
+  const age = parseFloat(document.getElementById("calc-age").value);
+  const weightKg = parseFloat(document.getElementById("calc-weight").value);
+  const heightCm = parseFloat(document.getElementById("calc-height").value);
+  if (!age || !weightKg || !heightCm) {
+    alert("Please fill in age, weight, and height.");
+    return;
+  }
+  const activityMult = parseFloat(document.getElementById("calc-activity").value);
+  const steps = parseFloat(document.getElementById("calc-steps").value) || 0;
+  const sessions = parseFloat(document.getElementById("calc-sessions").value) || 0;
+  const intensityKcal = parseFloat(document.getElementById("calc-intensity").value);
+
+  const heightM = heightCm / 100;
+  const bmi = weightKg / (heightM * heightM);
+
+  const bmr = calcSex === "male"
+    ? (10 * weightKg + 6.25 * heightCm - 5 * age + 5)
+    : (10 * weightKg + 6.25 * heightCm - 5 * age - 161);
+
+  const stepsKcal = steps * weightKg * 0.00057;
+  const trainingKcalPerDay = (sessions * intensityKcal) / 7;
+  const tdee = (bmr * activityMult) + stepsKcal + trainingKcalPerDay;
+
+  const g = CALC_GOALS[calcGoal];
+  const targetCalories = tdee + g.delta;
+  const weeklyKg = (Math.abs(g.delta) * 7) / 7700;
+
+  const proteinG = weightKg * g.proteinPerKg;
+  const proteinKcal = proteinG * 4;
+  const fatKcal = targetCalories * g.fatPct;
+  const fatG = fatKcal / 9;
+  const carbKcal = Math.max(0, targetCalories - proteinKcal - fatKcal);
+  const carbG = carbKcal / 4;
+  const fibreG = (targetCalories / 1000) * 14;
+  const totalG = proteinG + carbG + fatG;
+
+  let explainer;
+  const maintenanceStr = `<strong>${Math.round(tdee)} kcal/day</strong>`;
+  const targetStr = `<strong>${Math.round(targetCalories)} kcal/day</strong>`;
+  if (g.delta < 0) {
+    explainer = `Your maintenance is ${maintenanceStr} — for ${g.label.toLowerCase()}, eat ${Math.abs(g.delta)} kcal less: ${targetStr}. Expect to lose roughly ${weeklyKg.toFixed(2)} kg a week.`;
+  } else if (g.delta > 0) {
+    explainer = `Your maintenance is ${maintenanceStr} — for ${g.label.toLowerCase()}, eat ${g.delta} kcal more: ${targetStr}. Expect to gain roughly ${weeklyKg.toFixed(2)} kg a week.`;
+  } else {
+    explainer = `Your maintenance is ${maintenanceStr} — that's also your target for ${g.label.toLowerCase()}.`;
+  }
+
+  document.getElementById("calc-explainer").innerHTML = explainer;
+  document.getElementById("res-bmi").textContent = bmi.toFixed(1);
+  document.getElementById("res-calories").textContent = Math.round(targetCalories);
+  document.getElementById("res-fibre").textContent = Math.round(fibreG) + "g";
+  document.getElementById("res-protein").textContent = Math.round(proteinG) + "g";
+  document.getElementById("res-carbs").textContent = Math.round(carbG) + "g";
+  document.getElementById("res-fat").textContent = Math.round(fatG) + "g";
+  document.getElementById("bar-protein").style.width = (proteinG / totalG * 100).toFixed(1) + "%";
+  document.getElementById("bar-carbs").style.width = (carbG / totalG * 100).toFixed(1) + "%";
+  document.getElementById("bar-fat").style.width = (fatG / totalG * 100).toFixed(1) + "%";
+  document.getElementById("calc-results").style.display = "block";
+});
+</script>
+
+</body>
+</html>
