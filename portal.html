@@ -108,6 +108,24 @@
   footer.site .container { text-align: center; }
   footer.site p { font-size: 13px; color: rgba(255,255,255,0.4); }
 
+  /* Recipes */
+  .chip-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .recipe-chip { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 20px; padding: 10px 18px; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); cursor: pointer; }
+  .recipe-chip:hover { border-color: var(--green); color: var(--green); }
+  .recipe-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+  .recipe-macros { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0 24px; }
+  .recipe-macro { background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 16px; text-align: center; min-width: 70px; }
+  .recipe-macro .val { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--green); }
+  .recipe-macro .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .recipe-section h4 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.5px; margin: 18px 0 8px; }
+  .recipe-section ul, .recipe-section ol { padding-left: 20px; font-size: 14px; line-height: 1.8; }
+
+  @media print {
+    .nav, footer.site, .back-link, #print-recipe-btn, .signout { display: none !important; }
+    body { background: white; }
+    main.container { padding: 0; max-width: none; }
+  }
+
   .view { display: none; }
   .view.visible { display: block; }
 </style>
@@ -159,6 +177,7 @@
     <div class="tile-grid">
       <a class="tile" data-nav="challenge"><h3>30-Day Challenge</h3><p>Log today's entry and see your progress.</p></a>
       <a class="tile" data-nav="calculator"><h3>BMI &amp; Macro Calculator</h3><p>Your calories, macros, and BMI.</p></a>
+      <a class="tile" data-nav="recipes"><h3>Recipes</h3><p>Healthy alternatives from social media.</p></a>
       <a class="tile" data-nav="shop"><h3>Shop</h3><p>Coming soon.</p></a>
       <a class="tile" href="/#early-access"><h3>App Beta</h3><p>Get free lifetime access, early.</p></a>
     </div>
@@ -262,6 +281,32 @@
     <h1 class="page-title">Shop</h1>
     <div class="card"><p>Nothing here yet &mdash; merch and products are coming soon. Check back later.</p></div>
   </section>
+  <!-- ===================== RECIPES ===================== -->
+  <section class="view" id="view-recipes">
+    <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
+    <h1 class="page-title">Recipes</h1>
+    <p class="page-sub">These are all the healthy alternative meals you've seen me create on social media. Tap one to see the full recipe.</p>
+    <div class="chip-grid" id="recipe-chips"></div>
+  </section>
+
+  <!-- ===================== RECIPE DETAIL ===================== -->
+  <section class="view" id="view-recipe-detail">
+    <button class="back-link" data-nav="recipes">&larr; Back to Recipes</button>
+    <div class="recipe-actions">
+      <button class="btn-primary" id="print-recipe-btn">Print Recipe</button>
+    </div>
+    <h1 class="page-title" id="recipe-title"></h1>
+    <p class="page-sub" id="recipe-desc"></p>
+    <div class="recipe-macros" id="recipe-macros"></div>
+    <div class="recipe-section">
+      <h4>Ingredients</h4>
+      <ul id="recipe-ingredients"></ul>
+    </div>
+    <div class="recipe-section">
+      <h4>Instructions</h4>
+      <ol id="recipe-instructions"></ol>
+    </div>
+  </section>
 
 </main>
 
@@ -270,6 +315,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="recipes.js"></script>
 <script>
 const SUPABASE_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
@@ -297,6 +343,33 @@ function renderIdeas() {
   `).join("");
 }
 renderIdeas();
+
+/* ---------- Recipes ---------- */
+// Recipes now live in recipes.js (loaded via <script src="recipes.js">) so you never edit this file to add a recipe.
+
+function renderRecipeChips() {
+  const container = document.getElementById("recipe-chips");
+  container.innerHTML = RECIPES.map(r => `<button type="button" class="recipe-chip" data-recipe="${r.id}">${escapeHtml(r.chip)}</button>`).join("");
+  container.querySelectorAll("[data-recipe]").forEach(btn => {
+    btn.addEventListener("click", () => openRecipe(btn.getAttribute("data-recipe")));
+  });
+}
+renderRecipeChips();
+
+function openRecipe(id) {
+  const r = RECIPES.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById("recipe-title").textContent = r.title;
+  document.getElementById("recipe-desc").textContent = r.desc;
+  document.getElementById("recipe-macros").innerHTML = r.macros.map(m => `
+    <div class="recipe-macro"><div class="val">${m[0]}</div><div class="lbl">${m[1]}</div></div>
+  `).join("");
+  document.getElementById("recipe-ingredients").innerHTML = r.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("");
+  document.getElementById("recipe-instructions").innerHTML = r.instructions.map(i => `<li>${escapeHtml(i)}</li>`).join("");
+  showView("recipe-detail");
+}
+
+document.getElementById("print-recipe-btn").addEventListener("click", () => window.print());
 
 /* ---------- View switching ---------- */
 function showView(name) {
@@ -388,7 +461,7 @@ function enterPortal(user) {
   document.getElementById("dash-greeting").textContent = "Welcome back, " + name;
   showView("dashboard");
   const hash = window.location.hash.replace("#", "");
-  if (hash === "challenge" || hash === "calculator" || hash === "shop") {
+  if (hash === "challenge" || hash === "calculator" || hash === "shop" || hash === "recipes") {
     showView(hash);
     if (hash === "challenge") loadChallenge();
   }
