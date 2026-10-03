@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Discipline Path — Beast Coach</title>
+  <meta name="description" content="A 7-step interactive system that rebuilds the one thing every diet and gym program assumes you already have: the ability to actually follow through." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .dp-section { padding: 88px 0; }
+    .dp-section.light { background: var(--white); }
+    .dp-section.off { background: var(--off-white); }
+    .dp-section.dark { background: var(--green-dark); }
+    .dp-container { max-width: 800px; margin: 0 auto; padding: 0 32px; }
+    .dp-container.wide { max-width: 880px; }
+    .dp-container.narrow { max-width: 760px; }
+    .dp-h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(42px,6vw,72px); line-height: 0.98; letter-spacing: 1px; }
+    .dp-h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(30px,3.6vw,40px); letter-spacing: 1px; margin-bottom: 8px; }
+    .dp-h3 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(24px,2.8vw,30px); letter-spacing: 1px; }
+    .dp-p { font-size: 18px; line-height: 1.7; }
+    .dp-img-frame { border-radius: 14px; overflow: hidden; box-shadow: 0 16px 40px rgba(0,0,0,0.18); max-width: 420px; }
+    .dp-img-frame img { width: 100%; display: block; }
+    .dp-step-num { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: var(--green-light); color: var(--green-dark); font-family: 'Bebas Neue', sans-serif; font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+    .dp-faq-q { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+    .dp-faq-a { font-size: 16px; line-height: 1.6; color: var(--muted); }
+    .dp-bullet { font-size: 16px; line-height: 1.8; }
+    .dp-sticky-cta { position: sticky; top: 0; z-index: 40; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav dp-sticky-cta">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">BEAST<span>COACH</span></a>
+      <div class="nav-links">
+        <a href="/features">Features</a>
+        <a href="/about">Our Story</a>
+        <a href="#pricing" class="nav-cta">Start Now</a>
+      </div>
+      <button class="nav-hamburger" onclick="toggleMenu()">&#9776;</button>
+    </div>
+    <div class="nav-mobile" id="mobileMenu">
+      <a href="/features">Features</a>
+      <a href="/about">Our Story</a>
+      <a href="#pricing">Start Now</a>
+    </div>
+  </nav>
+
+  <!-- 1. HERO -->
+  <section class="dp-section dark" style="padding:80px 0 72px;">
+    <div class="dp-container wide" style="display:flex;flex-wrap:wrap;gap:48px;align-items:center;">
+      <div style="flex:1 1 440px;display:flex;flex-direction:column;gap:26px;">
+        <h1 class="dp-h1" style="color:var(--white);">Discipline Isn't Something You're Born With. It's Something You Build.</h1>
+        <p style="font-size:clamp(17px,2vw,20px);line-height:1.6;color:rgba(255,255,255,0.78);">This is my heart and soul, and I want to share it with people who may have been struggling their whole life with weight, like I did. The Discipline Path is a 7-step interactive system that rebuilds the one thing every diet and gym program assumes you already have: the ability to actually follow through. Built from one person's real 70kg transformation, not theory.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:8px;">
+          <a href="#pricing" class="btn-primary" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;padding:16px 34px;border-radius:8px;">Start The Discipline Path</a>
+          <p style="font-size:14px;color:rgba(255,255,255,0.5);">One-time purchase. Self-paced. Lifetime access.</p>
+        </div>
+      </div>
+      <div style="flex:0 1 340px;max-width:340px;" class="dp-img-frame">
+        <img src="dp-img/dp-hero.jpg" alt="The Discipline Path" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. WHAT THIS ACTUALLY IS -->
+  <section class="dp-section light">
+    <div class="dp-container" style="display:flex;flex-direction:column;gap:22px;">
+      <h2 class="dp-h2">What This Actually Is</h2>
+      <p class="dp-p">This is not a book that you read once and put on the shelf. This is not an app that you forget to use. The Discipline Path is interactive, living entirely on your device. Each step asks you to actually do something: log a habit, make a decision, write your own plan. By the end, you're holding a system you built yourself, guided by me and how I became disciplined, one step at a time.</p>
+      <div class="dp-img-frame">
+        <img src="dp-img/dp-nav.png" alt="The step navigation sidebar" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. THE PROBLEM -->
+  <section class="dp-section dark">
+    <div class="dp-container narrow" style="display:flex;flex-direction:column;gap:20px;">
+      <h2 class="dp-h2" style="color:var(--white);">The Problem</h2>
+      <p class="dp-p" style="color:rgba(255,255,255,0.8);">You've probably already lost the weight once. Maybe more than once. You know what a calorie deficit is. You've read the macros breakdown, downloaded the app, bought the gym membership. None of that was ever the actual problem.</p>
+      <p class="dp-p" style="color:rgba(255,255,255,0.8);">The real problem shows up two or three weeks in, on the day you're tired, or stressed, or it's a Friday and everyone else is having a drink. That's the day the plan falls apart, not because the plan was wrong, but because nothing was holding you to it except motivation, and motivation was never built to last that long.</p>
+      <p class="dp-p" style="color:var(--white);font-weight:600;">If you've started more times than you can count and quit every single one, this isn't a willpower problem. It's that nobody ever taught you how to build the thing underneath willpower.</p>
+    </div>
+  </section>
+
+  <!-- 4. WHY THIS IS DIFFERENT -->
+  <section class="dp-section off">
+    <div class="dp-container" style="display:flex;flex-direction:column;gap:20px;">
+      <h2 class="dp-h2">Why This Is Different</h2>
+      <p class="dp-p">This isn't written by a coach who read about discipline. It's written by someone who lost 70kg, kept it off, and is honest about the fact that it took him three real separate attempts across years to actually figure out why the first two didn't stick.</p>
+      <p class="dp-p">The first two times, motivation did the work: a breakup, a big move, a fresh start. It worked for a while, and then it didn't, because motivation always fades and nothing was built to replace it. The third time was different because the approach was different: no gym split, no diet, just one small proven habit a day until trust in himself was rebuilt from the ground up.</p>
+      <p class="dp-p" style="font-weight:600;">That's what this program actually teaches, not a meal plan, not a training schedule, the thing underneath both of them.</p>
+    </div>
+  </section>
+
+  <!-- 5. WHAT'S INSIDE: 7-STEP SYSTEM -->
+  <section class="dp-section dark">
+    <div class="dp-container" style="display:flex;flex-direction:column;gap:26px;">
+      <h2 class="dp-h2" style="color:var(--white);">What's Inside: The 7-Step System</h2>
+      <p style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.8);">Each step builds directly on the one before it, so they're designed to be worked through in order, not jumped around.</p>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div class="dp-step-num">1</div>
+          <p style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.82);padding-top:6px;"><span style="color:var(--white);font-weight:700;">Identity Reset.</span> You build proof you can trust yourself, one small habit at a time, over 30 days. This is the foundation everything else sits on.</p>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div class="dp-step-num">2</div>
+          <p style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.82);padding-top:6px;"><span style="color:var(--white);font-weight:700;">Environment Reset.</span> You remove the daily decisions that only exist to wear down your willpower, including a real plan for households where you're not the only one eating.</p>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div class="dp-step-num">3</div>
+          <p style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.82);padding-top:6px;"><span style="color:var(--white);font-weight:700;">Social Playbook.</span> You decide, ahead of time, exactly how you'll handle the situations that actually derail people: parties, dinners, drinks with friends.</p>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div class="dp-step-num">4</div>
+          <p style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.82);padding-top:6px;"><span style="color:var(--white);font-weight:700;">Routine Build.</span> You build a week you can fall into on the days you don't feel like thinking: wake time, training, steps, bedtime, all in one place.</p>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div class="dp-step-num">5</div>
+          <p style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.82);padding-top:6px;"><span style="color:var(--white);font-weight:700;">Reset Protocol.</span> You decide your rule for a bad day, before you're in the middle of one, so one slip-up never turns into a lost week.</p>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div class="dp-step-num">6</div>
+          <p style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.82);padding-top:6px;"><span style="color:var(--white);font-weight:700;">The Reminder.</span> You choose something physical that keeps you honest, not something that tests your willpower.</p>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <div class="dp-step-num">7</div>
+          <p style="font-size:17px;line-height:1.6;color:rgba(255,255,255,0.82);padding-top:6px;"><span style="color:var(--white);font-weight:700;">Full System.</span> Everything comes together: your personal calorie and macro targets, the Meal Plan Ideas tool, the Workout Sheet, and the full recipe library.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. THE THREE -->
+  <section class="dp-section light">
+    <div class="dp-container wide" style="display:flex;flex-direction:column;gap:52px;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <h2 class="dp-h2">The Three Steps In This Program That Actually Change Everything</h2>
+        <p style="font-size:17px;line-height:1.6;color:var(--muted);">Everything else in the system supports these three.</p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <h3 class="dp-h3" style="color:var(--green);">Identity Reset</h3>
+        <p style="font-size:20px;font-weight:700;line-height:1.4;">You Don't Need Motivation. You Need Proof.</p>
+        <p class="dp-p">Most people have tried to change more times than they can count, and every failed attempt quietly taught them not to trust themselves. Identity Reset fixes that directly: one small habit, chosen on your own terms, added every single day for 30 days. Not a personality overhaul, not a new you overnight, just evidence stacking up until you can't argue with it anymore. By day 30 you're not forcing habits, you've become someone who does them.</p>
+        <div class="dp-img-frame"><img src="dp-img/dp-identity-log.png" alt="The Identity Reset habit log" /></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <h3 class="dp-h3" style="color:var(--green);">Environment Reset</h3>
+        <p style="font-size:20px;font-weight:700;line-height:1.4;">Willpower Was Never Supposed to Do This Alone.</p>
+        <p class="dp-p">This is the step most programs generally skip entirely: physically going through your kitchen and removing the daily decision, not just telling you to "have more willpower" at the fridge every night. It includes a real answer for households where you're not the only one eating: a dedicated shelf for trigger foods that aren't yours to throw out, and a Goodbye Box ritual for anything you're keeping for someone else. You stop relying on willpower for something that should've just been removed.</p>
+        <div class="dp-img-frame"><img src="dp-img/dp-environment.jpg" alt="The Disposal Ritual and dedicated trigger-food shelf" /></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <h3 class="dp-h3" style="color:var(--green);">Social Playbook</h3>
+        <p style="font-size:20px;font-weight:700;line-height:1.4;">The Plan Was Never Wrong. You Just Hadn't Decided Anything Yet.</p>
+        <p class="dp-p">The moment that actually derails most people isn't a lack of knowledge, it's standing at a party, a dinner, or a round of drinks with zero plan, improvising under social pressure. The Social Playbook has you decide ahead of time, while you're calm and thinking clearly, exactly how you'll handle the specific situations that get you. By the time you're actually in the room, there's nothing left to decide.</p>
+        <div class="dp-img-frame"><img src="dp-img/dp-social.jpg" alt="The Social Playbook scenario page" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MID CTA -->
+  <section style="background:var(--green-light);padding:60px 0;">
+    <div class="dp-container narrow" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;">
+      <h2 class="dp-h2" style="color:var(--green-dark);">You Don't Need More Motivation. You Need the Next 30 Days.</h2>
+      <a href="#pricing" class="btn-primary" style="background:var(--green-dark);font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;padding:16px 34px;border-radius:8px;">Start The Discipline Path</a>
+    </div>
+  </section>
+
+  <!-- 7. PSYCHOLOGY -->
+  <section class="dp-section off">
+    <div class="dp-container" style="display:flex;flex-direction:column;gap:20px;">
+      <h2 class="dp-h2">The Psychology</h2>
+      <p style="font-size:19px;font-weight:700;line-height:1.5;color:var(--green);">Not just what to do. Why you've never been able to do it before.</p>
+      <p class="dp-p">Before you touch a single step, the program walks you through the actual psychology of why people fail, not generic motivation advice, but the real mechanics: why starting feels impossible, why willpower runs out by the evening, why one slip-up turns into a lost month, and why your environment is doing half the work against you without you noticing.</p>
+      <p class="dp-p">You answer a short, honest question under each one. Those answers come back to you at the end, in your Full System summary, so you can see exactly what you were thinking on day one versus who you've become by day sixty.</p>
+      <div class="dp-img-frame"><img src="dp-img/dp-psychology.jpg" alt="The Psychology section" /></div>
+    </div>
+  </section>
+
+  <!-- 8. WHAT ELSE YOU GET -->
+  <section class="dp-section dark">
+    <div class="dp-container wide" style="display:flex;flex-direction:column;gap:26px;">
+      <h2 class="dp-h2" style="color:var(--white);">What Else You Get</h2>
+      <div style="border:1px solid rgba(255,255,255,0.14);border-radius:12px;overflow:hidden;">
+        <div style="display:flex;flex-wrap:wrap;gap:4px 24px;padding:18px 22px;background:rgba(255,255,255,0.05);">
+          <p style="flex:1 1 200px;font-weight:700;color:var(--green-light);font-size:14px;letter-spacing:1px;text-transform:uppercase;">Included</p>
+          <p style="flex:2 1 380px;font-weight:700;color:var(--green-light);font-size:14px;letter-spacing:1px;text-transform:uppercase;">What it actually is</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 24px;padding:18px 22px;border-top:1px solid rgba(255,255,255,0.1);">
+          <p style="flex:1 1 200px;color:var(--white);font-weight:700;font-size:15px;">Meal Plan Ideas</p>
+          <p style="flex:2 1 380px;color:rgba(255,255,255,0.78);font-size:15px;line-height:1.5;">An interactive tool built around proteins, carbs, and fats you pick yourself, not a rigid plan you're forced into. A good way to start educating yourself on what healthy eating habits look like.</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 24px;padding:18px 22px;border-top:1px solid rgba(255,255,255,0.1);">
+          <p style="flex:1 1 200px;color:var(--white);font-weight:700;font-size:15px;">60 Original Recipes</p>
+          <p style="flex:2 1 380px;color:rgba(255,255,255,0.78);font-size:15px;line-height:1.5;">Simple, repeatable meals Stefan actually developed and eats, with full macros and a personal note on why each one works, updated weekly.</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 24px;padding:18px 22px;border-top:1px solid rgba(255,255,255,0.1);">
+          <p style="flex:1 1 200px;color:var(--white);font-weight:700;font-size:15px;">Workout Sheet</p>
+          <p style="flex:2 1 380px;color:rgba(255,255,255,0.78);font-size:15px;line-height:1.5;">A day-by-day training sheet with a Gym or Home toggle, a great entry point to start logging your workouts, if you choose.</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 24px;padding:18px 22px;border-top:1px solid rgba(255,255,255,0.1);">
+          <p style="flex:1 1 200px;color:var(--white);font-weight:700;font-size:15px;">Education Library</p>
+          <p style="flex:2 1 380px;color:rgba(255,255,255,0.78);font-size:15px;line-height:1.5;">I've seen so much confusion out there, so I summarised the top 20 fat-loss myths, 20 core nutrition topics explained in plain English, and the real cost of alcohol on your progress.</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 24px;padding:18px 22px;border-top:1px solid rgba(255,255,255,0.1);">
+          <p style="flex:1 1 200px;color:var(--white);font-weight:700;font-size:15px;">Your Personal Targets</p>
+          <p style="flex:2 1 380px;color:rgba(255,255,255,0.78);font-size:15px;line-height:1.5;">Calories, protein, carbs, and fat, calculated from your own numbers, not a generic chart.</p>
+        </div>
+      </div>
+      <p style="font-size:15px;line-height:1.6;color:rgba(255,255,255,0.78);">The Education library is available to you from day one. The rest becomes part of your toolkit as you move through the system, and the Education library alone is worth printing and keeping.</p>
+    </div>
+  </section>
+
+  <!-- 9. RESULTS -->
+  <section class="dp-section light">
+    <div class="dp-container narrow" style="display:flex;flex-direction:column;gap:22px;">
+      <h2 class="dp-h2">Results</h2>
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4.2vw,42px);color:var(--green);line-height:1.1;">70kg lost. Not a single scale photo faked, not a single before/after filtered.</p>
+      <p style="font-size:19px;font-style:italic;line-height:1.6;border-left:3px solid var(--green);padding-left:20px;">"I've lost 70kg in total. This program is everything I actually did, not the version that sounds better on social media."</p>
+      <p style="font-size:16px;line-height:1.7;color:var(--muted);">This isn't a program built by a marketing team and tested on nobody. It's the exact system one person used to go from three failed attempts and a gym membership he paid for 18 months without using, to keeping the weight off for good.</p>
+    </div>
+  </section>
+
+  <!-- 10. WHO THIS IS FOR -->
+  <section class="dp-section dark">
+    <div class="dp-container wide" style="display:flex;flex-direction:column;gap:36px;">
+      <h2 class="dp-h2" style="color:var(--white);">Who This Is For</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:36px;">
+        <div style="flex:1 1 300px;display:flex;flex-direction:column;gap:12px;">
+          <p style="font-size:16px;font-weight:700;color:var(--green-light);">This is for you if:</p>
+          <p class="dp-bullet" style="color:rgba(255,255,255,0.82);">• You've lost weight before and gained it back, more than once</p>
+          <p class="dp-bullet" style="color:rgba(255,255,255,0.82);">• You need some accountability and discipline structure</p>
+          <p class="dp-bullet" style="color:rgba(255,255,255,0.82);">• You already know the basics of nutrition and training, and that's never been the problem</p>
+          <p class="dp-bullet" style="color:rgba(255,255,255,0.82);">• You're tired of starting over every Monday</p>
+          <p class="dp-bullet" style="color:rgba(255,255,255,0.82);">• You want a system you build once and actually follow, not another plan to abandon in three weeks</p>
+        </div>
+        <div style="flex:1 1 300px;display:flex;flex-direction:column;gap:12px;">
+          <p style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.5);">This probably isn't for you if:</p>
+          <p class="dp-bullet" style="color:rgba(255,255,255,0.5);">• You want a coach or a full meal plan done-for-you and workout program with no self-reflection involved</p>
+          <p class="dp-bullet" style="color:rgba(255,255,255,0.5);">• You're looking for a quick fix before an event in the next few weeks</p>
+          <p class="dp-bullet" style="color:rgba(255,255,255,0.5);">• You have a diagnosed eating disorder or a medical condition where you need a doctor's guidance first, this program says so upfront and means it</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. HOW IT WORKS -->
+  <section class="dp-section off">
+    <div class="dp-container" style="display:flex;flex-direction:column;gap:24px;">
+      <h2 class="dp-h2">How It Works</h2>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <p style="font-size:17px;line-height:1.6;"><span style="font-weight:700;">1. Buy once, get instant access.</span> No subscription, no recurring charge.</p>
+        <p style="font-size:17px;line-height:1.6;"><span style="font-weight:700;">2. Work through the 7 steps in order, at your own pace.</span> You move through them one at a time, finishing each before starting the next. There's no deadline, no pressure to rush.</p>
+        <p style="font-size:17px;line-height:1.6;"><span style="font-weight:700;">3. Print it as you go.</span> Every step is designed to be printed, especially handy for your workout schedule or meal ideas.</p>
+        <p style="font-size:17px;line-height:1.6;"><span style="font-weight:700;">4. Keep the Full System forever.</span> Once you reach Step 7, your meal ideas, recipes, workout sheet, and targets are yours to come back to any time.</p>
+      </div>
+      <p style="font-size:15px;line-height:1.6;color:var(--muted);background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">This saves your progress right in your browser, privately, on this device. There's nothing to install, nothing to configure, and nothing sent to a server, you just start.</p>
+    </div>
+  </section>
+
+  <!-- 12. WHAT COMES NEXT -->
+  <section class="dp-section dark">
+    <div class="dp-container" style="display:flex;flex-direction:column;gap:20px;">
+      <h2 class="dp-h2" style="color:var(--white);">What Comes Next: The Beast Coach App</h2>
+      <p style="font-size:18px;font-weight:700;line-height:1.5;color:var(--green-light);">This isn't trying to sell you a second product. It's making sure that when you're ready for one, you actually stick with it.</p>
+      <p class="dp-p" style="color:rgba(255,255,255,0.8);">Once you've actually built the discipline to follow through, the Beast Coach app is where the real work happens: full training programs, detailed nutrition tracking, and day-to-day coaching.</p>
+      <p class="dp-p" style="color:rgba(255,255,255,0.8);">But it's built for people who've already done this groundwork. Most people who download a fitness app and quit within a few weeks don't fail because the app is bad, they fail because they never built the discipline to use it consistently in the first place. That's the gap The Discipline Path closes before you ever open the app.</p>
+      <p class="dp-p" style="color:rgba(255,255,255,0.8);">You don't need it today. Finish this, build the proof, and the app becomes the obvious next step instead of one more thing you abandon in February.</p>
+    </div>
+  </section>
+
+  <!-- 13. FAQ -->
+  <section class="dp-section light">
+    <div class="dp-container" style="display:flex;flex-direction:column;gap:28px;">
+      <h2 class="dp-h2">FAQ</h2>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div><p class="dp-faq-q">Is this a meal plan or workout program?</p><p class="dp-faq-a">No, those are included as bonuses, but the core of the program is the 7-step discipline system. If you only want a meal plan, this isn't built for you.</p></div>
+        <div><p class="dp-faq-q">How long does it take?</p><p class="dp-faq-a">The Identity Reset step is designed around 30 days, but doing the whole program properly takes longer than that. Most people move through the full 7 steps over 8 to 12 weeks.</p></div>
+        <div><p class="dp-faq-q">Do I need any equipment?</p><p class="dp-faq-a">No. The Workout Sheet has a Home option built entirely around bodyweight, dumbbells, or bands if you don't have gym access.</p></div>
+        <div><p class="dp-faq-q">Is this medical or dietary advice?</p><p class="dp-faq-a">No. This reflects one person's personal experience. Please consult a doctor or accredited health professional before changing your diet or exercise routine, this is stated clearly before you begin.</p></div>
+        <div><p class="dp-faq-q">What if I fall behind or miss a day?</p><p class="dp-faq-a">Step 5, the Reset Protocol, exists specifically for this. You'll set your own rule for a bad day before you ever have one.</p></div>
+        <div><p class="dp-faq-q">Do I get updates?</p><p class="dp-faq-a">Yes, new recipes are added to the library on an ongoing basis at no extra cost.</p></div>
+        <div><p class="dp-faq-q">Will my progress show up if I open this on another device?</p><p class="dp-faq-a">No. Everything saves locally in your browser, on purpose, so your habit log and reflections stay private and never touch a server. That means it stays on the one device and browser you use it on, pick one and stick with it.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14. ALL SALES FINAL -->
+  <section class="dp-section dark">
+    <div class="dp-container" style="display:flex;flex-direction:column;gap:18px;">
+      <h2 class="dp-h2" style="color:var(--white);">All Sales Are Final</h2>
+      <p class="dp-p" style="color:rgba(255,255,255,0.8);max-width:620px;">This is a one-time purchase at a price that reflects what it actually is: a complete system, not a subscription trap. Because you get instant access to the full program the moment you buy, every sale is final, there are no refunds.</p>
+    </div>
+  </section>
+
+  <!-- 15. PRICING & FINAL CTA -->
+  <section id="pricing" style="background:var(--green-light);padding:90px 0;">
+    <div class="dp-container narrow" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:20px;">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,3vw,28px);letter-spacing:1px;color:var(--green-dark);">THE DISCIPLINE PATH</p>
+      <p style="font-size:16px;line-height:1.6;color:var(--green-dark);max-width:540px;">The complete 7-step system, plus your personal targets, Meal Plan Ideas, 60 recipes, a full Workout Sheet, and the Education library.</p>
+      <div style="display:flex;align-items:baseline;gap:14px;">
+        <p style="font-size:20px;font-weight:700;color:rgba(27,48,34,0.55);text-decoration:line-through;">AUD $55</p>
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,4.6vw,46px);color:var(--green-dark);">AUD $38.50</p>
+      </div>
+      <div style="background:rgba(27,48,34,0.12);border-radius:10px;padding:12px 22px;display:flex;flex-direction:column;gap:2px;align-items:center;">
+        <p id="dp-price-label" style="font-size:12px;letter-spacing:1px;color:var(--green-dark);text-transform:uppercase;font-weight:700;">Price goes back up to $55 in</p>
+        <p id="dp-countdown" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green-dark);letter-spacing:1px;">&nbsp;</p>
+      </div>
+      <a href="#pricing" class="btn-primary" style="background:var(--green-dark);font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;padding:16px 36px;border-radius:8px;">Get Instant Access</a>
+      <p style="font-size:13px;color:rgba(27,48,34,0.75);">Instant access · Private, stays on your device · Lifetime access, no subscription · No refunds, all sales final</p>
+      <p style="font-size:16px;font-weight:700;line-height:1.5;color:var(--green-dark);max-width:500px;margin-top:6px;">You don't need a better plan. You need proof you can trust yourself, and that's exactly what the next 30 days are for.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logo">BEAST<span>COACH</span></div>
+          <p>We all have a beast in us.</p>
+        </div>
+        <div class="footer-links">
+          <a href="/features">Features</a>
+          <a href="/about">Our Story</a>
+          <a href="/privacy">Privacy Policy</a>
+        </div>
+        <div class="footer-legal">
+          <p>The Discipline Path, a Beast Coach program.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('active'); }
+
+    (function () {
+      var dealEndsAt = new Date('2026-11-15T00:00:00+11:00').getTime();
+      var countdownEl = document.getElementById('dp-countdown');
+      var labelEl = document.getElementById('dp-price-label');
+
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function tick() {
+        var msLeft = dealEndsAt - Date.now();
+        if (msLeft > 0) {
+          var totalSeconds = Math.floor(msLeft / 1000);
+          var days = Math.floor(totalSeconds / 86400);
+          var hours = Math.floor((totalSeconds % 86400) / 3600);
+          var minutes = Math.floor((totalSeconds % 3600) / 60);
+          var seconds = totalSeconds % 60;
+          countdownEl.textContent = days + 'd ' + pad(hours) + 'h ' + pad(minutes) + 'm ' + pad(seconds) + 's';
+          labelEl.textContent = 'Price goes back up to $55 in';
+        } else {
+          countdownEl.textContent = 'Offer ended';
+          labelEl.textContent = 'The $38.50 launch price has ended';
+          clearInterval(timer);
+        }
+      }
+
+      tick();
+      var timer = setInterval(tick, 1000);
+    })();
+  </script>
+</body>
+</html>
