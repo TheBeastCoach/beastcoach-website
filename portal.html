@@ -472,6 +472,39 @@ function enterPortal(user) {
     showView(hash);
     if (hash === "challenge") loadChallenge();
   }
+  checkDisciplinePurchase(user);
+}
+
+/* ---------- Discipline Path purchase check ---------- */
+async function checkDisciplinePurchase(user) {
+  const tile = document.getElementById("disciplineTile");
+  if (!tile || !user.email) return;
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("purchase") === "success") {
+    const banner = document.createElement("p");
+    banner.className = "form-msg visible";
+    banner.style.marginBottom = "16px";
+    banner.textContent = "Payment received! It can take a few seconds to confirm, refresh if the program tile doesn't update right away.";
+    document.getElementById("dash-greeting").insertAdjacentElement("afterend", banner);
+  }
+
+  try {
+    const { data, error } = await sb
+      .from("purchases")
+      .select("id")
+      .eq("email", user.email.toLowerCase().trim())
+      .eq("product", "discipline-path")
+      .limit(1);
+    if (error) { console.error("Purchase check failed:", error); return; }
+    if (data && data.length > 0) {
+      tile.querySelector("h3").textContent = "7-Step Discipline Program";
+      tile.querySelector("p").textContent = "Unlocked — open your program.";
+      tile.style.borderColor = "var(--green)";
+    }
+  } catch (err) {
+    console.error("Purchase check failed:", err);
+  }
 }
 
 sb.auth.onAuthStateChange((_e, session) => { if (session && session.user) enterPortal(session.user); });
