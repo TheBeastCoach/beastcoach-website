@@ -498,6 +498,7 @@ async function checkDisciplinePurchase(user) {
       .limit(1);
     if (error) { console.error("Purchase check failed:", error); return; }
     if (data && data.length > 0) {
+      tile.href = "/program";
       tile.querySelector("h3").textContent = "7-Step Discipline Program";
       tile.querySelector("p").textContent = "Unlocked — open your program.";
       tile.style.borderColor = "var(--green)";
