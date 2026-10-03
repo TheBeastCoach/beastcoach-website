@@ -236,6 +236,43 @@
       letter-spacing: 1px;
     }
 
+    .hero-dp-teaser {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 48px;
+      padding: 14px 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      text-decoration: none;
+      max-width: 420px;
+      transition: border-color 0.2s;
+    }
+    .hero-dp-teaser:hover { border-color: var(--accent); }
+    .hero-dp-teaser img {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex: 0 0 auto;
+    }
+    .hero-dp-teaser-label {
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+    .hero-dp-teaser-title {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+    }
+    @media (max-width: 600px) {
+      .hero-dp-teaser { max-width: 100%; }
+    }
+
     .hero-image {
       position: relative;
     }
@@ -903,7 +940,7 @@
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-content">
-      <div class="hero-label">Launching August 2026</div>
+      <div class="hero-label">Launching Late 2026</div>
       <h1>We All Have<br><span>A Beast</span><br>In Us</h1>
       <p class="hero-sub">At 48, I transformed my body. I just wish I'd done it sooner. For years I was held back by bad info, misconceptions, and apps that were built on theory, not real experience. So I built one myself: 5 apps in one, all connected.</p>
       <div class="hero-buttons">
@@ -924,6 +961,13 @@
           <div class="hero-stat-label">Powered</div>
         </div>
       </div>
+      <a href="/discipline-path" class="hero-dp-teaser">
+        <img src="dp-img/dp-hero.jpg" alt="The Discipline Path" />
+        <div>
+          <div class="hero-dp-teaser-label">A Beast Coach Program</div>
+          <div class="hero-dp-teaser-title">The Discipline Path &rarr;</div>
+        </div>
+      </a>
     </div>
   </div>
 </section>
