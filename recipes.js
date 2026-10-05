@@ -92,5 +92,23 @@ const RECIPES = [
     ingredients: ["200g sweet potato, cooked and cooled", "1 tbsp cacao powder", "100g low-fat Greek yogurt", "Splash of unsweetened almond milk, to blend"],
     instructions: ["Blend the sweet potato, cacao powder, Greek yogurt, and almond milk until completely smooth.", "Pour into a Ninja Creami pint container and freeze solid (usually 20 to 24 hours).", "Process in the Ninja Creami on the ice cream setting until smooth and scoopable."],
     macros: [["~255", "kcal (est.)"], ["13g", "Protein"], ["47g", "Carbs"], ["1.5g", "Fat"]]
+  },
+  {
+    id: "chia-lemon-creatine-tonic",
+    chip: "Chia Lemon Tonic",
+    title: "Chia, Lemon & Honey Creatine Tonic",
+    desc: "A thick, tangy between-meals tonic that doubles as an easy way to get your daily creatine down without the chalky aftertaste.",
+    ingredients: ["12g chia seeds", "250ml boiling hot water", "Juice of 1 whole lemon", "1 tsp raw honey", "1 serving (5g) creatine monohydrate"],
+    instructions: ["Add the chia seeds to a glass or shaker and pour over the boiling water.", "Stir in the lemon juice, honey, and your creatine serving.", "Let it sit for 5 minutes so the chia seeds swell and thicken the liquid, stirring once halfway through.", "Enjoy thick, tangy, and refreshing between meals. Creatine itself adds no meaningful calories, so the macros below are for the chia, lemon, and honey base."],
+    macros: [["90", "kcal"], ["2g", "Protein"], ["15g", "Carbs"], ["3.5g", "Fat"]]
+  },
+  {
+    id: "cacao-chia-pumpkin-smoothie",
+    chip: "Cacao Chia Smoothie",
+    title: "Cacao, Chia & Pumpkin Seed Protein Smoothie",
+    desc: "A magnesium-rich seed and cacao blend stirred into a chocolate-strawberry protein smoothie. Chia brings fiber and omega-3s, raw cacao brings magnesium and polyphenols, and pumpkin seeds bring magnesium, zinc, and plant protein on top of the shake's whey.",
+    ingredients: ["12g chia seeds", "1 tbsp (about 5g) raw cacao powder", "30g pumpkin seeds (pepitas)", "1 scoop (30g) chocolate protein powder", "100g strawberries", "200ml almond milk"],
+    instructions: ["Combine the chia seeds, raw cacao powder, and pumpkin seeds, these three are the add-in base and can be stirred into any smoothie you like.", "For this version, blend them with the chocolate protein powder, strawberries, and almond milk until smooth.", "Pour and drink immediately, or let it sit a few minutes first if you want the chia to thicken it further."],
+    macros: [["415", "kcal"], ["38g", "Protein"], ["23g", "Carbs"], ["23g", "Fat"]]
   }
 ];
