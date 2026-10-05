@@ -55,7 +55,11 @@ module.exports = async function handler(req, res) {
       return res.status(502).json({ error: session.error?.message || 'Could not start checkout' });
     }
 
-    return res.status(200).json({ url: session.url });
+    // TEMPORARY DEBUG: confirms whether this deployment is actually using the
+    // live or test Stripe key. Safe to leave briefly, remove once confirmed.
+    console.log('[create-checkout debug] key prefix:', secretKey.slice(0, 11), '| session livemode:', session.livemode, '| session id:', session.id);
+
+    return res.status(200).json({ url: session.url, debug_livemode: session.livemode, debug_key_prefix: secretKey.slice(0, 11) });
   } catch (err) {
     console.error('Checkout creation failed:', err);
     return res.status(500).json({ error: 'Could not start checkout' });
