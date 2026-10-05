@@ -392,7 +392,7 @@
           if (!res.ok || !data.url) {
             throw new Error(data.error || 'Could not start checkout');
           }
-          console.log('[Discipline Path checkout debug]', 'livemode:', data.debug_livemode, '| key prefix:', data.debug_key_prefix);
+          alert('DEBUG — livemode: ' + data.debug_livemode + ' | key prefix: ' + data.debug_key_prefix);
           window.location.href = data.url;
         } catch (err) {
           btn.disabled = false;
