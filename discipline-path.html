@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Discipline Path — Beast Coach</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta name="description" content="A 7-step interactive system that rebuilds the one thing every diet and gym program assumes you already have: the ability to actually follow through." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -392,7 +396,6 @@
           if (!res.ok || !data.url) {
             throw new Error(data.error || 'Could not start checkout');
           }
-          alert('DEBUG — livemode: ' + data.debug_livemode + ' | key prefix: ' + data.debug_key_prefix);
           window.location.href = data.url;
         } catch (err) {
           btn.disabled = false;
