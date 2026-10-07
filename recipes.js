@@ -25,6 +25,7 @@ const RECIPES = [
   },
   {
     id: "creme-brulee",
+    image: "recipe-img/creme-brulee.jpg",
     chip: "Crème Brûlée",
     title: "High-Protein Crème Brûlée (Gelato Option)",
     desc: "A decadent custard dessert transformed into a macro-friendly evening staple.",
@@ -70,6 +71,7 @@ const RECIPES = [
   },
   {
     id: "pb-replacement",
+    image: "recipe-img/pb-replacement.jpg",
     chip: "PB Replacement",
     title: "Sweet Potato Peanut Butter Replacement",
     desc: "A dense, high-volume alternative to traditional peanut butter that slashes dietary fat while keeping complex carbs high for training fuel.",
@@ -79,6 +81,7 @@ const RECIPES = [
   },
   {
     id: "choc-mousse",
+    image: "recipe-img/choc-mousse.jpg",
     chip: "Choc Mousse",
     title: "High-Protein Chocolate Mousse",
     desc: "An ultra-lean dessert hack using cooked egg whites as an odorless, neutral-flavor aerating agent that whips into a thick, glossy pudding.",
