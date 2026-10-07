@@ -80,7 +80,7 @@ const RECIPES = [
     desc: "A dense, high-volume alternative to traditional peanut butter that slashes dietary fat while keeping complex carbs high for training fuel.",
     ingredients: ["300g sweet potato, roasted or steamed, skin removed", "48g (about 4 tbsp) powdered peanut butter, e.g. PB2 or Macro Mike", "1/2 tsp ground cinnamon", "1 tsp vanilla extract", "Stevia or monk fruit sweetener, to taste", "2 to 3 tbsp unsweetened almond milk or water, optional, to reach desired consistency"],
     instructions: ["Roast (or steam) the sweet potato until fork-tender throughout; let cool slightly.", "Add the warm sweet potato, peanut butter powder, cinnamon, vanilla, and sweetener to a food processor or blender.", "Blend on high until completely silky and whipped, adding a splash of liquid only if needed to loosen the blades.", "Transfer to an airtight jar and chill. Thickens further in the fridge; stays fresh for 4 to 5 days."],
-    macros: [["110", "kcal/serving"], ["7g", "Protein"], ["19g", "Carbs"], ["1.5g", "Fat"]]
+    macros: [["~50", "kcal per 40g"], ["3g", "Protein"], ["8g", "Carbs"], ["0.5g", "Fat"]]
   },
   {
     id: "choc-mousse",
@@ -107,7 +107,7 @@ const RECIPES = [
     chip: "Chia Lemon Tonic",
     title: "Chia, Lemon & Honey Creatine Tonic",
     desc: "A thick, tangy between-meals tonic that doubles as an easy way to get your daily creatine down without the chalky aftertaste.",
-    ingredients: ["12g chia seeds", "250ml boiling hot water", "Juice of 1 whole lemon", "1 tsp raw honey", "1 serving (5g) creatine monohydrate"],
+    ingredients: ["12g chia seeds", "250ml boiling hot water", "Juice of 1 whole lemon", "1 tsp honey", "1 serving (5g) creatine monohydrate"],
     instructions: ["Add the chia seeds to a glass and pour over the hot water.", "Stir in the lemon juice, honey, and creatine.", "Let it sit for 5 minutes, stirring once halfway, so the chia swells and thickens the drink, then drink it. Creatine adds no meaningful calories, so the macros are for the chia, lemon, and honey."],
     macros: [["90", "kcal"], ["2g", "Protein"], ["15g", "Carbs"], ["3.5g", "Fat"]]
   },
