@@ -15,6 +15,7 @@ const RECIPES = [
   {
     id: "protein-jellies",
     chip: "Protein Jellies",
+    image: "recipe-img/protein-jellies.jpg",
     title: "Monster Energy Protein Jellies",
     desc: "A portable, zero-fat caffeine boost designed for pre-workout or afternoon energy.",
     ingredients: ["500ml Ultra/Zero-Sugar Monster Energy, chilled", "20g unflavored gelatin powder", "30g whey protein isolate or clear whey isolate, matching flavor", "60ml cold water"],
