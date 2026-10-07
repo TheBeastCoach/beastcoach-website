@@ -9,7 +9,7 @@ const RECIPES = [
     image: "recipe-img/ice-cream-sandwich.jpg",
     title: "Sweet Potato Brownie Ice Cream Sandwich",
     desc: "A high-volume, satiating frozen snack that balances complex carbs and slow-digesting protein.",
-    ingredients: ["2 plain thin rice cakes", "120g baked sweet potato (skin removed, chilled)", "100g non-fat plain Greek yogurt", "10g unsweetened dark cocoa powder", "Stevia or zero-calorie sweetener, to taste", "Splash of unsweetened almond milk, if needed to blend"],
+    ingredients: ["2 plain thin rice cakes (optional)", "120g baked sweet potato (skin removed, chilled)", "100g non-fat plain Greek yogurt", "10g unsweetened dark cocoa powder", "Stevia or zero-calorie sweetener to taste, or 1 tbsp honey", "Up to 200ml unsweetened almond milk, if needed to blend", "Splash of vanilla extract"],
     instructions: ["Blend or mash baked sweet potato, Greek yogurt, cocoa powder, and sweetener until completely smooth and thick.", "Spread evenly across the surface of one rice cake and top with the second.", "Freeze for 45 to 60 minutes until firm but biteable."],
     macros: [["230", "kcal"], ["13g", "Protein"], ["40g", "Carbs"], ["2g", "Fat"]]
   },
