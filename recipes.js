@@ -34,15 +34,6 @@ const RECIPES = [
     macros: [["245", "kcal"], ["34g", "Protein"], ["7g", "Carbs"], ["6g", "Fat"]]
   },
   {
-    id: "recovery-hot-chocolate",
-    chip: "Recovery Hot Chocolate",
-    title: "High-Magnesium Recovery Hot Chocolate",
-    desc: "Designed for post-workout neural recovery and deeper sleep quality.",
-    ingredients: ["250ml unsweetened almond milk", "15g raw organic cacao powder", "15g pumpkin seed meal / powdered pumpkin seeds", "10g ground chia seeds", "1 scoop (25g) unflavored or chocolate collagen/casein powder", "Pinch of pink Himalayan sea salt, plus zero-calorie sweetener to taste"],
-    instructions: ["Whisk almond milk, cacao, finely ground pumpkin seeds, and chia seeds in a small saucepan over medium-low heat.", "Simmer gently for 2 to 3 minutes until the chia and seeds slightly thicken the liquid.", "Remove from heat, whisk in protein/collagen vigorously until dissolved, and serve hot."],
-    macros: [["275", "kcal"], ["31g", "Protein"], ["8g", "Carbs"], ["12g", "Fat"]]
-  },
-  {
     id: "cheeseburgers",
     image: "recipe-img/cheeseburgers.jpg",
     chip: "Cheeseburgers",
@@ -91,15 +82,6 @@ const RECIPES = [
     ingredients: ["200g liquid egg whites, carton or fresh", "1 scoop (30g) chocolate whey/casein blend, or whey isolate", "2 heaped tsp (10g) unsweetened baking cocoa powder", "2 heaped tsp (10g) sugar-free hot chocolate powder, e.g. Avalanche or Jarrah", "1 heaped tbsp (30g) low-fat or non-fat plain Greek yogurt", "Optional: 1 to 2 tbsp cold water or unsweetened almond milk, plus zero-calorie sweetener if extra sweetness is preferred"],
     instructions: ["Microwave the egg whites in a bowl in 45-second intervals, stirring between bursts until just set (soft-scrambled, not browned or rubbery). Alternatively, steam or soft-poach them.", "Allow the cooked whites to cool for 5 minutes so they don't curdle the protein powder.", "Transfer the cooked egg whites, protein powder, cocoa powder, hot chocolate mix, Greek yogurt, and sweetener into a high-speed blender or bullet blender.", "Blend on high for 60 to 90 seconds, stopping to scrape down the sides, until velvety and uniform.", "Pour into a bowl or ramekin and refrigerate for 2 to 4 hours to chill and set into a firm, spoonable mousse."],
     macros: [["275", "kcal"], ["49g", "Protein"], ["13g", "Carbs"], ["3.5g", "Fat"]]
-  },
-  {
-    id: "creami-sweet-potato",
-    chip: "Creami Sweet Potato",
-    title: "Ninja Creami Sweet Potato & Cacao \"Ice Cream\"",
-    desc: "A simple, no-added-sugar frozen dessert made in the Ninja Creami, using sweet potato as the base instead of cream or bananas.",
-    ingredients: ["200g sweet potato, cooked and cooled", "1 tbsp cacao powder", "100g low-fat Greek yogurt", "Splash of unsweetened almond milk, to blend"],
-    instructions: ["Blend the sweet potato, cacao powder, Greek yogurt, and almond milk until completely smooth.", "Pour into a Ninja Creami pint container, level the top, and freeze flat for at least 16 hours (24 is ideal).", "Process on the Lite Ice Cream setting. If it comes out crumbly or powdery, add a splash of almond milk and re-spin."],
-    macros: [["~255", "kcal (est.)"], ["13g", "Protein"], ["47g", "Carbs"], ["1.5g", "Fat"]]
   },
   {
     id: "chia-lemon-creatine-tonic",
