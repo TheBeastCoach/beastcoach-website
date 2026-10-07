@@ -44,6 +44,7 @@ const RECIPES = [
   },
   {
     id: "cheeseburgers",
+    image: "recipe-img/cheeseburgers.jpg",
     chip: "Cheeseburgers",
     title: "Savory Rice Cake Cheeseburgers",
     desc: "Satisfies burger cravings without the heavy refined-carb load of traditional brioche.",
@@ -53,6 +54,7 @@ const RECIPES = [
   },
   {
     id: "protein-waffles",
+    image: "recipe-img/protein-waffles.jpg",
     chip: "Protein Waffles",
     title: "Oat Flour Protein Waffles & Pancakes",
     desc: "A high-fiber, low-glycemic breakfast that holds up under sugar-free maple syrup.",
@@ -62,6 +64,7 @@ const RECIPES = [
   },
   {
     id: "lamb-chimichurri",
+    image: "recipe-img/lamb-chimichurri.jpg",
     chip: "Lamb Chimichurri",
     title: "Lean Lamb Herb & Yogurt Chimichurri Sauce",
     desc: "A bright, acidic drizzle formulated to complement lamb cuts without pouring on olive oil calories.",
@@ -100,6 +103,7 @@ const RECIPES = [
   },
   {
     id: "chia-lemon-creatine-tonic",
+    image: "recipe-img/chia-lemon-creatine-tonic.jpg",
     chip: "Chia Lemon Tonic",
     title: "Chia, Lemon & Honey Creatine Tonic",
     desc: "A thick, tangy between-meals tonic that doubles as an easy way to get your daily creatine down without the chalky aftertaste.",
