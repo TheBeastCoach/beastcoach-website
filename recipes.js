@@ -105,8 +105,9 @@ const RECIPES = [
   },
   {
     id: "cacao-chia-pumpkin-smoothie",
-    chip: "Cacao Chia Smoothie",
-    title: "Cacao, Chia & Pumpkin Seed Protein Smoothie",
+    chip: "Magnesium Smoothie",
+    image: "recipe-img/magnesium-smoothie.jpg",
+    title: "Magnesium Smoothie",
     desc: "A magnesium-rich seed and cacao blend stirred into a chocolate-strawberry protein smoothie. Chia brings fiber and omega-3s, raw cacao brings magnesium and polyphenols, and pumpkin seeds bring magnesium, zinc, and plant protein on top of the shake's whey.",
     ingredients: ["12g chia seeds", "1 tbsp (about 5g) raw cacao powder", "30g pumpkin seeds (pepitas)", "1 scoop (30g) chocolate protein powder", "100g strawberries", "200ml almond milk"],
     instructions: ["Combine the chia seeds, raw cacao powder, and pumpkin seeds, these three are the add-in base and can be stirred into any smoothie you like.", "For this version, blend them with the chocolate protein powder, strawberries, and almond milk until smooth.", "Pour and drink immediately, or let it sit a few minutes first if you want the chia to thicken it further."],
