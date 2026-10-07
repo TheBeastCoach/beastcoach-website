@@ -10,7 +10,7 @@ const RECIPES = [
     title: "Sweet Potato Brownie Ice Cream Sandwich",
     desc: "A high-volume, satiating frozen snack that balances complex carbs and slow-digesting protein.",
     ingredients: ["2 plain thin rice cakes (optional)", "120g baked sweet potato (skin removed, chilled)", "100g non-fat plain Greek yogurt", "10g unsweetened dark cocoa powder", "Stevia or zero-calorie sweetener to taste, or 1 tbsp honey", "Up to 200ml unsweetened almond milk, if needed to blend", "Splash of vanilla extract"],
-    instructions: ["Blend or mash baked sweet potato, Greek yogurt, cocoa powder, and sweetener until completely smooth and thick.", "Spread evenly across the surface of one rice cake and top with the second.", "Freeze for 45 to 60 minutes until firm but biteable."],
+    instructions: ["Blend the sweet potato, Greek yogurt, cocoa powder, sweetener or honey, vanilla, and almond milk until completely smooth.", "Pour into a Ninja Creami pint container, level the top, and freeze flat for at least 16 hours.", "Process in the Ninja Creami on the Lite Ice Cream setting. If it comes out crumbly or powdery, add a splash of almond milk and re-spin.", "Spread a thick layer between two rice cakes and eat straight away, or skip the rice cakes and eat it from the pint."],
     macros: [["230", "kcal"], ["13g", "Protein"], ["40g", "Carbs"], ["2g", "Fat"]]
   },
   {
@@ -20,7 +20,7 @@ const RECIPES = [
     title: "Monster Energy Protein Jellies",
     desc: "A portable, zero-fat caffeine boost designed for pre-workout or afternoon energy.",
     ingredients: ["500ml Ultra/Zero-Sugar Monster Energy, chilled", "20g unflavored gelatin powder", "30g whey protein isolate or clear whey isolate, matching flavor", "60ml cold water"],
-    instructions: ["Bloom gelatin in 60ml cold water for 5 minutes.", "Gently warm 150ml of Monster over low heat (do not boil); stir in bloomed gelatin until dissolved.", "Whisk protein isolate into remaining cold Monster, combine with the gelatin liquid, and pour into silicone molds.", "Chill in the fridge for 3 to 4 hours until set. Store uncovered or with a paper towel to prevent condensation."],
+    instructions: ["Bloom the gelatin in 60ml cold water for 5 minutes.", "Gently warm 150ml of the Monster over low heat (do not boil), then stir in the bloomed gelatin until fully dissolved.", "Whisk the protein isolate into the remaining 350ml cold Monster (let it go flat first, or skim the foam), then slowly pour in the warm gelatin liquid while whisking.", "Pour into silicone molds and chill for 3 to 4 hours until set. Store uncovered or with a paper towel over them to prevent condensation."],
     macros: [["190", "kcal (batch)"], ["42g", "Protein"], ["2g", "Carbs"], ["0g", "Fat"]]
   },
   {
@@ -29,8 +29,8 @@ const RECIPES = [
     chip: "Crème Brûlée",
     title: "High-Protein Crème Brûlée (Gelato Option)",
     desc: "A decadent custard dessert transformed into a macro-friendly evening staple.",
-    ingredients: ["150g non-fat Greek yogurt (or liquid egg whites, cooked gently sous-vide style)", "25g vanilla casein or whey/casein blend protein powder", "1 egg yolk, optional, for authentic custardy mouthfeel", "1 tsp vanilla extract", "1 tbsp granular erythritol/allulose blend, for torching"],
-    instructions: ["Whisk Greek yogurt, protein powder, vanilla extract, and egg yolk thoroughly until glossy and smooth. For gelato: churn in a mini ice-cream maker, or freeze 90 minutes, stirring every 30 minutes.", "Transfer into a shallow ramekin and level the top.", "Sprinkle granular sweetener evenly across the surface and caramelize using a kitchen blowtorch until crisp."],
+    ingredients: ["150g non-fat Greek yogurt (or liquid egg whites, cooked gently sous-vide style)", "25g vanilla casein or whey/casein blend protein powder", "1 pasteurised egg yolk, optional, for authentic custardy mouthfeel (it isn't cooked)", "1 tsp vanilla extract", "1 tbsp granular erythritol/allulose blend, for torching"],
+    instructions: ["Whisk the Greek yogurt, protein powder, vanilla extract, and egg yolk (if using) until glossy and smooth.", "Spoon into a shallow ramekin, level the top, and chill for at least 30 minutes so it firms up.", "Sprinkle the granular sweetener evenly over the surface and torch until golden and crisp. Gelato option: skip the torch and churn the mix in a mini ice-cream maker, or freeze for 90 minutes, stirring every 30 minutes."],
     macros: [["245", "kcal"], ["34g", "Protein"], ["7g", "Carbs"], ["6g", "Fat"]]
   },
   {
@@ -59,7 +59,7 @@ const RECIPES = [
     title: "Oat Flour Protein Waffles & Pancakes",
     desc: "A high-fiber, low-glycemic breakfast that holds up under sugar-free maple syrup.",
     ingredients: ["40g rolled oats, blended into fine flour", "30g whey/casein blend protein powder", "100g liquid egg whites", "1/2 tsp baking powder", "45ml unsweetened almond milk"],
-    instructions: ["Blend all ingredients until smooth; let batter sit for 3 minutes to thicken.", "Pour into a preheated, non-stick waffle iron for 3 to 4 minutes, or flip in a skillet for pancakes."],
+    instructions: ["Blend all ingredients until smooth, then let the batter sit for 3 minutes to thicken.", "Waffles: pour into a preheated, greased waffle iron and cook for 3 to 4 minutes. Pancakes: cook in a non-stick pan over medium heat for 2 to 3 minutes until bubbles form, then flip and cook 1 to 2 minutes more."],
     macros: [["310", "kcal"], ["37g", "Protein"], ["30g", "Carbs"], ["4g", "Fat"]]
   },
   {
@@ -98,7 +98,7 @@ const RECIPES = [
     title: "Ninja Creami Sweet Potato & Cacao \"Ice Cream\"",
     desc: "A simple, no-added-sugar frozen dessert made in the Ninja Creami, using sweet potato as the base instead of cream or bananas.",
     ingredients: ["200g sweet potato, cooked and cooled", "1 tbsp cacao powder", "100g low-fat Greek yogurt", "Splash of unsweetened almond milk, to blend"],
-    instructions: ["Blend the sweet potato, cacao powder, Greek yogurt, and almond milk until completely smooth.", "Pour into a Ninja Creami pint container and freeze solid (usually 20 to 24 hours).", "Process in the Ninja Creami on the ice cream setting until smooth and scoopable."],
+    instructions: ["Blend the sweet potato, cacao powder, Greek yogurt, and almond milk until completely smooth.", "Pour into a Ninja Creami pint container, level the top, and freeze flat for at least 16 hours (24 is ideal).", "Process on the Lite Ice Cream setting. If it comes out crumbly or powdery, add a splash of almond milk and re-spin."],
     macros: [["~255", "kcal (est.)"], ["13g", "Protein"], ["47g", "Carbs"], ["1.5g", "Fat"]]
   },
   {
@@ -108,7 +108,7 @@ const RECIPES = [
     title: "Chia, Lemon & Honey Creatine Tonic",
     desc: "A thick, tangy between-meals tonic that doubles as an easy way to get your daily creatine down without the chalky aftertaste.",
     ingredients: ["12g chia seeds", "250ml boiling hot water", "Juice of 1 whole lemon", "1 tsp raw honey", "1 serving (5g) creatine monohydrate"],
-    instructions: ["Add the chia seeds to a glass or shaker and pour over the boiling water.", "Stir in the lemon juice, honey, and your creatine serving.", "Let it sit for 5 minutes so the chia seeds swell and thicken the liquid, stirring once halfway through.", "Enjoy thick, tangy, and refreshing between meals. Creatine itself adds no meaningful calories, so the macros below are for the chia, lemon, and honey base."],
+    instructions: ["Add the chia seeds to a glass and pour over the hot water.", "Stir in the lemon juice, honey, and creatine.", "Let it sit for 5 minutes, stirring once halfway, so the chia swells and thickens the drink, then drink it. Creatine adds no meaningful calories, so the macros are for the chia, lemon, and honey."],
     macros: [["90", "kcal"], ["2g", "Protein"], ["15g", "Carbs"], ["3.5g", "Fat"]]
   },
   {
@@ -118,7 +118,7 @@ const RECIPES = [
     title: "Magnesium Smoothie",
     desc: "A magnesium-rich seed and cacao blend stirred into a chocolate-strawberry protein smoothie. Chia brings fiber and omega-3s, raw cacao brings magnesium and polyphenols, and pumpkin seeds bring magnesium, zinc, and plant protein on top of the shake's whey.",
     ingredients: ["12g chia seeds", "1 tbsp (about 5g) raw cacao powder", "30g pumpkin seeds (pepitas)", "1 scoop (30g) chocolate protein powder", "100g strawberries", "200ml almond milk"],
-    instructions: ["Combine the chia seeds, raw cacao powder, and pumpkin seeds, these three are the add-in base and can be stirred into any smoothie you like.", "For this version, blend them with the chocolate protein powder, strawberries, and almond milk until smooth.", "Pour and drink immediately, or let it sit a few minutes first if you want the chia to thicken it further."],
+    instructions: ["Blend the chia seeds, cacao powder, pumpkin seeds, protein powder, strawberries, and almond milk until smooth. (The chia, cacao, and pumpkin seed trio also works as an add-in for any smoothie.)", "Drink straight away, or let it sit a few minutes if you want the chia to thicken it."],
     macros: [["415", "kcal"], ["38g", "Protein"], ["23g", "Carbs"], ["23g", "Fat"]]
   }
 ];
