@@ -98,9 +98,9 @@ const RECIPES = [
     chip: "Magnesium Smoothie",
     image: "recipe-img/magnesium-smoothie.jpg",
     title: "Magnesium Smoothie",
-    desc: "A magnesium-rich seed and cacao blend stirred into a chocolate-strawberry protein smoothie. Chia brings fiber and omega-3s, raw cacao brings magnesium and polyphenols, and pumpkin seeds bring magnesium, zinc, and plant protein on top of the shake's whey.",
-    ingredients: ["12g chia seeds", "1 tbsp (about 5g) raw cacao powder", "30g pumpkin seeds (pepitas)", "1 scoop (30g) chocolate protein powder", "100g strawberries", "200ml almond milk"],
-    instructions: ["Blend the chia seeds, cacao powder, pumpkin seeds, protein powder, strawberries, and almond milk until smooth. (The chia, cacao, and pumpkin seed trio also works as an add-in for any smoothie.)", "Drink straight away, or let it sit a few minutes if you want the chia to thicken it."],
-    macros: [["415", "kcal"], ["38g", "Protein"], ["23g", "Carbs"], ["23g", "Fat"]]
+    desc: "A magnesium-and-protein-dense seed, strawberry, and cottage cheese shake. Flaxseed, chia, and pepitas bring magnesium, zinc, fiber, and omega-3s, while liquid egg whites and low-fat cottage cheese push you past 30g of protein before the milk even goes in.",
+    ingredients: ["10g ground flaxseed", "12g chia seeds", "30g pumpkin seeds (pepitas)", "50g pasteurized liquid egg whites", "100g low-fat cottage cheese", "100g frozen strawberries", "150–200ml ultra-filtered high-protein skim milk (or standard skim/light milk for a lighter protein version)", "4–5 ice cubes", "Stevia or a few drops of liquid monk fruit, to taste (optional)"],
+    instructions: ["Blend the flaxseed, chia seeds, pepitas, and milk on high for 30–45 seconds first, so the seeds fully break down.", "Add the cottage cheese, liquid egg whites, strawberries, and ice, then blend again until velvety and aerated.", "Taste and add stevia or monk fruit if you want to balance the tartness of the berries and cottage cheese. 200ml of ultra-filtered high-protein milk (e.g. Fairlife) gets you to roughly 43g protein; swap in standard skim milk instead for a lighter ~36–38g protein version."],
+    macros: [["500", "kcal"], ["43g", "Protein"], ["30g", "Carbs"], ["25g", "Fat"]]
   }
 ];
