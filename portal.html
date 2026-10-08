@@ -173,8 +173,37 @@
         <input type="email" class="form-input" id="signin-email" placeholder="you@email.com" required autocomplete="email">
         <input type="password" class="form-input" id="signin-password" placeholder="Password" required autocomplete="current-password">
         <button type="submit" class="btn-primary">Log In</button>
+        <button type="button" class="back-link" id="forgot-link" style="margin-top:14px; margin-bottom:0;">Forgot your password?</button>
       </form>
       <p class="form-msg" id="auth-status"></p>
+    </div>
+  </section>
+
+  <!-- ===================== FORGOT PASSWORD ===================== -->
+  <section class="view" id="view-forgot">
+    <button class="back-link" id="forgot-back">&larr; Back to log in</button>
+    <h1 class="page-title">Reset your password</h1>
+    <p class="page-sub">Enter your email and we'll send you a link to set a new password.</p>
+    <div class="card">
+      <form class="auth-form" id="forgot-form">
+        <input type="email" class="form-input" id="forgot-email" placeholder="you@email.com" required autocomplete="email">
+        <button type="submit" class="btn-primary">Send reset link</button>
+      </form>
+      <p class="form-msg" id="forgot-status"></p>
+    </div>
+  </section>
+
+  <!-- ===================== SET NEW PASSWORD (via email link) ===================== -->
+  <section class="view" id="view-reset">
+    <h1 class="page-title">Set a new password</h1>
+    <p class="page-sub">Choose a new password for your account.</p>
+    <div class="card">
+      <form class="auth-form" id="reset-form">
+        <input type="password" class="form-input" id="reset-password" placeholder="New password" required autocomplete="new-password" minlength="6">
+        <input type="password" class="form-input" id="reset-password-confirm" placeholder="Confirm new password" required autocomplete="new-password" minlength="6">
+        <button type="submit" class="btn-primary">Set new password</button>
+      </form>
+      <p class="form-msg" id="reset-status"></p>
     </div>
   </section>
 
@@ -334,6 +363,7 @@
 <script>
 const SUPABASE_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
+const SITE_URL = "https://www.beastcoach.fit/portal";
 
 let sb = null;
 try {
@@ -431,6 +461,13 @@ const authStatus = document.getElementById("auth-status");
 const signoutBtn = document.getElementById("signout-btn");
 const entryForm = document.getElementById("entry-form");
 const entryStatus = document.getElementById("entry-status");
+const forgotLink = document.getElementById("forgot-link");
+const forgotBack = document.getElementById("forgot-back");
+const forgotForm = document.getElementById("forgot-form");
+const forgotStatus = document.getElementById("forgot-status");
+const resetForm = document.getElementById("reset-form");
+const resetStatus = document.getElementById("reset-status");
+let inPasswordRecovery = false;
 
 function showStatus(el, msg, isError) {
   el.textContent = msg;
@@ -454,7 +491,7 @@ signupForm.addEventListener("submit", async (e) => {
   const password = document.getElementById("signup-password").value;
   const btn = signupForm.querySelector("button");
   btn.disabled = true;
-  const { data, error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name } } });
+  const { data, error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo: SITE_URL } });
   btn.disabled = false;
   if (error) {
     showStatus(authStatus, error.message || "Something went wrong.", true);
@@ -483,6 +520,44 @@ signinForm.addEventListener("submit", async (e) => {
 signoutBtn.addEventListener("click", async () => {
   await sb.auth.signOut();
   window.location.reload();
+});
+
+forgotLink.addEventListener("click", () => { showView("forgot"); });
+forgotBack.addEventListener("click", () => { showView("auth"); });
+
+forgotForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("forgot-email").value.trim();
+  const btn = forgotForm.querySelector("button");
+  btn.disabled = true;
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: SITE_URL });
+  btn.disabled = false;
+  if (error) {
+    showStatus(forgotStatus, error.message || "Something went wrong.", true);
+  } else {
+    showStatus(forgotStatus, "Check your email for a link to reset your password.", false);
+  }
+});
+
+resetForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const pw1 = document.getElementById("reset-password").value;
+  const pw2 = document.getElementById("reset-password-confirm").value;
+  if (pw1 !== pw2) {
+    showStatus(resetStatus, "Passwords don't match.", true);
+    return;
+  }
+  const btn = resetForm.querySelector("button");
+  btn.disabled = true;
+  const { data, error } = await sb.auth.updateUser({ password: pw1 });
+  btn.disabled = false;
+  if (error) {
+    showStatus(resetStatus, error.message || "Couldn't update your password.", true);
+  } else {
+    inPasswordRecovery = false;
+    showStatus(resetStatus, "Password updated — taking you to your dashboard.", false);
+    setTimeout(() => enterPortal(data.user), 1200);
+  }
 });
 
 function enterPortal(user) {
@@ -530,8 +605,19 @@ async function checkDisciplinePurchase(user) {
   }
 }
 
-sb.auth.onAuthStateChange((_e, session) => { if (session && session.user) enterPortal(session.user); });
-sb.auth.getSession().then(({ data: { session } }) => { if (session && session.user) enterPortal(session.user); });
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    inPasswordRecovery = true;
+    showView("reset");
+    return;
+  }
+  if (inPasswordRecovery) return;
+  if (session && session.user) enterPortal(session.user);
+});
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (inPasswordRecovery) return;
+  if (session && session.user) enterPortal(session.user);
+});
 
 /* ---------- 30-Day Challenge (embedded, same tables as challenge.html) ---------- */
 async function ensureChallengeProfile(user) {
