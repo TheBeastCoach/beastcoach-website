@@ -90,6 +90,24 @@
   .idea-group li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
   .idea-group li:last-child { border-bottom: none; }
 
+  /* Selectable idea pills (dashboard only — clicking fills the habit entry box) */
+  #ideas-list-dashboard .idea-group li {
+    cursor: pointer;
+    border-radius: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 2px 0;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  #ideas-list-dashboard .idea-group li:hover { background: rgba(45,106,79,0.08); }
+  #ideas-list-dashboard .idea-group li.selected {
+    background: var(--green);
+    color: var(--white);
+    border-bottom-color: var(--green);
+    font-weight: 600;
+  }
+  #ideas-list-dashboard .idea-group li.selected:hover { background: var(--green-light); }
+
   /* DASHBOARD */
   #dashboard { display: none; }
   #dashboard.visible { display: block; }
@@ -415,17 +433,40 @@ const IDEA_GROUPS = [
   }
 ];
 
+function escapeAttr(str) {
+  return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
 function renderIdeas(containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = IDEA_GROUPS.map(group => `
     <div class="idea-group">
       <h3>${group.title}</h3>
-      <ul>${group.items.map(item => `<li>${item}</li>`).join("")}</ul>
+      <ul>${group.items.map(item => `<li data-idea="${escapeAttr(item)}">${item}</li>`).join("")}</ul>
     </div>
   `).join("");
 }
 renderIdeas("ideas-list-landing");
 renderIdeas("ideas-list-dashboard");
+
+/* Clicking an idea on the dashboard fills the habit entry box, highlights
+   the chosen pill, and scrolls the entry card into view so it's clear
+   where it landed. */
+const dashboardIdeas = document.getElementById("ideas-list-dashboard");
+dashboardIdeas.addEventListener("click", (e) => {
+  const li = e.target.closest("li[data-idea]");
+  if (!li) return;
+
+  dashboardIdeas.querySelectorAll("li.selected").forEach(el => el.classList.remove("selected"));
+  li.classList.add("selected");
+
+  const entryText = document.getElementById("entry-text");
+  entryText.value = li.dataset.idea;
+
+  const entryCard = document.querySelector(".entry-card");
+  entryCard.scrollIntoView({ behavior: "smooth", block: "center" });
+  entryText.focus();
+});
 
 /* ============================================================
    LIVE SPOTS COUNTER — mirrors the same logic as beastcoach.fit's
