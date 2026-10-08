@@ -127,10 +127,16 @@
 
   .entries { margin-top: 36px; }
   .entries-title { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-  .entry { padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .entry { padding: 16px 0; border-bottom: 1px solid var(--border); border-radius: 10px; transition: background 0.4s ease; }
   .entry:last-child { border-bottom: none; }
   .entry .meta { font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 0.5px; margin-bottom: 4px; }
   .entry .body { font-size: 15px; color: var(--text); line-height: 1.6; }
+
+  .entry.just-logged { background: rgba(82,183,136,0.18); padding-left: 12px; padding-right: 12px; animation: justLoggedFade 2.2s ease forwards; }
+  @keyframes justLoggedFade {
+    0% { background: rgba(82,183,136,0.35); }
+    100% { background: rgba(82,183,136,0.18); }
+  }
 
   .empty-state { color: var(--muted); font-size: 14px; padding: 20px 0; }
 
@@ -579,9 +585,19 @@ entryForm.addEventListener("submit", async (e) => {
   } else {
     document.getElementById("entry-text").value = "";
     showStatus(entryStatus, "Logged.", false);
-    loadEntries(user.id);
+    dashboardIdeas.querySelectorAll("li.selected").forEach(el => el.classList.remove("selected"));
+    await loadEntries(user.id);
+    highlightNewestEntry();
   }
 });
+
+function highlightNewestEntry() {
+  const newest = document.querySelector("#entries-container .entry");
+  if (!newest) return;
+  newest.classList.add("just-logged");
+  newest.scrollIntoView({ behavior: "smooth", block: "center" });
+  setTimeout(() => newest.classList.remove("just-logged"), 2200);
+}
 
 async function ensureProfile(user) {
   const { error } = await sb.from("challenge_users").upsert(
