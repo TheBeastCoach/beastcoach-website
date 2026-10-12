@@ -3,6 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  (function () {
+    try {
+      fetch('/version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (data) {
+        var latest = data && data.version;
+        if (!latest) return;
+        var stored = localStorage.getItem('bc_site_version');
+        if (stored === latest) {
+          var url = new URL(window.location.href);
+          if (url.searchParams.has('_v')) {
+            url.searchParams.delete('_v');
+            window.history.replaceState({}, '', url.toString());
+          }
+          return;
+        }
+        localStorage.setItem('bc_site_version', latest);
+        if (stored !== null) {
+          var reloadUrl = new URL(window.location.href);
+          reloadUrl.searchParams.set('_v', latest);
+          window.location.replace(reloadUrl.toString());
+        }
+      }).catch(function () {});
+    } catch (e) {}
+  })();
+  </script>
 <title>Dashboard — Beast Coach</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
