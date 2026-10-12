@@ -106,6 +106,7 @@ const RECIPES = [
   {
     id: "spiced-pumpkin-latte-creami",
     chip: "Spiced Pumpkin Latte Creami",
+    image: "recipe-img/spiced-pumpkin-latte-creami.jpg",
     title: "Spiced Pumpkin Latte Creami",
     desc: "A Ninja Creami pumpkin-spice latte, built from roasted butternut pumpkin, cottage cheese, and Greek yoghurt instead of cream and sugar — espresso and warm spice give it full coffee-shop flavour for a fraction of the kcal. Base stats: ~235 kcal, 23.5g protein, 2.5g fat, 27g carbs (optional waffle cone: add 57 kcal).",
     ingredients: ["100g roasted butternut pumpkin (roasted until soft and naturally sweet)", "100g low-fat cottage cheese", "100g fat-free Greek yoghurt", "1.5 tsp (10g) honey", "1 tsp instant espresso powder (or 15ml cooled espresso)", "1/2 tsp pumpkin pie spice blend (optional: cinnamon only)", "1/2 tsp vanilla extract", "30–50ml unsweetened almond milk (to reach pint fill line if needed)"],
