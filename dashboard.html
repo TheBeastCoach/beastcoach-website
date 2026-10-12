@@ -98,7 +98,6 @@
   .back-link { display: inline-block; margin-bottom: 20px; font-size: 14px; color: var(--green); text-decoration: none; font-weight: 600; cursor: pointer; background: none; border: none; font-family: 'Manrope', sans-serif; }
 
   /* Challenge (embedded) */
-  .day-counter { display: inline-block; background: rgba(45,106,79,0.1); color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 10px; margin-bottom: 10px; }
   textarea.entry-box { width: 100%; min-height: 90px; resize: vertical; margin-bottom: 12px; }
   .privacy-note { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .entries { margin-top: 28px; }
@@ -262,48 +261,11 @@
     </div>
     <div class="tile-grid">
       <a class="tile" id="disciplineTile" href="/discipline-path"><h3>7-Step Discipline Program</h3><p>View the program and get started.</p></a>
-      <a class="tile" data-nav="challenge"><h3>30-Day Challenge</h3><p>Log today's entry and see your progress.</p></a>
+      <a class="tile" href="/challenge"><h3>30-Day Challenge</h3><p>Log today's entry and see your progress.</p></a>
       <a class="tile" data-nav="calculator"><h3>BMI &amp; Macro Calculator</h3><p>Your calories, macros, and BMI.</p></a>
       <a class="tile" data-nav="recipes"><h3>Recipes</h3><p>Healthy alternatives from social media.</p></a>
       <a class="tile" data-nav="shop"><h3>Shop</h3><p>Coming soon.</p></a>
       <a class="tile" href="/#early-access"><h3>App Beta</h3><p>Get free lifetime access, early.</p></a>
-    </div>
-  </section>
-
-  <!-- ===================== 30-DAY CHALLENGE (embedded) ===================== -->
-  <section class="view" id="view-challenge">
-    <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
-    <span class="day-counter" id="day-counter">Day 1 of 30</span>
-    <h1 class="page-title">30-Day Challenge</h1>
-    <div class="card">
-      <form id="entry-form">
-        <label class="field-label">What habit did you complete?</label>
-        <textarea class="form-input entry-box" id="entry-text" placeholder="e.g. Made my bed, read a label before breakfast, walked to the shop instead of driving." required></textarea>
-        <button type="submit" class="btn-primary">Log today</button>
-        <p class="privacy-note">Only you can see these entries &mdash; this is your private log.</p>
-        <p class="form-msg" id="entry-status"></p>
-      </form>
-    </div>
-
-    <details class="ideas">
-      <summary><span>Need an idea for today? 100 ways to start</span><span class="plus">+</span></summary>
-      <p class="intro">This isn't a checklist &mdash; pick one, do it your way, or use it to spark your own idea.</p>
-      <div id="ideas-list"></div>
-    </details>
-
-    <div class="entries">
-      <div class="entries-title">Your entries</div>
-      <div id="entries-container"><div class="empty-state">Loading&hellip;</div></div>
-    </div>
-
-    <div class="dp-promo">
-      <h3>Ready to go deeper than a daily habit?</h3>
-      <p>
-        The 30-Day Challenge is step one. The Discipline Path is the full 7-step system behind it:
-        the exact framework from a real 70kg transformation, built to make discipline stick long
-        after day 30.
-      </p>
-      <a class="btn-primary" href="/discipline-path">Start The Discipline Path</a>
     </div>
   </section>
 
@@ -436,29 +398,6 @@ try {
   console.error("Supabase failed to load:", e);
 }
 
-/* ---------- 100 ideas (same list as the standalone challenge page) ---------- */
-const IDEA_GROUPS = [
-  { title: "Morning & environment setup", items: ["Make your bed immediately after getting up","Put a glass of water next to your bed before sleeping","Drink a glass of water before coffee","Get sunlight on your face within 30 minutes of waking","Never hit snooze again","Stretch for 60 seconds before getting out of bed","Open your blinds completely upon waking","Say one thing you're looking forward to today","Lay out your workout clothes or sneakers the night before","Put your gym bag or sneakers by the front door","Charge your phone across the room or outside the bedroom","Put your phone on airplane mode overnight","Take 3 deep belly breaths while the kettle boils","Wash and dry cookware right after cooking, not later","Clear your kitchen bench before bed","Set out your gym clothes the night before","Prep tomorrow's lunch or snack tonight"] },
-  { title: "Nutrition & kitchen awareness", items: ["Read the nutrition label before buying something new","Drink a glass of water before your main meal","Walk for 5 minutes after a meal","Include a palm-sized portion of protein with breakfast","Swap one liquid-calorie drink for a zero-calorie option","Treat takeaway as a once-a-month thing, not a default","Plan your breakfasts 3 days ahead","Eat one meal at a table, no screen","Put your fork down between bites for a few minutes","Swap something deep-fried for another option today","Batch cook an extra portion of protein for tomorrow","Weigh or measure oil and dressing instead of free-pouring","Choose a zero-calorie drink at a restaurant or catch-up","Finish dinner at least 2 hours before bed","Stop eating at 80% full and wait 10 minutes before seconds","Swap an afternoon sugary snack for a high-protein one","Keep a backup high-protein snack in your bag or car","Write a grocery list before you shop","Eat a small snack before grocery shopping hungry","Log everything you eat today, no changes yet","Try a food you've never had before","Check the protein content of your next meal before eating it","Add one vegetable to a meal you wouldn't normally","Notice if you're actually hungry before eating something"] },
-  { title: "Movement & daily activity", items: ["Take the stairs instead of the lift","Walk for 10 minutes after your biggest meal","Stand instead of sit for one call or task","Park at the far end of the car park on purpose","Pace or stand while on a phone call","Walk one loop of the block before sitting after work","Find a reward for yourself that isn't food","Put your workout shoes on just to do 5 push-ups","Take a dedicated 15-minute lunchtime walk","Stand on one foot while brushing your teeth, then switch","Take a walk while catching up with a colleague or friend","Track your steps today, no target yet","Finish the set you said you'd do","Try one new form of movement you haven't done in a while","Carry your own shopping bags instead of using a trolley","Get off public transport one stop early and walk"] },
-  { title: "Evening routine & sleep", items: ["Set a screens-off alarm 45 minutes before bed","Keep your bedroom slightly cooler than the rest of the house","Swap your phone for 5 pages of a book before sleep","Dim the lights after 8pm","Write tomorrow's top 3 tasks before bed instead of in bed","Avoid caffeine after 2pm","Set up an eye mask or blackout blind","Commit to lights out by a fixed time tonight","Lay out your pajamas and night routine while making dinner","Use ambient or white noise instead of TV at night","Skip alcohol on a weeknight and find another treat","Go to bed at the same time every night","Stop screens 20 minutes before bed","Do a wind-down activity instead of scrolling before bed"] },
-  { title: "Identity, mindset & self-talk", items: ["Write down: I am the type of person who values my health","Put a photo somewhere prominent that reminds you why","Do your body measurements once this month","Acknowledge one physical thing your body can do, out loud","Reframe \"I have to work out\" to \"I get to move today\"","Practice saying no thank you to offered junk food","Unfollow an account that makes you feel worse about your body","Follow one account that teaches practical, no-nonsense habits","Journal one sentence about how your energy felt today","Replace a self-deprecating joke with a neutral statement","Notice a moment intentionally, like water in the shower","Catch an excuse and write down the real friction behind it","Say \"I am someone who...\" instead of \"I'm trying to...\"","Ask \"would the person I'm becoming do this?\" before deciding","Act on a decision before motivation shows up","Do one thing today future-you would thank you for","Choose based on identity, not mood, once today","Write one thing you did well today","Replace \"I can't\" with \"I haven't yet\" once today","Speak to yourself like someone you respect","Say \"I choose to\" instead of \"I have to\" once today","Acknowledge one thing you're proud of, without downplaying it"] },
-  { title: "Organization & planning", items: ["Clean out one fridge shelf for prepped healthy staples only","Throw out or donate expired pantry items","Prep washed, chopped snack veggies into containers","Put your supplements next to something you use every morning","Set a recurring daily hydration reminder","Pack your gym bag for the week, ready to go","Clean your shaker bottle right after use, not later","Move delivery apps off your home screen","Stock your freezer with vegetables and portioned protein","Keep a food scale next to your cutting board","Check the calories in a cereal portion you'd normally guess","Weigh your cooking oil once to see what free-pouring actually costs","Keep a notepad on the counter for instant grocery logging","Map out your 3 movement windows for next week","Prep tomorrow's clothes tonight","Clear one surface in your home today","Tidy your car or bag before the day starts","Put your phone in another room for an hour of focused work"] },
-  { title: "Recovery & mobility", items: ["Take a 3-minute cold rinse at the end of your shower","Roll the bottoms of your feet on a ball while sitting","Do 10 slow wrist and ankle rotations seated","Sit in silence for 5 minutes, no inputs","Elevate your legs against a wall for 5 minutes in the evening","Do 10 slow cat-cow movements before starting your day","Roll each calf for 60 seconds with a massage roller","Rest your eyes on something 6 metres away for 60 seconds","Write down one physical signal your body gave you today","Stretch for 5 minutes before bed","Stand up and stretch for 60 seconds once this hour"] },
-  { title: "Money", items: ["Check your bank balance without avoiding it","Write down everything you spent today","Move a small amount into savings","Skip one non-essential purchase today","Compare a purchase to the hours worked to afford it"] },
-  { title: "Discipline & self-trust", items: ["Start a task the second an alarm goes off","Finish something you started but never completed","Keep a promise to yourself nobody else would know about","Reply to messages the same day you get them","Say out loud when you'll do something, then do it exactly then","Do the boring thing on purpose today","Pick one habit, not five, right now","Let a habit prove itself before adding another","Do it before you feel ready","Remove one decision instead of relying on willpower","Keep a promise to yourself today","Choose consistency over motivation today","Do one task at the same time every day this week","Repeat yesterday's habit before adding a new one","Do something imperfectly rather than skip it entirely","Show up to a commitment even when you don't feel like it","End the day with the same small ritual every night","Do the thing you've been putting off for under 2 minutes","Say no to one thing that doesn't serve you","Do one uncomfortable thing on purpose","Clean up after yourself immediately instead of leaving it","Choose the harder, better option once today","Follow through on one thing without telling anyone","Notice how today's version of you is different from day 1"] },
-  { title: "Communication & relationships", items: ["Say no to something you'd normally agree to out of guilt","Give one genuine, specific compliment today","Tell someone a truth you've been avoiding","Set one boundary out loud","Ask for something you need instead of hoping someone notices","Reach out to someone you've been meaning to contact","Spend 10 minutes with someone, phone away","Ask someone how they're really doing, and wait for the answer","Forgive one small thing you've been holding onto","Show up for someone without being asked"] },
-  { title: "Focus & body awareness", items: ["Single-task for 20 minutes, no switching","Turn off notifications for one app all day","Read one page of something that isn't your phone","Sit through 5 minutes of boredom with no screen","Do one thing slower than usual, on purpose","Take 3 deep breaths before reacting to stress","Roll your shoulders back and check your posture","Notice physical tension without judging it","Unclench your jaw when you catch it","Breathe through your nose for a set period today","Check your phone 10 minutes later than usual after waking","Have one meal with your phone out of reach"] },
-  { title: "Accountability", items: ["Own a mistake out loud instead of explaining it away","Name one excuse you used today, honestly","Write the real reason you didn't do something","Follow through on something you told someone you'd do","Take responsibility for a result you'd normally blame elsewhere"] },
-  { title: "Gratitude, rest & small wins", items: ["Write one thing you're grateful for that you usually overlook","Notice one thing better today than a year ago","Acknowledge progress instead of the distance left","Recognize one habit you already do well","Rest without guilt for a set period today","Say no to something today to protect your energy","Notice when you're pushing through exhaustion, and stop","Write down your top 1 priority for the day, nothing else","Leave your phone off the table during a meal","Do one small task you've been putting off","Say something you're grateful for out loud, not just in your head","Check in with yourself once today: how am I actually doing"] }
-];
-function renderIdeas() {
-  document.getElementById("ideas-list").innerHTML = IDEA_GROUPS.map(g => `
-    <div class="idea-group"><h4>${g.title}</h4><ul>${g.items.map(i => `<li>${i}</li>`).join("")}</ul></div>
-  `).join("");
-}
-renderIdeas();
-
 /* ---------- Recipes ---------- */
 // Recipes now live in recipes.js (loaded via <script src="recipes.js">) so you never edit this file to add a recipe.
 
@@ -504,7 +443,6 @@ document.querySelectorAll("[data-nav]").forEach(el => {
   el.addEventListener("click", () => {
     const target = el.getAttribute("data-nav");
     showView(target);
-    if (target === "challenge") loadChallenge();
   });
 });
 
@@ -523,8 +461,6 @@ const signupForm = document.getElementById("signup-form");
 const signinForm = document.getElementById("signin-form");
 const authStatus = document.getElementById("auth-status");
 const signoutBtn = document.getElementById("signout-btn");
-const entryForm = document.getElementById("entry-form");
-const entryStatus = document.getElementById("entry-status");
 const forgotLink = document.getElementById("forgot-link");
 const forgotBack = document.getElementById("forgot-back");
 const forgotForm = document.getElementById("forgot-form");
@@ -629,9 +565,8 @@ function enterPortal(user) {
   document.getElementById("dash-greeting").textContent = "Welcome back, " + name;
   showView("dashboard");
   const hash = window.location.hash.replace("#", "");
-  if (hash === "challenge" || hash === "calculator" || hash === "shop" || hash === "recipes") {
+  if (hash === "calculator" || hash === "shop" || hash === "recipes") {
     showView(hash);
-    if (hash === "challenge") loadChallenge();
   }
   checkDisciplinePurchase(user);
 }
@@ -681,73 +616,6 @@ sb.auth.onAuthStateChange((event, session) => {
 sb.auth.getSession().then(({ data: { session } }) => {
   if (inPasswordRecovery) return;
   if (session && session.user) enterPortal(session.user);
-});
-
-/* ---------- 30-Day Challenge (embedded, same tables as challenge.html) ---------- */
-async function ensureChallengeProfile(user) {
-  const { error } = await sb.from("challenge_users").upsert(
-    { id: user.id, email: user.email },
-    { onConflict: "id", ignoreDuplicates: true }
-  );
-  if (error) console.error("Failed to create/find challenge profile:", error);
-  return !error;
-}
-
-async function getDayNumber(user) {
-  const { data } = await sb.from("challenge_users").select("created_at").eq("id", user.id).maybeSingle();
-  const start = data ? new Date(data.created_at) : new Date();
-  const diffDays = Math.floor((Date.now() - start.getTime()) / 86400000) + 1;
-  return Math.max(1, diffDays);
-}
-
-async function loadEntries(userId) {
-  const container = document.getElementById("entries-container");
-  const { data, error } = await sb.from("challenge_entries").select("*").eq("user_id", userId).order("created_at", { ascending: false });
-  if (error || !data || data.length === 0) {
-    container.innerHTML = `<div class="empty-state">No entries yet &mdash; log your first one above.</div>`;
-    return;
-  }
-  container.innerHTML = data.map(entry => {
-    const date = new Date(entry.created_at).toLocaleDateString(undefined, { day: "numeric", month: "short" });
-    return `<div class="entry"><div class="meta">Day ${entry.day_number} &mdash; ${date}</div><div class="body">${escapeHtml(entry.entry_text)}</div></div>`;
-  }).join("");
-}
-
-async function loadChallenge() {
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return;
-  await ensureChallengeProfile(user);
-  const dayNumber = await getDayNumber(user);
-  document.getElementById("day-counter").textContent = `Day ${Math.min(dayNumber, 30)} of 30`;
-  loadEntries(user.id);
-}
-
-entryForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return;
-  const text = document.getElementById("entry-text").value.trim();
-  if (!text) return;
-  const btn = entryForm.querySelector("button");
-  btn.disabled = true;
-
-  const profileOk = await ensureChallengeProfile(user);
-  if (!profileOk) {
-    btn.disabled = false;
-    showStatus(entryStatus, "Couldn't set up your profile — try again in a moment.", true);
-    return;
-  }
-  const dayNumber = await getDayNumber(user);
-  const { error } = await sb.from("challenge_entries").insert({ user_id: user.id, entry_text: text, day_number: dayNumber });
-  btn.disabled = false;
-  if (error) {
-    console.error(error);
-    showStatus(entryStatus, "Couldn't save that entry — try again.", true);
-  } else {
-    document.getElementById("entry-text").value = "";
-    showStatus(entryStatus, "Logged.", false);
-    loadEntries(user.id);
-  }
 });
 
 } // end if (sb)
