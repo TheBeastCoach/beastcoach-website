@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>
   (function () {
+    // If this page is being restored from the browser's back/forward cache
+    // (bfcache), the network is bypassed entirely and nothing below runs, so
+    // a stale page could stay stale forever. Force a true reload whenever
+    // that happens.
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) { window.location.reload(); }
+    });
     try {
       fetch('/version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (data) {
         var latest = data && data.version;
