@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
 
   const { email } = req.body || {};
 
-  const amountCents = Date.now() < DEAL_ENDS_AT ? 3850 : 5500;
+  const amountCents = Date.now() < DEAL_ENDS_AT ? 2700 : 3800;
 
   const params = new URLSearchParams();
   params.append('mode', 'payment');
