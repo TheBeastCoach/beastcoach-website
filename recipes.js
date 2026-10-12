@@ -102,5 +102,14 @@ const RECIPES = [
     ingredients: ["10g ground flaxseed", "12g chia seeds", "30g pumpkin seeds (pepitas)", "50g pasteurized liquid egg whites", "100g low-fat cottage cheese", "100g frozen strawberries", "150–200ml ultra-filtered high-protein skim milk (or standard skim/light milk for a lighter protein version)", "4–5 ice cubes", "Stevia or a few drops of liquid monk fruit, to taste (optional)"],
     instructions: ["Blend the flaxseed, chia seeds, pepitas, and milk on high for 30–45 seconds first, so the seeds fully break down.", "Add the cottage cheese, liquid egg whites, strawberries, and ice, then blend again until velvety and aerated.", "Taste and add stevia or monk fruit if you want to balance the tartness of the berries and cottage cheese. 200ml of ultra-filtered high-protein milk (e.g. Fairlife) gets you to roughly 43g protein; swap in standard skim milk instead for a lighter ~36–38g protein version."],
     macros: [["500", "kcal"], ["43g", "Protein"], ["30g", "Carbs"], ["25g", "Fat"]]
+  },
+  {
+    id: "spiced-pumpkin-latte-creami",
+    chip: "Spiced Pumpkin Latte Creami",
+    title: "Spiced Pumpkin Latte Creami",
+    desc: "A Ninja Creami pumpkin-spice latte, built from roasted butternut pumpkin, cottage cheese, and Greek yoghurt instead of cream and sugar — espresso and warm spice give it full coffee-shop flavour for a fraction of the kcal. Base stats: ~235 kcal, 23.5g protein, 2.5g fat, 27g carbs (optional waffle cone: add 57 kcal).",
+    ingredients: ["100g roasted butternut pumpkin (roasted until soft and naturally sweet)", "100g low-fat cottage cheese", "100g fat-free Greek yoghurt", "1.5 tsp (10g) honey", "1 tsp instant espresso powder (or 15ml cooled espresso)", "1/2 tsp pumpkin pie spice blend (optional: cinnamon only)", "1/2 tsp vanilla extract", "30–50ml unsweetened almond milk (to reach pint fill line if needed)"],
+    instructions: ["Cook: Roast the butternut pumpkin in the oven until tender and lightly caramelised, then let it cool slightly.", "Blend: Add the roasted butternut pumpkin, cottage cheese, Greek yoghurt, honey, espresso powder, pumpkin pie spice blend (or cinnamon only), and vanilla into a food processor. Blend until silky smooth to completely break down the cottage cheese curds.", "Prep Pint: Pour the mixture into your Ninja Creami pint (top up with a splash of unsweetened almond milk to the max fill line if needed) and freeze flat for at least 16–24 hours (up to 60+ hours).", "Spin: Process on the Light Ice Cream setting. If slightly powdery on the first run, add a splash of almond milk and run a Re-spin.", "Serve: Enjoy straight from the pint, or scoop into a cone (optional: adds 57 kcal)."],
+    macros: [["235", "kcal"], ["23.5g", "Protein"], ["27g", "Carbs"], ["2.5g", "Fat"]]
   }
 ];
