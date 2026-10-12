@@ -4,6 +4,10 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" }
   ],
+  "redirects": [
+    { "source": "/portal", "destination": "/dashboard", "permanent": true },
+    { "source": "/portal.html", "destination": "/dashboard", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/((?!.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|css|js|woff|woff2)$).*)",

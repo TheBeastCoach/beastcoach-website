@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Member Portal — Beast Coach</title>
+<title>Dashboard — Beast Coach</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -34,6 +34,11 @@
 
   h1.page-title { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 1px; margin-bottom: 6px; }
   p.page-sub { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+
+  ul.freebies-list { list-style: none; margin: -14px 0 6px; }
+  ul.freebies-list li { position: relative; padding-left: 26px; margin-bottom: 10px; font-size: 14px; color: var(--text); font-weight: 600; }
+  ul.freebies-list li::before { content: "\2713"; position: absolute; left: 0; top: 0; color: var(--green); font-weight: 800; }
+  p.freebies-note { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
 
   .card { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px; margin-bottom: 20px; }
   .card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 8px; }
@@ -163,8 +168,15 @@
 
   <!-- ===================== AUTH ===================== -->
   <section class="view visible" id="view-auth">
-    <h1 class="page-title">Member Portal</h1>
-    <p class="page-sub">Create an account for the 30-Day Challenge, the calculator, and more.</p>
+    <h1 class="page-title">Your Dashboard</h1>
+    <p class="page-sub">Create a free account and get access to all my freebies &mdash; plus anything new I add.</p>
+    <ul class="freebies-list">
+      <li>Log your 30-Day Challenge entries</li>
+      <li>Calculate your BMI, calories &amp; macros</li>
+      <li>Browse the recipe library</li>
+      <li>Early access to the app beta</li>
+    </ul>
+    <p class="freebies-note">More free tools coming soon.</p>
     <div class="card">
       <div class="auth-tabs">
         <button type="button" class="auth-tab active" id="tab-signup">Sign Up</button>
@@ -382,7 +394,7 @@
 </main>
 
 <footer class="site">
-  <div class="container"><p>Beast Coach &mdash; Member Portal</p></div>
+  <div class="container"><p>Beast Coach &mdash; Dashboard</p></div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -390,7 +402,7 @@
 <script>
 const SUPABASE_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
-const SITE_URL = "https://www.beastcoach.fit/portal";
+const SITE_URL = "https://www.beastcoach.fit/dashboard";
 
 let sb = null;
 try {

@@ -247,7 +247,7 @@
     sbGate.auth.getSession().then(function (res) {
       var session = res.data && res.data.session;
       if (!session || !session.user || !session.user.email) {
-        lock('/portal');
+        lock('/dashboard');
         return;
       }
       var email = session.user.email.toLowerCase().trim();
@@ -261,7 +261,7 @@
           if (gateStyle) gateStyle.remove();
         });
     }).catch(function () {
-      lock('/portal');
+      lock('/dashboard');
     });
   })();
   </script>

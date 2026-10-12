@@ -31,7 +31,7 @@ module.exports = async function handler(req, res) {
   params.append('line_items[0][price_data][unit_amount]', String(amountCents));
   params.append('line_items[0][quantity]', '1');
   params.append('allow_promotion_codes', 'true');
-  params.append('success_url', `${SITE_URL}/portal?purchase=success&session_id={CHECKOUT_SESSION_ID}`);
+  params.append('success_url', `${SITE_URL}/dashboard?purchase=success&session_id={CHECKOUT_SESSION_ID}`);
   params.append('cancel_url', `${SITE_URL}/discipline-path?checkout=cancelled`);
   params.append('metadata[product]', 'discipline-path');
   if (email && typeof email === 'string') {
