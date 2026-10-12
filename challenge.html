@@ -119,6 +119,11 @@
 
   .signout { font-size: 13px; color: var(--muted); background: none; border: none; text-decoration: underline; cursor: pointer; font-family: 'Manrope', sans-serif; }
 
+  .how-it-works { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 22px 24px; margin-top: 20px; }
+  .how-it-works h3 { margin: 0 0 12px 0; font-size: 15px; font-weight: 700; color: var(--text); }
+  .how-it-works ul { margin: 0; padding-left: 20px; }
+  .how-it-works li { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 8px; }
+  .how-it-works li:last-child { margin-bottom: 0; }
   .entry-card { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px; margin-top: 28px; }
   .entry-card label { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 600; color: var(--text); }
   textarea.entry-box { width: 100%; min-height: 90px; resize: vertical; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); outline: none; margin-bottom: 12px; }
@@ -234,10 +239,20 @@
       <button class="signout" id="signout-btn">Sign out</button>
     </div>
 
+    <div class="how-it-works">
+      <h3>How it works</h3>
+      <ul>
+        <li>Pick one new habit you're committing to from today onward. Not something you already did, but something you're choosing to start doing every day from now on.</li>
+        <li>Type it in the box, or tap one of the ideas below to add it instantly.</li>
+        <li>Hit log. It's saved with today's date.</li>
+        <li>Come back any time and add another. By day 30 you'll have a stacked list of habits you've committed to, and proof you followed through on every one.</li>
+      </ul>
+    </div>
+
     <div class="entry-card">
       <form id="entry-form">
-        <label for="entry-text">What habit did you complete?</label>
-        <textarea class="entry-box" id="entry-text" placeholder="e.g. Made my bed, read a label before breakfast, walked to the shop instead of driving." required></textarea>
+        <label for="entry-text">What habit are you committing to from today?</label>
+        <textarea class="entry-box" id="entry-text" placeholder="e.g. No phone after 9pm, read a food label before I buy, 10 min walk after dinner, every day from now on." required></textarea>
         <button type="submit" class="btn-primary">Log today</button>
         <p class="privacy-note">Only you can see these entries — this is your private log.</p>
         <p class="form-msg" id="entry-status"></p>
