@@ -133,5 +133,14 @@ const RECIPES = [
       "4. Freeze Solid: Shake gently to settle the mixture into the remaining Zooper Dooper juice, then lay flat or stand upright in the freezer for 4–6 hours until completely frozen."
     ],
     macros: [["55–60", "kcal"], ["5.5–6g", "Protein"], ["7g", "Carbs"], ["0.6–0.8g", "Fat"]]
+  },
+  {
+    id: "blackberry-magnesium-smoothie",
+    chip: "Blackberry Magnesium Smoothie",
+    title: "Blackberry Magnesium Smoothie",
+    desc: "An all-natural, seed-and-berry smoothie built around magnesium and recovery, not just protein. Pepitas, chia, cottage cheese, Greek yoghurt, and egg whites bring the protein, while frozen blackberries add fibre and a serious anthocyanin dose. Magnesium: about 250mg per serve (roughly 60% of a typical daily target) — 170mg from the pepitas, 40mg from the chia, 20mg from the blackberries. Inflammation support: Cyanidin-3-glucoside from the blackberries is a powerful anthocyanin that helps blunt exercise-induced oxidative stress and down-regulate COX-2 enzymes; the chia contributes roughly 2,100mg of plant omega-3 (ALA) to counter systemic pro-inflammatory eicosanoids; and the combined zinc (over 2.3mg) and magnesium support muscle relaxation and tissue repair without the gut issues some magnesium supplements cause.",
+    ingredients: ["30g pumpkin seeds (pepitas)", "12g chia seeds", "50g pasteurized liquid egg whites", "100g low-fat cottage cheese", "50g low-fat Greek yoghurt", "100g frozen blackberries", "~120ml unsweetened almond milk (a splash to blend)", "3–4 ice cubes"],
+    instructions: ["Blend the pumpkin seeds, chia seeds, and almond milk on high for 30–45 seconds first, so the seeds fully break down before anything else goes in.", "Add the cottage cheese, Greek yoghurt, egg whites, frozen blackberries, and ice, then blend again until smooth and aerated.", "Taste and adjust — add a touch more almond milk if it's too thick, or a few extra blackberries for more tartness."],
+    macros: [["430", "kcal"], ["35.7g", "Protein"], ["24.9g", "Carbs (11.2g fiber)"], ["22.2g", "Fat"]]
   }
 ];
