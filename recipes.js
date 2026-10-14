@@ -112,5 +112,26 @@ const RECIPES = [
     ingredients: ["100g roasted butternut pumpkin (roasted until soft and naturally sweet)", "100g low-fat cottage cheese", "100g fat-free Greek yoghurt", "1.5 tsp (10g) honey", "1 tsp instant espresso powder (or 15ml cooled espresso)", "1/2 tsp pumpkin pie spice blend (optional: cinnamon only)", "1/2 tsp vanilla extract", "30–50ml unsweetened almond milk (to reach pint fill line if needed)"],
     instructions: ["Cook: Roast the butternut pumpkin in the oven until tender and lightly caramelised, then let it cool slightly.", "Blend: Add the roasted butternut pumpkin, cottage cheese, Greek yoghurt, honey, espresso powder, pumpkin pie spice blend (or cinnamon only), and vanilla into a food processor. Blend until silky smooth to completely break down the cottage cheese curds.", "Prep Pint: Pour the mixture into your Ninja Creami pint (top up with a splash of unsweetened almond milk to the max fill line if needed) and freeze flat for at least 16–24 hours (up to 60+ hours).", "Spin: Process on the Light Ice Cream setting. If slightly powdery on the first run, add a splash of almond milk and run a Re-spin.", "Serve: Enjoy straight from the pint, or scoop into a cone (optional: adds 57 kcal)."],
     macros: [["235", "kcal"], ["23.5g", "Protein"], ["27g", "Carbs"], ["2.5g", "Fat"]]
+  },
+  {
+    id: "zooper-dooper-protein-pops",
+    chip: "Zooper Dooper Protein Pops",
+    image: "recipe-img/zooper-dooper-protein-pops.jpg",
+    title: "Zooper Dooper Protein Pops",
+    desc: "A clever reseal hack that turns Zooper Doopers into high-protein ice pops — pour most of the juice out, pipe in a cottage cheese and Greek yoghurt base, then heat-seal the tube shut with a hair straightener. Two methods below: a soft-serve swirl version using the Ninja Creami, or a fast, no-pre-freeze blender version. Makes ~8–10 resealed tubes, about 55–60 kcal and 5.5–6g protein each.",
+    ingredients: ["200g low-fat cottage cheese (adds casein for a creamy, slow-melting texture)", "200g low-fat Greek yoghurt (Chobani Fit, YoPRO, or plain low-fat)", "50–75ml unsweetened almond milk (a light splash to loosen the blend)", "1.5–2 tbsp honey (~30g, or adjust to taste)", "1 tsp vanilla extract", "Small pinch of salt (balances the tang and brings out the honey/vanilla)", "8–10 Zooper Dooper tubes (snip the top, pour out ~75% of the liquid, leaving the bottom 25% for flavor contrast)"],
+    instructions: [
+      "Method 1 — Ninja Creami Route (soft-serve swirl texture, best for an ultra-smooth, aerated mouthfeel before re-freezing):",
+      "1. Blend Base and Freeze Pint: Add the cottage cheese, Greek yoghurt, almond milk, honey, vanilla, and salt to a blender. Blend until silky with no curds remaining. Pour into a standard Ninja Creami pint and freeze solid for 24 hours.",
+      "2. Spin to Soft Serve: Run the frozen pint on the Lite Ice Cream cycle. If it looks chalky or powdery, add 1 tablespoon of almond milk to the center and run a Re-spin cycle until it reaches soft-serve consistency.",
+      "3. Pipe and Seal: Transfer the churned soft serve directly into a piping bag. Snip the tip and pipe into the prepped Zooper Dooper tubes on top of the remaining juice. Wipe the top inner rim clean and dry.",
+      "4. Heat-Seal and Reset: Clamp a hair straightener set to low/medium heat (around 120–140°C) across the dry plastic opening for 3–5 seconds to fuse the seam — use low heat to avoid melting through. Stand upright in the freezer for 1–2 hours to firm back up.",
+      "Method 2 — Direct Blender Route (classic ice-pole texture, fastest, no 24-hour pint pre-freeze required):",
+      "1. Blend Smooth: Add all ingredients into a high-speed blender or bullet blender. Blend on high for 45–60 seconds until completely emulsified and glossy, ensuring all cottage cheese curds are fully liquefied.",
+      "2. Fill Tubes via Piping Bag: Pour the liquid batter directly into a piping bag. Snip a small opening and pipe the mix directly into each Zooper Dooper tube, leaving about 2cm of head space at the top.",
+      "3. Wipe and Heat-Seal: Wipe any excess liquid from the top inside seal with paper towel — this is crucial, as it won't fuse if wet. Clamp the dry plastic edge with the hair straightener for 3–5 seconds until heat-fused shut.",
+      "4. Freeze Solid: Shake gently to settle the mixture into the remaining Zooper Dooper juice, then lay flat or stand upright in the freezer for 4–6 hours until completely frozen."
+    ],
+    macros: [["55–60", "kcal"], ["5.5–6g", "Protein"], ["7g", "Carbs"], ["0.6–0.8g", "Fat"]]
   }
 ];
