@@ -288,7 +288,7 @@
       <a class="tile" data-nav="shop"><h3>Shop</h3><p>Coming soon.</p></a>
       <a class="tile" href="/#early-access"><h3>App Beta</h3><p>Get free lifetime access, early.</p></a>
     </div>
-    <div class="donate-card" id="donate-card">
+    <div class="donate-card" id="donate-card" hidden>
       <div class="donate-row">
         <p><strong>Everything here is free.</strong> If it's helped you, a one-off $5 donation helps pay for building and maintaining these tools and creating new recipes.</p>
         <button type="button" class="btn-primary" id="donate-btn">Donate $5 once</button>
@@ -646,7 +646,8 @@ async function checkDonation(user) {
     const q = params.toString();
     window.history.replaceState({}, "", window.location.pathname + (q ? "?" + q : ""));
   }
-  if (!user.email) return;
+  const showCard = () => { donateCard.hidden = false; };
+  if (!user.email) { showCard(); return; }
   try {
     const { data, error } = await sb
       .from("purchases")
@@ -654,13 +655,15 @@ async function checkDonation(user) {
       .eq("email", user.email.toLowerCase().trim())
       .eq("product", "challenge-support")
       .limit(1);
-    if (error) { console.error("Donation check failed:", error); return; }
+    if (error) { console.error("Donation check failed:", error); showCard(); return; }
     if (data && data.length > 0) {
-      donateCard.hidden = true;
       document.getElementById("donate-thanks").hidden = false;
+    } else {
+      showCard();
     }
   } catch (err) {
     console.error("Donation check failed:", err);
+    showCard();
   }
 }
 
