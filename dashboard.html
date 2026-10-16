@@ -647,6 +647,8 @@ async function checkDonation(user) {
     window.history.replaceState({}, "", window.location.pathname + (q ? "?" + q : ""));
   }
   const showCard = () => { donateCard.hidden = false; };
+  // Add ?showdonate to the dashboard address to always see the card (for checking how it looks)
+  if (params.has("showdonate")) { showCard(); return; }
   if (!user.email) { showCard(); return; }
   try {
     const { data, error } = await sb
