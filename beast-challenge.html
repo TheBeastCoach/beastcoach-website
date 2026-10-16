@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <script>
+  (function () {
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) { window.location.reload(); }
+    });
+    try {
+      fetch('/version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (data) {
+        var latest = data && data.version;
+        if (!latest) return;
+        var stored = localStorage.getItem('bc_site_version');
+        if (stored === latest) {
+          var url = new URL(window.location.href);
+          if (url.searchParams.has('_v')) {
+            url.searchParams.delete('_v');
+            window.history.replaceState({}, '', url.toString());
+          }
+          return;
+        }
+        localStorage.setItem('bc_site_version', latest);
+        if (stored !== null) {
+          var reloadUrl = new URL(window.location.href);
+          reloadUrl.searchParams.set('_v', latest);
+          window.location.replace(reloadUrl.toString());
+        }
+      }).catch(function () {});
+    } catch (e) {}
+  })();
+  </script>
+<title>Beast Challenge — Beast Coach</title>
+<meta name="description" content="A free 30-day challenge: walk 10,000 steps a day to a real destination, log a few simple habits, and build a streak you can see.">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F9F8; --surface:#FFFFFF; --ink:#1B2E24; --muted:#707973; --line:#E4E8E6;
+  --sign:#2D6A4F; --sign-ink:#FFFFFF; --accent:#52B788; --accent-ink:#1B3022;
+  --good:#2D6A4F; --warn:#B45309; --soft:#EAF1ED; --deep:#1B3022; --err:#E24B4A;
+  --display:"Bebas Neue","Arial Narrow",Impact,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-synthesis:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+.nav{position:sticky;top:0;z-index:15;background:rgba(27,46,36,0.97);border-bottom:1px solid rgba(255,255,255,0.08);padding-top:env(safe-area-inset-top,0px)}
+.nav-inner{max-width:440px;margin:0 auto;height:58px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.nav-logo{font-family:var(--display);font-size:24px;letter-spacing:2px;color:#fff;text-decoration:none;background:none;border:0;cursor:pointer;padding:0}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:14px;align-items:center}
+.nav-links a,.nav-links button{color:rgba(255,255,255,.8);text-decoration:none;font:500 14px var(--body);background:none;border:0;cursor:pointer;padding:0}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.app{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;letter-spacing:.03em}
+p{margin:0}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.tabs button{background:none;border:0;padding:9px 4px;border-radius:9px;font:600 14px var(--body);color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.hello{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.hello h2{font-size:30px;line-height:1.05}
+.why{font-style:italic;color:var(--muted);font-size:14px}
+.score{font-family:var(--display);font-size:44px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.score small{font-size:18px;color:var(--muted)}
+.sign{background:var(--sign);color:var(--sign-ink);border-radius:12px;padding:14px 16px;border:3px solid var(--sign-ink);box-shadow:0 0 0 2px var(--sign);display:flex;flex-direction:column;gap:10px}
+.sign .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sign .dest{font-family:var(--display);font-size:22px;line-height:1.1;min-width:0;letter-spacing:.03em}
+.sign .km{font-family:var(--display);font-size:28px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.road{height:14px;border-radius:7px;background:rgba(255,255,255,.22);position:relative;overflow:hidden}
+.road i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:7px}
+.road::after{content:"";position:absolute;left:0;right:0;top:6px;border-top:2px dashed rgba(255,255,255,.55)}
+.sign .sub{font-size:14px;opacity:.9}
+.day-chips{display:flex;gap:6px;flex-wrap:wrap}
+.day-chips button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;font:600 13px var(--body);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.day-chips button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.day-chips .dot{width:7px;height:7px;border-radius:50%;background:var(--warn)}
+.catchup{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--soft);border:1px solid color-mix(in srgb,var(--accent) 60%,var(--line));border-radius:10px;padding:10px 12px;font-size:14px;flex-wrap:wrap}
+.catchup p{flex:1 1 180px;min-width:0}
+.item{display:grid;grid-template-columns:1fr auto;gap:8px 10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.item .name{font-weight:600}
+.item .meta{font-size:14.5px;color:var(--muted);grid-column:1/-1;margin-top:-6px}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.pill.hit{background:var(--good);color:var(--surface)}
+.pill.miss{background:var(--soft);color:var(--muted)}
+.pill.off{background:transparent;color:var(--muted);border:1px dashed var(--line)}
+.ctrl{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ctrl input,.ctrl select{flex:1;min-width:0;font:500 16px var(--body);padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:10px 14px;font:700 14px var(--body);cursor:pointer;white-space:nowrap;text-align:center;text-decoration:none}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.alt{background:var(--soft);color:var(--ink)}
+.btn.accent{background:var(--sign);color:#FFFFFF}
+.btn.big{padding:14px 18px;font-size:16px}
+.toggle{display:flex;gap:6px}
+.toggle button{flex:1}
+.entries{display:flex;gap:6px;flex-wrap:wrap;grid-column:1/-1}
+.entries span{background:var(--soft);border-radius:999px;padding:3px 4px 3px 10px;font-size:13px;display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
+.entries button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:15px;padding:0 6px}
+.grid30{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+.grid30 div{aspect-ratio:1;border-radius:6px;display:grid;place-items:center;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted);background:var(--soft);max-width:100%}
+.grid30 .s1{background:color-mix(in srgb,var(--good) 35%,var(--soft));color:var(--ink)}
+.grid30 .s2{background:color-mix(in srgb,var(--good) 65%,var(--soft));color:var(--surface)}
+.grid30 .s3{background:var(--good);color:var(--surface)}
+.grid30 .today{outline:2px solid var(--accent);outline-offset:1px}
+.grid30 .future{background:transparent;border:1px dashed var(--line)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat{background:var(--bg);border-radius:10px;padding:10px 12px}
+.stat b{display:block;font-family:var(--display);font-weight:400;font-size:26px;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted)}
+.badges{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.badge{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted);text-align:center}
+.badge .disc{width:52px;height:52px;max-width:100%;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:22px;border:2px dashed var(--line);color:var(--muted)}
+.badge.on .disc{background:var(--sign);color:#FFFFFF;border:3px solid var(--accent)}
+.badge.on{color:var(--ink);font-weight:600}
+.routes{display:flex;flex-direction:column;gap:8px}
+.route{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer;text-align:left;color:var(--ink);font:500 15px var(--body);width:100%}
+.route[aria-pressed="true"]{border-color:var(--sign);box-shadow:inset 0 0 0 2px var(--sign)}
+.route b{font-variant-numeric:tabular-nums;font-family:var(--display);font-weight:400;font-size:18px;white-space:nowrap}
+.region-h{margin-top:6px}
+.meals{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.meal{border-radius:12px;overflow:hidden;background:var(--bg);border:1px solid var(--line);cursor:pointer;text-align:left;padding:0;color:var(--ink);font:inherit}
+.meal .ph{aspect-ratio:4/3;display:grid;place-items:center;font-family:var(--display);font-size:15px;color:var(--muted);letter-spacing:.06em;background:var(--soft);max-width:100%}
+.meal p{padding:8px 10px 2px;font-weight:600;font-size:14px;line-height:1.25}
+.meal small{display:block;padding:0 10px 4px;color:var(--muted);font-size:12px}
+.meal .tag{display:inline-block;margin:0 10px 8px;font-size:11px;font-weight:700;color:var(--sign);text-transform:uppercase;letter-spacing:.06em}
+.meal img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;max-width:100%}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filters button{flex:0 1 auto;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 13px;font:600 13px var(--body);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--sign);color:#FFFFFF;border-color:var(--sign)}
+.recipe img{width:100%;border-radius:10px;aspect-ratio:4/3;object-fit:cover}
+.recipe ul,.recipe ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.est{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:12px}
+.est b{font-family:var(--display);font-weight:400;font-size:34px;line-height:1;font-variant-numeric:tabular-nums;color:var(--sign);white-space:nowrap}
+.est span{font-size:13px;color:var(--muted)}
+.supportbox{border:2px solid var(--sign);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.supportbox h3{font-size:24px}
+.supportbox .facts{display:flex;flex-wrap:wrap;gap:6px}
+.supportbox .facts span{background:var(--soft);border-radius:999px;padding:4px 10px;font-size:13px;font-weight:600}
+.donate-mini{border-color:var(--sign);flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
+.donate-mini p{flex:1;min-width:0;font-size:16px;line-height:1.45}
+.donate-mini .btn{flex:none;padding:12px 16px;font-size:15px}
+@media (max-width:420px){.donate-mini{flex-direction:column;align-items:stretch}.donate-mini .btn{width:100%}}
+.support-mini{display:flex;flex-direction:row;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;color:var(--muted)}
+.support-mini p{flex:1 1 220px;min-width:0;font-size:15px}
+.community{font-size:14px;color:var(--muted)}
+.community b{color:var(--ink)}
+canvas{width:100%;max-width:270px;height:auto;border-radius:12px;display:block;margin:0 auto;border:1px solid var(--line)}
+.note{font-size:14.5px;color:var(--muted)}
+.hero{background:var(--deep);color:var(--sign-ink);border-radius:16px;padding:22px 20px;display:flex;flex-direction:column;gap:12px}
+.hero .eyebrow{font-family:var(--display);letter-spacing:.12em;text-transform:uppercase;font-size:16px;opacity:.85}
+.hero h1{font-size:52px;line-height:.95;text-transform:uppercase}
+.hero p{font-size:17px;max-width:34ch}
+.how{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none;counter-reset:s}
+.how li{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start;counter-increment:s}
+.how li::before{content:counter(s);width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:var(--display);font-size:18px}
+.how b{display:block}
+.how span{color:var(--muted);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14px;background:var(--bg)}
+.disclaimer{font-size:14.5px;color:var(--muted);display:flex;flex-direction:column;gap:8px}
+.disclaimer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.disclaimer a{color:var(--sign);font-weight:600}
+.linkbtn{background:none;border:0;padding:0;color:var(--sign);font:600 inherit var(--body);font-size:inherit;text-decoration:underline;cursor:pointer}
+.agree{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer;font-size:14px}
+.agree input{width:20px;height:20px;accent-color:var(--sign);flex:none;margin-top:1px}
+.faq details{border-top:1px solid var(--line);padding:10px 0}
+.faq details:first-of-type{border-top:0}
+.faq summary{font-weight:600;cursor:pointer}
+.faq p{color:var(--muted);font-size:14px;margin-top:6px}
+.ob{position:fixed;inset:0;background:var(--bg);overflow-y:auto;z-index:20;padding:calc(20px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(30px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.ob .app{gap:16px}
+.steps{display:flex;gap:4px}
+.steps i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.steps i.on{background:var(--sign)}
+.ob h2{font-size:32px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.field .flabel{font-weight:600;font-size:14px}
+.field input,.field select{font:500 16px var(--body);padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);width:100%;min-width:0}
+.field .hint{font-size:13px;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1 1 auto;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;font:600 14px var(--body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.checks{display:flex;flex-direction:column;gap:8px}
+.check{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--sign);flex:none}
+.check small{display:block;color:var(--muted);font-size:13px}
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.calc .wide{grid-column:1/-1}
+.navrow{display:flex;gap:10px;justify-content:space-between}
+.msg{font-size:14px;color:var(--err)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:40;max-width:calc(100% - 32px)}
+.modal{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 45%,transparent);display:grid;place-items:center;z-index:30;padding:16px;overflow-y:auto}
+.modal .panel{max-width:400px;width:100%;max-height:calc(100vh - 32px);overflow-y:auto}
+.loading{padding:40px 0;text-align:center;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.road i{transition:width .6s ease}}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-inner">
+  <button class="nav-logo" id="home" aria-label="Beast Challenge intro page">BEAST<span>CHALLENGE</span></button>
+  <div class="nav-links"><a href="/dashboard">Dashboard</a><button id="signout" hidden>Sign out</button></div>
+</div></nav>
+
+<div class="wrap"><div class="app" id="screen"><p class="loading">Loading…</p></div></div>
+<div id="layer"></div>
+<div id="mlayer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="recipes.js"></script>
+<script>
+const SUPABASE_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
+let sb=null;
+try{ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }catch(e){ console.error("Supabase failed to load:",e); }
+
+const ROUTES=[
+ ["Australia","Melbourne → Wilsons Promontory",220],["Australia","Melbourne → Halls Gap (Grampians)",260],["Australia","Melbourne → Lakes Entrance",315],["Australia","Torquay → Warrnambool (Great Ocean Road)",250],["Australia","Sydney → Canberra",285],["Australia","Sydney → Jervis Bay",200],["Australia","Sydney → Mudgee",265],["Australia","Gold Coast → Noosa",230],["Australia","Brisbane → Hervey Bay",290],["Australia","Adelaide → Clare Valley and back",270],["Australia","Perth → Margaret River",270],["Australia","Hobart → Launceston",200],["Australia","Larapinta Trail (NT)",223],["Australia","Canberra → Thredbo",210],
+ ["US","Miami → Key West",260],["US","Los Angeles → San Diego",200],["US","Las Vegas → Grand Canyon Skywalk",200],["US","Washington DC → Philadelphia",225],["US","San Francisco → Yosemite Valley",270],["US","Seattle → Portland",280],
+ ["South Africa","Cape Town → Cape Agulhas",220],["UK","London → Bath",185],["UK","London → Birmingham",190],["Canada","Montreal → Quebec City",250],["Canada","Toronto → Niagara Falls and back",260]
+];
+const ITEMS={steps:["Steps","10,000 a day, fills your route bar"],workout:["Workout","Gym or home"],calories:["Calories","Type a number, it adds to your day"],protein:["Protein check","Tick when you've hit it"],water:["Water","Glasses a day"],sleep:["Sleep","Hours last night"],alcohol:["Alcohol-free day","Tick it off"]};
+// Stefan's recipes come from recipes.js (the same file the dashboard uses); the extra ideas below are general meal ideas.
+const EXTRA_RECIPES=[{"n": "Greek yoghurt berry stack", "cats": ["breakfast"], "k": 310, "macros": [["310", "kcal"], ["28g", "Protein"]], "i": ["200 g high-protein Greek yoghurt", "1 cup mixed berries", "2 tbsp granola", "1 tsp honey"], "s": ["Layer yoghurt and berries in a glass.", "Top with granola and honey."]}, {"n": "Egg and spinach wraps", "cats": ["breakfast"], "k": 360, "macros": [["360", "kcal"], ["27g", "Protein"]], "i": ["2 eggs plus 2 egg whites", "1 handful spinach", "1 wholemeal wrap", "30 g reduced-fat feta"], "s": ["Scramble the eggs with the spinach.", "Fill the wrap, add feta, toast in a pan for a minute."]}, {"n": "Overnight protein oats", "cats": ["breakfast"], "k": 420, "macros": [["420", "kcal"], ["35g", "Protein"]], "i": ["½ cup rolled oats", "1 scoop vanilla protein powder", "150 ml milk of choice", "100 g Greek yoghurt", "½ cup berries"], "s": ["Mix everything except the berries in a jar.", "Refrigerate overnight, top with berries in the morning."]}, {"n": "Chicken burrito bowl", "cats": ["lunch"], "k": 520, "macros": [["520", "kcal"], ["45g", "Protein"]], "i": ["150 g cooked chicken breast", "½ cup cooked rice", "½ cup black beans, rinsed", "Salsa, lettuce, lime"], "s": ["Warm the chicken, rice and beans.", "Build over lettuce, top with salsa and lime."]}, {"n": "Tuna pasta salad", "cats": ["lunch"], "k": 450, "macros": [["450", "kcal"], ["36g", "Protein"]], "i": ["1 tin tuna in springwater, drained", "1 cup cooked pasta", "Cherry tomatoes, cucumber, red onion", "2 tbsp Greek yoghurt or light mayo"], "s": ["Mix the pasta, tuna and vegetables.", "Stir through the dressing and season."]}, {"n": "Turkey mince lettuce cups", "cats": ["lunch", "dinner"], "k": 390, "macros": [["390", "kcal"], ["38g", "Protein"]], "i": ["150 g lean turkey mince", "1 tsp garlic and ginger", "1 tbsp soy sauce", "Cos lettuce, carrot, spring onion"], "s": ["Brown the mince with garlic and ginger, stir in soy.", "Spoon into lettuce cups and top with carrot and spring onion."]}, {"n": "Beef and veg stir-fry", "cats": ["dinner"], "k": 480, "macros": [["480", "kcal"], ["40g", "Protein"]], "i": ["150 g lean beef strips", "2 cups stir-fry vegetables", "1 tbsp oyster sauce", "½ cup cooked noodles"], "s": ["Sear the beef, set aside.", "Stir-fry the vegetables for 3 minutes, add beef, noodles and sauce."]}, {"n": "Salmon tray bake", "cats": ["dinner"], "k": 540, "macros": [["540", "kcal"], ["38g", "Protein"]], "i": ["150 g salmon fillet", "200 g baby potatoes, halved", "Broccolini, lemon", "1 tsp olive oil"], "s": ["Roast potatoes at 200°C for 20 minutes.", "Add salmon and broccolini, roast 12 minutes, finish with lemon."]}, {"n": "Lean beef chilli", "cats": ["dinner"], "k": 510, "macros": [["510", "kcal"], ["42g", "Protein"]], "i": ["150 g lean beef mince", "½ tin kidney beans", "½ tin crushed tomatoes", "Chilli, cumin, paprika, onion", "½ cup cooked rice"], "s": ["Brown the onion and mince with the spices.", "Add tomatoes and beans, simmer 15 minutes, serve on rice."]}, {"n": "Cottage cheese fruit cup", "cats": ["snack"], "k": 210, "macros": [["210", "kcal"], ["20g", "Protein"]], "i": ["150 g low-fat cottage cheese", "½ cup pineapple or berries", "Sprinkle of cinnamon"], "s": ["Spoon cottage cheese into a bowl, top with fruit and cinnamon."]}, {"n": "Berry protein smoothie", "cats": ["smoothie", "breakfast"], "k": 320, "macros": [["320", "kcal"], ["32g", "Protein"]], "i": ["1 cup frozen mixed berries", "1 scoop vanilla protein powder", "250 ml unsweetened almond milk", "100 g Greek yoghurt"], "s": ["Blend until smooth. Add ice for a thicker shake."]}, {"n": "Banana peanut butter smoothie", "cats": ["smoothie", "breakfast"], "k": 430, "macros": [["430", "kcal"], ["34g", "Protein"]], "i": ["1 frozen banana", "1 scoop chocolate protein powder", "1 tbsp peanut butter", "250 ml milk of choice"], "s": ["Blend everything until smooth."]}, {"n": "Green protein smoothie", "cats": ["smoothie"], "k": 280, "macros": [["280", "kcal"], ["30g", "Protein"]], "i": ["1 handful spinach", "½ frozen banana", "½ cup frozen pineapple", "1 scoop vanilla protein powder", "250 ml water or coconut water"], "s": ["Blend the spinach and liquid first, then add the rest and blend again."]}, {"n": "Mango coconut protein smoothie", "cats": ["smoothie"], "k": 340, "macros": [["340", "kcal"], ["30g", "Protein"]], "i": ["1 cup frozen mango", "1 scoop vanilla protein powder", "200 ml light coconut milk drink", "Squeeze of lime"], "s": ["Blend until smooth and serve straight away."]}];
+const MEALS=[...(typeof RECIPES!=="undefined"?RECIPES:[]).map(r=>({n:r.title,img:r.image,d:r.desc,cats:r.meal||[],stefan:true,k:parseInt(String(r.macros[0][0]).match(/\d+/)),macros:r.macros,i:r.ingredients,s:r.instructions})),
+  ...EXTRA_RECIPES.map(r=>({...r,stefan:false}))];
+const WORKOUT_KCAL=300, M_PER_STEP=0.8, STEP_GOAL=10000, BADGES=[3,7,14,21,30];
+const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const fmt=n=>Math.round(n).toLocaleString("en-AU");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+// ---------- calorie and target calculator ----------
+// Calculator formula (Mifflin-St Jeor × daily activity). Steps aren't asked: if they track steps,
+// the challenge's 10,000 a day is built in, and workouts are counted on the day they're logged.
+const GOALS={fatloss:{label:"Fat loss",proteinPerKg:2.2,delta:-500},recomp:{label:"Tone",proteinPerKg:2.0,delta:-250},muscle:{label:"Muscle",proteinPerKg:1.8,delta:300}};
+function calcTargets(p){
+  const bmr=10*p.kg+6.25*p.cm-5*p.age+(p.sex==="male"?5:-161);
+  const stepsKcal=p.walk?STEP_GOAL*p.kg*0.00057:0;
+  const maint=bmr*p.job+stepsKcal;
+  const g=GOALS[p.goal];
+  const bmi=p.kg/((p.cm/100)**2);
+  return {bmr:Math.round(bmr),maint:Math.round(maint),target:Math.round(maint+g.delta),protein:Math.round(p.kg*g.proteinPerKg),bmi:Math.round(bmi*10)/10,stepsKcal:Math.round(stepsKcal)};
+}
+function bmiNote(b){return b<18.5?"below the healthy range":b<25?"in the healthy range":b<30?"above the healthy range":"well above the healthy range"}
+
+// ---------- state ----------
+let user=null, S=null, page="loading", tab="today", logDay=null, mealFilter="all", communityKm=null;
+const pad=n=>String(n).padStart(2,"0");
+const dateStr=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseDate=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+function todayDate(){const t=new Date();t.setHours(0,0,0,0);return t}
+function dayDate(d){const x=new Date(S.start);x.setDate(x.getDate()+d-1);return x}
+function rawDay(){return Math.round((todayDate()-S.start)/864e5)+1}
+function currentDay(){return Math.min(30,Math.max(1,rawDay()))}
+function finished(){return rawDay()>30}
+function dayNum(s){return Math.round((parseDate(s)-S.start)/864e5)+1}
+function L(d){return S.logs[d]||(S.logs[d]={steps:null,water:0,sleep:null,protein:false,alcohol:false,kcal:[],workouts:[]})}
+
+// ---------- scoring and streaks ----------
+function dueItems(d){const dow=dayDate(d).getDay();return S.tracked.filter(k=>k!=="workout"||S.workoutDays.includes(dow))}
+const kcalTotal=l=>l.kcal.reduce((a,b)=>a+b.k,0);
+function hit(k,l){
+  if(!l)return false;
+  switch(k){
+    case"steps":return (l.steps||0)>=STEP_GOAL;
+    case"workout":return l.workouts.length>0;
+    case"calories":return l.kcal.length>0;
+    case"protein":return !!l.protein;
+    case"water":return (l.water||0)>=S.targets.water;
+    case"sleep":return l.sleep!=null&&Math.abs(l.sleep-S.targets.sleep)<=0.5;
+    case"alcohol":return !!l.alcohol;
+  }}
+function dayScore(d){const l=S.logs[d];const due=dueItems(d);if(!l||!due.length)return 0;return Math.round(due.filter(k=>hit(k,l)).length/due.length*100)}
+function logged(d){const l=S.logs[d];if(!l)return false;return (l.steps||0)>0||l.water>0||l.protein||l.alcohol||l.kcal.length>0||l.workouts.length>0||l.sleep!=null}
+function challengeScore(){const n=currentDay();let t=0;for(let d=1;d<=n;d++)t+=dayScore(d);return Math.round(t/n)}
+function streaks(){
+  const cd=currentDay();let best=0,run=0;
+  for(let d=1;d<=cd;d++){run=logged(d)?run+1:0;best=Math.max(best,run)}
+  let cur=0;let d=logged(cd)||finished()?cd:cd-1; // today not logged yet doesn't break the streak
+  while(d>=1&&logged(d)){cur++;d--}
+  return {cur,best};
+}
+function estChange(){
+  if(!S.tracked.includes("calories"))return null;
+  const last=finished()?30:currentDay()-1;let bal=0,days=0;
+  for(let d=1;d<=last;d++){const l=S.logs[d];if(!l||!l.kcal.length)continue; // today is left out until it's finished
+    const extra=(l.steps!=null?(l.steps-S.stepsBaseline)*S.kg*0.00057:0)+l.workouts.length*WORKOUT_KCAL;
+    bal+=kcalTotal(l)-(S.maint+extra);days++}
+  return {kg:bal/7700,days};
+}
+function estHTML(){const e=estChange();if(!e)return"";
+  if(!e.days)return `<div class="est"><span>Log calories for a full day to see your estimated weight change.</span></div>`;
+  const v=Math.abs(e.kg);
+  return `<div class="est"><span>Estimated change from ${e.days} ${e.days===1?"day":"days"} of logged calories and steps. Only as accurate as your logging; the scale also moves with water.</span><b>${v<0.05?"±0.0":(e.kg<=0?"−":"+")+v.toFixed(1)} kg</b></div>`}
+function kmWalked(){let t=0;for(let d=1;d<=30;d++){const l=S.logs[d];if(l)t+=l.steps||0}return t*M_PER_STEP/1000}
+
+// ---------- data ----------
+function profileToState(p){
+  const ri=ROUTES.findIndex(r=>r[1]===p.route);
+  return {name:p.first_name,why:p.why,region:p.region,route:ri<0?0:ri,tracked:p.tracked||[],
+    targets:{calories:p.calorie_target,protein:p.protein_target,water:p.water_target||8,sleep:+p.sleep_target||7.5},
+    workoutDays:p.workout_days||[],start:parseDate(p.start_date),kg:+p.weight_kg,maint:p.maintenance,stepsBaseline:p.steps_baseline||0,logs:{}};
+}
+async function loadLogs(){
+  const from=dateStr(S.start);
+  const [days,cals,wos]=await Promise.all([
+    sb.from("beast_challenge_days").select("*").eq("user_id",user.id).gte("day",from),
+    sb.from("beast_challenge_calories").select("id,day,kcal").eq("user_id",user.id).gte("day",from).order("id"),
+    sb.from("beast_challenge_workouts").select("id,day,location,type,minutes").eq("user_id",user.id).gte("day",from).order("id")]);
+  if(days.error||cals.error||wos.error)throw (days.error||cals.error||wos.error);
+  S.logs={};
+  days.data.forEach(r=>{const l=L(dayNum(r.day));Object.assign(l,{steps:r.steps,water:r.water||0,sleep:r.sleep==null?null:+r.sleep,protein:r.protein_hit,alcohol:r.alcohol_free})});
+  cals.data.forEach(r=>L(dayNum(r.day)).kcal.push({id:r.id,k:r.kcal}));
+  wos.data.forEach(r=>L(dayNum(r.day)).workouts.push({id:r.id,where:r.location,type:r.type,min:r.minutes}));
+}
+async function loadProfile(){
+  const {data,error}=await sb.from("beast_challenge_profiles").select("*").eq("user_id",user.id).maybeSingle();
+  if(error)throw error;
+  if(!data){S=null;return false}
+  S=profileToState(data);await loadLogs();return true;
+}
+async function saveDay(d){
+  const l=L(d);
+  const {error}=await sb.from("beast_challenge_days").upsert({user_id:user.id,day:dateStr(dayDate(d)),steps:l.steps,water:l.water||0,sleep:l.sleep,protein_hit:!!l.protein,alcohol_free:!!l.alcohol,updated_at:new Date().toISOString()});
+  if(error)return failed(error);
+}
+async function failed(err){console.error(err);toast("Couldn't save that. Check your connection and try again.");try{await loadLogs()}catch(e){}render()}
+async function loadCommunity(){
+  try{const {data,error}=await sb.rpc("beast_challenge_community_km");if(!error){communityKm=+data;if(page==="app"&&tab==="progress")render()}}catch(e){}
+}
+
+// ---------- screens ----------
+const screen=document.getElementById("screen");
+function go(p){page=p;render();window.scrollTo(0,0)}
+function render(){
+  document.getElementById("signout").hidden=!user;
+  if(page==="loading"){screen.innerHTML=`<p class="loading">Loading…</p>`;return}
+  if(page==="intro"||!S){screen.innerHTML=vIntro();bindIntro();return}
+  if(logDay==null)logDay=currentDay();
+  screen.innerHTML=`<div class="tabs" role="tablist">${["today","route","progress","meals"].map(t=>`<button role="tab" data-tab="${t}" aria-selected="${t===tab}">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div>
+   ${finished()?`<div class="catchup"><p><b>Your 30 days are done.</b> Check your Progress tab, share your card, then start another 30 if you want to keep going.</p><button class="btn" data-restart>Start a new 30 days</button></div>`:""}
+   ${{today:vToday,route:vRoute,progress:vProgress,meals:vMeals}[tab]()}
+   <div class="panel support-mini"><p>Free to use. If you'd like to help keep the lights on, you can make a one-off $5 donation. Charged once, never again.</p><button class="btn accent" data-support>Donate $5 once</button></div>
+   <p class="note" style="text-align:center">General information, not medical advice. <button class="linkbtn" data-disclaimer>Read the disclaimer</button></p>`;
+  bindApp();
+}
+
+const DISCLAIMER=`<div class="disclaimer">
+  <p><b style="color:var(--ink)">Before you start.</b> The Beast Challenge is general fitness and nutrition information, not medical advice. It isn't a substitute for advice from your doctor or another qualified health professional.</p>
+  <ul>
+   <li>Check with your GP before changing your diet or exercise, especially if you're pregnant or breastfeeding, have a medical condition, take medication, or have a history of disordered eating.</li>
+   <li>Calorie, protein, BMI, weight-change and distance figures are estimates based on what you enter. Your real results will differ.</li>
+   <li>Stop and seek medical help if you feel pain, dizziness, chest tightness or shortness of breath.</li>
+   <li>You take part at your own risk and are responsible for your own health and safety, including where and when you walk.</li>
+  </ul>
+  <p>See the <a href="/terms" target="_blank" rel="noopener">Terms</a> and <a href="/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>.</p></div>`;
+function showDisclaimer(){modal(`<h3 style="font-size:28px">Disclaimer</h3>${DISCLAIMER}`)}
+function supportBox(){return `<div class="supportbox">
+  <div class="label">Optional</div>
+  <h3>Want to help keep the lights on?</h3>
+  <p>The challenge is free, and it stays free. Running it costs real money, so if it helps you and you'd like to chip in, you can make a single donation of $5.</p>
+  <div class="facts"><span>$5 AUD, one time only</span><span>Not a subscription</span><span>Doesn't unlock anything</span></div>
+  <button class="btn accent big" data-support>Donate $5 once</button>
+  <p class="note">You'll never be charged again. Skipping this changes nothing about your challenge.</p></div>`}
+
+function vIntro(){
+  const sample=ROUTES.filter(r=>r[0]==="Australia").slice(0,3);
+  const cta=S?"Open my challenge":"Start the challenge, free";
+  return `<section class="hero">
+    <div class="eyebrow">Free · 30 days · Starts the day you join</div>
+    <h1>Beast<br>Challenge</h1>
+    <p>Walk 10,000 steps a day to a real destination, log the few habits you pick, and build a streak you can actually see.</p>
+    <div class="road"><i style="width:38%"></i></div>
+    <button class="btn accent big" data-start>${cta}</button>
+  </section>
+  <div class="panel donate-mini"><p><b>Free, and it stays free.</b> Want to help keep the lights on? A one-off $5 donation, charged once, not a subscription.</p><button class="btn accent" data-support>Donate $5 once</button></div>
+  <div class="panel"><div class="label">How it works</div>
+   <ol class="how">
+    <li><div><b>Tell us a bit about you</b><span>Age, height, weight and your day. We work out your calories and protein for you.</span></div></li>
+    <li><div><b>Pick what you'll log</b><span>Three or four things to start. Steps, workouts, calories, protein, water, sleep, alcohol-free days.</span></div></li>
+    <li><div><b>Log in seconds each day</b><span>Forgot a day? You can catch up on yesterday and the day before.</span></div></li>
+    <li><div><b>Watch it add up</b><span>Your route fills, your streak grows, and you get a card to share each week.</span></div></li>
+   </ol></div>
+  <div class="panel"><div class="label">Walk somewhere real</div>
+   <p>10,000 steps is about 8 km. Over 30 days that's around 240 km. Pick a route near you:</p>
+   <div class="routes">${sample.map(r=>`<div class="route" style="cursor:default"><span>${r[1]}</span><b>${r[2]} km</b></div>`).join("")}</div>
+   <p class="note">Routes for every Australian state and territory, the US, South Africa, the UK and Canada.</p></div>
+  <div class="panel"><div class="label">What you can log</div>
+   <div class="chips">${Object.values(ITEMS).map(v=>`<span>${v[0]}</span>`).join("")}</div></div>
+  <div class="panel"><div class="label">Streak badges</div>
+   <div class="badges">${BADGES.map(b=>`<div class="badge on"><div class="disc">${b}</div>${b} days</div>`).join("")}</div>
+   <p class="note">Earned for logging days in a row. Badges show on your share card.</p></div>
+  <div class="panel faq"><div class="label">Questions</div>
+   <details><summary>Is it really free?</summary><p>Yes. No card needed to join, nothing to cancel. The $5 donation is entirely optional.</p></details>
+   <details><summary>I've never tracked anything. Is this for me?</summary><p>Yes. Start with three easy things and add more when you're ready.</p></details>
+   <details><summary>Who can see my logs?</summary><p>Only you. Your logs are private to your account.</p></details>
+   <details><summary>What if I miss a day?</summary><p>Log it the next day or the day after. If you miss longer, keep going. The challenge doesn't reset.</p></details>
+  </div>
+  <div class="panel">${DISCLAIMER}</div>
+  ${supportBox()}
+  <button class="btn big" data-start>${cta}</button>`;
+}
+
+function signHTML(){
+  const [,name,km]=ROUTES[S.route];const done=Math.min(km,kmWalked());const pct=done/km*100;
+  const left=Math.max(0,km-done), daysLeft=Math.max(1,30-currentDay()+1);
+  const need=Math.ceil(left*1000/M_PER_STEP/daysLeft);
+  return `<div class="sign"><div class="row"><div class="dest">${name}</div><div class="km">${Math.round(done)}<span style="font-size:18px;opacity:.8"> / ${km} km</span></div></div>
+  <div class="road"><i style="width:${pct.toFixed(1)}%"></i></div>
+  <div class="sub">${left<=0?"You made it. Pick another route to keep going.":finished()?"Distances are approximate.":`${fmt(need)} steps a day gets you there by day 30 · approx. distances`}</div></div>`;
+}
+function dayLabel(d,cd){const w=DOW[dayDate(d).getDay()];return d===cd?"Today":d===cd-1?`Yesterday · ${w}`:`${w} · day ${d}`}
+const shortLabel=(d,cd)=>d===cd-1?"yesterday":DOW[dayDate(d).getDay()];
+function vToday(){
+  const cd=currentDay();const l=L(logDay);
+  const win=finished()?[]:[cd-2,cd-1,cd].filter(d=>d>=1);
+  if(!finished()&&!win.includes(logDay))logDay=cd;
+  const missed=win.filter(d=>d<cd&&!logged(d));
+  const chips=win.map(d=>`<button data-logday="${d}" aria-pressed="${d===logDay}">${d<cd&&!logged(d)?'<i class="dot"></i>':""}${dayLabel(d,cd)}</button>`).join("");
+  const due=dueItems(logDay);
+  const row=(k,ctrl,meta)=>{const isDue=due.includes(k);const p=!isDue?`<span class="pill off">Rest day</span>`:hit(k,l)?`<span class="pill hit">Done</span>`:`<span class="pill miss">Not yet</span>`;
+    return `<div class="item"><div class="name">${ITEMS[k][0]}</div>${p}${meta?`<div class="meta">${meta}</div>`:""}${ctrl}</div>`};
+  const parts={
+    steps:()=>row("steps",`<div class="ctrl"><input id="in-steps" type="number" inputmode="numeric" min="0" max="60000" placeholder="Steps" aria-label="Steps" value="${l.steps??""}"><button class="btn" data-act="steps">Save</button></div>`,`${fmt(l.steps||0)} of ${fmt(STEP_GOAL)}`),
+    workout:()=>row("workout",`<div class="ctrl"><select id="in-where" aria-label="Where"><option>Gym</option><option>Home</option></select><select id="in-type" aria-label="Type"><option>Strength</option><option>Cardio</option><option>Class</option><option>Walk</option></select><input id="in-min" type="number" inputmode="numeric" placeholder="Min" aria-label="Minutes" style="max-width:80px"><button class="btn" data-act="workout">Log</button></div>${l.workouts.length?`<div class="entries">${l.workouts.map((w,i)=>`<span>${esc(w.where)} · ${esc(w.type)}${w.min?" · "+w.min+" min":""}<button aria-label="Remove" data-delw="${i}">×</button></span>`).join("")}</div>`:""}`,S.workoutDays.length?`Planned on ${S.workoutDays.map(d=>DOW[d]).join(", ")}`:""),
+    calories:()=>{const tot=kcalTotal(l);return row("calories",`<div class="ctrl"><input id="in-kcal" type="number" inputmode="numeric" placeholder="e.g. 500" aria-label="Calories"><button class="btn" data-act="kcal">Add</button></div>${l.kcal.length?`<div class="entries">${l.kcal.map((k,i)=>`<span>${fmt(k.k)} cal<button aria-label="Remove" data-delk="${i}">×</button></span>`).join("")}</div>`:""}`,`${fmt(tot)} of ${fmt(S.targets.calories)} cal${tot&&Math.abs(tot-S.targets.calories)<=S.targets.calories*.1?" · on target":""}`)},
+    protein:()=>row("protein",`<div class="ctrl toggle"><button class="btn ${l.protein?"":"alt"}" data-act="protein">${l.protein?"Hit my protein ✓":"Hit my protein"}</button></div>`,`Target ${S.targets.protein} g`),
+    water:()=>row("water",`<div class="ctrl"><button class="btn alt" data-act="water-" aria-label="Remove a glass">−</button><button class="btn" data-act="water+">+1 glass</button></div>`,`${l.water||0} of ${S.targets.water} glasses`),
+    sleep:()=>row("sleep",`<div class="ctrl"><input id="in-sleep" type="number" step="0.5" min="0" max="14" placeholder="Hours" value="${l.sleep??""}" aria-label="Hours slept"><button class="btn" data-act="sleep">Save</button></div>`,`Ideal ${S.targets.sleep} h`),
+    alcohol:()=>row("alcohol",`<div class="ctrl toggle"><button class="btn ${l.alcohol?"":"alt"}" data-act="alcohol">${l.alcohol?"Alcohol-free ✓":"Alcohol-free"}</button></div>`,"")
+  };
+  const st=streaks();
+  return `<div class="panel">
+    <div class="hello"><div><div class="label">Day ${cd} of 30 · ${st.cur}-day streak</div><h2>Hey ${esc(S.name)}</h2></div><div class="score">${dayScore(logDay)}<small>/100</small></div></div>
+    ${S.why?`<div class="why">"${esc(S.why)}"</div>`:""}
+    ${estHTML()}
+  </div>
+  ${S.tracked.includes("steps")?signHTML():""}
+  ${finished()?"":`<div class="panel"><div class="label">Log ${logDay===cd?"today":dayLabel(logDay,cd).toLowerCase()}</div>
+  ${missed.length&&logDay===cd?`<div class="catchup"><p>Missed ${missed.map(d=>shortLabel(d,cd)).join(" and ")}? You can still log it.</p><button class="btn" data-logday="${missed[missed.length-1]}">Log ${shortLabel(missed[missed.length-1],cd)}</button></div>`:""}
+  <div class="day-chips">${chips}</div><div>${S.tracked.map(k=>parts[k]()).join("")}</div>
+  <p class="note">You can log today and catch up on the two days before.</p></div>`}`;
+}
+function vRoute(){
+  let h=`${signHTML()}<div class="panel"><div class="label">Pick your route · 10,000 steps a day ≈ 8 km</div><div class="routes">`;let last="";
+  ROUTES.forEach((r,i)=>{if(r[0]!==last){h+=`<div class="label region-h">${r[0]}</div>`;last=r[0]}
+    h+=`<button class="route" data-route="${i}" aria-pressed="${i===S.route}"><span>${r[1]}</span><b>${r[2]} km</b></button>`});
+  return h+`</div><p class="note">Distances are approximate. Progress carries over if you switch.</p></div>`;
+}
+function vProgress(){
+  const cd=currentDay();let cells="";
+  for(let d=1;d<=30;d++){const sc=dayScore(d);const c=d>cd?"future":!logged(d)?"":sc>=80?"s3":sc>=50?"s2":"s1";cells+=`<div class="${c}${d===cd&&!finished()?" today":""}" title="Day ${d}">${d}</div>`}
+  const vals=Object.entries(S.logs).filter(([d])=>d>=1&&d<=30).map(([,l])=>l),st=streaks();
+  const workouts=vals.reduce((a,l)=>a+l.workouts.length,0),prot=vals.filter(l=>l.protein).length,alc=vals.filter(l=>l.alcohol).length,days=Array.from({length:cd},(_,i)=>i+1).filter(logged).length;
+  const next=BADGES.find(b=>b>st.best);
+  return `<div class="panel"><div class="hello"><div><div class="label">Challenge score ${finished()?"":"so far"}</div><h2>${days} of ${cd} days logged</h2></div><div class="score">${challengeScore()}<small>/100</small></div></div>
+  <div class="grid30">${cells}</div><p class="note">Darker green = more of your items hit that day. Missed days count as 0.</p></div>
+  <div class="panel"><div class="label">Streak badges</div>
+   <div class="badges">${BADGES.map(b=>`<div class="badge ${st.best>=b?"on":""}"><div class="disc">${b}</div>${b} days</div>`).join("")}</div>
+   <p class="note">Current streak ${st.cur} ${st.cur===1?"day":"days"} · best ${st.best}.${next?` ${Math.max(1,next-st.cur)} more days in a row for the ${next}-day badge.`:" Every badge earned."}</p></div>
+  <div class="panel"><div class="stats">
+   <div class="stat"><b>${Math.round(kmWalked())} km</b><span>walked</span></div>
+   <div class="stat"><b>${workouts}</b><span>workouts</span></div>
+   <div class="stat"><b>${prot}</b><span>protein days</span></div>
+   <div class="stat"><b>${alc}</b><span>alcohol-free days</span></div></div>
+   ${estHTML()}
+   ${communityKm?`<div class="community">Together, everyone in the Beast Challenge has walked <b>${fmt(communityKm)} km</b>.</div>`:""}</div>
+  <div class="panel"><div class="label">${finished()?"Your 30-day":"Week "+Math.min(4,Math.ceil(cd/7))} share card</div><canvas id="card" width="1080" height="1920" aria-label="Share card preview"></canvas>
+   <button class="btn" id="share">Share to story</button><p class="note">Your weight never appears on the card.</p></div>`;
+}
+function vMeals(){
+  const F=[["all","All"],["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"],["snack","Snacks"],["smoothie","Smoothies"],["stefan","Stefan's recipes"]];
+  const list=MEALS.map((r,i)=>[r,i]).filter(([r])=>mealFilter==="all"||(mealFilter==="stefan"?r.stefan:r.cats.includes(mealFilter)));
+  const tagOf=r=>r.stefan?"Stefan's recipe":r.cats.map(c=>c==="smoothie"?"Smoothie":c[0].toUpperCase()+c.slice(1)).join(" · ");
+  return `<div class="panel"><div class="label">Meal ideas</div>
+  <div class="filters" role="group" aria-label="Filter recipes">${F.map(([k,t])=>`<button data-mf="${k}" aria-pressed="${k===mealFilter}">${t}</button>`).join("")}</div>
+  <div class="meals">${list.map(([m,i])=>`<button class="meal" data-recipe="${i}">${m.img?`<img src="${esc(m.img)}" alt="" loading="lazy">`:`<div class="ph">${tagOf(m)}</div>`}<p>${esc(m.n)}</p><small>${m.macros.slice(0,2).map(x=>x.join(" ")).join(" · ")}</small><span class="tag">${tagOf(m)}</span></button>`).join("")||`<p class="note">Nothing here yet.</p>`}</div>
+  <p class="note">Stefan's recipes are the ones from his social media. Tap any recipe to open it.</p></div>`;
+}
+
+// ---------- events ----------
+function toast(t){const el=document.createElement("div");el.className="toast";el.setAttribute("role","status");el.textContent=t;document.body.appendChild(el);setTimeout(()=>el.remove(),2600)}
+const layer=document.getElementById("layer");
+const mlayer=document.getElementById("mlayer");
+function modal(html){mlayer.innerHTML=`<div class="modal" id="m"><div class="panel">${html}<button class="btn alt" id="mclose">Close</button></div></div>`;
+  document.getElementById("mclose").onclick=()=>mlayer.innerHTML="";document.getElementById("m").onclick=e=>{if(e.target.id==="m")mlayer.innerHTML=""}}
+function openSupport(){
+  modal(`<h3 style="font-size:26px">One-off $5 donation</h3><p>Thanks for thinking about it. You'll go to a secure Stripe checkout for a single $5 AUD payment, then come straight back here.</p><p class="note">Charged once. No subscription. It doesn't unlock anything, and the challenge stays free either way.</p><button class="btn accent big" id="go-checkout">Continue to secure checkout</button>`);
+  document.getElementById("go-checkout").onclick=async e=>{
+    const b=e.currentTarget;b.disabled=true;b.textContent="Opening checkout…";
+    try{const r=await fetch("/api/create-support-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:user?user.email:undefined})});
+      const j=await r.json();if(!r.ok||!j.url)throw new Error(j.error||"Checkout failed");window.location.href=j.url;
+    }catch(err){console.error(err);b.disabled=false;b.textContent="Continue to secure checkout";toast("Couldn't open checkout. Please try again in a moment.")}
+  };
+}
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-disclaimer]")){e.preventDefault();showDisclaimer();return}
+  if(e.target.closest("[data-support]")){e.preventDefault();openSupport()}
+});
+function bindIntro(){screen.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>{if(S){go("app")}else onboarding()})}
+function bindApp(){
+  screen.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();if(tab==="progress")loadCommunity()});
+  screen.querySelectorAll("[data-logday]").forEach(b=>b.onclick=()=>{logDay=+b.dataset.logday;render()});
+  screen.querySelectorAll("[data-route]").forEach(b=>b.onclick=async()=>{S.route=+b.dataset.route;render();
+    const {error}=await sb.from("beast_challenge_profiles").update({route:ROUTES[S.route][1],updated_at:new Date().toISOString()}).eq("user_id",user.id);
+    if(error)failed(error);else toast("Route changed")});
+  screen.querySelectorAll("[data-delk]").forEach(b=>b.onclick=async()=>{const l=L(logDay);const [e]=l.kcal.splice(+b.dataset.delk,1);render();
+    const {error}=await sb.from("beast_challenge_calories").delete().eq("id",e.id);if(error)failed(error)});
+  screen.querySelectorAll("[data-delw]").forEach(b=>b.onclick=async()=>{const l=L(logDay);const [w]=l.workouts.splice(+b.dataset.delw,1);render();
+    const {error}=await sb.from("beast_challenge_workouts").delete().eq("id",w.id);if(error)failed(error)});
+  screen.querySelectorAll("[data-mf]").forEach(b=>b.onclick=()=>{mealFilter=b.dataset.mf;render()});
+  screen.querySelectorAll("[data-recipe]").forEach(b=>b.onclick=()=>{const r=MEALS[+b.dataset.recipe];
+    const canAdd=S.tracked.includes("calories")&&!finished()&&r.k>0;
+    modal(`<div class="recipe" style="display:flex;flex-direction:column;gap:10px">${r.img?`<img src="${esc(r.img)}" alt="${esc(r.n)}">`:""}<h3 style="font-size:30px">${esc(r.n)}</h3>${r.d?`<p class="note">${esc(r.d)}</p>`:""}<div class="chips">${r.macros.map(m=>`<span>${esc(m.join(" "))}</span>`).join("")}</div><div class="label">Ingredients</div><ul>${r.i.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><div class="label">Method</div><ol>${r.s.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${canAdd?`<button class="btn" id="addmeal">Add ${r.k} cal to ${logDay===currentDay()?"today":"this day"}</button>`:""}</div>`);
+    const a=document.getElementById("addmeal");if(a)a.onclick=async()=>{mlayer.innerHTML="";await addKcal(logDay,r.k)}});
+  screen.querySelectorAll("[data-restart]").forEach(b=>b.onclick=async()=>{
+    b.disabled=true;const {error}=await sb.from("beast_challenge_profiles").update({start_date:dateStr(todayDate()),updated_at:new Date().toISOString()}).eq("user_id",user.id);
+    if(error){b.disabled=false;return failed(error)}
+    S.start=todayDate();await loadLogs();logDay=1;tab="today";render();toast("Day 1. Here we go again.")});
+  screen.querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{
+    const d=logDay,l=L(d),a=b.dataset.act,v=id=>document.getElementById(id).value;
+    if(a==="steps"){const n=+v("in-steps");if(v("in-steps")===""||!(n>=0&&n<=60000)){toast("Steps must be between 0 and 60,000");return}l.steps=Math.round(n);render();await saveDay(d);toast("Steps saved");return}
+    if(a==="kcal"){const n=+v("in-kcal");if(!(n>0&&n<=5000)){toast("Enter calories between 1 and 5,000");return}await addKcal(d,Math.round(n));return}
+    if(a==="workout"){const w={where:v("in-where"),type:v("in-type"),min:+v("in-min")||null};
+      if(w.min!=null&&!(w.min>=1&&w.min<=600)){toast("Minutes should be between 1 and 600");return}
+      b.disabled=true;const {data,error}=await sb.from("beast_challenge_workouts").insert({user_id:user.id,day:dateStr(dayDate(d)),location:w.where,type:w.type,minutes:w.min}).select("id").single();
+      if(error)return failed(error);w.id=data.id;l.workouts.push(w);render();toast("Workout logged");return}
+    if(a==="sleep"){const n=+v("in-sleep");if(!(n>0&&n<=14)){toast("Enter hours between 0.5 and 14");return}l.sleep=n;render();await saveDay(d);toast("Sleep saved");return}
+    if(a==="protein")l.protein=!l.protein;
+    if(a==="alcohol")l.alcohol=!l.alcohol;
+    if(a==="water+")l.water=Math.min(40,(l.water||0)+1);
+    if(a==="water-")l.water=Math.max(0,(l.water||0)-1);
+    render();await saveDay(d);
+  });
+  const c=document.getElementById("card");if(c){drawCard(c);document.fonts&&document.fonts.ready.then(()=>{if(document.getElementById("card")===c)drawCard(c)})}
+  const sh=document.getElementById("share");if(sh)sh.onclick=()=>shareCard(c);
+}
+async function addKcal(d,k){
+  const {data,error}=await sb.from("beast_challenge_calories").insert({user_id:user.id,day:dateStr(dayDate(d)),kcal:k}).select("id").single();
+  if(error)return failed(error);
+  L(d).kcal.push({id:data.id,k});render();toast(`Added. ${fmt(kcalTotal(L(d)))} cal that day`);
+}
+function shareCard(c){
+  c.toBlob(async blob=>{
+    if(!blob){toast("Couldn't create the card. Please try again.");return}
+    const file=new File([blob],"beast-challenge.png",{type:"image/png"});
+    try{
+      if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Beast Challenge",text:"My Beast Challenge progress · beastcoach.fit/beast-challenge"});return}
+    }catch(e){if(e&&e.name==="AbortError")return}
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="beast-challenge.png";document.body.appendChild(a);a.click();a.remove();
+    toast("Card saved. Post it from your photos.");
+  },"image/png");
+}
+document.getElementById("home").onclick=()=>go("intro");
+document.getElementById("signout").onclick=async()=>{await sb.auth.signOut();window.location.href="/beast-challenge"};
+
+// ---------- share card ----------
+function drawCard(c){
+  const x=c.getContext("2d");
+  const sign="#2D6A4F",acc="#52B788";
+  const cd=currentDay(),wk=Math.min(4,Math.ceil(cd/7)),st=streaks();
+  const D="'Bebas Neue', 'Arial Narrow', Impact, sans-serif",B="Manrope, Arial, sans-serif";
+  x.clearRect(0,0,1080,1920);
+  x.fillStyle="#1B3022";x.fillRect(0,0,1080,1920);
+  x.fillStyle=sign;x.fillRect(0,0,1080,600);
+  x.fillStyle="#FFFFFF";x.font=`400 72px ${D}`;x.fillText("BEAST CHALLENGE",80,140);
+  x.font=`600 54px ${B}`;x.fillText(`${S.name} · ${finished()?"30 days":"Week "+wk}`,80,225);
+  x.font=`400 250px ${D}`;const sc=String(challengeScore());x.fillText(sc,80,500);const sw=x.measureText(sc).width;
+  x.font=`600 54px ${B}`;x.fillText("/100",80+sw+16,500);
+  const earned=[...BADGES].reverse().find(b=>st.best>=b);
+  if(earned){const cx=860,cy=380,R=150;x.beginPath();x.arc(cx,cy,R,0,Math.PI*2);x.fillStyle=acc;x.fill();x.lineWidth=14;x.strokeStyle="#FFFFFF";x.stroke();x.fillStyle=sign;x.beginPath();x.arc(cx,cy,R-24,0,Math.PI*2);x.fill();
+    x.fillStyle="#FFFFFF";x.textAlign="center";x.font=`400 130px ${D}`;x.fillText(String(earned),cx,cy+30);x.font=`400 40px ${D}`;x.fillText("DAY STREAK",cx,cy+82);x.textAlign="left"}
+  if(S.tracked.includes("steps")){const [,name,km]=ROUTES[S.route];const done=Math.min(km,kmWalked());
+    x.fillStyle="#FFFFFF";x.font=`600 46px ${B}`;x.fillText(name,80,720);
+    x.fillStyle="rgba(255,255,255,.18)";x.fillRect(80,760,920,40);x.fillStyle=acc;x.fillRect(80,760,920*done/km,40);
+    x.fillStyle="#FFFFFF";x.font=`400 90px ${D}`;x.fillText(`${Math.round(done)} / ${km} km`,80,900);}
+  const vals=Object.entries(S.logs).filter(([d])=>d>=1&&d<=30).map(([,l])=>l);
+  const rows=[[`${st.cur}`,"day streak right now"],[`${Array.from({length:cd},(_,i)=>i+1).filter(logged).length} of ${cd}`,"days logged"],[vals.reduce((a,l)=>a+l.workouts.length,0),"workouts"],[vals.filter(l=>l.protein).length,"protein days"]];
+  rows.forEach((r,i)=>{const y=1040+i*150;x.fillStyle=acc;x.font=`400 96px ${D}`;x.fillText(String(r[0]),80,y+70);x.fillStyle="#C9D3D0";x.font=`500 44px ${B}`;x.fillText(r[1],440,y+60)});
+  x.fillStyle="#FFFFFF";x.font=`700 52px ${B}`;x.fillText("beastcoach.fit",80,1800);
+  x.fillStyle="#93A09C";x.font=`500 36px ${B}`;x.fillText("Free 30-day challenge · App launching late 2026",80,1860);
+}
+
+// ---------- onboarding ----------
+function onboarding(){
+  const meta=(user&&user.user_metadata)||{};
+  const d={name:(meta.full_name||"").split(" ")[0],region:"Australia",units:"metric",sex:"",age:"",cm:"",kg:"",ft:"",inch:"",lb:"",job:1.15,goal:"fatloss",why:"",found:"Instagram",
+    tracked:null,targets:{water:8,sleep:7.5},workoutDays:[1,3,5],route:0,calc:null,over:{},agree:false,authMode:"signup"};
+  try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";
+    d.region=tz.startsWith("Australia")?"Australia":tz.startsWith("Africa/Johannesburg")?"South Africa":tz==="Europe/London"?"UK":/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Montreal|Regina|St_Johns)/.test(tz)?"Canada":tz.startsWith("America")?"US":"Australia";
+    if(d.region==="US"||d.region==="UK")d.units="imperial";}catch(e){}
+  d.route=ROUTES.findIndex(r=>r[0]===d.region);
+  const presets=g=>({fatloss:["steps","calories","protein","water"],recomp:["steps","workout","protein","sleep"],muscle:["workout","calories","protein","sleep"]})[g];
+  const N=6;let first=user?1:0;let step=first;
+  const lab=i=>`Step ${i+1-first} of ${N-first}`;
+  const bar=()=>`<div class="steps">${Array.from({length:N-first},(_,i)=>`<i class="${i+first<=step?"on":""}"></i>`).join("")}</div>`;
+  const seg=(key,opts)=>`<div class="seg" data-seg="${key}">${opts.map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="${String(d[key])===String(v)}">${t}</button>`).join("")}</div>`;
+  const body=()=>({kg:d.units==="metric"?+d.kg:+d.lb*0.4536,cm:d.units==="metric"?+d.cm:(+d.ft*12+ +d.inch)*2.54,age:+d.age,sex:d.sex,job:+d.job,goal:d.goal,walk:(d.tracked||presets(d.goal)).includes("steps")});
+  const screens=[
+    ()=>`<div class="label">${lab(0)} · Account</div><h2>Start your 30 days</h2><p class="note">Use your beastcoach.fit account, or create a free one. It's the same login as the member dashboard.</p>
+      ${seg("authMode",[["signup","Create account"],["signin","Log in"]])}
+      ${d.authMode==="signup"?`<div class="field"><label for="ob-fullname">Your name</label><input id="ob-fullname" autocomplete="name" value="${esc(d.name)}"></div>`:""}
+      <div class="field"><label for="ob-email">Email</label><input id="ob-email" type="email" autocomplete="email" value="${esc(d.email||"")}"></div>
+      <div class="field"><label for="ob-pass">Password</label><input id="ob-pass" type="password" autocomplete="${d.authMode==="signup"?"new-password":"current-password"}" minlength="6"></div>
+      ${d.authMode==="signin"?`<a class="note" href="/dashboard" style="color:var(--sign)">Forgot your password? Reset it from the dashboard.</a>`:""}
+      <p class="msg" id="ob-msg" role="alert"></p>`,
+    ()=>`<div class="label">${lab(1)} · About you</div><h2>The basics</h2>${user?`<div class="catchup"><p>Signed in as <b>${esc(user.email)}</b>.</p><button type="button" class="btn alt" id="ob-signout">Not you?</button></div>`:""}
+      <div class="field"><label for="ob-name">First name</label><input id="ob-name" value="${esc(d.name)}" placeholder="Your first name" autocomplete="given-name"></div>
+      <div class="two"><div class="field"><label for="ob-region">Region</label><select id="ob-region">${["Australia","US","South Africa","UK","Canada"].map(r=>`<option ${r===d.region?"selected":""}>${r}</option>`).join("")}</select></div>
+      <div class="field"><label for="ob-age">Age</label><input id="ob-age" type="number" inputmode="numeric" min="16" max="90" value="${esc(d.age)}" placeholder="Years"></div></div>
+      <div class="field"><span class="flabel">Sex</span>${seg("sex",[["female","Female"],["male","Male"]])}<span class="hint">Used only to calculate your calories.</span></div>
+      <div class="field"><span class="flabel">Units</span>${seg("units",[["metric","cm / kg"],["imperial","ft / lb"]])}</div>
+      ${d.units==="metric"?`<div class="two"><div class="field"><label for="ob-cm">Height (cm)</label><input id="ob-cm" type="number" inputmode="numeric" value="${esc(d.cm)}" placeholder="e.g. 175"></div><div class="field"><label for="ob-kg">Weight (kg)</label><input id="ob-kg" type="number" inputmode="decimal" value="${esc(d.kg)}" placeholder="e.g. 88"></div></div>`
+       :`<div class="two"><div class="field"><label for="ob-ft">Height (ft)</label><input id="ob-ft" type="number" inputmode="numeric" value="${esc(d.ft)}" placeholder="5"></div><div class="field"><label for="ob-in">(in)</label><input id="ob-in" type="number" inputmode="numeric" value="${esc(d.inch)}" placeholder="9"></div></div><div class="field"><label for="ob-lb">Weight (lb)</label><input id="ob-lb" type="number" inputmode="decimal" value="${esc(d.lb)}" placeholder="e.g. 195"></div>`}`,
+    ()=>`<div class="label">${lab(2)} · Your day</div><h2>How active are you now?</h2>
+      <div class="field"><label for="ob-job">Daily activity (job and lifestyle, not counting exercise)</label><select id="ob-job">${[[1.15,"Desk job: mostly sitting"],[1.25,"On your feet sometimes: teaching, service, errands"],[1.35,"Physically demanding: trades, labour, delivery"]].map(([v,t])=>`<option value="${v}" ${+d.job===v?"selected":""}>${t}</option>`).join("")}</select></div>
+      <div class="field"><span class="flabel">Your goal</span>${seg("goal",[["fatloss","Fat loss"],["recomp","Tone"],["muscle","Muscle"]])}</div>
+      <div class="field"><label for="ob-why">Why are you doing this? (optional)</label><input id="ob-why" value="${esc(d.why)}" placeholder="One line, just for you" maxlength="140"></div>
+      <div class="field"><label for="ob-found">How did you find us?</label><select id="ob-found">${["Instagram","TikTok","A friend","Other"].map(o=>`<option ${o===d.found?"selected":""}>${o}</option>`).join("")}</select></div>`,
+    ()=>`<div class="label">${lab(3)} · What you'll log</div><h2>Pick 3 or 4 to start</h2><p class="note">We've ticked a good starting set for you. You can add more later.</p>
+      <div class="checks">${Object.entries(ITEMS).map(([k,v])=>`<label class="check"><input type="checkbox" data-k="${k}" ${d.tracked.includes(k)?"checked":""}><span><b>${v[0]}</b><small>${v[1]}</small></span></label>`).join("")}</div>`,
+    ()=>{const c=d.calc=calcTargets(body());const t=d.tracked;
+      const cal=d.over.calories??c.target, pro=d.over.protein??c.protein;
+      let h=`<div class="label">${lab(4)} · Your numbers</div><h2>Here's what we worked out</h2>
+       <div class="calc">
+        <div class="stat"><b>${c.bmi}</b><span>BMI, ${bmiNote(c.bmi)}</span></div>
+        <div class="stat"><b>${fmt(c.maint)}</b><span>calories to maintain</span></div>
+        <div class="stat wide"><b>${fmt(cal)} cal · ${pro} g protein</b><span>your daily target for ${GOALS[d.goal].label.toLowerCase()} (${GOALS[d.goal].delta>0?"+":"−"}${Math.abs(GOALS[d.goal].delta)} cal from maintenance)</span></div>
+       </div>
+       <p class="note">${t.includes("steps")?`This includes the 10,000 steps a day you'll walk in the challenge (about ${c.stepsKcal} calories). `:""}Workouts you log are counted on the day, not built in here. BMI is a rough guide and can't tell muscle from fat. You can change any number below.</p>`;
+      if(t.includes("calories"))h+=`<div class="field"><label for="ob-cal">Daily calories</label><input id="ob-cal" type="number" value="${cal}"></div>`;
+      if(t.includes("protein"))h+=`<div class="field"><label for="ob-pro">Daily protein (g)</label><input id="ob-pro" type="number" value="${pro}"></div>`;
+      if(t.includes("water"))h+=`<div class="field"><label for="ob-water">Glasses of water a day</label><input id="ob-water" type="number" value="${d.targets.water}"><span class="hint">We recommend 8.</span></div>`;
+      if(t.includes("sleep"))h+=`<div class="field"><label for="ob-sleep">Hours of sleep</label><input id="ob-sleep" type="number" step="0.5" value="${d.targets.sleep}"><span class="hint">We recommend 7.5.</span></div>`;
+      if(t.includes("workout"))h+=`<div class="field"><span class="flabel">Which days will you train?</span><div class="day-chips">${DOW.map((n,i)=>`<button type="button" data-wd="${i}" aria-pressed="${d.workoutDays.includes(i)}">${n}</button>`).join("")}</div><span class="hint">Other days count as rest days, not misses.</span></div>`;
+      return h},
+    ()=>{const agree=`<label class="agree"><input type="checkbox" id="ob-agree" ${d.agree?"checked":""}><span>I understand this is general information, not medical advice, and I take part at my own risk. <button type="button" class="linkbtn" data-disclaimer>Read the disclaimer</button></span></label>`;
+      if(!d.tracked.includes("steps"))return `<div class="label">${lab(5)} · Ready</div><h2>You're set, ${esc(d.name)}</h2><p class="note">Add Steps any time to walk a route.</p>${agree}`;
+      const list=ROUTES.map((r,i)=>[r,i]).filter(([r])=>r[0]===d.region);
+      return `${agree}<div class="label">${lab(5)} · Your route</div><h2>Where are you walking?</h2><p class="note">10,000 steps a day is about 8 km, so around 240 km in 30 days.</p>
+      <div class="routes">${list.map(([r,i])=>`<button type="button" class="route" data-r="${i}" aria-pressed="${i===d.route}"><span>${r[1]}</span><b>${r[2]} km</b></button>`).join("")}</div>`}
+  ];
+  const g=id=>document.getElementById(id);
+  function save(){
+    if(step===0){d.email=g("ob-email").value.trim();if(g("ob-fullname"))d.name=g("ob-fullname").value.trim().split(" ")[0]}
+    if(step===1){d.name=g("ob-name").value.trim();d.region=g("ob-region").value;d.age=g("ob-age").value;
+      if(d.units==="metric"){d.cm=g("ob-cm").value;d.kg=g("ob-kg").value}else{d.ft=g("ob-ft").value;d.inch=g("ob-in").value;d.lb=g("ob-lb").value}
+      if(ROUTES[d.route][0]!==d.region)d.route=ROUTES.findIndex(r=>r[0]===d.region)}
+    if(step===2){d.job=+g("ob-job").value;d.why=g("ob-why").value.trim();d.found=g("ob-found").value}
+    if(step===3)d.tracked=[...layer.querySelectorAll("[data-k]")].filter(c=>c.checked).map(c=>c.dataset.k);
+    if(step===4){if(g("ob-cal"))d.over.calories=+g("ob-cal").value||undefined;if(g("ob-pro"))d.over.protein=+g("ob-pro").value||undefined;
+      if(g("ob-water"))d.targets.water=Math.min(40,Math.max(1,+g("ob-water").value||8));if(g("ob-sleep"))d.targets.sleep=Math.min(14,Math.max(1,+g("ob-sleep").value||7.5))}
+    if(step===N-1)d.agree=g("ob-agree").checked;
+  }
+  function valid(){
+    if(step===1){const p=body();
+      if(!d.name)return"Add your first name";
+      if(!(p.age>=16&&p.age<=90))return"Enter an age between 16 and 90";
+      if(!d.sex)return"Choose female or male";
+      if(!(p.cm>=120&&p.cm<=230))return"Check your height";
+      if(!(p.kg>=35&&p.kg<=300))return"Check your weight"}
+    if(step===3&&!d.tracked.length)return"Pick at least one thing to log";
+    if(step===4){if(d.tracked.includes("calories")&&!((d.over.calories??d.calc.target)>=800&&(d.over.calories??d.calc.target)<=6000))return"Daily calories should be between 800 and 6,000";
+      if(d.tracked.includes("protein")&&!((d.over.protein??d.calc.protein)>=20&&(d.over.protein??d.calc.protein)<=400))return"Daily protein should be between 20 and 400 g"}
+    if(step===N-1&&!d.agree)return"Tick the box to confirm you've read the disclaimer";
+    return"";
+  }
+  async function doAuth(){
+    const email=d.email,pw=g("ob-pass").value,msg=g("ob-msg");msg.textContent="";
+    if(!email||!pw){msg.textContent="Enter your email and password.";return false}
+    if(d.authMode==="signup"){
+      if(pw.length<6){msg.textContent="Use at least 6 characters for your password.";return false}
+      const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{full_name:g("ob-fullname").value.trim()},emailRedirectTo:window.location.origin+"/beast-challenge"}});
+      if(error){msg.textContent=error.message||"Couldn't create your account.";return false}
+      if(!data.session){msg.style.color="var(--sign)";msg.textContent="Check your email to confirm your account, then come back here and log in.";d.authMode="signin";return false}
+      user=data.user;
+    }else{
+      const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
+      if(error){msg.textContent=error.message||"Couldn't log in.";return false}
+      user=data.user;
+    }
+    // Already started? Skip onboarding and open their challenge.
+    if(await loadProfile()){layer.innerHTML="";logDay=null;tab="today";go("app");toast(`Welcome back, ${S.name}`);return false}
+    const m=user.user_metadata||{};if(!d.name&&m.full_name)d.name=m.full_name.split(" ")[0];
+    return true;
+  }
+  async function finish(){
+    const bp=body(),c=calcTargets(bp);
+    const row={user_id:user.id,first_name:d.name,region:d.region,units:d.units,sex:d.sex,age:bp.age,height_cm:Math.round(bp.cm*10)/10,weight_kg:Math.round(bp.kg*10)/10,
+      activity:bp.job,goal:d.goal,why:d.why||null,found_via:d.found,tracked:d.tracked,
+      calorie_target:d.over.calories??c.target,protein_target:d.over.protein??c.protein,water_target:d.targets.water,sleep_target:d.targets.sleep,
+      workout_days:d.tracked.includes("workout")?d.workoutDays:[],route:ROUTES[d.route][1],maintenance:c.maint,steps_baseline:bp.walk?STEP_GOAL:0,
+      start_date:dateStr(todayDate()),agreed_disclaimer_at:new Date().toISOString(),updated_at:new Date().toISOString()};
+    const {error}=await sb.from("beast_challenge_profiles").upsert(row);
+    if(error){console.error(error);toast("Couldn't start your challenge. Please try again.");return}
+    S=profileToState(row);layer.innerHTML="";tab="today";logDay=1;go("app");toast(`Day 1. Let's go, ${d.name}`);
+  }
+  function draw(){
+    layer.innerHTML=`<div class="ob"><div class="app">${bar()}<div class="panel">${screens[step]()}</div>
+      <div class="navrow"><button class="btn alt" id="ob-back">${step===first?"Cancel":"Back"}</button><button class="btn" id="ob-next">${step===N-1?"Start day 1":step===0?(d.authMode==="signup"?"Create account":"Log in"):"Next"}</button></div></div></div>`;
+    layer.querySelectorAll("[data-seg]").forEach(s=>s.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      const key=s.dataset.seg;save();d[key]=isNaN(+b.dataset.v)?b.dataset.v:+b.dataset.v;
+      if(key==="goal")d.tracked=null;
+      if(key==="units"){if(d.units==="imperial"&&d.cm){const inches=d.cm/2.54;d.ft=Math.floor(inches/12);d.inch=Math.round(inches%12);d.lb=d.kg?Math.round(d.kg/0.4536):""}
+        if(d.units==="metric"&&d.ft){d.cm=Math.round((+d.ft*12+ +d.inch)*2.54);d.kg=d.lb?Math.round(d.lb*0.4536):""}}
+      draw()}));
+    layer.querySelectorAll("[data-wd]").forEach(b=>b.onclick=()=>{const i=+b.dataset.wd;d.workoutDays=d.workoutDays.includes(i)?d.workoutDays.filter(x=>x!==i):[...d.workoutDays,i].sort();b.setAttribute("aria-pressed",d.workoutDays.includes(i))});
+    layer.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{d.route=+b.dataset.r;layer.querySelectorAll("[data-r]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+    g("ob-back").onclick=()=>{if(step===first){layer.innerHTML="";return}save();step--;draw()};
+    const so=g("ob-signout");if(so)so.onclick=async()=>{await sb.auth.signOut();user=null;S=null;layer.innerHTML="";document.getElementById("signout").hidden=true;onboarding()};
+    g("ob-next").onclick=async e=>{
+      const btn=e.currentTarget;save();
+      if(step===0){btn.disabled=true;const ok=await doAuth();btn.disabled=false;if(!ok){if(page!=="app")draw2();return}first=1;step=1;draw();return}
+      const err=valid();if(err){toast(err);return}
+      if(step===2&&!d.tracked)d.tracked=presets(d.goal);
+      if(step<N-1){step++;draw();layer.firstChild.scrollTop=0;return}
+      btn.disabled=true;await finish();btn.disabled=false;
+    };
+  }
+  // Redraw the account step while keeping any message on screen
+  function draw2(){const m=g("ob-msg");const t=m?m.textContent:"",col=m?m.style.color:"";draw();const m2=g("ob-msg");if(m2){m2.textContent=t;m2.style.color=col}}
+  draw();
+}
+
+// ---------- start up ----------
+async function start(){
+  const params=new URLSearchParams(location.search);
+  if(!sb){page="intro";render();return}
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    if(session&&session.user){user=session.user;if(await loadProfile()){page="app"}else page="intro"}else page="intro";
+  }catch(e){console.error(e);page="intro"}
+  if(params.get("intro")!==null)page="intro";
+  render();
+  if(params.get("support")==="thanks"){
+    history.replaceState({},"",location.pathname);
+    modal(`<h3 style="font-size:28px">Thank you</h3><p>Your $5 donation went through. It genuinely helps keep the Beast Challenge free for everyone.</p><p class="note">Stripe will email you a receipt. You won't be charged again.</p>`);
+  }
+}
+if(sb)sb.auth.onAuthStateChange(async(event,session)=>{
+  if(event==="SIGNED_OUT"){user=null}
+});
+start();
+</script>
+</body>
+</html>

@@ -1,10 +1,12 @@
 // Beast Coach — Recipes data file
 // Add a new recipe by copying the {...} block below and giving it a unique id.
+// meal: which Beast Challenge filters it shows under: breakfast, lunch, dinner, snack, smoothie.
 // Save this file and re-upload it to your repo — you never need to touch portal.html for this.
 
 const RECIPES = [
   {
     id: "ice-cream-sandwich",
+    meal: ["snack"],
     chip: "Sweet Potato Brownie Ice Cream Sandwich",
     image: "recipe-img/ice-cream-sandwich.jpg",
     title: "Sweet Potato Brownie Ice Cream Sandwich",
@@ -15,6 +17,7 @@ const RECIPES = [
   },
   {
     id: "protein-jellies",
+    meal: ["snack"],
     chip: "Protein Jellies",
     image: "recipe-img/protein-jellies.jpg",
     title: "Monster Energy Protein Jellies",
@@ -25,6 +28,7 @@ const RECIPES = [
   },
   {
     id: "creme-brulee",
+    meal: ["snack"],
     image: "recipe-img/creme-brulee.jpg",
     chip: "Crème Brûlée",
     title: "High-Protein Crème Brûlée (Gelato Option)",
@@ -35,6 +39,7 @@ const RECIPES = [
   },
   {
     id: "cheeseburgers",
+    meal: ["lunch", "dinner"],
     image: "recipe-img/cheeseburgers.jpg",
     chip: "Cheeseburgers",
     title: "Savory Rice Cake Cheeseburgers",
@@ -45,6 +50,7 @@ const RECIPES = [
   },
   {
     id: "protein-waffles",
+    meal: ["breakfast"],
     image: "recipe-img/protein-waffles.jpg",
     chip: "Protein Waffles",
     title: "Oat Flour Protein Waffles & Pancakes",
@@ -55,6 +61,7 @@ const RECIPES = [
   },
   {
     id: "lamb-chimichurri",
+    meal: ["dinner"],
     image: "recipe-img/lamb-chimichurri.jpg",
     chip: "Lamb Chimichurri",
     title: "Lean Lamb Herb & Yogurt Chimichurri Sauce",
@@ -65,6 +72,7 @@ const RECIPES = [
   },
   {
     id: "pb-replacement",
+    meal: ["snack"],
     image: "recipe-img/pb-replacement.jpg",
     chip: "PB Replacement",
     title: "Sweet Potato Peanut Butter Replacement",
@@ -75,6 +83,7 @@ const RECIPES = [
   },
   {
     id: "choc-mousse",
+    meal: ["snack"],
     image: "recipe-img/choc-mousse.jpg",
     chip: "Choc Mousse",
     title: "High-Protein Chocolate Mousse",
@@ -85,6 +94,7 @@ const RECIPES = [
   },
   {
     id: "chia-lemon-creatine-tonic",
+    meal: ["smoothie"],
     image: "recipe-img/chia-lemon-creatine-tonic.jpg",
     chip: "Chia Lemon Tonic",
     title: "Chia, Lemon & Honey Creatine Tonic",
@@ -95,6 +105,7 @@ const RECIPES = [
   },
   {
     id: "cacao-chia-pumpkin-smoothie",
+    meal: ["smoothie", "breakfast"],
     chip: "Magnesium Smoothie",
     image: "recipe-img/magnesium-smoothie.jpg",
     title: "Magnesium Smoothie",
@@ -105,6 +116,7 @@ const RECIPES = [
   },
   {
     id: "spiced-pumpkin-latte-creami",
+    meal: ["snack"],
     chip: "Spiced Pumpkin Latte Creami",
     image: "recipe-img/spiced-pumpkin-latte-creami.jpg",
     title: "Spiced Pumpkin Latte Creami",
@@ -115,6 +127,7 @@ const RECIPES = [
   },
   {
     id: "zooper-dooper-protein-pops",
+    meal: ["snack"],
     chip: "Zooper Dooper Protein Pops",
     image: "recipe-img/zooper-dooper-protein-pops.jpg",
     title: "Zooper Dooper Protein Pops",
@@ -136,6 +149,7 @@ const RECIPES = [
   },
   {
     id: "blackberry-magnesium-smoothie",
+    meal: ["smoothie", "breakfast"],
     chip: "Blackberry Magnesium Smoothie",
     image: "recipe-img/blackberry-magnesium-smoothie.jpg",
     title: "Blackberry Magnesium Smoothie",
