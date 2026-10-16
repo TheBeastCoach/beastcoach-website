@@ -21,20 +21,21 @@ module.exports = async function handler(req, res) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) { return res.status(500).json({ error: 'Stripe is not configured' }); }
 
-  const { email } = req.body || {};
+  const { email, from } = req.body || {};
   const base = returnBase(req.headers.origin);
+  const fromDashboard = from === 'dashboard';
 
   const params = new URLSearchParams();
   params.append('mode', 'payment');
   params.append('submit_type', 'donate');
   params.append('payment_method_types[0]', 'card');
   params.append('line_items[0][price_data][currency]', 'aud');
-  params.append('line_items[0][price_data][product_data][name]', 'Beast Challenge donation');
-  params.append('line_items[0][price_data][product_data][description]', 'Optional one-off $5 to help keep the free Beast Challenge running. Charged once, not a subscription.');
+  params.append('line_items[0][price_data][product_data][name]', 'Beast Coach donation');
+  params.append('line_items[0][price_data][product_data][description]', 'Optional one-off $5 to help pay for building and maintaining the free Beast Coach tools and recipes.');
   params.append('line_items[0][price_data][unit_amount]', String(AMOUNT_CENTS));
   params.append('line_items[0][quantity]', '1');
-  params.append('success_url', `${base}/beast-challenge?support=thanks`);
-  params.append('cancel_url', `${base}/beast-challenge`);
+  params.append('success_url', fromDashboard ? `${base}/dashboard?donation=thanks` : `${base}/beast-challenge?support=thanks`);
+  params.append('cancel_url', fromDashboard ? `${base}/dashboard` : `${base}/beast-challenge`);
   params.append('metadata[product]', 'challenge-support');
   if (email && typeof email === 'string') {
     params.append('customer_email', email.trim());
