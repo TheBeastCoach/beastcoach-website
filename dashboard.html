@@ -178,6 +178,18 @@
   .view { display: none; }
   .view.visible { display: block; }
 
+  /* Donation card */
+  .donate-card { border: 1.5px solid var(--green); border-radius: 18px; padding: 18px 20px; margin-top: 20px; background: var(--white); }
+  .donate-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .donate-row p { flex: 1 1 260px; font-size: 15px; color: var(--text); line-height: 1.55; }
+  .donate-row .btn-primary { white-space: nowrap; padding: 12px 22px; }
+  .donate-confirm { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .donate-confirm p { flex: 1 1 220px; font-size: 14px; color: var(--muted); }
+  .donate-cancel { background: none; border: none; font-family: 'Manrope', sans-serif; font-size: 14px; color: var(--muted); text-decoration: underline; cursor: pointer; }
+  .donate-card[hidden], .donate-confirm[hidden], .donate-thanks[hidden] { display: none; }
+  .donate-thanks { margin-top: 20px; font-size: 14px; color: var(--muted); text-align: center; }
+  @media (max-width: 480px) { .donate-row .btn-primary, .donate-confirm .btn-primary { width: 100%; text-align: center; } }
+
   /* Discipline Path cross-promo */
   .dp-promo { background: var(--green-dark); border-radius: 18px; padding: 26px 24px; margin-top: 24px; }
   .dp-promo h3 { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; color: var(--white); margin-bottom: 10px; }
@@ -276,6 +288,19 @@
       <a class="tile" data-nav="shop"><h3>Shop</h3><p>Coming soon.</p></a>
       <a class="tile" href="/#early-access"><h3>App Beta</h3><p>Get free lifetime access, early.</p></a>
     </div>
+    <div class="donate-card" id="donate-card">
+      <div class="donate-row">
+        <p><strong>Everything here is free.</strong> If it's helped you, a one-off $5 donation helps pay for building and maintaining these tools and creating new recipes.</p>
+        <button type="button" class="btn-primary" id="donate-btn">Donate $5 once</button>
+      </div>
+      <div class="donate-confirm" id="donate-confirm" hidden>
+        <p>You'll go to Stripe's secure checkout for a single $5 AUD donation. It doesn't unlock anything, and everything here stays free.</p>
+        <button type="button" class="btn-primary" id="donate-go">Continue to checkout</button>
+        <button type="button" class="donate-cancel" id="donate-cancel">Cancel</button>
+      </div>
+      <p class="form-msg form-msg--err" id="donate-msg"></p>
+    </div>
+    <p class="donate-thanks" id="donate-thanks" hidden>Thanks for supporting Beast Coach.</p>
   </section>
 
   <!-- ===================== CALCULATOR (embedded) ===================== -->
@@ -578,6 +603,65 @@ function enterPortal(user) {
     showView(hash);
   }
   checkDisciplinePurchase(user);
+  checkDonation(user);
+}
+
+/* ---------- Donation ---------- */
+let currentUser = null;
+const donateCard = document.getElementById("donate-card");
+const donateConfirm = document.getElementById("donate-confirm");
+const donateMsg = document.getElementById("donate-msg");
+document.getElementById("donate-btn").addEventListener("click", () => { donateConfirm.hidden = false; });
+document.getElementById("donate-cancel").addEventListener("click", () => { donateConfirm.hidden = true; });
+document.getElementById("donate-go").addEventListener("click", async (e) => {
+  const btn = e.currentTarget;
+  btn.disabled = true; btn.textContent = "Opening checkout…";
+  donateMsg.classList.remove("visible");
+  try {
+    const r = await fetch("/api/create-support-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: currentUser ? currentUser.email : undefined, from: "dashboard" })
+    });
+    const j = await r.json();
+    if (!r.ok || !j.url) throw new Error(j.error || "Checkout failed");
+    window.location.href = j.url;
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false; btn.textContent = "Continue to checkout";
+    showStatus(donateMsg, "Couldn't open checkout. Please try again in a moment.", true);
+  }
+});
+
+async function checkDonation(user) {
+  currentUser = user;
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("donation") === "thanks") {
+    const banner = document.createElement("p");
+    banner.className = "form-msg visible";
+    banner.style.marginBottom = "16px";
+    banner.textContent = "Thanks, your donation went through. Stripe will email you a receipt.";
+    document.getElementById("dash-greeting").insertAdjacentElement("afterend", banner);
+    params.delete("donation");
+    const q = params.toString();
+    window.history.replaceState({}, "", window.location.pathname + (q ? "?" + q : ""));
+  }
+  if (!user.email) return;
+  try {
+    const { data, error } = await sb
+      .from("purchases")
+      .select("id")
+      .eq("email", user.email.toLowerCase().trim())
+      .eq("product", "challenge-support")
+      .limit(1);
+    if (error) { console.error("Donation check failed:", error); return; }
+    if (data && data.length > 0) {
+      donateCard.hidden = true;
+      document.getElementById("donate-thanks").hidden = false;
+    }
+  } catch (err) {
+    console.error("Donation check failed:", err);
+  }
 }
 
 /* ---------- Discipline Path purchase check ---------- */
