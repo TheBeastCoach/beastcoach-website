@@ -288,9 +288,9 @@
       <a class="tile" data-nav="shop"><h3>Shop</h3><p>Coming soon.</p></a>
       <a class="tile" href="/#early-access"><h3>App Beta</h3><p>Get free lifetime access, early.</p></a>
     </div>
-    <div class="donate-card" id="donate-card" hidden>
+    <div class="donate-card" id="donate-card">
       <div class="donate-row">
-        <p><strong>Everything here is free.</strong> If it's helped you, a one-off $5 donation helps pay for building and maintaining these tools and creating new recipes.</p>
+        <p id="donate-text"><strong>Everything here is free.</strong> If it's helped you, a one-off $5 donation helps pay for building and maintaining these tools and creating new recipes.</p>
         <button type="button" class="btn-primary" id="donate-btn">Donate $5 once</button>
       </div>
       <div class="donate-confirm" id="donate-confirm" hidden>
@@ -300,7 +300,6 @@
       </div>
       <p class="form-msg form-msg--err" id="donate-msg"></p>
     </div>
-    <p class="donate-thanks" id="donate-thanks" hidden>Thanks for supporting Beast Coach.</p>
   </section>
 
   <!-- ===================== CALCULATOR (embedded) ===================== -->
@@ -646,10 +645,7 @@ async function checkDonation(user) {
     const q = params.toString();
     window.history.replaceState({}, "", window.location.pathname + (q ? "?" + q : ""));
   }
-  const showCard = () => { donateCard.hidden = false; };
-  // Add ?showdonate to the dashboard address to always see the card (for checking how it looks)
-  if (params.has("showdonate")) { showCard(); return; }
-  if (!user.email) { showCard(); return; }
+  if (!user.email) return;
   try {
     const { data, error } = await sb
       .from("purchases")
@@ -657,15 +653,13 @@ async function checkDonation(user) {
       .eq("email", user.email.toLowerCase().trim())
       .eq("product", "challenge-support")
       .limit(1);
-    if (error) { console.error("Donation check failed:", error); showCard(); return; }
+    if (error) { console.error("Donation check failed:", error); return; }
     if (data && data.length > 0) {
-      document.getElementById("donate-thanks").hidden = false;
-    } else {
-      showCard();
+      // Already donated: same card and button, thank-you wording
+      document.getElementById("donate-text").innerHTML = "<strong>Thanks for your support.</strong> If you'd like to chip in again, a one-off $5 helps keep these tools and recipes coming.";
     }
   } catch (err) {
     console.error("Donation check failed:", err);
-    showCard();
   }
 }
 
