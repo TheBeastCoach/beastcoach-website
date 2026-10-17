@@ -1,10 +1,8 @@
 // Creates a Stripe Checkout Session for The Discipline Path.
-// Price is computed server-side from the same launch-deadline logic as the
-// sales page, so the discount can't be spoofed from the client. Stripe's
-// built-in promotion-code field is enabled, so discount codes created in the
+// Flat price, no launch-deadline discount. Stripe's built-in
+// promotion-code field is enabled, so discount codes created in the
 // Stripe Dashboard work automatically at checkout.
 
-const DEAL_ENDS_AT = new Date('2026-11-15T00:00:00+11:00').getTime();
 const SITE_URL = 'https://www.beastcoach.fit';
 
 module.exports = async function handler(req, res) {
@@ -20,7 +18,7 @@ module.exports = async function handler(req, res) {
 
   const { email } = req.body || {};
 
-  const amountCents = Date.now() < DEAL_ENDS_AT ? 2700 : 3800;
+  const amountCents = 8900;
 
   const params = new URLSearchParams();
   params.append('mode', 'payment');
