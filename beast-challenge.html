@@ -351,7 +351,7 @@ function render(){
   screen.innerHTML=`<div class="tabs" role="tablist">${["today","route","progress","meals"].map(t=>`<button role="tab" data-tab="${t}" aria-selected="${t===tab}">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div>
    ${finished()?`<div class="catchup"><p><b>Your 30 days are done.</b> Check your Progress tab, share your card, then start another 30 if you want to keep going.</p><button class="btn" data-restart>Start a new 30 days</button></div>`:""}
    ${{today:vToday,route:vRoute,progress:vProgress,meals:vMeals}[tab]()}
-   <div class="panel support-mini"><p>Free to use. If you'd like to help keep the lights on, you can make a one-off $5 donation. Charged once, never again.</p><button class="btn accent" data-support>Donate $5 once</button></div>
+   <div class="panel support-mini"><p>This challenge is free, always free. If you'd like to buy me a coffee for the time and knowledge that went into it, it's $5 — totally optional, no obligation. Otherwise, enjoy it.</p><button class="btn accent" data-support>Buy me a coffee ($5)</button></div>
    <p class="note" style="text-align:center">General information, not medical advice. <button class="linkbtn" data-disclaimer>Read the disclaimer</button></p>`;
   bindApp();
 }
@@ -368,10 +368,10 @@ const DISCLAIMER=`<div class="disclaimer">
 function showDisclaimer(){modal(`<h3 style="font-size:28px">Disclaimer</h3>${DISCLAIMER}`)}
 function supportBox(){return `<div class="supportbox">
   <div class="label">Optional</div>
-  <h3>Want to help keep the lights on?</h3>
-  <p>The challenge is free, and it stays free. Running it costs real money, so if it helps you and you'd like to chip in, you can make a single donation of $5.</p>
+  <h3>Buy me a coffee?</h3>
+  <p>This challenge is free, always free. Making it costs real time and knowledge, so if you want to buy me a coffee, it's $5 — but don't feel obligated. Otherwise, enjoy it.</p>
   <div class="facts"><span>$5 AUD, one time only</span><span>Not a subscription</span><span>Doesn't unlock anything</span></div>
-  <button class="btn accent big" data-support>Donate $5 once</button>
+  <button class="btn accent big" data-support>Buy me a coffee ($5)</button>
   <p class="note">You'll never be charged again. Skipping this changes nothing about your challenge.</p></div>`}
 
 function vIntro(){
@@ -384,7 +384,7 @@ function vIntro(){
     <div class="road"><i style="width:38%"></i></div>
     <button class="btn accent big" data-start>${cta}</button>
   </section>
-  <div class="panel donate-mini"><p><b>Free, and it stays free.</b> Want to help keep the lights on? A one-off $5 donation, charged once, not a subscription.</p><button class="btn accent" data-support>Donate $5 once</button></div>
+  <div class="panel donate-mini"><p><b>Free, always free.</b> If you want to buy me a coffee for the time and knowledge behind it, it's $5 — no obligation. Otherwise, enjoy it.</p><button class="btn accent" data-support>Buy me a coffee ($5)</button></div>
   <div class="panel"><div class="label">How it works</div>
    <ol class="how">
     <li><div><b>Tell us a bit about you</b><span>Age, height, weight and your day. We work out your calories and protein for you.</span></div></li>
@@ -402,7 +402,7 @@ function vIntro(){
    <div class="badges">${BADGES.map(b=>`<div class="badge on"><div class="disc">${b}</div>${b} days</div>`).join("")}</div>
    <p class="note">Earned for logging days in a row. Badges show on your share card.</p></div>
   <div class="panel faq"><div class="label">Questions</div>
-   <details><summary>Is it really free?</summary><p>Yes. No card needed to join, nothing to cancel. The $5 donation is entirely optional.</p></details>
+   <details><summary>Is it really free?</summary><p>Yes, always free. No card needed to join, nothing to cancel. The $5 coffee is entirely optional and never obligated.</p></details>
    <details><summary>I've never tracked anything. Is this for me?</summary><p>Yes. Start with three easy things and add more when you're ready.</p></details>
    <details><summary>Who can see my logs?</summary><p>Only you. Your logs are private to your account.</p></details>
    <details><summary>What if I miss a day?</summary><p>Log it the next day or the day after. If you miss longer, keep going. The challenge doesn't reset.</p></details>
@@ -496,7 +496,7 @@ const mlayer=document.getElementById("mlayer");
 function modal(html){mlayer.innerHTML=`<div class="modal" id="m"><div class="panel">${html}<button class="btn alt" id="mclose">Close</button></div></div>`;
   document.getElementById("mclose").onclick=()=>mlayer.innerHTML="";document.getElementById("m").onclick=e=>{if(e.target.id==="m")mlayer.innerHTML=""}}
 function openSupport(){
-  modal(`<h3 style="font-size:26px">One-off $5 donation</h3><p>Thanks for thinking about it. You'll go to a secure Stripe checkout for a single $5 AUD payment, then come straight back here.</p><p class="note">Charged once. No subscription. It doesn't unlock anything, and the challenge stays free either way.</p><button class="btn accent big" id="go-checkout">Continue to secure checkout</button>`);
+  modal(`<h3 style="font-size:26px">Buy me a coffee ($5)</h3><p>Thanks for thinking about it, but don't feel obligated. You'll go to a secure Stripe checkout for a single $5 AUD payment, then come straight back here.</p><p class="note">Charged once. No subscription. It doesn't unlock anything, and the challenge stays free either way.</p><button class="btn accent big" id="go-checkout">Continue to secure checkout</button>`);
   document.getElementById("go-checkout").onclick=async e=>{
     const b=e.currentTarget;b.disabled=true;b.textContent="Opening checkout…";
     try{const r=await fetch("/api/create-support-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:user?user.email:undefined})});
@@ -745,7 +745,7 @@ async function start(){
   render();
   if(params.get("support")==="thanks"){
     history.replaceState({},"",location.pathname);
-    modal(`<h3 style="font-size:28px">Thank you</h3><p>Your $5 donation went through. It genuinely helps keep the Beast Challenge free for everyone.</p><p class="note">Stripe will email you a receipt. You won't be charged again.</p>`);
+    modal(`<h3 style="font-size:28px">Thank you</h3><p>Your coffee's on its way. It genuinely helps keep the Beast Challenge free for everyone.</p><p class="note">Stripe will email you a receipt. You won't be charged again.</p>`);
   }
 }
 if(sb)sb.auth.onAuthStateChange(async(event,session)=>{
