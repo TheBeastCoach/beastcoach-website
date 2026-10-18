@@ -162,6 +162,7 @@ const RECIPES = [
     id: "quick-set-chia-seed-wraps",
     meal: ["lunch", "dinner", "snack"],
     chip: "Quick-Set Chia Seed Wraps",
+    image: "recipe-img/quick-set-chia-seed-wraps.jpg",
     title: "Quick-Set Chia Seed Wraps",
     desc: "Yield: 2 pliable wraps. Prep time: 3 minutes. Bake time: ~30 minutes. Equipment: heatproof bowl or bullet blender cup; bullet blender (or stick blender); large flat baking tray; non-stick baking paper (2 sheets: one base sheet and one top sheet); flat plate, bench scraper, or rolling pin (optional, for pressing).",
     ingredients: ["50 g whole chia seeds", "210 ml boiling water", "¼ tsp fine salt (adjust to taste)", "½ tsp chili flakes (adjust to taste)"],
