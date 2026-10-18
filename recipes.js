@@ -157,5 +157,23 @@ const RECIPES = [
     ingredients: ["30g pumpkin seeds (pepitas)", "12g chia seeds", "50g pasteurized liquid egg whites", "100g low-fat cottage cheese", "50g low-fat Greek yoghurt", "100g frozen blackberries", "~120ml unsweetened almond milk (a splash to blend)", "3–4 ice cubes"],
     instructions: ["Blend the pumpkin seeds, chia seeds, and almond milk on high for 30–45 seconds first, so the seeds fully break down before anything else goes in.", "Add the cottage cheese, Greek yoghurt, egg whites, frozen blackberries, and ice, then blend again until smooth and aerated.", "Taste and adjust — add a touch more almond milk if it's too thick, or a few extra blackberries for more tartness."],
     macros: [["430", "kcal"], ["35.7g", "Protein"], ["24.9g", "Carbs (11.2g fiber)"], ["22.2g", "Fat"]]
+  },
+  {
+    id: "quick-set-chia-seed-wraps",
+    meal: ["lunch", "dinner", "snack"],
+    chip: "Quick-Set Chia Seed Wraps",
+    title: "Quick-Set Chia Seed Wraps",
+    desc: "Yield: 2 pliable wraps. Prep time: 3 minutes. Bake time: ~30 minutes. Equipment: heatproof bowl or bullet blender cup; bullet blender (or stick blender); large flat baking tray; non-stick baking paper (2 sheets: one base sheet and one top sheet); flat plate, bench scraper, or rolling pin (optional, for pressing).",
+    ingredients: ["50 g whole chia seeds", "210 ml boiling water", "¼ tsp fine salt (adjust to taste)", "½ tsp chili flakes (adjust to taste)"],
+    instructions: [
+      "1. Flash-Hydrate: Place the 50 g chia seeds, salt, and chili flakes into a heatproof container. Pour in the 210 ml boiling water. Stir thoroughly for 30 to 45 seconds to distribute the seeds evenly, then let rest for 2 minutes until a thick, loose gel forms.",
+      "2. Purée: Transfer to your blender and blitz on high for 30 to 45 seconds until smooth, glossy, and batter-like.",
+      "3. Prep the Tray & Oven: Preheat the oven to 160°C (320°F). Line a large baking tray with your first sheet of baking paper.",
+      "4. Spread Using Top Sheet: Pour the purée into two equal portions onto the lined tray. Place a second sheet of baking paper directly over the top of the mounds. Use your hands, a flat-bottomed plate, or a rolling pin over the top sheet to press and smooth each mound into an even circle roughly 18–20 cm (7–8 inches) wide and 4 mm thick. Carefully peel off the top sheet of baking paper and discard (or save for future batches).",
+      "5. Bake: Bake on the middle rack at 160°C for approximately 30 minutes. The wraps are done when the entire surface turns completely matte, is dry to the touch, and feels flexible rather than tacky.",
+      "6. Rest & Peel: Remove the tray from the oven and let sit for 2 to 3 minutes so residual steam releases. Gently peel the base baking paper away from each wrap. Fill and roll while warm, or store between parchment squares in an airtight container.",
+      "Bake Time Note: Actual bake time depends heavily on your specific oven. Because oven temperatures and heat distribution are often inconsistent, keep monitoring around the 25-minute mark to ensure the edges don't over-crisp before the center dries out."
+    ],
+    macros: [["122", "kcal"], ["4.2g", "Protein"], ["10.6g", "Carbs (8.6g fiber, 2.0g net carbs)"], ["7.7g", "Fat"]]
   }
 ];
