@@ -203,6 +203,15 @@ canvas{width:100%;max-width:270px;height:auto;border-radius:12px;display:block;m
 .modal{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 45%,transparent);display:grid;place-items:center;z-index:30;padding:16px;overflow-y:auto}
 .modal .panel{max-width:400px;width:100%;max-height:calc(100vh - 32px);overflow-y:auto}
 .loading{padding:40px 0;text-align:center;color:var(--muted)}
+.finish{width:100%;margin-top:4px}
+.sum-score{display:flex;align-items:baseline;gap:10px}
+.sum-score b{font-family:var(--display);font-weight:400;font-size:64px;line-height:1;color:var(--sign);font-variant-numeric:tabular-nums}
+.sum-score span{color:var(--muted)}
+.sum-list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.sum-list div{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px}
+.sum-list div span:last-child{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.sum-list .ok span:first-child::before{content:"\2713";color:var(--good);font-weight:800;margin-right:8px}
+.sum-list .no span:first-child::before{content:"\25CB";color:var(--muted);margin-right:8px}
 @media (prefers-reduced-motion:no-preference){.road i{transition:width .6s ease}}
 </style>
 </head>
@@ -450,6 +459,7 @@ function vToday(){
   ${finished()?"":`<div class="panel"><div class="label">Log ${logDay===cd?"today":dayLabel(logDay,cd).toLowerCase()}</div>
   ${missed.length&&logDay===cd?`<div class="catchup"><p>Missed ${missed.map(d=>shortLabel(d,cd)).join(" and ")}? You can still log it.</p><button class="btn" data-logday="${missed[missed.length-1]}">Log ${shortLabel(missed[missed.length-1],cd)}</button></div>`:""}
   <div class="day-chips">${chips}</div><div>${S.tracked.map(k=>parts[k]()).join("")}</div>
+  <button class="btn accent big finish" data-finish>${logDay===cd?"Finish my day":`Finish ${shortLabel(logDay,cd)}`}</button>
   <p class="note">You can log today and catch up on the two days before.</p></div>`}`;
 }
 function vRoute(){
@@ -524,6 +534,7 @@ function bindApp(){
     const canAdd=S.tracked.includes("calories")&&!finished()&&r.k>0;
     modal(`<div class="recipe" style="display:flex;flex-direction:column;gap:10px">${r.img?`<img src="${esc(r.img)}" alt="${esc(r.n)}">`:""}<h3 style="font-size:30px">${esc(r.n)}</h3>${r.d?`<p class="note">${esc(r.d)}</p>`:""}<div class="chips">${r.macros.map(m=>`<span>${esc(m.join(" "))}</span>`).join("")}</div><div class="label">Ingredients</div><ul>${r.i.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><div class="label">Method</div><ol>${r.s.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${canAdd?`<button class="btn" id="addmeal">Add ${r.k} cal to ${logDay===currentDay()?"today":"this day"}</button>`:""}</div>`);
     const a=document.getElementById("addmeal");if(a)a.onclick=async()=>{mlayer.innerHTML="";await addKcal(logDay,r.k)}});
+  screen.querySelectorAll("[data-finish]").forEach(b=>b.onclick=()=>finishDay(logDay));
   screen.querySelectorAll("[data-restart]").forEach(b=>b.onclick=async()=>{
     b.disabled=true;const {error}=await sb.from("beast_challenge_profiles").update({start_date:dateStr(todayDate()),updated_at:new Date().toISOString()}).eq("user_id",user.id);
     if(error){b.disabled=false;return failed(error)}
@@ -545,6 +556,26 @@ function bindApp(){
   });
   const c=document.getElementById("card");if(c){drawCard(c);document.fonts&&document.fonts.ready.then(()=>{if(document.getElementById("card")===c)drawCard(c)})}
   const sh=document.getElementById("share");if(sh)sh.onclick=()=>shareCard(c);
+}
+function finishDay(d){
+  if(!logged(d)){toast("Log at least one thing first.");return}
+  const cd=currentDay(),l=L(d),due=dueItems(d),st=streaks(),sc=dayScore(d),tot=kcalTotal(l);
+  const val={steps:()=>`${fmt(l.steps||0)} steps`,workout:()=>l.workouts.length?`${l.workouts.length} logged`:"Not logged",calories:()=>tot?`${fmt(tot)} cal`:"Not logged",
+    protein:()=>l.protein?"Target hit":"Not ticked",water:()=>`${l.water||0} of ${S.targets.water} glasses`,sleep:()=>l.sleep!=null?`${l.sleep} h`:"Not logged",alcohol:()=>l.alcohol?"Yes":"Not ticked"};
+  const rows=due.map(k=>`<div class="${hit(k,l)?"ok":"no"}"><span>${ITEMS[k][0]}</span><span>${val[k]()}</span></div>`).join("");
+  const missed=due.filter(k=>!hit(k,l)).length;
+  const next=BADGES.find(b=>b>st.best);
+  let walk="";
+  if(S.tracked.includes("steps")){const [,name,km]=ROUTES[S.route];const done=Math.min(km,kmWalked());walk=done>=km?`You've reached the end of ${name}.`:`${Math.round(done)} of ${km} km walked on ${name}.`}
+  const title=d===cd?`Day ${d} done`:`Day ${d} wrapped up`;
+  const head=sc===100?`Every box ticked, ${esc(S.name)}.`:sc>=50?`Solid day, ${esc(S.name)}.`:`Logged is better than perfect, ${esc(S.name)}.`;
+  modal(`<div class="label">${title}</div><h3 style="font-size:28px">${head}</h3>
+    <div class="sum-score"><b>${sc}</b><span>/100 today</span></div>
+    <div class="sum-list">${rows}</div>
+    <p>${st.cur}-day streak${next?`, ${Math.max(1,next-st.cur)} more for the ${next}-day badge`:""}.${walk?" "+walk:""}</p>
+    ${missed&&d===cd?`<p class="note">Still going? You can keep adding to today, and catch up for two days after.</p>`:""}
+    <button class="btn accent big" id="sum-progress">See my progress</button>`);
+  document.getElementById("sum-progress").onclick=()=>{mlayer.innerHTML="";tab="progress";render();window.scrollTo(0,0);loadCommunity()};
 }
 async function addKcal(d,k){
   const {data,error}=await sb.from("beast_challenge_calories").insert({user_id:user.id,day:dateStr(dayDate(d)),kcal:k}).select("id").single();
