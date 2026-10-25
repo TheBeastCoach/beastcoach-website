@@ -176,5 +176,21 @@ const RECIPES = [
       "Bake Time Note: Actual bake time depends heavily on your specific oven. Because oven temperatures and heat distribution are often inconsistent, keep monitoring around the 25-minute mark to ensure the edges don't over-crisp before the center dries out."
     ],
     macros: [["122", "kcal"], ["4.2g", "Protein"], ["10.6g", "Carbs (8.6g fiber, 2.0g net carbs)"], ["7.7g", "Fat"]]
+  },
+  {
+    id: "chia-oats-bowl",
+    meal: ["breakfast", "snack"],
+    chip: "Chia Oats Bowl",
+    image: "recipe-img/chia-oats-bowl.jpg",
+    title: "Chia Oats Bowl",
+    desc: "A 100% whole, natural-food overnight chia and oats bowl, made in batches of three. Blend the wet ingredients, stir in the oats and chia, divide into containers, then top with blackberries and a drizzle of honey. Per container: ~540 kcal, 40.1g protein, 60.1g carbs (17.7g fiber, 42.4g net carbs), 15.3g fat, ~165mg magnesium.",
+    ingredients: ["90g rolled oats (30g per container)", "90g chia seeds (30g per container)", "270g low-fat Greek yoghurt (90g per container)", "270g pasteurized liquid egg whites (90g per container)", "270g low-fat cottage cheese (90g per container)", "120ml unsweetened almond milk (40ml per container)", "45g honey, to drizzle (15g per container)", "240g blackberries, about 2 standard 125g punnets (80g per container)"],
+    instructions: [
+      "Blend the wet ingredients: add the Greek yoghurt, liquid egg whites, cottage cheese, and almond milk to a blender and blend until smooth.",
+      "Pour the blended mixture into a bowl, then stir in the rolled oats and chia seeds until evenly combined.",
+      "Divide the mixture evenly into three containers (about 445g each) and refrigerate for at least a few hours, or overnight, until the chia and oats have absorbed the liquid and set to a thick, pudding-like texture.",
+      "When ready to eat, top each container with blackberries and a drizzle of honey."
+    ],
+    macros: [["540", "kcal"], ["40.1g", "Protein"], ["60.1g", "Carbs (17.7g fiber, 42.4g net carbs)"], ["15.3g", "Fat"]]
   }
 ];
