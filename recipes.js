@@ -27,7 +27,7 @@ const RECIPES = [
     difficulty: "Medium",
     healthScore: 8,
     dateAdded: "2026-10-13",
-    blurb: "This is my go-to when I want something sweet at night but don't want to blow my macros. Give it the full freeze time, it's worth the wait."
+    blurb: "I do love my brownie, so I thought why not recreate this one as an ice cream. Honestly, it's really chocolatey and sweet from the natural sweet potato."
   },
   {
     id: "protein-jellies",
@@ -47,7 +47,7 @@ const RECIPES = [
     difficulty: "Medium",
     healthScore: 3,
     dateAdded: "2026-10-13",
-    blurb: "I make a batch of these before a late session when I need caffeine without the liquid sloshing around in my stomach."
+    blurb: "These jellies are a really good pre-workout snack. They've got sodium in them to help your muscles get a good pump, a hit of caffeine, and a little bit of protein."
   },
   {
     id: "creme-brulee",
@@ -67,7 +67,7 @@ const RECIPES = [
     difficulty: "Medium",
     healthScore: 6,
     dateAdded: "2026-10-13",
-    blurb: "This one tricked my own brother into thinking I'd gone off my diet. Torch it properly and you'll get that real crack on top."
+    blurb: "This was one of the first recipes I ever posted. Creme brulee is my absolute favourite, and I was adamant to try and make a proper healthy version of it."
   },
   {
     id: "cheeseburgers",
@@ -167,7 +167,7 @@ const RECIPES = [
     difficulty: "Medium",
     healthScore: 5,
     dateAdded: "2026-10-15",
-    blurb: "Don't let the egg white step put you off, it's the whole trick to the texture. First time I made this I didn't believe it myself."
+    blurb: "Don't let the egg white step put you off, it's the whole trick to the texture and getting it to set. First time I made this I didn't believe it myself."
   },
   {
     id: "chia-lemon-creatine-tonic",
@@ -187,7 +187,7 @@ const RECIPES = [
     difficulty: "Easy",
     healthScore: 9,
     dateAdded: "2026-10-15",
-    blurb: "This is how I get my creatine down every single day without thinking about it."
+    blurb: "I switch between this and the hot chocolate version of it all the time. Low calorie, and honestly it fills you up."
   },
   {
     id: "cacao-chia-pumpkin-smoothie",
@@ -258,7 +258,7 @@ const RECIPES = [
     difficulty: "Hard",
     healthScore: 6,
     dateAdded: "2026-10-20",
-    blurb: "A bit of a project but the kids (and the adults) go wild for these. Worth doing a big batch at once."
+    blurb: "A bit of a project but the kids (and the adults) go wild for these. Worth doing a big batch at once. A real easy, low cal treat."
   },
   {
     id: "blackberry-magnesium-smoothie",
@@ -278,7 +278,7 @@ const RECIPES = [
     difficulty: "Easy",
     healthScore: 9,
     dateAdded: "2026-10-21",
-    blurb: "Same magnesium hit as the other smoothie, different berries, different mood. Both live in my fridge most weeks."
+    blurb: "Same magnesium hit as the other smoothie, different berries, different mood. Also helps with inflammation."
   },
   {
     id: "quick-set-chia-seed-wraps",
@@ -306,7 +306,7 @@ const RECIPES = [
     difficulty: "Medium",
     healthScore: 10,
     dateAdded: "2026-10-23",
-    blurb: "Four ingredients, that's it. I've been making these on repeat since I figured out the bake time."
+    blurb: "One ingredient, practically zero carbs, just fibre. Once you've got a good filling inside it, it fills you up, let me tell you that."
   },
   {
     id: "chia-oats-bowl",
@@ -331,6 +331,6 @@ const RECIPES = [
     difficulty: "Easy",
     healthScore: 10,
     dateAdded: "2026-10-25",
-    blurb: "100% whole food, nothing fancy. I prep three at a time on a Sunday and I'm sorted for breakfast all week."
+    blurb: "100% whole food, nothing fancy. I prep three at a time. Sometimes I switch out the blackberries for strawberries."
   }
 ];
