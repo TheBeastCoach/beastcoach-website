@@ -610,6 +610,11 @@ try {
   console.error("Supabase failed to load:", e);
 }
 
+/* currentUser: declared here (not inside the "if (sb)" block below) so code like the
+   recipe rating widget, which runs outside that block, can read it without a
+   ReferenceError. checkDonation() sets it once the visitor is signed in. */
+let currentUser = null;
+
 /* ---------- Shopping list (declared early: renderRecipeChips below reads this on first render) ---------- */
 let shoppingList = new Set();
 try {
@@ -1072,7 +1077,6 @@ function enterPortal(user) {
 }
 
 /* ---------- Donation ---------- */
-let currentUser = null;
 const donateCard = document.getElementById("donate-card");
 const donateConfirm = document.getElementById("donate-confirm");
 const donateMsg = document.getElementById("donate-msg");
