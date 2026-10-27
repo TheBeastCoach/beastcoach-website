@@ -168,8 +168,73 @@
   .recipe-section h4 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.5px; margin: 18px 0 8px; }
   .recipe-section ul, .recipe-section ol { padding-left: 20px; font-size: 14px; line-height: 1.8; }
 
+  /* Recipe filter / sort / search bar */
+  .recipe-toolbar { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px 18px; margin-top: 18px; }
+  .recipe-toolbar-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .recipe-toolbar-row:last-child { margin-bottom: 0; }
+  .recipe-toolbar input[type="text"], .recipe-toolbar select { flex: 1 1 140px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); outline: none; }
+  .recipe-toolbar input[type="text"]:focus, .recipe-toolbar select:focus { border-color: var(--green); }
+  .recipe-toolbar .meal-pill { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 8px 14px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; font-family: 'Manrope', sans-serif; }
+  .recipe-toolbar .meal-pill.active { background: var(--green); border-color: var(--green); color: var(--white); }
+  .recipe-toolbar details { margin-top: 2px; }
+  .recipe-toolbar summary { cursor: pointer; font-size: 12px; font-weight: 700; color: var(--green); list-style: none; }
+  .range-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+  .range-grid label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .range-grid .range-pair { display: flex; gap: 6px; align-items: center; }
+  .range-grid input[type="number"] { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); outline: none; }
+  .toolbar-clear { background: none; border: none; font-size: 12px; color: var(--muted); text-decoration: underline; cursor: pointer; font-family: 'Manrope', sans-serif; padding: 0; }
+  .recipe-toolbar-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+  .recipe-count { font-size: 12px; color: var(--muted); }
+  .recipe-links { display: flex; gap: 14px; margin: 14px 0 4px; flex-wrap: wrap; }
+  .recipe-links button { background: none; border: none; font-size: 13px; font-weight: 700; color: var(--green); text-decoration: underline; cursor: pointer; font-family: 'Manrope', sans-serif; padding: 0; }
+
+  /* Recipe card select checkbox (for shopping list) */
+  .recipe-card { position: relative; }
+  .recipe-card .select-check { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.92); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--muted); z-index: 2; }
+  .recipe-card .select-check.checked { background: var(--green); border-color: var(--green); color: var(--white); }
+  .recipe-card .badge-row { display: flex; gap: 4px; padding: 6px 10px 0; flex-wrap: wrap; }
+  .recipe-card .mini-badge { font-size: 10px; font-weight: 700; color: var(--green); background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 2px 6px; }
+
+  /* Floating shopping bar */
+  .shopping-bar { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--green-dark); color: var(--white); border-radius: 32px; padding: 12px 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); z-index: 50; }
+  .shopping-bar[hidden] { display: none; }
+  .shopping-bar span { font-size: 13px; font-weight: 700; }
+  .shopping-bar button.go { background: var(--green-light); color: var(--green-dark); border: none; border-radius: 20px; padding: 8px 16px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: 'Manrope', sans-serif; }
+  .shopping-bar button.clear { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 12px; text-decoration: underline; cursor: pointer; font-family: 'Manrope', sans-serif; }
+
+  /* Word from Stefan */
+  .stefan-blurb { background: var(--off-white); border-left: 4px solid var(--green); border-radius: 10px; padding: 14px 18px; margin: 4px 0 20px; }
+  .stefan-blurb .lbl { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--green); margin-bottom: 4px; }
+  .stefan-blurb p { font-size: 14px; color: var(--text); line-height: 1.6; font-style: italic; }
+
+  /* Rating */
+  .rating-block { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .rating-stars { display: inline-flex; gap: 2px; }
+  .rating-stars .star { font-size: 22px; color: var(--border); cursor: pointer; line-height: 1; }
+  .rating-stars .star.filled { color: var(--green); }
+  .rating-stars.readonly .star { cursor: default; }
+  .rating-summary { font-size: 12px; color: var(--muted); }
+  .rating-note { font-size: 12px; color: var(--muted); }
+
+  /* Shopping list view */
+  .shop-group { margin-bottom: 20px; }
+  .shop-group h4 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .shop-group ul { list-style: none; padding: 0; }
+  .shop-group li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .shop-group li input[type="checkbox"] { width: 17px; height: 17px; flex-shrink: 0; }
+  .shop-group li.checked span { text-decoration: line-through; color: var(--muted); }
+
+  /* Recipe book */
+  .book-recipe { padding-bottom: 28px; margin-bottom: 28px; border-bottom: 2px solid var(--border); }
+  .book-recipe:last-child { border-bottom: none; }
+  .book-recipe h2 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 0.5px; margin-bottom: 6px; }
+
+  /* Idea submission */
+  .idea-card { margin-top: 28px; }
+  .idea-card textarea.form-input { resize: vertical; min-height: 80px; }
+
   @media print {
-    .nav, footer.site, .back-link, #print-recipe-btn, .signout { display: none !important; }
+    .nav, footer.site, .back-link, #print-recipe-btn, .signout, .recipe-toolbar, .recipe-links, .shopping-bar, .rating-block, .idea-card, .select-check { display: none !important; }
     body { background: white; }
     main.container { padding: 0; max-width: none; }
     .recipe-hero { max-height: 240px; }
@@ -208,6 +273,12 @@
 </nav>
 
 <main class="container">
+
+<div class="shopping-bar" id="shopping-bar" hidden>
+  <span id="shopping-bar-count"></span>
+  <button type="button" class="go" id="shopping-bar-go">Get shopping list</button>
+  <button type="button" class="clear" id="shopping-bar-clear">Clear</button>
+</div>
 
   <!-- ===================== AUTH ===================== -->
   <section class="view visible" id="view-auth">
@@ -389,8 +460,61 @@
   <section class="view" id="view-recipes">
     <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
     <h1 class="page-title">Recipes</h1>
-    <p class="page-sub">These are all the healthy alternative meals you've seen me create on social media. Tap one to see the full recipe.</p>
+    <p class="page-sub">These are all the healthy alternative meals you've seen me create on social media. Tap one to see the full recipe, or tick a few and grab a shopping list.</p>
+
+    <div class="recipe-toolbar">
+      <div class="recipe-toolbar-row">
+        <input type="text" id="recipe-search" placeholder="Search recipes…">
+        <select id="recipe-sort">
+          <option value="latest">Sort: Latest</option>
+          <option value="health">Sort: Health rating</option>
+          <option value="difficulty">Sort: Difficulty</option>
+        </select>
+      </div>
+      <div class="recipe-toolbar-row" id="recipe-meal-pills">
+        <button type="button" class="meal-pill active" data-meal="all">All</button>
+        <button type="button" class="meal-pill" data-meal="breakfast">Breakfast</button>
+        <button type="button" class="meal-pill" data-meal="lunch">Lunch</button>
+        <button type="button" class="meal-pill" data-meal="dinner">Dinner</button>
+        <button type="button" class="meal-pill" data-meal="snack">Snack</button>
+        <button type="button" class="meal-pill" data-meal="smoothie">Smoothie</button>
+      </div>
+      <details>
+        <summary>More filters (calories, protein, fibre)</summary>
+        <div class="range-grid">
+          <div>
+            <label>Calories (kcal)</label>
+            <div class="range-pair"><input type="number" id="filter-kcal-min" placeholder="Min"><input type="number" id="filter-kcal-max" placeholder="Max"></div>
+          </div>
+          <div>
+            <label>Protein (g)</label>
+            <div class="range-pair"><input type="number" id="filter-protein-min" placeholder="Min"><input type="number" id="filter-protein-max" placeholder="Max"></div>
+          </div>
+          <div>
+            <label>Fibre (g)</label>
+            <div class="range-pair"><input type="number" id="filter-fibre-min" placeholder="Min"><input type="number" id="filter-fibre-max" placeholder="Max"></div>
+          </div>
+        </div>
+      </details>
+      <div class="recipe-toolbar-footer">
+        <span class="recipe-count" id="recipe-count"></span>
+        <button type="button" class="toolbar-clear" id="recipe-filters-clear">Clear filters</button>
+      </div>
+    </div>
+
+    <div class="recipe-links">
+      <button type="button" data-nav="recipe-book">View the full Recipe Book &rarr;</button>
+    </div>
+
     <div class="recipe-grid" id="recipe-chips"></div>
+
+    <div class="card idea-card">
+      <h4 style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.5px;margin-bottom:8px;">Got a recipe request?</h4>
+      <p style="margin-bottom:12px;">Tell me what you'd like to see turned into a healthy version and I'll add it to the list.</p>
+      <textarea class="form-input" id="idea-text" placeholder="e.g. a healthier version of a Big Mac"></textarea>
+      <button class="btn-primary" id="idea-submit-btn" type="button">Submit idea</button>
+      <p class="form-msg" id="idea-msg"></p>
+    </div>
   </section>
 
   <!-- ===================== RECIPE DETAIL ===================== -->
@@ -398,11 +522,23 @@
     <button class="back-link" data-nav="recipes">&larr; Back to Recipes</button>
     <div class="recipe-actions">
       <button class="btn-primary" id="print-recipe-btn">Print Recipe</button>
+      <button class="btn-primary" id="add-to-list-btn" style="background:var(--green-light);color:var(--green-dark);">Add to shopping list</button>
     </div>
     <img class="recipe-hero" id="recipe-hero" alt="" hidden>
     <h1 class="page-title" id="recipe-title"></h1>
     <p class="page-sub" id="recipe-desc"></p>
     <div class="recipe-macros" id="recipe-macros"></div>
+
+    <div class="rating-block">
+      <div class="rating-stars" id="rating-stars"></div>
+      <span class="rating-summary" id="rating-summary"></span>
+    </div>
+
+    <div class="stefan-blurb" id="stefan-blurb" hidden>
+      <div class="lbl">A word from Stefan</div>
+      <p id="stefan-blurb-text"></p>
+    </div>
+
     <div class="recipe-section">
       <h4>Ingredients</h4>
       <ul id="recipe-ingredients"></ul>
@@ -411,6 +547,29 @@
       <h4>Instructions</h4>
       <ol id="recipe-instructions"></ol>
     </div>
+  </section>
+
+  <!-- ===================== SHOPPING LIST ===================== -->
+  <section class="view" id="view-shopping-list">
+    <button class="back-link" data-nav="recipes">&larr; Back to Recipes</button>
+    <h1 class="page-title">Shopping List</h1>
+    <p class="page-sub">Everything you'll need for the recipes you picked, grouped by recipe. Tick items off as you shop.</p>
+    <div class="recipe-actions">
+      <button class="btn-primary" id="print-shopping-btn">Print List</button>
+      <button class="btn-primary" id="clear-shopping-btn" style="background:var(--err);">Clear list</button>
+    </div>
+    <div id="shopping-list-body"></div>
+  </section>
+
+  <!-- ===================== RECIPE BOOK ===================== -->
+  <section class="view" id="view-recipe-book">
+    <button class="back-link" data-nav="recipes">&larr; Back to Recipes</button>
+    <h1 class="page-title">The Recipe Book</h1>
+    <p class="page-sub">Every recipe I've shared, in one place. Print this page to keep a physical copy.</p>
+    <div class="recipe-actions">
+      <button class="btn-primary" id="print-book-btn">Print Recipe Book</button>
+    </div>
+    <div id="recipe-book-body"></div>
   </section>
 
 </main>
@@ -436,23 +595,107 @@ try {
 /* ---------- Recipes ---------- */
 // Recipes now live in recipes.js (loaded via <script src="recipes.js">) so you never edit this file to add a recipe.
 
+const DIFFICULTY_RANK = { "Easy": 1, "Medium": 2, "Hard": 3 };
+let currentRecipeId = null;
+
+const recipeFilter = { search: "", meal: "all" };
+
+function matchesRecipeFilter(r) {
+  if (recipeFilter.meal !== "all" && !(r.meal || []).includes(recipeFilter.meal)) return false;
+  const s = recipeFilter.search.trim().toLowerCase();
+  if (s && !r.title.toLowerCase().includes(s) && !r.chip.toLowerCase().includes(s) && !r.desc.toLowerCase().includes(s)) return false;
+  const minKcal = parseFloat(document.getElementById("filter-kcal-min").value);
+  const maxKcal = parseFloat(document.getElementById("filter-kcal-max").value);
+  const minProtein = parseFloat(document.getElementById("filter-protein-min").value);
+  const maxProtein = parseFloat(document.getElementById("filter-protein-max").value);
+  const minFibre = parseFloat(document.getElementById("filter-fibre-min").value);
+  const maxFibre = parseFloat(document.getElementById("filter-fibre-max").value);
+  if (!isNaN(minKcal) && (r.kcal || 0) < minKcal) return false;
+  if (!isNaN(maxKcal) && (r.kcal || 0) > maxKcal) return false;
+  if (!isNaN(minProtein) && (r.protein || 0) < minProtein) return false;
+  if (!isNaN(maxProtein) && (r.protein || 0) > maxProtein) return false;
+  if (!isNaN(minFibre) && (r.fibre || 0) < minFibre) return false;
+  if (!isNaN(maxFibre) && (r.fibre || 0) > maxFibre) return false;
+  return true;
+}
+
+function sortRecipes(list) {
+  const sort = document.getElementById("recipe-sort").value;
+  const copy = list.slice();
+  if (sort === "health") {
+    copy.sort((a, b) => (b.healthScore || 0) - (a.healthScore || 0));
+  } else if (sort === "difficulty") {
+    copy.sort((a, b) => (DIFFICULTY_RANK[a.difficulty] || 0) - (DIFFICULTY_RANK[b.difficulty] || 0));
+  } else {
+    copy.sort((a, b) => (b.dateAdded || "").localeCompare(a.dateAdded || ""));
+  }
+  return copy;
+}
+
+function filteredSortedRecipes() {
+  return sortRecipes(RECIPES.filter(matchesRecipeFilter));
+}
+
 function renderRecipeChips() {
   const container = document.getElementById("recipe-chips");
-  container.innerHTML = RECIPES.map(r => {
+  const list = filteredSortedRecipes();
+  document.getElementById("recipe-count").textContent = list.length + (list.length === 1 ? " recipe" : " recipes");
+  container.innerHTML = list.map(r => {
     const thumb = r.image
       ? `<img src="${escapeHtml(r.image)}" alt="${escapeHtml(r.title)}" loading="lazy">`
       : `<span class="ph">${escapeHtml(r.chip.charAt(0))}</span>`;
-    return `<button type="button" class="recipe-card" data-recipe="${r.id}"><div class="thumb">${thumb}</div><div class="name">${escapeHtml(r.chip)}</div></button>`;
+    const checked = shoppingList.has(r.id);
+    return `<div class="recipe-card" data-recipe="${r.id}">
+      <div class="select-check${checked ? " checked" : ""}" data-select="${r.id}">${checked ? "&check;" : "+"}</div>
+      <div class="thumb">${thumb}</div>
+      <div class="badge-row"><span class="mini-badge">${escapeHtml(r.difficulty || "")}</span><span class="mini-badge">Health ${r.healthScore || "-"}/10</span></div>
+      <div class="name">${escapeHtml(r.chip)}</div>
+    </div>`;
   }).join("");
-  container.querySelectorAll("[data-recipe]").forEach(btn => {
-    btn.addEventListener("click", () => openRecipe(btn.getAttribute("data-recipe")));
+  container.querySelectorAll("[data-recipe]").forEach(card => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("[data-select]")) return;
+      openRecipe(card.getAttribute("data-recipe"));
+    });
+  });
+  container.querySelectorAll("[data-select]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleShoppingItem(btn.getAttribute("data-select"));
+    });
   });
 }
 renderRecipeChips();
 
+document.getElementById("recipe-search").addEventListener("input", (e) => { recipeFilter.search = e.target.value; renderRecipeChips(); });
+document.getElementById("recipe-sort").addEventListener("change", renderRecipeChips);
+["filter-kcal-min","filter-kcal-max","filter-protein-min","filter-protein-max","filter-fibre-min","filter-fibre-max"].forEach(id => {
+  document.getElementById(id).addEventListener("input", renderRecipeChips);
+});
+document.querySelectorAll("#recipe-meal-pills [data-meal]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#recipe-meal-pills [data-meal]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    recipeFilter.meal = btn.getAttribute("data-meal");
+    renderRecipeChips();
+  });
+});
+document.getElementById("recipe-filters-clear").addEventListener("click", () => {
+  recipeFilter.search = ""; recipeFilter.meal = "all";
+  document.getElementById("recipe-search").value = "";
+  document.getElementById("recipe-sort").value = "latest";
+  document.querySelectorAll("#recipe-meal-pills [data-meal]").forEach(b => b.classList.remove("active"));
+  document.querySelector('#recipe-meal-pills [data-meal="all"]').classList.add("active");
+  ["filter-kcal-min","filter-kcal-max","filter-protein-min","filter-protein-max","filter-fibre-min","filter-fibre-max"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  renderRecipeChips();
+});
+
 function openRecipe(id) {
   const r = RECIPES.find(x => x.id === id);
   if (!r) return;
+  currentRecipeId = id;
   const hero = document.getElementById("recipe-hero");
   if (r.image) { hero.src = r.image; hero.alt = r.title; hero.hidden = false; }
   else { hero.removeAttribute("src"); hero.hidden = true; }
@@ -463,10 +706,184 @@ function openRecipe(id) {
   `).join("");
   document.getElementById("recipe-ingredients").innerHTML = r.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("");
   document.getElementById("recipe-instructions").innerHTML = r.instructions.map(i => `<li>${escapeHtml(i)}</li>`).join("");
+  const blurbBox = document.getElementById("stefan-blurb");
+  if (r.blurb) { blurbBox.hidden = false; document.getElementById("stefan-blurb-text").textContent = r.blurb; }
+  else { blurbBox.hidden = true; }
+  updateAddToListBtn();
+  loadRatingFor(id);
   showView("recipe-detail");
 }
 
 document.getElementById("print-recipe-btn").addEventListener("click", () => window.print());
+document.getElementById("add-to-list-btn").addEventListener("click", () => {
+  if (!currentRecipeId) return;
+  toggleShoppingItem(currentRecipeId);
+  updateAddToListBtn();
+});
+function updateAddToListBtn() {
+  const btn = document.getElementById("add-to-list-btn");
+  if (!currentRecipeId) return;
+  btn.textContent = shoppingList.has(currentRecipeId) ? "Added to shopping list ✓" : "Add to shopping list";
+}
+
+/* ---------- Shopping list ---------- */
+let shoppingList = new Set();
+try {
+  const saved = JSON.parse(localStorage.getItem("bc_shopping_list") || "[]");
+  shoppingList = new Set(saved);
+} catch (e) {}
+
+function saveShoppingList() {
+  try { localStorage.setItem("bc_shopping_list", JSON.stringify(Array.from(shoppingList))); } catch (e) {}
+}
+function toggleShoppingItem(id) {
+  if (shoppingList.has(id)) shoppingList.delete(id); else shoppingList.add(id);
+  saveShoppingList();
+  renderShoppingBar();
+  renderRecipeChips();
+  updateAddToListBtn();
+}
+function renderShoppingBar() {
+  const bar = document.getElementById("shopping-bar");
+  if (!bar) return;
+  if (shoppingList.size === 0) { bar.hidden = true; return; }
+  bar.hidden = false;
+  document.getElementById("shopping-bar-count").textContent = shoppingList.size + (shoppingList.size === 1 ? " recipe selected" : " recipes selected");
+}
+function renderShoppingListView() {
+  const body = document.getElementById("shopping-list-body");
+  const ids = Array.from(shoppingList);
+  if (ids.length === 0) {
+    body.innerHTML = `<p class="empty-state">No recipes selected yet. Go back to Recipes and tap the + on any recipe to add it here.</p>`;
+    return;
+  }
+  let checkedState = {};
+  try { checkedState = JSON.parse(localStorage.getItem("bc_shopping_checked") || "{}"); } catch (e) {}
+  body.innerHTML = ids.map(id => {
+    const r = RECIPES.find(x => x.id === id);
+    if (!r) return "";
+    return `<div class="shop-group">
+      <h4>${escapeHtml(r.chip)}</h4>
+      <ul>${r.ingredients.map((ing, i) => {
+        const key = id + "-" + i;
+        const isChecked = !!checkedState[key];
+        return `<li class="${isChecked ? "checked" : ""}" data-key="${key}"><input type="checkbox" ${isChecked ? "checked" : ""}><span>${escapeHtml(ing)}</span></li>`;
+      }).join("")}</ul>
+    </div>`;
+  }).join("");
+  body.querySelectorAll(".shop-group li").forEach(li => {
+    li.querySelector("input").addEventListener("change", (e) => {
+      let state = {};
+      try { state = JSON.parse(localStorage.getItem("bc_shopping_checked") || "{}"); } catch (err) {}
+      state[li.getAttribute("data-key")] = e.target.checked;
+      try { localStorage.setItem("bc_shopping_checked", JSON.stringify(state)); } catch (err) {}
+      li.classList.toggle("checked", e.target.checked);
+    });
+  });
+}
+document.getElementById("shopping-bar-go").addEventListener("click", () => { renderShoppingListView(); showView("shopping-list"); });
+document.getElementById("shopping-bar-clear").addEventListener("click", () => {
+  shoppingList.clear();
+  saveShoppingList();
+  renderShoppingBar();
+  renderRecipeChips();
+});
+document.getElementById("print-shopping-btn").addEventListener("click", () => window.print());
+document.getElementById("clear-shopping-btn").addEventListener("click", () => {
+  shoppingList.clear();
+  saveShoppingList();
+  try { localStorage.removeItem("bc_shopping_checked"); } catch (e) {}
+  renderShoppingBar();
+  renderRecipeChips();
+  renderShoppingListView();
+});
+renderShoppingBar();
+
+/* ---------- Recipe book ---------- */
+function renderRecipeBook() {
+  const body = document.getElementById("recipe-book-body");
+  body.innerHTML = sortRecipes(RECIPES.slice()).map(r => `
+    <div class="book-recipe">
+      ${r.image ? `<img class="recipe-hero" src="${escapeHtml(r.image)}" alt="${escapeHtml(r.title)}">` : ""}
+      <h2>${escapeHtml(r.title)}</h2>
+      <p class="page-sub">${escapeHtml(r.desc)}</p>
+      <div class="recipe-macros">${r.macros.map(m => `<div class="recipe-macro"><div class="val">${m[0]}</div><div class="lbl">${m[1]}</div></div>`).join("")}</div>
+      ${r.blurb ? `<div class="stefan-blurb"><div class="lbl">A word from Stefan</div><p>${escapeHtml(r.blurb)}</p></div>` : ""}
+      <div class="recipe-section"><h4>Ingredients</h4><ul>${r.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ul></div>
+      <div class="recipe-section"><h4>Instructions</h4><ol>${r.instructions.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ol></div>
+    </div>
+  `).join("");
+}
+document.querySelectorAll('[data-nav="recipe-book"]').forEach(el => {
+  el.addEventListener("click", renderRecipeBook);
+});
+document.getElementById("print-book-btn").addEventListener("click", () => window.print());
+
+/* ---------- Ratings ---------- */
+function renderStars(container, value, readonly, onPick) {
+  container.innerHTML = "";
+  container.classList.toggle("readonly", !!readonly);
+  for (let i = 1; i <= 5; i++) {
+    const s = document.createElement("span");
+    s.className = "star" + (i <= Math.round(value) ? " filled" : "");
+    s.textContent = "★";
+    if (!readonly) s.addEventListener("click", () => onPick(i));
+    container.appendChild(s);
+  }
+}
+async function loadRatingFor(recipeId) {
+  const starsEl = document.getElementById("rating-stars");
+  const summaryEl = document.getElementById("rating-summary");
+  renderStars(starsEl, 0, true, null);
+  summaryEl.textContent = "";
+  if (!sb) return;
+  try {
+    const { data, error } = await sb.from("recipe_ratings").select("rating,email").eq("recipe_id", recipeId);
+    if (error) { console.error("Rating load failed:", error); return; }
+    const ratings = (data || []).map(r => r.rating);
+    const avg = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
+    summaryEl.textContent = ratings.length ? `${avg.toFixed(1)} / 5 · ${ratings.length} rating${ratings.length === 1 ? "" : "s"}` : "No ratings yet";
+    const mine = currentUser && currentUser.email ? data.find(r => r.email === currentUser.email.toLowerCase().trim()) : null;
+    if (currentUser) {
+      renderStars(starsEl, mine ? mine.rating : 0, false, (val) => submitRating(recipeId, val));
+    } else {
+      renderStars(starsEl, avg, true, null);
+    }
+  } catch (err) {
+    console.error("Rating load failed:", err);
+  }
+}
+async function submitRating(recipeId, val) {
+  if (!sb || !currentUser || !currentUser.email) return;
+  try {
+    const { error } = await sb.from("recipe_ratings").upsert({
+      recipe_id: recipeId,
+      email: currentUser.email.toLowerCase().trim(),
+      rating: val
+    }, { onConflict: "recipe_id,email" });
+    if (error) { console.error("Rating save failed:", error); return; }
+    loadRatingFor(recipeId);
+  } catch (err) {
+    console.error("Rating save failed:", err);
+  }
+}
+
+/* ---------- Recipe idea submissions ---------- */
+document.getElementById("idea-submit-btn").addEventListener("click", async () => {
+  const text = document.getElementById("idea-text").value.trim();
+  const msg = document.getElementById("idea-msg");
+  if (!text) { showStatus(msg, "Type an idea first.", true); return; }
+  if (!sb || !currentUser || !currentUser.email) { showStatus(msg, "Sign in to submit an idea.", true); return; }
+  try {
+    const { error } = await sb.from("recipe_ideas").insert({ email: currentUser.email.toLowerCase().trim(), idea: text });
+    if (error) throw error;
+    document.getElementById("idea-text").value = "";
+    showStatus(msg, "Thanks, I'll take a look!", false);
+  } catch (err) {
+    console.error("Idea submit failed:", err);
+    showStatus(msg, "Couldn't submit that, try again in a moment.", true);
+  }
+});
 
 /* ---------- View switching ---------- */
 function showView(name) {
