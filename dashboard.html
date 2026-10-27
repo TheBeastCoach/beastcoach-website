@@ -592,6 +592,13 @@ try {
   console.error("Supabase failed to load:", e);
 }
 
+/* ---------- Shopping list (declared early: renderRecipeChips below reads this on first render) ---------- */
+let shoppingList = new Set();
+try {
+  const saved = JSON.parse(localStorage.getItem("bc_shopping_list") || "[]");
+  shoppingList = new Set(saved);
+} catch (e) {}
+
 /* ---------- Recipes ---------- */
 // Recipes now live in recipes.js (loaded via <script src="recipes.js">) so you never edit this file to add a recipe.
 
@@ -727,12 +734,6 @@ function updateAddToListBtn() {
 }
 
 /* ---------- Shopping list ---------- */
-let shoppingList = new Set();
-try {
-  const saved = JSON.parse(localStorage.getItem("bc_shopping_list") || "[]");
-  shoppingList = new Set(saved);
-} catch (e) {}
-
 function saveShoppingList() {
   try { localStorage.setItem("bc_shopping_list", JSON.stringify(Array.from(shoppingList))); } catch (e) {}
 }
