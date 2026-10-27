@@ -655,12 +655,14 @@ function matchesRecipeFilter(r) {
 function sortRecipes(list) {
   const sort = document.getElementById("recipe-sort").value;
   const copy = list.slice();
+  // Recipes without a photo yet always sink to the bottom, whatever the sort.
+  const hasImageRank = (r) => (r.image ? 0 : 1);
   if (sort === "health") {
-    copy.sort((a, b) => (b.healthScore || 0) - (a.healthScore || 0));
+    copy.sort((a, b) => hasImageRank(a) - hasImageRank(b) || (b.healthScore || 0) - (a.healthScore || 0));
   } else if (sort === "difficulty") {
-    copy.sort((a, b) => (DIFFICULTY_RANK[a.difficulty] || 0) - (DIFFICULTY_RANK[b.difficulty] || 0));
+    copy.sort((a, b) => hasImageRank(a) - hasImageRank(b) || (DIFFICULTY_RANK[a.difficulty] || 0) - (DIFFICULTY_RANK[b.difficulty] || 0));
   } else {
-    copy.sort((a, b) => (b.dateAdded || "").localeCompare(a.dateAdded || ""));
+    copy.sort((a, b) => hasImageRank(a) - hasImageRank(b) || (b.dateAdded || "").localeCompare(a.dateAdded || ""));
   }
   return copy;
 }
