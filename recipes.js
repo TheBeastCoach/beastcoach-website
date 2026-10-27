@@ -1,7 +1,12 @@
 // Beast Coach — Recipes data file
 // Add a new recipe by copying the {...} block below and giving it a unique id.
 // meal: which Beast Challenge filters it shows under: breakfast, lunch, dinner, snack, smoothie.
-// Save this file and re-upload it to your repo — you never need to touch portal.html for this.
+// kcal / protein / fibre: clean numbers (no units) used by the filter bar. Keep these in sync with the macros array below.
+// difficulty: "Easy", "Medium", or "Hard".
+// healthScore: 1-10, based on how whole/unprocessed the ingredients are — NOT a macro score.
+// dateAdded: "YYYY-MM-DD", used for the Latest sort.
+// blurb: a short personal note in Stefan's voice, shown on the recipe as "A word from Stefan".
+// Save this file and re-upload it to your repo — you never need to touch dashboard.html for this.
 
 const RECIPES = [
   {
@@ -10,10 +15,19 @@ const RECIPES = [
     chip: "Sweet Potato Brownie Ice Cream Sandwich",
     image: "recipe-img/ice-cream-sandwich.jpg",
     title: "Sweet Potato Brownie Ice Cream Sandwich",
-    desc: "A high-volume, satiating frozen snack that balances complex carbs and slow-digesting protein.",
+    desc: "This is the one I reach for when I want something sweet at night and don't want to undo the day. Sweet potato gives it that fudgy brownie texture, no refined sugar needed.",
     ingredients: ["2 plain thin rice cakes (optional)", "120g baked sweet potato (skin removed, chilled)", "100g non-fat plain Greek yogurt", "10g unsweetened dark cocoa powder", "Stevia or zero-calorie sweetener to taste, or 1 tbsp honey", "Up to 200ml unsweetened almond milk, if needed to blend", "Splash of vanilla extract"],
     instructions: ["Blend the sweet potato, Greek yogurt, cocoa powder, sweetener or honey, vanilla, and almond milk until completely smooth.", "Pour into a Ninja Creami pint container, level the top, and freeze flat for at least 16 hours.", "Process in the Ninja Creami on the Lite Ice Cream setting. If it comes out crumbly or powdery, add a splash of almond milk and re-spin.", "Spread a thick layer between two rice cakes and eat straight away, or skip the rice cakes and eat it from the pint."],
-    macros: [["230", "kcal"], ["13g", "Protein"], ["40g", "Carbs"], ["2g", "Fat"]]
+    macros: [["230", "kcal"], ["13g", "Protein"], ["40g", "Carbs"], ["2g", "Fat"]],
+    kcal: 230,
+    protein: 13,
+    fibre: 5,
+    carbs: 40,
+    fat: 2,
+    difficulty: "Medium",
+    healthScore: 8,
+    dateAdded: "2026-10-13",
+    blurb: "I do love my brownie, so I thought why not recreate this one as an ice cream. Honestly, it's really chocolatey and sweet from the natural sweet potato."
   },
   {
     id: "protein-jellies",
@@ -21,10 +35,19 @@ const RECIPES = [
     chip: "Protein Jellies",
     image: "recipe-img/protein-jellies.jpg",
     title: "Monster Energy Protein Jellies",
-    desc: "A portable, zero-fat caffeine boost designed for pre-workout or afternoon energy.",
+    desc: "I make these up before a late session when I want the caffeine hit without a drink sloshing around in my stomach. Portable, zero fat, and they actually taste like the can.",
     ingredients: ["500ml Ultra/Zero-Sugar Monster Energy, chilled", "20g unflavored gelatin powder", "30g whey protein isolate or clear whey isolate, matching flavor", "60ml cold water"],
     instructions: ["Bloom the gelatin in 60ml cold water for 5 minutes.", "Gently warm 150ml of the Monster over low heat (do not boil), then stir in the bloomed gelatin until fully dissolved.", "Whisk the protein isolate into the remaining 350ml cold Monster (let it go flat first, or skim the foam), then slowly pour in the warm gelatin liquid while whisking.", "Pour into silicone molds and chill for 3 to 4 hours until set. Store uncovered or with a paper towel over them to prevent condensation."],
-    macros: [["190", "kcal (batch)"], ["42g", "Protein"], ["2g", "Carbs"], ["0g", "Fat"]]
+    macros: [["190", "kcal (batch)"], ["42g", "Protein"], ["2g", "Carbs"], ["0g", "Fat"]],
+    kcal: 190,
+    protein: 42,
+    fibre: 0,
+    carbs: 2,
+    fat: 0,
+    difficulty: "Medium",
+    healthScore: 3,
+    dateAdded: "2026-10-13",
+    blurb: "These jellies are a really good pre-workout snack. They've got sodium in them to help your muscles get a good pump, a hit of caffeine, and a little bit of protein."
   },
   {
     id: "creme-brulee",
@@ -32,10 +55,19 @@ const RECIPES = [
     image: "recipe-img/creme-brulee.jpg",
     chip: "Crème Brûlée",
     title: "High-Protein Crème Brûlée (Gelato Option)",
-    desc: "A decadent custard dessert transformed into a macro-friendly evening staple.",
+    desc: "This one tricked my own family into thinking I'd gone off my diet. Same crack on top, same custard feel, built from yogurt and protein instead of cream and sugar.",
     ingredients: ["150g non-fat Greek yogurt (or liquid egg whites, cooked gently sous-vide style)", "25g vanilla casein or whey/casein blend protein powder", "1 pasteurised egg yolk, optional, for authentic custardy mouthfeel (it isn't cooked)", "1 tsp vanilla extract", "1 tbsp granular erythritol/allulose blend, for torching"],
     instructions: ["Whisk the Greek yogurt, protein powder, vanilla extract, and egg yolk (if using) until glossy and smooth.", "Spoon into a shallow ramekin, level the top, and chill for at least 30 minutes so it firms up.", "Sprinkle the granular sweetener evenly over the surface and torch until golden and crisp. Gelato option: skip the torch and churn the mix in a mini ice-cream maker, or freeze for 90 minutes, stirring every 30 minutes."],
-    macros: [["245", "kcal"], ["34g", "Protein"], ["7g", "Carbs"], ["6g", "Fat"]]
+    macros: [["245", "kcal"], ["34g", "Protein"], ["7g", "Carbs"], ["6g", "Fat"]],
+    kcal: 245,
+    protein: 34,
+    fibre: 0,
+    carbs: 7,
+    fat: 6,
+    difficulty: "Medium",
+    healthScore: 6,
+    dateAdded: "2026-10-13",
+    blurb: "This was one of the first recipes I ever posted. Creme brulee is my absolute favourite, and I was adamant to try and make a proper healthy version of it."
   },
   {
     id: "cheeseburgers",
@@ -43,10 +75,19 @@ const RECIPES = [
     image: "recipe-img/cheeseburgers.jpg",
     chip: "Cheeseburgers",
     title: "Savory Rice Cake Cheeseburgers",
-    desc: "Satisfies burger cravings without the heavy refined-carb load of traditional brioche.",
+    desc: "My answer when a burger craving hits and I don't want to carry a brioche bun's worth of carbs for it. Smash the patty thin, that's the whole trick.",
     ingredients: ["2 large lightly salted rice cakes (or tomato/cheese flavored)", "150g extra-lean ground beef (95/5 or 96/4)", "1 slice low-fat burger cheese, e.g. light cheddar", "2 dill pickle slices, shredded lettuce, thin tomato slice", "15g light burger sauce (light mayo, sugar-free ketchup, mustard blend)", "Salt, black pepper, garlic powder, to taste"],
     instructions: ["Season and smash lean beef into a thin, wide patty in a hot non-stick pan; sear 2 minutes per side.", "Melt cheese slice on patty during the last 30 seconds of cooking.", "Layer sauce, pickles, lettuce, tomato, and cheesy patty between the two rice cakes. Eat immediately while crisp."],
-    macros: [["330", "kcal"], ["38g", "Protein"], ["16g", "Carbs"], ["8g", "Fat"]]
+    macros: [["330", "kcal"], ["38g", "Protein"], ["16g", "Carbs"], ["8g", "Fat"]],
+    kcal: 330,
+    protein: 38,
+    fibre: 2,
+    carbs: 16,
+    fat: 8,
+    difficulty: "Easy",
+    healthScore: 7,
+    dateAdded: "2026-10-14",
+    blurb: "My answer to a burger craving without derailing the week. Smash the patty thin, that's the secret."
   },
   {
     id: "protein-waffles",
@@ -54,10 +95,19 @@ const RECIPES = [
     image: "recipe-img/protein-waffles.jpg",
     chip: "Protein Waffles",
     title: "Oat Flour Protein Waffles & Pancakes",
-    desc: "A high-fiber, low-glycemic breakfast that holds up under sugar-free maple syrup.",
+    desc: "A Sunday staple in my house. Simple oat and egg white batter that holds up fine under sugar-free syrup, and the kids can't tell the difference.",
     ingredients: ["40g rolled oats, blended into fine flour", "30g whey/casein blend protein powder", "100g liquid egg whites", "1/2 tsp baking powder", "45ml unsweetened almond milk"],
     instructions: ["Blend all ingredients until smooth, then let the batter sit for 3 minutes to thicken.", "Waffles: pour into a preheated, greased waffle iron and cook for 3 to 4 minutes. Pancakes: cook in a non-stick pan over medium heat for 2 to 3 minutes until bubbles form, then flip and cook 1 to 2 minutes more."],
-    macros: [["310", "kcal"], ["37g", "Protein"], ["30g", "Carbs"], ["4g", "Fat"]]
+    macros: [["310", "kcal"], ["37g", "Protein"], ["30g", "Carbs"], ["4g", "Fat"]],
+    kcal: 310,
+    protein: 37,
+    fibre: 4,
+    carbs: 30,
+    fat: 4,
+    difficulty: "Easy",
+    healthScore: 7,
+    dateAdded: "2026-10-14",
+    blurb: "Sunday staple in my house. Double the batch and freeze the extras for busy mornings."
   },
   {
     id: "lamb-chimichurri",
@@ -65,10 +115,19 @@ const RECIPES = [
     image: "recipe-img/lamb-chimichurri.jpg",
     chip: "Lamb Chimichurri",
     title: "Lean Lamb Herb & Yogurt Chimichurri Sauce",
-    desc: "A bright, acidic drizzle formulated to complement lamb cuts without pouring on olive oil calories.",
+    desc: "I put this on everything, not just lamb. Bright, herby, and it cuts through rich cuts without me having to pour olive oil over dinner.",
     ingredients: ["60g non-fat Greek yogurt", "1 tbsp fresh flat-leaf parsley, finely chopped", "1 tbsp fresh mint, finely chopped", "1 clove garlic, minced", "1 tbsp red wine vinegar or lemon juice", "1/2 tsp dried oregano, red pepper flakes, salt, and black pepper"],
     instructions: ["Whisk all ingredients in a small prep bowl until well incorporated.", "Let sit 10 minutes before spooning over grilled lamb backstrap or cutlets."],
-    macros: [["45", "kcal (batch)"], ["6g", "Protein"], ["4g", "Carbs"], ["0.5g", "Fat"]]
+    macros: [["45", "kcal (batch)"], ["6g", "Protein"], ["4g", "Carbs"], ["0.5g", "Fat"]],
+    kcal: 45,
+    protein: 6,
+    fibre: 1,
+    carbs: 4,
+    fat: 0.5,
+    difficulty: "Easy",
+    healthScore: 9,
+    dateAdded: "2026-10-14",
+    blurb: "I put this on everything, not just lamb. It keeps in the fridge for a few days so make extra."
   },
   {
     id: "pb-replacement",
@@ -76,10 +135,19 @@ const RECIPES = [
     image: "recipe-img/pb-replacement.jpg",
     chip: "PB Replacement",
     title: "Sweet Potato Peanut Butter Replacement",
-    desc: "A dense, high-volume alternative to traditional peanut butter that slashes dietary fat while keeping complex carbs high for training fuel.",
+    desc: "I built this because I was going through real peanut butter way too fast. Same spreadable texture, a fraction of the fat, and the carbs actually fuel training.",
     ingredients: ["300g sweet potato, roasted or steamed, skin removed", "48g (about 4 tbsp) powdered peanut butter, e.g. PB2 or Macro Mike", "1/2 tsp ground cinnamon", "1 tsp vanilla extract", "Stevia or monk fruit sweetener, to taste", "2 to 3 tbsp unsweetened almond milk or water, optional, to reach desired consistency"],
     instructions: ["Roast (or steam) the sweet potato until fork-tender throughout; let cool slightly.", "Add the warm sweet potato, peanut butter powder, cinnamon, vanilla, and sweetener to a food processor or blender.", "Blend on high until completely silky and whipped, adding a splash of liquid only if needed to loosen the blades.", "Transfer to an airtight jar and chill. Thickens further in the fridge; stays fresh for 4 to 5 days."],
-    macros: [["~50", "kcal per 40g"], ["3g", "Protein"], ["8g", "Carbs"], ["0.5g", "Fat"]]
+    macros: [["~50", "kcal per 40g"], ["3g", "Protein"], ["8g", "Carbs"], ["0.5g", "Fat"]],
+    kcal: 50,
+    protein: 3,
+    fibre: 4,
+    carbs: 8,
+    fat: 0.5,
+    difficulty: "Easy",
+    healthScore: 8,
+    dateAdded: "2026-10-15",
+    blurb: "Built this because I was going through peanut butter way too fast. Tastes richer than it has any right to."
   },
   {
     id: "choc-mousse",
@@ -87,10 +155,19 @@ const RECIPES = [
     image: "recipe-img/choc-mousse.jpg",
     chip: "Choc Mousse",
     title: "High-Protein Chocolate Mousse",
-    desc: "An ultra-lean dessert hack using cooked egg whites as an odorless, neutral-flavor aerating agent that whips into a thick, glossy pudding.",
+    desc: "First time I made this I didn't believe it myself. Cooked egg whites are the trick, they whip up into a thick glossy mousse with almost no fat and a stupid amount of protein.",
     ingredients: ["200g liquid egg whites, carton or fresh", "1 scoop (30g) chocolate whey/casein blend, or whey isolate", "2 heaped tsp (10g) unsweetened baking cocoa powder", "2 heaped tsp (10g) sugar-free hot chocolate powder, e.g. Avalanche or Jarrah", "1 heaped tbsp (30g) low-fat or non-fat plain Greek yogurt", "Optional: 1 to 2 tbsp cold water or unsweetened almond milk, plus zero-calorie sweetener if extra sweetness is preferred"],
     instructions: ["Microwave the egg whites in a bowl in 45-second intervals, stirring between bursts until just set (soft-scrambled, not browned or rubbery). Alternatively, steam or soft-poach them.", "Allow the cooked whites to cool for 5 minutes so they don't curdle the protein powder.", "Transfer the cooked egg whites, protein powder, cocoa powder, hot chocolate mix, Greek yogurt, and sweetener into a high-speed blender or bullet blender.", "Blend on high for 60 to 90 seconds, stopping to scrape down the sides, until velvety and uniform.", "Pour into a bowl or ramekin and refrigerate for 2 to 4 hours to chill and set into a firm, spoonable mousse."],
-    macros: [["275", "kcal"], ["49g", "Protein"], ["13g", "Carbs"], ["3.5g", "Fat"]]
+    macros: [["275", "kcal"], ["49g", "Protein"], ["13g", "Carbs"], ["3.5g", "Fat"]],
+    kcal: 275,
+    protein: 49,
+    fibre: 1,
+    carbs: 13,
+    fat: 3.5,
+    difficulty: "Medium",
+    healthScore: 5,
+    dateAdded: "2026-10-15",
+    blurb: "Don't let the egg white step put you off, it's the whole trick to the texture and getting it to set. First time I made this I didn't believe it myself."
   },
   {
     id: "chia-lemon-creatine-tonic",
@@ -98,10 +175,19 @@ const RECIPES = [
     image: "recipe-img/chia-lemon-creatine-tonic.jpg",
     chip: "Chia Lemon Tonic",
     title: "Chia, Lemon & Honey Creatine Tonic",
-    desc: "A thick, tangy between-meals tonic that doubles as an easy way to get your daily creatine down without the chalky aftertaste.",
+    desc: "This is how I get my creatine down every single day without thinking about it. Thick, tangy, and the chia takes away that chalky aftertaste completely.",
     ingredients: ["12g chia seeds", "250ml boiling hot water", "Juice of 1 whole lemon", "1 tsp honey", "1 serving (5g) creatine monohydrate"],
     instructions: ["Add the chia seeds to a glass and pour over the hot water.", "Stir in the lemon juice, honey, and creatine.", "Let it sit for 5 minutes, stirring once halfway, so the chia swells and thickens the drink, then drink it. Creatine adds no meaningful calories, so the macros are for the chia, lemon, and honey."],
-    macros: [["90", "kcal"], ["2g", "Protein"], ["15g", "Carbs"], ["3.5g", "Fat"]]
+    macros: [["90", "kcal"], ["2g", "Protein"], ["15g", "Carbs"], ["3.5g", "Fat"]],
+    kcal: 90,
+    protein: 2,
+    fibre: 5,
+    carbs: 15,
+    fat: 3.5,
+    difficulty: "Easy",
+    healthScore: 9,
+    dateAdded: "2026-10-15",
+    blurb: "I switch between this and the hot chocolate version of it all the time. Low calorie, and honestly it fills you up."
   },
   {
     id: "cacao-chia-pumpkin-smoothie",
@@ -109,10 +195,19 @@ const RECIPES = [
     chip: "Magnesium Smoothie",
     image: "recipe-img/magnesium-smoothie.jpg",
     title: "Magnesium Smoothie",
-    desc: "A magnesium-and-protein-dense seed, strawberry, and cottage cheese shake. Flaxseed, chia, and pepitas bring magnesium, zinc, fiber, and omega-3s, while liquid egg whites and low-fat cottage cheese push you past 30g of protein before the milk even goes in.",
+    desc: "I lean on this one on heavy training days when my legs want magnesium more than anything else. Flaxseed, chia, and pepitas carry the minerals, cottage cheese and egg whites carry the protein.",
     ingredients: ["10g ground flaxseed", "12g chia seeds", "30g pumpkin seeds (pepitas)", "50g pasteurized liquid egg whites", "100g low-fat cottage cheese", "100g frozen strawberries", "150–200ml ultra-filtered high-protein skim milk (or standard skim/light milk for a lighter protein version)", "4–5 ice cubes", "Stevia or a few drops of liquid monk fruit, to taste (optional)"],
     instructions: ["Blend the flaxseed, chia seeds, pepitas, and milk on high for 30–45 seconds first, so the seeds fully break down.", "Add the cottage cheese, liquid egg whites, strawberries, and ice, then blend again until velvety and aerated.", "Taste and add stevia or monk fruit if you want to balance the tartness of the berries and cottage cheese. 200ml of ultra-filtered high-protein milk (e.g. Fairlife) gets you to roughly 43g protein; swap in standard skim milk instead for a lighter ~36–38g protein version."],
-    macros: [["500", "kcal"], ["43g", "Protein"], ["30g", "Carbs"], ["25g", "Fat"]]
+    macros: [["500", "kcal"], ["43g", "Protein"], ["30g", "Carbs"], ["25g", "Fat"]],
+    kcal: 500,
+    protein: 43,
+    fibre: 8,
+    carbs: 30,
+    fat: 25,
+    difficulty: "Easy",
+    healthScore: 9,
+    dateAdded: "2026-10-16",
+    blurb: "I lean on this one on heavy training days when my legs feel like they need the magnesium more than anything else."
   },
   {
     id: "spiced-pumpkin-latte-creami",
@@ -120,10 +215,19 @@ const RECIPES = [
     chip: "Spiced Pumpkin Latte Creami",
     image: "recipe-img/spiced-pumpkin-latte-creami.jpg",
     title: "Spiced Pumpkin Latte Creami",
-    desc: "A Ninja Creami pumpkin-spice latte, built from roasted butternut pumpkin, cottage cheese, and Greek yoghurt instead of cream and sugar — espresso and warm spice give it full coffee-shop flavour for a fraction of the kcal. Base stats: ~235 kcal, 23.5g protein, 2.5g fat, 27g carbs (optional waffle cone: add 57 kcal).",
+    desc: "My spin on a pumpkin spice latte that actually fits the diet. Roasted butternut pumpkin and real espresso instead of syrup, it tastes like cheating.",
     ingredients: ["100g roasted butternut pumpkin (roasted until soft and naturally sweet)", "100g low-fat cottage cheese", "100g fat-free Greek yoghurt", "1.5 tsp (10g) honey", "1 tsp instant espresso powder (or 15ml cooled espresso)", "1/2 tsp pumpkin pie spice blend (optional: cinnamon only)", "1/2 tsp vanilla extract", "30–50ml unsweetened almond milk (to reach pint fill line if needed)"],
     instructions: ["Cook: Roast the butternut pumpkin in the oven until tender and lightly caramelised, then let it cool slightly.", "Blend: Add the roasted butternut pumpkin, cottage cheese, Greek yoghurt, honey, espresso powder, pumpkin pie spice blend (or cinnamon only), and vanilla into a food processor. Blend until silky smooth to completely break down the cottage cheese curds.", "Prep Pint: Pour the mixture into your Ninja Creami pint (top up with a splash of unsweetened almond milk to the max fill line if needed) and freeze flat for at least 16–24 hours (up to 60+ hours).", "Spin: Process on the Light Ice Cream setting. If slightly powdery on the first run, add a splash of almond milk and run a Re-spin.", "Serve: Enjoy straight from the pint, or scoop into a cone (optional: adds 57 kcal)."],
-    macros: [["235", "kcal"], ["23.5g", "Protein"], ["27g", "Carbs"], ["2.5g", "Fat"]]
+    macros: [["235", "kcal"], ["23.5g", "Protein"], ["27g", "Carbs"], ["2.5g", "Fat"]],
+    kcal: 235,
+    protein: 23.5,
+    fibre: 3,
+    carbs: 27,
+    fat: 2.5,
+    difficulty: "Medium",
+    healthScore: 9,
+    dateAdded: "2026-10-18",
+    blurb: "My spin on a pumpkin spice latte that actually fits the diet. Tastes like cheating."
   },
   {
     id: "zooper-dooper-protein-pops",
@@ -131,7 +235,7 @@ const RECIPES = [
     chip: "Zooper Dooper Protein Pops",
     image: "recipe-img/zooper-dooper-protein-pops.jpg",
     title: "Zooper Dooper Protein Pops",
-    desc: "A clever reseal hack that turns Zooper Doopers into high-protein ice pops — pour most of the juice out, pipe in a cottage cheese and Greek yoghurt base, then heat-seal the tube shut with a hair straightener. Two methods below: a soft-serve swirl version using the Ninja Creami, or a fast, no-pre-freeze blender version. Makes ~8–10 resealed tubes, about 55–60 kcal and 5.5–6g protein each.",
+    desc: "A bit of a project but the kids, and the adults, go wild for these. Pour most of the juice out, pipe in a cottage cheese and yoghurt base, then heat-seal the tube shut with a hair straightener. Two methods below: a soft-serve swirl version using the Ninja Creami, or a fast, no-pre-freeze blender version. Makes ~8–10 resealed tubes, about 55–60 kcal and 5.5–6g protein each.",
     ingredients: ["200g low-fat cottage cheese (adds casein for a creamy, slow-melting texture)", "200g low-fat Greek yoghurt (Chobani Fit, YoPRO, or plain low-fat)", "50–75ml unsweetened almond milk (a light splash to loosen the blend)", "1.5–2 tbsp honey (~30g, or adjust to taste)", "1 tsp vanilla extract", "Small pinch of salt (balances the tang and brings out the honey/vanilla)", "8–10 Zooper Dooper tubes (snip the top, pour out ~75% of the liquid, leaving the bottom 25% for flavor contrast)"],
     instructions: [
       "Method 1 — Ninja Creami Route (soft-serve swirl texture, best for an ultra-smooth, aerated mouthfeel before re-freezing):",
@@ -145,7 +249,16 @@ const RECIPES = [
       "3. Wipe and Heat-Seal: Wipe any excess liquid from the top inside seal with paper towel — this is crucial, as it won't fuse if wet. Clamp the dry plastic edge with the hair straightener for 3–5 seconds until heat-fused shut.",
       "4. Freeze Solid: Shake gently to settle the mixture into the remaining Zooper Dooper juice, then lay flat or stand upright in the freezer for 4–6 hours until completely frozen."
     ],
-    macros: [["55–60", "kcal"], ["5.5–6g", "Protein"], ["7g", "Carbs"], ["0.6–0.8g", "Fat"]]
+    macros: [["55–60", "kcal"], ["5.5–6g", "Protein"], ["7g", "Carbs"], ["0.6–0.8g", "Fat"]],
+    kcal: 57.5,
+    protein: 5.75,
+    fibre: 0,
+    carbs: 7,
+    fat: 0.7,
+    difficulty: "Hard",
+    healthScore: 6,
+    dateAdded: "2026-10-20",
+    blurb: "A bit of a project but the kids (and the adults) go wild for these. Worth doing a big batch at once. A real easy, low cal treat."
   },
   {
     id: "blackberry-magnesium-smoothie",
@@ -153,10 +266,19 @@ const RECIPES = [
     chip: "Blackberry Magnesium Smoothie",
     image: "recipe-img/blackberry-magnesium-smoothie.jpg",
     title: "Blackberry Magnesium Smoothie",
-    desc: "An all-natural, seed-and-berry smoothie built around magnesium and recovery, not just protein. Pepitas, chia, cottage cheese, Greek yoghurt, and egg whites bring the protein, while frozen blackberries add fibre and a serious anthocyanin dose. Magnesium: about 250mg per serve (roughly 60% of a typical daily target) — 170mg from the pepitas, 40mg from the chia, 20mg from the blackberries. Inflammation support: Cyanidin-3-glucoside from the blackberries is a powerful anthocyanin that helps blunt exercise-induced oxidative stress and down-regulate COX-2 enzymes; the chia contributes roughly 2,100mg of plant omega-3 (ALA) to counter systemic pro-inflammatory eicosanoids; and the combined zinc (over 2.3mg) and magnesium support muscle relaxation and tissue repair without the gut issues some magnesium supplements cause.",
+    desc: "Same magnesium hit as my other smoothie, different berries, different mood. About 250mg of magnesium a serve, mostly from the pepitas and chia, plus a serious dose of anthocyanins from the blackberries that help take the edge off post-training inflammation.",
     ingredients: ["30g pumpkin seeds (pepitas)", "12g chia seeds", "50g pasteurized liquid egg whites", "100g low-fat cottage cheese", "50g low-fat Greek yoghurt", "100g frozen blackberries", "~120ml unsweetened almond milk (a splash to blend)", "3–4 ice cubes"],
     instructions: ["Blend the pumpkin seeds, chia seeds, and almond milk on high for 30–45 seconds first, so the seeds fully break down before anything else goes in.", "Add the cottage cheese, Greek yoghurt, egg whites, frozen blackberries, and ice, then blend again until smooth and aerated.", "Taste and adjust — add a touch more almond milk if it's too thick, or a few extra blackberries for more tartness."],
-    macros: [["430", "kcal"], ["35.7g", "Protein"], ["24.9g", "Carbs (11.2g fiber)"], ["22.2g", "Fat"]]
+    macros: [["430", "kcal"], ["35.7g", "Protein"], ["24.9g", "Carbs (11.2g fiber)"], ["22.2g", "Fat"]],
+    kcal: 430,
+    protein: 35.7,
+    fibre: 11.2,
+    carbs: 24.9,
+    fat: 22.2,
+    difficulty: "Easy",
+    healthScore: 9,
+    dateAdded: "2026-10-21",
+    blurb: "Same magnesium hit as the other smoothie, different berries, different mood. Also helps with inflammation."
   },
   {
     id: "quick-set-chia-seed-wraps",
@@ -164,7 +286,7 @@ const RECIPES = [
     chip: "Quick-Set Chia Seed Wraps",
     image: "recipe-img/quick-set-chia-seed-wraps.jpg",
     title: "Quick-Set Chia Seed Wraps",
-    desc: "Yield: 2 pliable wraps. Prep time: 3 minutes. Bake time: ~30 minutes. Equipment: heatproof bowl or bullet blender cup; bullet blender (or stick blender); large flat baking tray; non-stick baking paper (2 sheets: one base sheet and one top sheet); flat plate, bench scraper, or rolling pin (optional, for pressing).",
+    desc: "Four ingredients, that's it. I've been making these on repeat since I figured out the bake time. Yield: 2 pliable wraps. Prep time: 3 minutes. Bake time: ~30 minutes. Equipment: heatproof bowl or bullet blender cup; bullet blender (or stick blender); large flat baking tray; non-stick baking paper (2 sheets: one base sheet and one top sheet); flat plate, bench scraper, or rolling pin (optional, for pressing).",
     ingredients: ["50 g whole chia seeds", "210 ml boiling water", "¼ tsp fine salt (adjust to taste)", "½ tsp chili flakes (adjust to taste)"],
     instructions: [
       "1. Flash-Hydrate: Place the 50 g chia seeds, salt, and chili flakes into a heatproof container. Pour in the 210 ml boiling water. Stir thoroughly for 30 to 45 seconds to distribute the seeds evenly, then let rest for 2 minutes until a thick, loose gel forms.",
@@ -175,7 +297,16 @@ const RECIPES = [
       "6. Rest & Peel: Remove the tray from the oven and let sit for 2 to 3 minutes so residual steam releases. Gently peel the base baking paper away from each wrap. Fill and roll while warm, or store between parchment squares in an airtight container.",
       "Bake Time Note: Actual bake time depends heavily on your specific oven. Because oven temperatures and heat distribution are often inconsistent, keep monitoring around the 25-minute mark to ensure the edges don't over-crisp before the center dries out."
     ],
-    macros: [["122", "kcal"], ["4.2g", "Protein"], ["10.6g", "Carbs (8.6g fiber, 2.0g net carbs)"], ["7.7g", "Fat"]]
+    macros: [["122", "kcal"], ["4.2g", "Protein"], ["10.6g", "Carbs (8.6g fiber, 2.0g net carbs)"], ["7.7g", "Fat"]],
+    kcal: 122,
+    protein: 4.2,
+    fibre: 8.6,
+    carbs: 10.6,
+    fat: 7.7,
+    difficulty: "Medium",
+    healthScore: 10,
+    dateAdded: "2026-10-23",
+    blurb: "One ingredient, practically zero carbs, just fibre. Once you've got a good filling inside it, it fills you up, let me tell you that."
   },
   {
     id: "chia-oats-bowl",
@@ -183,7 +314,7 @@ const RECIPES = [
     chip: "Chia Oats Bowl",
     image: "recipe-img/chia-oats-bowl.jpg",
     title: "Chia Oats Bowl",
-    desc: "A 100% whole, natural-food overnight chia and oats bowl, made in batches of three. Blend the wet ingredients, stir in the oats and chia, divide into containers, then top with blackberries and a drizzle of honey. Per container: ~540 kcal, 40.1g protein, 60.1g carbs (17.7g fiber, 42.4g net carbs), 15.3g fat, ~165mg magnesium.",
+    desc: "100% whole food, nothing fancy. I prep three at a time on a Sunday and I'm sorted for breakfast all week. Blend the wet ingredients, stir in the oats and chia, divide into containers, then top with blackberries and a drizzle of honey. Per container: ~540 kcal, 40.1g protein, 60.1g carbs (17.7g fiber, 42.4g net carbs), 15.3g fat, ~165mg magnesium.",
     ingredients: ["90g rolled oats (30g per container)", "90g chia seeds (30g per container)", "270g low-fat Greek yoghurt (90g per container)", "270g pasteurized liquid egg whites (90g per container)", "270g low-fat cottage cheese (90g per container)", "120ml unsweetened almond milk (40ml per container)", "45g honey, to drizzle (15g per container)", "240g blackberries, about 2 standard 125g punnets (80g per container)"],
     instructions: [
       "Blend the wet ingredients: add the Greek yoghurt, liquid egg whites, cottage cheese, and almond milk to a blender and blend until smooth.",
@@ -191,6 +322,15 @@ const RECIPES = [
       "Divide the mixture evenly into three containers (about 445g each) and refrigerate for at least a few hours, or overnight, until the chia and oats have absorbed the liquid and set to a thick, pudding-like texture.",
       "When ready to eat, top each container with blackberries and a drizzle of honey."
     ],
-    macros: [["540", "kcal"], ["40.1g", "Protein"], ["60.1g", "Carbs (17.7g fiber, 42.4g net carbs)"], ["15.3g", "Fat"]]
+    macros: [["540", "kcal"], ["40.1g", "Protein"], ["60.1g", "Carbs (17.7g fiber, 42.4g net carbs)"], ["15.3g", "Fat"]],
+    kcal: 540,
+    protein: 40.1,
+    fibre: 17.7,
+    carbs: 60.1,
+    fat: 15.3,
+    difficulty: "Easy",
+    healthScore: 10,
+    dateAdded: "2026-10-25",
+    blurb: "100% whole food, nothing fancy. I prep three at a time. Sometimes I switch out the blackberries for strawberries."
   }
 ];
