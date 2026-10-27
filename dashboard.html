@@ -161,10 +161,16 @@
   .recipe-card .name { padding: 10px 12px 12px; font-weight: 700; font-size: 13px; line-height: 1.35; }
   .recipe-hero { width: 100%; max-height: 420px; object-fit: cover; border-radius: 18px; margin-bottom: 22px; display: block; }
   .recipe-actions { display: flex; gap: 10px; margin-bottom: 20px; }
-  .recipe-macros { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0 24px; }
-  .recipe-macro { background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 16px; text-align: center; min-width: 70px; }
-  .recipe-macro .val { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--green); }
-  .recipe-macro .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .recipe-macros { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0 24px; }
+  .recipe-macro { background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; text-align: center; flex: 1 1 100px; min-width: 100px; }
+  .recipe-macro .val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--green); white-space: nowrap; }
+  .recipe-macro .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  @media (max-width: 480px) {
+    .recipe-macros { gap: 10px; }
+    .recipe-macro { flex: 1 1 calc(50% - 10px); min-width: 0; padding: 14px 10px; }
+    .recipe-macro .val { font-size: 24px; }
+    .recipe-macro .lbl { font-size: 13px; }
+  }
   .recipe-section h4 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.5px; margin: 18px 0 8px; }
   .recipe-section ul, .recipe-section ol { padding-left: 20px; font-size: 14px; line-height: 1.8; }
 
@@ -209,6 +215,7 @@
 
   /* Rating */
   .rating-block { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .rating-label { font-size: 12px; font-weight: 700; color: var(--text); }
   .rating-stars { display: inline-flex; gap: 2px; }
   .rating-stars .star { font-size: 22px; color: var(--border); cursor: pointer; line-height: 1; }
   .rating-stars .star.filled { color: var(--green); }
@@ -527,9 +534,11 @@
     <img class="recipe-hero" id="recipe-hero" alt="" hidden>
     <h1 class="page-title" id="recipe-title"></h1>
     <p class="page-sub" id="recipe-desc"></p>
+    <div id="recipe-badges"></div>
     <div class="recipe-macros" id="recipe-macros"></div>
 
     <div class="rating-block">
+      <span class="rating-label">Rate this recipe</span>
       <div class="rating-stars" id="rating-stars"></div>
       <span class="rating-summary" id="rating-summary"></span>
     </div>
@@ -699,6 +708,28 @@ document.getElementById("recipe-filters-clear").addEventListener("click", () => 
   renderRecipeChips();
 });
 
+function fmtNum(n) {
+  if (n === undefined || n === null) return "-";
+  const rounded = Math.round(n * 10) / 10;
+  return (rounded % 1 === 0) ? String(Math.round(rounded)) : String(rounded);
+}
+function macroTilesHTML(r) {
+  const tiles = [
+    [fmtNum(r.kcal), "Kcal"],
+    [fmtNum(r.protein) + "g", "Protein"],
+    [fmtNum(r.carbs) + "g", "Carbs"],
+    [fmtNum(r.fibre) + "g", "Fibre"],
+    [fmtNum(r.fat) + "g", "Fat"]
+  ];
+  return tiles.map(m => `<div class="recipe-macro"><div class="val">${m[0]}</div><div class="lbl">${m[1]}</div></div>`).join("");
+}
+function badgeRowHTML(r) {
+  return `<div class="badge-row" style="padding:0;margin-bottom:16px;">
+    <span class="mini-badge">${escapeHtml(r.difficulty || "")}</span>
+    <span class="mini-badge">Health ${r.healthScore || "-"}/10</span>
+  </div>`;
+}
+
 function openRecipe(id) {
   const r = RECIPES.find(x => x.id === id);
   if (!r) return;
@@ -708,9 +739,8 @@ function openRecipe(id) {
   else { hero.removeAttribute("src"); hero.hidden = true; }
   document.getElementById("recipe-title").textContent = r.title;
   document.getElementById("recipe-desc").textContent = r.desc;
-  document.getElementById("recipe-macros").innerHTML = r.macros.map(m => `
-    <div class="recipe-macro"><div class="val">${m[0]}</div><div class="lbl">${m[1]}</div></div>
-  `).join("");
+  document.getElementById("recipe-badges").innerHTML = badgeRowHTML(r);
+  document.getElementById("recipe-macros").innerHTML = macroTilesHTML(r);
   document.getElementById("recipe-ingredients").innerHTML = r.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("");
   document.getElementById("recipe-instructions").innerHTML = r.instructions.map(i => `<li>${escapeHtml(i)}</li>`).join("");
   const blurbBox = document.getElementById("stefan-blurb");
@@ -808,7 +838,8 @@ function renderRecipeBook() {
       ${r.image ? `<img class="recipe-hero" src="${escapeHtml(r.image)}" alt="${escapeHtml(r.title)}">` : ""}
       <h2>${escapeHtml(r.title)}</h2>
       <p class="page-sub">${escapeHtml(r.desc)}</p>
-      <div class="recipe-macros">${r.macros.map(m => `<div class="recipe-macro"><div class="val">${m[0]}</div><div class="lbl">${m[1]}</div></div>`).join("")}</div>
+      ${badgeRowHTML(r)}
+      <div class="recipe-macros">${macroTilesHTML(r)}</div>
       ${r.blurb ? `<div class="stefan-blurb"><div class="lbl">A word from Stefan</div><p>${escapeHtml(r.blurb)}</p></div>` : ""}
       <div class="recipe-section"><h4>Ingredients</h4><ul>${r.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ul></div>
       <div class="recipe-section"><h4>Instructions</h4><ol>${r.instructions.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ol></div>
@@ -836,22 +867,28 @@ async function loadRatingFor(recipeId) {
   const starsEl = document.getElementById("rating-stars");
   const summaryEl = document.getElementById("rating-summary");
   renderStars(starsEl, 0, true, null);
-  summaryEl.textContent = "";
-  if (!sb) return;
+  summaryEl.textContent = "Loading…";
+  if (!sb) { summaryEl.textContent = "Ratings unavailable"; return; }
   try {
     const { data, error } = await sb.from("recipe_ratings").select("rating,email").eq("recipe_id", recipeId);
-    if (error) { console.error("Rating load failed:", error); return; }
+    if (error) {
+      console.error("Rating load failed:", error);
+      summaryEl.textContent = "Ratings coming soon";
+      return;
+    }
     const ratings = (data || []).map(r => r.rating);
     const avg = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
-    summaryEl.textContent = ratings.length ? `${avg.toFixed(1)} / 5 · ${ratings.length} rating${ratings.length === 1 ? "" : "s"}` : "No ratings yet";
     const mine = currentUser && currentUser.email ? data.find(r => r.email === currentUser.email.toLowerCase().trim()) : null;
     if (currentUser) {
       renderStars(starsEl, mine ? mine.rating : 0, false, (val) => submitRating(recipeId, val));
+      summaryEl.textContent = ratings.length ? `${avg.toFixed(1)} / 5 · ${ratings.length} rating${ratings.length === 1 ? "" : "s"}` : "No ratings yet, be the first";
     } else {
       renderStars(starsEl, avg, true, null);
+      summaryEl.textContent = ratings.length ? `${avg.toFixed(1)} / 5 · ${ratings.length} rating${ratings.length === 1 ? "" : "s"}` : "No ratings yet";
     }
   } catch (err) {
     console.error("Rating load failed:", err);
+    summaryEl.textContent = "Ratings coming soon";
   }
 }
 async function submitRating(recipeId, val) {
