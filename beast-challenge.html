@@ -292,18 +292,6 @@ function streaks(){
   while(d>=1&&logged(d)){cur++;d--}
   return {cur,best};
 }
-function estChange(){
-  if(!S.tracked.includes("calories"))return null;
-  const last=finished()?30:currentDay()-1;let bal=0,days=0;
-  for(let d=1;d<=last;d++){const l=S.logs[d];if(!l||!l.kcal.length)continue; // today is left out until it's finished
-    const extra=(l.steps!=null?(l.steps-S.stepsBaseline)*S.kg*0.00057:0)+l.workouts.length*WORKOUT_KCAL;
-    bal+=kcalTotal(l)-(S.maint+extra);days++}
-  return {kg:bal/7700,days};
-}
-function estHTML(){const e=estChange();if(!e)return"";
-  if(!e.days)return `<div class="est"><span>Log calories for a full day to see your estimated weight change.</span></div>`;
-  const v=Math.abs(e.kg);
-  return `<div class="est"><span>Estimated change from ${e.days} ${e.days===1?"day":"days"} of logged calories and steps. Only as accurate as your logging; the scale also moves with water.</span><b>${v<0.05?"±0.0":(e.kg<=0?"−":"+")+v.toFixed(1)} kg</b></div>`}
 function kmWalked(){let t=0;for(let d=1;d<=30;d++){const l=S.logs[d];if(l)t+=l.steps||0}return t*M_PER_STEP/1000}
 
 // ---------- data ----------
@@ -444,8 +432,8 @@ function vToday(){
   const st=streaks();
   return `<div class="panel">
     <div class="hello"><div><div class="label">Day ${cd} of 30 · ${st.cur}-day streak</div><h2>Hey ${esc(S.name)}</h2></div><div class="score">${dayScore(logDay)}<small>/100</small></div></div>
+    <p class="note">Log each habit below as you go — steps, workouts, protein, water, sleep and staying alcohol-free — and your score for the day updates automatically.</p>
     ${S.why?`<div class="why">"${esc(S.why)}"</div>`:""}
-    ${estHTML()}
   </div>
   ${S.tracked.includes("steps")?signHTML():""}
   ${finished()?"":`<div class="panel"><div class="label">Log ${logDay===cd?"today":dayLabel(logDay,cd).toLowerCase()}</div>
@@ -475,7 +463,6 @@ function vProgress(){
    <div class="stat"><b>${workouts}</b><span>workouts</span></div>
    <div class="stat"><b>${prot}</b><span>protein days</span></div>
    <div class="stat"><b>${alc}</b><span>alcohol-free days</span></div></div>
-   ${estHTML()}
    ${communityKm?`<div class="community">Together, everyone in the Beast Challenge has walked <b>${fmt(communityKm)} km</b>.</div>`:""}</div>
   <div class="panel"><div class="label">${finished()?"Your 30-day":"Week "+Math.min(4,Math.ceil(cd/7))} share card</div><canvas id="card" width="1080" height="1920" aria-label="Share card preview"></canvas>
    <button class="btn" id="share">Share to story</button><p class="note">Your weight never appears on the card.</p></div>`;
