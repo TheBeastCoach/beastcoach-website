@@ -13,6 +13,10 @@
       if (e.persisted) { window.location.reload(); }
     });
     try {
+      // Don't disturb the page while a Supabase auth link (password reset, email
+      // confirmation, magic link) is still being processed — a forced reload here
+      // can race the auth exchange and burn the one-time token before it's used.
+      if (/access_token=|refresh_token=|type=recovery|token_hash=|[?&]code=/.test(window.location.href)) { return; }
       fetch('/version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (data) {
         var latest = data && data.version;
         if (!latest) return;
