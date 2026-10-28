@@ -1013,7 +1013,7 @@ signupForm.addEventListener("submit", async (e) => {
   } else if (data.session) {
     enterPortal(data.user);
   } else {
-    showStatus(authStatus, "Check your email to confirm your account, then log in.", false);
+    showStatus(authStatus, "Check your email to confirm your account, then log in. Can't find it? Check your spam/junk folder.", false);
   }
 });
 
@@ -1050,7 +1050,7 @@ forgotForm.addEventListener("submit", async (e) => {
   if (error) {
     showStatus(forgotStatus, error.message || "Something went wrong.", true);
   } else {
-    showStatus(forgotStatus, "Check your email for a link to reset your password.", false);
+    showStatus(forgotStatus, "Check your email for a link to reset your password. Can't find it? Check your spam/junk folder.", false);
   }
 });
 

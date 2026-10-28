@@ -675,7 +675,7 @@ function onboarding(){
       if(pw.length<6){msg.textContent="Use at least 6 characters for your password.";return false}
       const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{full_name:g("ob-fullname").value.trim()},emailRedirectTo:window.location.origin+"/beast-challenge"}});
       if(error){msg.textContent=error.message||"Couldn't create your account.";return false}
-      if(!data.session){msg.style.color="var(--sign)";msg.textContent="Check your email to confirm your account, then come back here and log in.";d.authMode="signin";return false}
+      if(!data.session){msg.style.color="var(--sign)";msg.textContent="Check your email to confirm your account, then come back here and log in. Can't find it? Check your spam/junk folder.";d.authMode="signin";return false}
       user=data.user;
     }else{
       const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
