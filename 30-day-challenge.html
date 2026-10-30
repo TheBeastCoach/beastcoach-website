@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  (function () {
+    // If this page is being restored from the browser's back/forward cache
+    // (bfcache), the network is bypassed entirely and nothing below runs, so
+    // a stale page could stay stale forever. Force a true reload whenever
+    // that happens.
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) { window.location.reload(); }
+    });
+    try {
+      // Don't disturb the page while a Supabase auth link (password reset, email
+      // confirmation, magic link) is still being processed. A forced reload here
+      // can race the auth exchange and burn the one-time token before it's used.
+      if (/access_token=|refresh_token=|type=recovery|token_hash=|[?&]code=/.test(window.location.href)) { return; }
+      fetch('/version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (data) {
+        var latest = data && data.version;
+        if (!latest) return;
+        var stored = localStorage.getItem('bc_site_version');
+        if (stored === latest) {
+          var url = new URL(window.location.href);
+          if (url.searchParams.has('_v')) {
+            url.searchParams.delete('_v');
+            window.history.replaceState({}, '', url.toString());
+          }
+          return;
+        }
+        localStorage.setItem('bc_site_version', latest);
+        if (stored !== null) {
+          var reloadUrl = new URL(window.location.href);
+          reloadUrl.searchParams.set('_v', latest);
+          window.location.replace(reloadUrl.toString());
+        }
+      }).catch(function () {});
+    } catch (e) {}
+  })();
+  </script>
+<title>Beast Challenge | Free 30 Day Challenge | Beast Coach</title>
+<meta name="description" content="A free 30 day challenge. Walk a real route from city to city, log a few simple habits and build a streak you can see.">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F9F8; --surface:#FFFFFF; --ink:#1B2E24; --muted:#707973; --line:#E4E8E6;
+  --sign:#2D6A4F; --sign-ink:#FFFFFF; --accent:#52B788;
+  --good:#2D6A4F; --soft:#EAF1ED; --deep:#1B3022;
+  --display:"Bebas Neue","Arial Narrow",Impact,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-synthesis:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+a{color:inherit}
+p{margin:0}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;letter-spacing:.03em}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.nav{position:sticky;top:0;z-index:15;background:rgba(27,46,36,0.97);border-bottom:1px solid rgba(255,255,255,0.08);padding-top:env(safe-area-inset-top,0px)}
+.nav-inner{max-width:560px;margin:0 auto;height:58px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.nav-logo{font-family:var(--display);font-size:24px;letter-spacing:2px;color:#fff;text-decoration:none}
+.nav-logo span{color:var(--accent)}
+
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.note{font-size:14.5px;color:var(--muted)}
+
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:10px 14px;font:700 14px var(--body);cursor:pointer;white-space:nowrap;text-align:center;text-decoration:none;display:inline-block}
+.btn.accent{background:var(--sign);color:#FFFFFF}
+.btn.big{padding:14px 18px;font-size:16px}
+.btn.light{background:var(--accent);color:var(--deep)}
+.btn.alt{background:var(--soft);color:var(--ink)}
+
+.hero{background:var(--deep);color:var(--sign-ink);border-radius:16px;padding:22px 20px;display:flex;flex-direction:column;gap:12px}
+.hero .eyebrow{font-family:var(--display);letter-spacing:.12em;text-transform:uppercase;font-size:16px;opacity:.85}
+.hero h1{font-size:52px;line-height:.95;text-transform:uppercase}
+.hero p{font-size:17px;max-width:34ch}
+.hero .btn{align-self:flex-start}
+
+.road{height:14px;border-radius:7px;background:rgba(255,255,255,.22);position:relative;overflow:hidden}
+.road i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:7px}
+.road::after{content:"";position:absolute;left:0;right:0;top:6px;border-top:2px dashed rgba(255,255,255,.55)}
+
+/* Sample day (looks like the real Today screen, but it is only a picture) */
+.preview{cursor:pointer;position:relative}
+.preview .ribbon{position:absolute;top:-10px;right:14px;background:var(--accent);color:var(--deep);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 10px}
+.hello{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.hello h2{font-size:30px;line-height:1.05}
+.score{font-family:var(--display);font-size:44px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.score small{font-size:18px;color:var(--muted)}
+.sign{background:var(--sign);color:var(--sign-ink);border-radius:12px;padding:14px 16px;border:3px solid var(--sign-ink);box-shadow:0 0 0 2px var(--sign);display:flex;flex-direction:column;gap:10px}
+.sign .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sign .dest{font-family:var(--display);font-size:22px;line-height:1.1;min-width:0;letter-spacing:.03em}
+.sign .km{font-family:var(--display);font-size:28px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sign .sub{font-size:14px;opacity:.9}
+.item{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.item .name{font-weight:600}
+.item .meta{font-size:14.5px;color:var(--muted);grid-column:1/-1}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.pill.hit{background:var(--good);color:var(--surface)}
+.pill.miss{background:var(--soft);color:var(--muted)}
+
+/* Routes */
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filters button{flex:0 1 auto;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 13px;font:600 13px var(--body);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--sign);color:#FFFFFF;border-color:var(--sign)}
+.routes{display:flex;flex-direction:column;gap:8px}
+.route{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer;text-align:left;color:var(--ink);font:500 15px var(--body)}
+.route b{font-variant-numeric:tabular-nums;font-family:var(--display);font-weight:400;font-size:18px;white-space:nowrap}
+.route .rh{display:block;font-size:14px;font-weight:500;color:var(--muted);margin-top:2px}
+.more{align-self:flex-start}
+
+/* Meals */
+.meals{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.meal{border-radius:12px;overflow:hidden;background:var(--bg);border:1px solid var(--line);cursor:pointer;text-align:left;padding:0;color:var(--ink);font:inherit}
+.meal img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.meal p{padding:8px 10px 10px;font-weight:600;font-size:14px;line-height:1.25}
+
+/* Content blocks */
+.how{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none;counter-reset:s}
+.how li{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start;counter-increment:s}
+.how li::before{content:counter(s);width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:var(--display);font-size:18px}
+.how b{display:block}
+.how span{color:var(--muted);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14px;background:var(--bg)}
+.badges{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.badge{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--ink);font-weight:600;text-align:center}
+.badge .disc{width:52px;height:52px;max-width:100%;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:22px;background:var(--sign);color:#FFFFFF;border:3px solid var(--accent)}
+.faq details{border-top:1px solid var(--line);padding:10px 0}
+.faq details:first-of-type{border-top:0}
+.faq summary{font-weight:600;cursor:pointer}
+.faq p{color:var(--muted);font-size:14px;margin-top:6px}
+.cta{background:var(--deep);color:#fff;border-radius:16px;padding:22px 20px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.cta h2{font-size:34px;line-height:1}
+.cta p{opacity:.9}
+.foot{text-align:center;font-size:14px;color:var(--muted)}
+.foot a{color:var(--sign);font-weight:700}
+
+/* Sign up prompt */
+.overlay{position:fixed;inset:0;background:rgba(17,26,20,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.overlay.visible{display:flex}
+.overlay-card{background:var(--surface);border-radius:18px;max-width:380px;width:100%;padding:26px 22px;text-align:center;display:flex;flex-direction:column;gap:10px}
+.overlay-card h3{font-size:28px;color:var(--deep)}
+.overlay-card p{color:var(--muted);font-size:15px;margin-bottom:6px}
+.overlay-card .btn{padding:14px}
+.overlay-card .later{background:none;border:0;color:var(--muted);font:600 14px var(--body);cursor:pointer;padding:6px}
+
+@media (max-width:480px){
+  .note,.sign .sub,.item .meta,.faq p{font-size:16.5px;line-height:1.55}
+  .route{font-size:16.5px}
+  .route .rh{font-size:14.5px}
+  .hero h1{font-size:46px}
+}
+@media (prefers-reduced-motion:no-preference){.road i{transition:width .6s ease}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">BEAST<span>COACH</span></a>
+    <a class="btn light" href="/beast-challenge?join">Join free</a>
+  </div>
+</nav>
+
+<main class="wrap"><div class="app">
+
+  <section class="hero">
+    <div class="eyebrow">Free · 30 days · Starts the day you join</div>
+    <h1>Beast<br>Challenge</h1>
+    <p>Walk a real route from city to city, log the few habits you pick, and build a streak you can actually see.</p>
+    <div class="road"><i style="width:38%"></i></div>
+    <a class="btn accent big" href="/beast-challenge?join">Start the challenge, free</a>
+  </section>
+
+  <div class="panel preview" id="preview" role="button" tabindex="0" aria-label="Sample day. Select to join the challenge.">
+    <span class="ribbon">Sample day</span>
+    <div class="label">What your day looks like</div>
+    <div class="hello"><div><div class="label">Day 12 of 30 · 11-day streak</div><h2>Hey Sam</h2></div><div class="score">67<small>/100</small></div></div>
+    <div class="sign" id="sample-sign"></div>
+    <div>
+      <div class="item"><div class="name">Steps</div><span class="pill hit">Done</span><div class="meta">10,214 of 10,000</div></div>
+      <div class="item"><div class="name">Workout</div><span class="pill hit">Done</span><div class="meta">Gym · Strength · 45 min</div></div>
+      <div class="item"><div class="name">Calories</div><span class="pill hit">Done</span><div class="meta">1,980 of 2,100 cal · on target</div></div>
+      <div class="item"><div class="name">Protein check</div><span class="pill hit">Done</span><div class="meta">Target 150 g</div></div>
+      <div class="item"><div class="name">Water</div><span class="pill miss">Not yet</span><div class="meta">6 of 8 glasses</div></div>
+      <div class="item"><div class="name">Sleep</div><span class="pill miss">Not yet</span><div class="meta">Ideal 7.5 h</div></div>
+    </div>
+    <p class="note">You pick which habits to log. Three or four is plenty to start.</p>
+  </div>
+
+  <div class="panel">
+    <div class="label">Walk somewhere real</div>
+    <p>10,000 steps is about 8 km, so around 240 km in 30 days. Pick a journey near you, from a weekend walk to an epic city to city trek.</p>
+    <div class="filters" id="region-filters" role="group" aria-label="Choose your region"></div>
+    <div class="routes" id="route-list"></div>
+    <button class="btn alt more" id="route-more" type="button" hidden></button>
+    <p class="note">Short routes you can finish. Longer ones are epic journeys, and you cover as much of the way as you can. Distances are approximate.</p>
+  </div>
+
+  <div class="panel" id="meals-panel" hidden>
+    <div class="label">Meal ideas</div>
+    <p>Simple, high protein ideas for breakfast, lunch, dinner and snacks, including recipes straight from Stefan.</p>
+    <div class="meals" id="meal-grid"></div>
+  </div>
+
+  <div class="panel"><div class="label">How it works</div>
+   <ol class="how">
+    <li><div><b>Tell us a bit about you</b><span>Age, height, weight and your day. We work out your calories and protein for you.</span></div></li>
+    <li><div><b>Pick what you'll log</b><span>Three or four things to start. Steps, workouts, calories, protein, water, sleep, alcohol-free days.</span></div></li>
+    <li><div><b>Log in seconds each day</b><span>Forgot a day? You can catch up on yesterday and the day before.</span></div></li>
+    <li><div><b>Watch it add up</b><span>Your route fills, your streak grows, and you get a card to share each week.</span></div></li>
+   </ol></div>
+
+  <div class="panel"><div class="label">What you can log</div>
+   <div class="chips"><span>Steps</span><span>Workout</span><span>Calories</span><span>Protein check</span><span>Water</span><span>Sleep</span><span>Alcohol-free day</span></div></div>
+
+  <div class="panel"><div class="label">Streak badges</div>
+   <div class="badges"><div class="badge"><div class="disc">3</div>3 days</div><div class="badge"><div class="disc">7</div>7 days</div><div class="badge"><div class="disc">14</div>14 days</div><div class="badge"><div class="disc">21</div>21 days</div><div class="badge"><div class="disc">30</div>30 days</div></div>
+   <p class="note">Earned for logging days in a row. Badges show on your share card.</p></div>
+
+  <div class="panel faq"><div class="label">Questions</div>
+   <details><summary>Is it really free?</summary><p>Yes, always free. No card needed to join, nothing to cancel. The $5 coffee inside the challenge is entirely optional and never obligated.</p></details>
+   <details><summary>I've never tracked anything. Is this for me?</summary><p>Yes. Start with three easy things and add more when you're ready.</p></details>
+   <details><summary>Who can see my logs?</summary><p>Only you. Your logs are private to your account.</p></details>
+   <details><summary>What if I miss a day?</summary><p>Log it the next day or the day after. If you miss longer, keep going. The challenge doesn't reset.</p></details>
+   <details><summary>Do I have to finish the whole route?</summary><p>No. Short routes you can finish in 30 days. The longer city to city journeys are epic, so you simply cover as much of the way as you can.</p></details>
+  </div>
+
+  <section class="cta">
+    <h2>Ready when you are</h2>
+    <p>Free, takes about a minute to set up, and starts the day you join.</p>
+    <a class="btn light big" href="/beast-challenge?join">Start the challenge, free</a>
+  </section>
+
+  <p class="foot">Already started? <a href="/beast-challenge">Open my challenge</a></p>
+  <p class="note" style="text-align:center">General information, not medical advice.</p>
+
+</div></main>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+  <div class="overlay-card">
+    <h3 id="overlay-title">Join the challenge</h3>
+    <p>Start your free 30 days to pick your route, log your habits and watch your streak build. It takes about a minute to set up.</p>
+    <a class="btn accent big" href="/beast-challenge?join">Start the challenge, free</a>
+    <button class="later" id="overlay-close" type="button">Maybe later</button>
+  </div>
+</div>
+
+<script src="recipes.js"></script>
+<script src="challenge-routes.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = n => Number(n).toLocaleString("en-US");
+const SHOW_FIRST = 8;
+let region = detectRegion(), showAll = false;
+
+function detectRegion() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    if (tz.startsWith("Australia")) return "Australia";
+    if (tz.startsWith("Africa/Johannesburg")) return "South Africa";
+    if (tz === "Europe/London") return "UK";
+    if (/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Montreal|Regina|St_Johns)/.test(tz)) return "Canada";
+    if (tz.startsWith("America")) return "US";
+  } catch (e) {}
+  return "Australia";
+}
+
+function openPrompt() { $("overlay").classList.add("visible"); $("overlay-close").focus(); }
+function closePrompt() { $("overlay").classList.remove("visible"); }
+$("overlay-close").addEventListener("click", closePrompt);
+$("overlay").addEventListener("click", e => { if (e.target.id === "overlay") closePrompt(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePrompt(); });
+
+// Sample day card: shows the visitor's own region, 12 days in at 10,000 steps a day
+function renderSample() {
+  const r = ROUTES[defaultRoute(region)];
+  const km = r[2], done = Math.min(km, Math.round(ROUTE_DAY_KM * 12));
+  $("sample-sign").innerHTML =
+    `<div class="row"><div class="dest">${esc(r[1])}</div><div class="km">${done}<span style="font-size:18px;opacity:.8"> / ${km} km</span></div></div>
+     <div class="road"><i style="width:${(done / km * 100).toFixed(1)}%"></i></div>
+     <div class="sub">Every step moves you along the road · approx. distances</div>`;
+}
+$("preview").addEventListener("click", openPrompt);
+$("preview").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPrompt(); } });
+
+function renderRoutes() {
+  $("region-filters").innerHTML = ROUTE_REGIONS.map(g =>
+    `<button type="button" data-region="${esc(g)}" aria-pressed="${g === region}">${esc(g)}</button>`).join("");
+  $("region-filters").querySelectorAll("[data-region]").forEach(b => b.addEventListener("click", () => {
+    region = b.getAttribute("data-region"); showAll = false; renderSample(); renderRoutes();
+  }));
+  const list = ROUTES.filter(r => r[0] === region);
+  const shown = showAll ? list : list.slice(0, SHOW_FIRST);
+  $("route-list").innerHTML = shown.map(r =>
+    `<div class="route" role="button" tabindex="0"><span>${esc(r[1])}<small class="rh">${esc(routeHint(r[2]))}</small></span><b>${fmt(r[2])} km</b></div>`).join("");
+  $("route-list").querySelectorAll(".route").forEach(el => {
+    el.addEventListener("click", openPrompt);
+    el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPrompt(); } });
+  });
+  const more = $("route-more");
+  if (list.length > SHOW_FIRST) {
+    more.hidden = false;
+    more.textContent = showAll ? "Show fewer routes" : "Show all " + list.length + " routes";
+  } else more.hidden = true;
+}
+$("route-more").addEventListener("click", () => { showAll = !showAll; renderRoutes(); });
+
+// Meal ideas: Stefan's recipes that already have a photo (comes straight from recipes.js)
+function renderMeals() {
+  const withPhoto = (typeof RECIPES !== "undefined" ? RECIPES : []).filter(r => r.image).slice(0, 4);
+  if (!withPhoto.length) return;
+  $("meals-panel").hidden = false;
+  $("meal-grid").innerHTML = withPhoto.map(r =>
+    `<button class="meal" type="button"><img src="${esc(r.image)}" alt="${esc(r.title)}" loading="lazy"><p>${esc(r.chip || r.title)}</p></button>`).join("");
+  $("meal-grid").querySelectorAll(".meal").forEach(b => b.addEventListener("click", openPrompt));
+}
+
+renderSample();
+renderRoutes();
+renderMeals();
+</script>
+</body>
+</html>
