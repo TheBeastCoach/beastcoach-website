@@ -81,7 +81,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{ou
 .sign .dest{font-family:var(--display);font-size:22px;line-height:1.1;min-width:0;letter-spacing:.03em}
 .sign .km{font-family:var(--display);font-size:28px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .road{height:14px;border-radius:7px;background:rgba(255,255,255,.22);position:relative;overflow:hidden}
-.road i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:7px}
+.road i{position:absolute;inset:0 auto 0 0;background:#F59E0B;border-radius:7px}
 .road::after{content:"";position:absolute;left:0;right:0;top:6px;border-top:2px dashed rgba(255,255,255,.55)}
 .sign .sub{font-size:14px;opacity:.9}
 .day-chips{display:flex;gap:6px;flex-wrap:wrap}
@@ -211,6 +211,8 @@ canvas{width:100%;max-width:270px;height:auto;border-radius:12px;display:block;m
 .lockbar b{display:block;font-size:16px}.lockbar span{font-size:14px;opacity:.85}
 .lockbar .lockbtns{display:flex;gap:8px}.lockbar .lockbtns .btn{flex:1}
 .restart p{font-size:14.5px;color:var(--muted)}
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.btn.tiny{padding:6px 12px;font-size:13px}
 .msg{font-size:14px;color:var(--err)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:40;max-width:calc(100% - 32px)}
 .modal{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 45%,transparent);display:grid;place-items:center;z-index:30;padding:16px;overflow-y:auto}
@@ -454,7 +456,8 @@ function vToday(){
   };
   const st=streaks();
   return `<div class="panel">
-    <div class="hello"><div><div class="label">Day ${cd} of 30 · ${st.cur}-day streak</div><h2>Hey ${esc(S.name)}</h2></div><div class="score">${dayScore(logDay)}<small>/100</small></div></div>
+    <div class="toprow"><div class="label">Day ${cd} of 30 · ${st.cur}-day streak</div><button class="btn alt tiny" data-restart-ask aria-label="Restart challenge">↺ Restart</button></div>
+    <div class="hello"><div><h2>Hey ${esc(S.name)}</h2></div><div class="score">${dayScore(logDay)}<small>/100</small></div></div>
     <p class="note">Log each habit below as you go — steps, workouts, protein, water, sleep and staying alcohol-free — and your score for the day updates automatically.</p>
     ${S.why?`<div class="why">"${esc(S.why)}"</div>`:""}
   </div>
@@ -604,7 +607,7 @@ function drawCard(c){
     x.fillStyle="#FFFFFF";x.textAlign="center";x.font=`400 130px ${D}`;x.fillText(String(earned),cx,cy+30);x.font=`400 40px ${D}`;x.fillText("DAY STREAK",cx,cy+82);x.textAlign="left"}
   if(S.tracked.includes("steps")){const [,name,km]=ROUTES[S.route];const done=Math.min(km,kmWalked());
     x.fillStyle="#FFFFFF";x.font=`600 46px ${B}`;x.fillText(name,80,720);
-    x.fillStyle="rgba(255,255,255,.18)";x.fillRect(80,760,920,40);x.fillStyle=acc;x.fillRect(80,760,920*done/km,40);
+    x.fillStyle="rgba(255,255,255,.18)";x.fillRect(80,760,920,40);x.fillStyle="#F59E0B";x.fillRect(80,760,920*done/km,40);
     x.fillStyle="#FFFFFF";x.font=`400 90px ${D}`;x.fillText(`${Math.round(done)} / ${km} km`,80,900);}
   const vals=Object.entries(S.logs).filter(([d])=>d>=1&&d<=30).map(([,l])=>l);
   const rows=[[`${st.cur}`,"day streak right now"],[`${Array.from({length:cd},(_,i)=>i+1).filter(logged).length} of ${cd}`,"days logged"],[vals.reduce((a,l)=>a+l.workouts.length,0),"workouts"],[vals.filter(l=>l.protein).length,"protein days"]];
