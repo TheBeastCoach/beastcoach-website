@@ -18,7 +18,7 @@ module.exports = async function handler(req, res) {
 
   const { email } = req.body || {};
 
-  const amountCents = 8900;
+  const amountCents = 2700;
 
   const params = new URLSearchParams();
   params.append('mode', 'payment');
