@@ -205,6 +205,12 @@ canvas{width:100%;max-width:270px;height:auto;border-radius:12px;display:block;m
 .calc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .calc .wide{grid-column:1/-1}
 .navrow{display:flex;gap:10px;justify-content:space-between}
+.ob .navrow{position:sticky;bottom:0;z-index:2;background:var(--bg);padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 12px -8px var(--bg)}
+.route .cur{display:inline-block;margin-left:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sign)}
+.lockbar{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--ink);color:var(--bg);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.lockbar b{display:block;font-size:16px}.lockbar span{font-size:14px;opacity:.85}
+.lockbar .lockbtns{display:flex;gap:8px}.lockbar .lockbtns .btn{flex:1}
+.restart p{font-size:14.5px;color:var(--muted)}
 .msg{font-size:14px;color:var(--err)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:40;max-width:calc(100% - 32px)}
 .modal{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 45%,transparent);display:grid;place-items:center;z-index:30;padding:16px;overflow-y:auto}
@@ -258,7 +264,7 @@ function calcTargets(p){
 function bmiNote(b){return b<18.5?"below the healthy range":b<25?"in the healthy range":b<30?"above the healthy range":"well above the healthy range"}
 
 // ---------- state ----------
-let user=null, S=null, page="loading", tab="today", logDay=null, mealFilter="all", communityKm=null;
+let user=null, S=null, page="loading", tab="today", logDay=null, mealFilter="all", communityKm=null, pendingRoute=null;
 const pad=n=>String(n).padStart(2,"0");
 const dateStr=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const parseDate=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
@@ -327,6 +333,21 @@ async function saveDay(d){
   if(error)return failed(error);
 }
 async function failed(err){console.error(err);toast("Couldn't save that. Check your connection and try again.");try{await loadLogs()}catch(e){}render()}
+// Begin Day 1 again today. Anything logged from today onwards is cleared; older days simply stop counting.
+async function restartChallenge(){
+  const today=todayDate();
+  const nums=Object.keys(S.logs).map(Number).filter(n=>dayDate(n)>=today);
+  const kIds=[],wIds=[];
+  nums.forEach(n=>{S.logs[n].kcal.forEach(x=>x.id&&kIds.push(x.id));S.logs[n].workouts.forEach(x=>x.id&&wIds.push(x.id))});
+  try{
+    if(kIds.length){const {error}=await sb.from("beast_challenge_calories").delete().in("id",kIds);if(error)throw error}
+    if(wIds.length){const {error}=await sb.from("beast_challenge_workouts").delete().in("id",wIds);if(error)throw error}
+    for(const n of nums){const {error}=await sb.from("beast_challenge_days").upsert({user_id:user.id,day:dateStr(dayDate(n)),steps:null,water:0,sleep:null,protein_hit:false,alcohol_free:false,updated_at:new Date().toISOString()});if(error)throw error}
+    const {error}=await sb.from("beast_challenge_profiles").update({start_date:dateStr(today),updated_at:new Date().toISOString()}).eq("user_id",user.id);
+    if(error)throw error;
+  }catch(err){mlayer.innerHTML="";return failed(err)}
+  mlayer.innerHTML="";S.start=today;S.logs={};await loadLogs();logDay=1;pendingRoute=null;tab="today";render();window.scrollTo(0,0);toast("Day 1. Here we go again.");
+}
 async function loadCommunity(){
   try{const {data,error}=await sb.rpc("beast_challenge_community_km");if(!error){communityKm=+data;if(page==="app"&&tab==="progress")render()}}catch(e){}
 }
@@ -443,11 +464,17 @@ function vToday(){
   <div class="day-chips">${chips}</div><div>${S.tracked.map(k=>parts[k]()).join("")}</div>
   <p class="note">You can log today and catch up on the two days before.</p></div>`}`;
 }
+function restartPanel(){return `<div class="panel restart"><div class="label">Start over</div><p>Want a fresh go? Restart begins Day 1 again today. Your route and targets stay the same.</p><button class="btn alt" data-restart-ask>Restart challenge</button></div>`}
 function vRoute(){
-  let h=`${signHTML()}<div class="panel"><div class="label">Pick your route · 10,000 steps a day ≈ 8 km</div><div class="routes">`;let last="";
+  if(pendingRoute===S.route)pendingRoute=null;
+  const sel=pendingRoute==null?S.route:pendingRoute;
+  let h=`${signHTML()}<div class="panel"><div class="label">Pick your route · 10,000 steps a day ≈ 8 km</div><p class="note">Tap a route, then lock it in.</p><div class="routes">`;let last="";
   ROUTES.forEach((r,i)=>{if(r[0]!==last){h+=`<div class="label region-h">${r[0]}</div>`;last=r[0]}
-    h+=`<button class="route" data-route="${i}" aria-pressed="${i===S.route}"><span>${r[1]}<small class="rh">${routeHint(r[2])}</small></span><b>${r[2]} km</b></button>`});
-  return h+`</div><p class="note">Distances are approximate. Progress carries over if you switch.</p></div>`;
+    h+=`<button class="route" data-route="${i}" aria-pressed="${i===sel}"><span>${r[1]}${i===S.route?'<span class="cur">Current</span>':""}<small class="rh">${routeHint(r[2])}</small></span><b>${r[2]} km</b></button>`});
+  h+=`</div><p class="note">Distances are approximate. Progress carries over if you switch.</p>`;
+  if(pendingRoute!=null){const [,pn,pk]=ROUTES[pendingRoute];
+    h+=`<div class="lockbar"><div><b>${pn}</b><span>${pk} km · ${routeHint(pk)}</span></div><div class="lockbtns"><button class="btn alt" data-route-cancel>Cancel</button><button class="btn accent" data-route-lock>Lock in route</button></div></div>`}
+  return h+`</div>${restartPanel()}`;
 }
 function vProgress(){
   const cd=currentDay();let cells="";
@@ -467,7 +494,7 @@ function vProgress(){
    <div class="stat"><b>${alc}</b><span>alcohol-free days</span></div></div>
    ${communityKm?`<div class="community">Together, everyone in the Beast Challenge has walked <b>${fmt(communityKm)} km</b>.</div>`:""}</div>
   <div class="panel"><div class="label">${finished()?"Your 30-day":"Week "+Math.min(4,Math.ceil(cd/7))} share card</div><canvas id="card" width="1080" height="1920" aria-label="Share card preview"></canvas>
-   <button class="btn" id="share">Share to story</button><p class="note">Your weight never appears on the card.</p></div>`;
+   <button class="btn" id="share">Share to story</button><p class="note">Your weight never appears on the card.</p></div>${restartPanel()}`;
 }
 function vMeals(){
   const F=[["all","All"],["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"],["snack","Snacks"],["smoothie","Smoothies"],["stefan","Stefan's recipes"]];
@@ -500,11 +527,18 @@ document.addEventListener("click",e=>{
 });
 function bindIntro(){screen.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>{if(S){go("app")}else onboarding()})}
 function bindApp(){
-  screen.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();if(tab==="progress")loadCommunity()});
+  screen.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;pendingRoute=null;render();if(tab==="progress")loadCommunity()});
   screen.querySelectorAll("[data-logday]").forEach(b=>b.onclick=()=>{logDay=+b.dataset.logday;render()});
-  screen.querySelectorAll("[data-route]").forEach(b=>b.onclick=async()=>{S.route=+b.dataset.route;render();
-    const {error}=await sb.from("beast_challenge_profiles").update({route:ROUTES[S.route][1],updated_at:new Date().toISOString()}).eq("user_id",user.id);
-    if(error)failed(error);else toast("Route changed")});
+  screen.querySelectorAll("[data-route]").forEach(b=>b.onclick=()=>{pendingRoute=+b.dataset.route;const y=window.scrollY;render();window.scrollTo(0,y)});
+  screen.querySelectorAll("[data-route-cancel]").forEach(b=>b.onclick=()=>{pendingRoute=null;const y=window.scrollY;render();window.scrollTo(0,y)});
+  screen.querySelectorAll("[data-route-lock]").forEach(b=>b.onclick=async()=>{
+    const i=pendingRoute;if(i==null)return;b.disabled=true;
+    const {error}=await sb.from("beast_challenge_profiles").update({route:ROUTES[i][1],updated_at:new Date().toISOString()}).eq("user_id",user.id);
+    if(error){b.disabled=false;return failed(error)}
+    S.route=i;pendingRoute=null;tab="today";render();window.scrollTo(0,0);toast(`Locked in: ${ROUTES[i][1]}`)});
+  screen.querySelectorAll("[data-restart-ask]").forEach(b=>b.onclick=()=>{
+    modal(`<h3 style="font-size:28px">Restart your challenge?</h3><p>This starts Day 1 again today and clears anything you've logged from today onwards. Your route and targets stay the same.</p><button class="btn accent" id="restart-yes">Yes, restart from Day 1</button>`);
+    document.getElementById("restart-yes").onclick=async e=>{e.currentTarget.disabled=true;await restartChallenge()}});
   screen.querySelectorAll("[data-delk]").forEach(b=>b.onclick=async()=>{const l=L(logDay);const [e]=l.kcal.splice(+b.dataset.delk,1);render();
     const {error}=await sb.from("beast_challenge_calories").delete().eq("id",e.id);if(error)failed(error)});
   screen.querySelectorAll("[data-delw]").forEach(b=>b.onclick=async()=>{const l=L(logDay);const [w]=l.workouts.splice(+b.dataset.delw,1);render();
@@ -514,10 +548,7 @@ function bindApp(){
     const canAdd=S.tracked.includes("calories")&&!finished()&&r.k>0;
     modal(`<div class="recipe" style="display:flex;flex-direction:column;gap:10px">${r.img?`<img src="${esc(r.img)}" alt="${esc(r.n)}">`:""}<h3 style="font-size:30px">${esc(r.n)}</h3>${r.d?`<p class="note">${esc(r.d)}</p>`:""}<div class="chips">${r.macros.map(m=>`<span>${esc(m.join(" "))}</span>`).join("")}</div><div class="label">Ingredients</div><ul>${r.i.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><div class="label">Method</div><ol>${r.s.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${canAdd?`<button class="btn" id="addmeal">Add ${r.k} cal to ${logDay===currentDay()?"today":"this day"}</button>`:""}</div>`);
     const a=document.getElementById("addmeal");if(a)a.onclick=async()=>{mlayer.innerHTML="";await addKcal(logDay,r.k)}});
-  screen.querySelectorAll("[data-restart]").forEach(b=>b.onclick=async()=>{
-    b.disabled=true;const {error}=await sb.from("beast_challenge_profiles").update({start_date:dateStr(todayDate()),updated_at:new Date().toISOString()}).eq("user_id",user.id);
-    if(error){b.disabled=false;return failed(error)}
-    S.start=todayDate();await loadLogs();logDay=1;tab="today";render();toast("Day 1. Here we go again.")});
+  screen.querySelectorAll("[data-restart]").forEach(b=>b.onclick=async()=>{b.disabled=true;await restartChallenge()});
   screen.querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{
     const d=logDay,l=L(d),a=b.dataset.act,v=id=>document.getElementById(id).value;
     if(a==="steps"){const n=+v("in-steps");if(v("in-steps")===""||!(n>=0&&n<=60000)){toast("Steps must be between 0 and 60,000");return}l.steps=Math.round(n);render();await saveDay(d);toast("Steps saved");return}
