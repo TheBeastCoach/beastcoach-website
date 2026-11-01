@@ -216,6 +216,11 @@
   .shopping-bar button.clear { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 12px; text-decoration: underline; cursor: pointer; font-family: 'Manrope', sans-serif; }
 
   /* Word from Stefan */
+  .recipe-notes p { font-size: 14px; line-height: 1.7; margin: 0 0 8px; }
+  .nutrient-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 6px; }
+  .nutrient-table th, .nutrient-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  .nutrient-table th { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+  .nutrient-cap { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
   .stefan-blurb { background: var(--off-white); border-left: 4px solid var(--green); border-radius: 10px; padding: 14px 18px; margin: 4px 0 20px; }
   .stefan-blurb .lbl { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--green); margin-bottom: 4px; }
   .stefan-blurb p { font-size: 14px; color: var(--text); line-height: 1.6; font-style: italic; }
@@ -499,6 +504,7 @@
         <button type="button" class="meal-pill" data-meal="dinner">Dinner</button>
         <button type="button" class="meal-pill" data-meal="snack">Snack</button>
         <button type="button" class="meal-pill" data-meal="smoothie">Smoothie</button>
+        <button type="button" class="meal-pill" data-meal="protein powder">Protein powder</button>
       </div>
       <details>
         <summary>More filters (calories, protein, fibre)</summary>
@@ -571,6 +577,7 @@
       <h4>Instructions</h4>
       <ol id="recipe-instructions"></ol>
     </div>
+    <div id="recipe-extra"></div>
   </section>
 
   <!-- ===================== SHOPPING LIST ===================== -->
@@ -735,6 +742,12 @@ function fmtNum(n) {
   const rounded = Math.round(n * 10) / 10;
   return (rounded % 1 === 0) ? String(Math.round(rounded)) : String(rounded);
 }
+function recipeExtraHTML(r) {
+  let h = "";
+  if (r.notes && r.notes.length) h += `<div class="recipe-section recipe-notes"><h4>Notes</h4>${r.notes.map(n => `<p>${escapeHtml(n)}</p>`).join("")}</div>`;
+  if (r.nutrients) h += `<div class="recipe-section"><h4>Nutrients per scoop</h4><table class="nutrient-table"><thead><tr><th>Nutrient</th><th>Per scoop</th><th>% daily</th></tr></thead><tbody>${r.nutrients.rows.map(x => `<tr><td>${escapeHtml(x[0])}</td><td>${escapeHtml(x[1])}</td><td>${escapeHtml(x[2])}</td></tr>`).join("")}</tbody></table><p class="nutrient-cap">${escapeHtml(r.nutrients.caption || "")}</p></div>`;
+  return h;
+}
 function macroTilesHTML(r) {
   const tiles = [
     [fmtNum(r.kcal), "Kcal"],
@@ -766,6 +779,7 @@ function openRecipe(id) {
   document.getElementById("recipe-macros").innerHTML = macroTilesHTML(r);
   document.getElementById("recipe-ingredients").innerHTML = r.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("");
   document.getElementById("recipe-instructions").innerHTML = r.instructions.map(i => `<li>${escapeHtml(i)}</li>`).join("");
+  document.getElementById("recipe-extra").innerHTML = recipeExtraHTML(r);
   const blurbBox = document.getElementById("stefan-blurb");
   if (r.blurb) { blurbBox.hidden = false; document.getElementById("stefan-blurb-text").textContent = r.blurb; }
   else { blurbBox.hidden = true; }
@@ -866,6 +880,7 @@ function renderRecipeBook() {
       ${r.blurb ? `<div class="stefan-blurb"><div class="lbl">A word from Stefan</div><p>${escapeHtml(r.blurb)}</p></div>` : ""}
       <div class="recipe-section"><h4>Ingredients</h4><ul>${r.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ul></div>
       <div class="recipe-section"><h4>Instructions</h4><ol>${r.instructions.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ol></div>
+      ${recipeExtraHTML(r)}
     </div>
   `).join("");
 }

@@ -446,5 +446,40 @@ const RECIPES = [
     healthScore: 7,
     dateAdded: "2026-10-27",
     blurb: "My go to when I want something sweet right now and can't be bothered waiting on the oven."
+  },
+  {
+    id: "homemade-protein-powder",
+    meal: ["protein powder"],
+    chip: "Homemade Protein Powder",
+    image: "recipe-img/homemade-protein-powder.jpg",
+    title: "Homemade Protein Powder",
+    desc: "This is a great alternative, natural and you can make this from some staples in the cupboard or potentially a visit to the health shop. Once you have the ingredients, you can make heaps of this.",
+    ingredients: ["250 grams low-fat cottage cheese (dries to ~45g)", "82 grams pumpkin seed flour (49% protein)", "40 grams hulled hemp seeds", "10 grams chia seeds", "10 grams sunflower kernels", "10 grams white unhulled sesame seeds", "3 grams black seed (nigella)"],
+    instructions: [
+      "Dry the cottage cheese (6h): Blend 250 grams low-fat cottage cheese (dries to ~45g) until smooth, then spread it about 3mm thick on a lined tray. Dry at 60\u201370\u00b0C until fully brittle and snapping clean.",
+      "Chill (freeze) the small seeds (20m): Near the end of dehydrating, freeze 10 grams chia seeds, 10 grams sunflower kernels, 10 grams white unhulled sesame seeds and 3 grams black seed (nigella) on a tray.",
+      "Grind: Break up the dried cottage cheese and pulse it with the chilled seeds in short bursts until fine.",
+      "Add the hemp: Add 40 grams hulled hemp seeds and pulse 3\u20134 times only.",
+      "Mix in the flour: Tip into a bowl and whisk in 82 grams pumpkin seed flour (49% protein). It's already fine, so it doesn't need grinding.",
+      "Store cold: Store airtight in the fridge and use within about 2 weeks."
+    ],
+    notes: [
+      "Protein: a 45g scoop gives about 20g and a 50g scoop about 22g. The batch makes about 4\u20135 scoops.",
+      "Applications: you can use this in a smoothie and in several savoury dishes. Make sure you add enough sweetness if you're adding it to a smoothie, because it is quite nutty, and do the same with a savoury dish. Try small batches first."
+    ],
+    nutrients: {
+      caption: "Approximate, per 45g scoop (~20g protein). % based on adult male daily targets.",
+      rows: [["Magnesium", "~220mg", "~50%"], ["Phosphorus", "~575mg", "~55%"], ["Iron", "~3.4mg", "~40%"], ["Copper", "~0.6mg", "~35%"], ["Manganese", "~1.9mg", "~35%"], ["Zinc", "~3.4mg", "~25%"], ["Vitamin E", "~1.4mg", "~15%"], ["Selenium", "~9\u00b5g", "~13%"], ["Vitamin B12", "~0.3\u00b5g", "~11%"], ["Calcium", "~100mg", "~10%"], ["Potassium", "~380mg", "~10%"], ["Sodium", "~230mg", "n/a"], ["Fibre", "~3.5g", "~10%"]]
+    },
+    macros: [["~205", "kcal (45g scoop)"], ["~20g", "Protein"], ["~8g", "Carbs"], ["~10g", "Fat"]],
+    kcal: 205,
+    protein: 20,
+    fibre: 3.5,
+    carbs: 8,
+    fat: 10,
+    difficulty: "Medium",
+    healthScore: 9,
+    dateAdded: "2026-11-01",
+    blurb: "I wanted a protein powder I could actually put a name to every ingredient in. This one is mostly cottage cheese, seeds and pumpkin flour, and one batch lasts a while. It's nutty, so sweeten it properly in a smoothie."
   }
 ];
