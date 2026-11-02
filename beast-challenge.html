@@ -219,6 +219,285 @@ canvas{width:100%;max-width:270px;height:auto;border-radius:12px;display:block;m
 .modal .panel{max-width:400px;width:100%;max-height:calc(100vh - 32px);overflow-y:auto}
 .loading{padding:40px 0;text-align:center;color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){.road i{transition:width .6s ease}}
+.d{--bg:#EEF6F0;--card:#FFFFFF;--ink:#1B3022;--muted:#4F6757;--line:#DCE8DF;--band:#2D6A4F;--band-ink:#FFFFFF;--band-soft:#B9DCC8;--accent:#52B788;--accent-ink:#1B4332;--accent-soft:#D8F3DC;--amber:#F59E0B;--amber-soft:#FFF1CC;--amber-ink:#6B4200;--idle-bg:#E9EEEA;--idle-ink:#3A4A40;--sign:#2D6A4F;--sign-ink:#FFFFFF;--sign-track:rgba(255,255,255,.2);--focus:#1B6FD8;--c1:#CDEBD6;--c2:#74C69D;--c3:#2D6A4F;--t1:#1B4332;--t2:#06281A;--t3:#FFFFFF;display:flex;flex-direction:column;gap:14px;color:var(--ink)}
+body.inapp{background:#EEF6F0}
+.d button,.d input{font:inherit;color:inherit}
+.d [hidden]{display:none!important}
+.d :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.d .pad{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.d .dband{background:var(--band);color:var(--band-ink);border-radius:18px;padding:2px 14px 0}
+.d .dtabs{margin-top:0}
+.d .pill.rest{background:var(--idle-bg);color:var(--idle-ink)}
+.d .why2{margin:0;color:var(--muted);font-style:italic;font-size:15px}
+.d .h40{font-size:40px}
+.d .rsign .comm{background:rgba(255,255,255,.14);color:#fff;margin-top:12px;font-size:15px}
+.d .rsign .tip{color:#fff}
+.d .statbar>div{display:flex;align-items:center}
+.d .sheet,.d .scrim{font-family:var(--body)}
+.d .sheet{color:var(--ink)}
+.d canvas{max-width:300px;width:100%;margin:14px auto 0}
+.d .chip.soft{margin-left:6px}
+.d .hint svg{flex:none}
+.d .sheet .tile{background:var(--card);border:1px solid var(--line)}
+@media (max-width:420px){.nav-logo{font-size:20px;letter-spacing:1.5px}.nav-links{gap:10px}.nav-links a,.nav-links button{font-size:13px;white-space:nowrap}}
+.d .xp>div{overflow:hidden;min-height:0}
+@media (prefers-reduced-motion:reduce){.d *{transition:none!important;animation:none!important}}
+.d .band{background:var(--band);color:var(--band-ink);padding-top:14px}
+.d .brand{font-family:var(--display);font-size:30px;letter-spacing:1.5px;line-height:1}
+.d .brand span{color:var(--accent)}
+.d .sub{font-size:14px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--band-soft);margin-top:2px}
+.d .dtabs{display:flex;gap:0;margin-top:10px;justify-content:space-between}
+.d .dtabs button{background:none;border:0;border-bottom:3px solid transparent;color:var(--band-soft);font-family:var(--display);font-size:20px;letter-spacing:.5px;padding:8px 4px 6px;cursor:pointer;min-height:44px;flex:0 1 auto;min-width:0;white-space:nowrap}
+.d .dtabs button[aria-selected="true"]{color:#fff;border-bottom-color:var(--accent)}
+.d .statbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:12px}
+.d .chip{display:inline-flex;align-items:center;font-weight:800;font-size:14px;letter-spacing:.4px;border-radius:999px;padding:7px 12px}
+.d .chip.dark{background:var(--band);color:#fff}
+.d .chip.soft{background:var(--accent-soft);color:var(--accent-ink);margin-left:6px}
+.d .ghost{background:var(--card);border:1.5px solid var(--line);border-radius:10px;font-weight:700;font-size:15px;padding:9px 14px;min-height:44px;cursor:pointer}
+.d .card{background:var(--card);border-radius:18px;padding:18px;border:1px solid var(--line)}
+.d .stack{display:flex;flex-direction:column;gap:14px}
+.d .hello{display:flex;align-items:center;gap:18px}
+.d .ring{position:relative;width:104px;height:104px;flex:none}
+.d .ring svg{width:104px;height:104px;transform:rotate(-90deg)}
+.d .ring .tr{stroke:var(--line)}
+.d .ring .fg{stroke:var(--band);transition:stroke-dashoffset .5s ease}
+.d .ring b{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-family:var(--display);font-size:38px;line-height:.95;font-weight:400}
+.d .ring b small{font-family:var(--body);font-size:14px;font-weight:700;color:var(--muted);display:block}
+.d .label{font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.d h1,.d h2{font-family:var(--display);font-weight:400;letter-spacing:.5px;margin:0;line-height:1}
+.d .hello h1{font-size:36px;margin-top:2px}
+.d .hello p{margin:6px 0 0;color:var(--muted);font-size:16px}
+.d .rsign{background:var(--sign);color:var(--sign-ink);border-radius:18px;padding:18px;border:3px solid rgba(255,255,255,.28)}
+.d .rsign .label{color:var(--band-soft)}
+.d .rsign h2{font-size:30px;margin-top:4px}
+.d .rsign .km{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;font-weight:800;font-size:16px}
+.d .rsign .km b{font-size:20px}
+.d .rd{position:relative;height:16px;border-radius:8px;background:var(--sign-track);margin-top:8px;overflow:hidden}
+.d .rd i{position:absolute;inset:0 auto 0 0;background:var(--amber);border-radius:8px;transition:width .5s ease}
+.d .rd::after{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed rgba(255,255,255,.55);transform:translateY(-1px)}
+.d .ends{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--band-soft);margin-top:8px;gap:12px}
+.d .rsign .tip{font-size:15px;margin-top:8px;color:#fff;opacity:.92}
+.d .days{display:flex;gap:8px;flex-wrap:wrap}
+.d .days button{background:var(--card);border:1.5px solid var(--line);border-radius:999px;font-weight:800;font-size:15px;padding:10px 16px;min-height:44px;cursor:pointer;position:relative}
+.d .days button[aria-pressed="true"]{background:var(--band);border-color:var(--band);color:#fff}
+.d .days .dot{position:absolute;top:6px;right:8px;width:9px;height:9px;border-radius:50%;background:var(--amber)}
+.d .hhead{display:flex;align-items:baseline;justify-content:space-between;margin:6px 0 -2px}
+.d .hhead h2{font-size:30px}
+.d .count{font-weight:800;font-size:15px;background:var(--accent-soft);color:var(--accent-ink);border-radius:999px;padding:6px 12px}
+.d .habit{background:var(--card);border:1.5px solid var(--line);border-radius:16px;overflow:hidden;transition:border-color .2s,background .2s}
+.d .habit.done{border-color:var(--accent)}
+.d .habit.open{border-color:var(--band);box-shadow:0 6px 18px rgba(27,48,34,.12)}
+.d .hrow{display:flex;align-items:center;gap:12px;width:100%;padding:14px;background:none;border:0;text-align:left;min-height:68px}
+.d button.hrow{cursor:pointer}
+.d .ico{flex:none;width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center}
+.d .ico svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.d .habit.done .ico{background:var(--accent);color:#06281A}
+.d .htxt{flex:1;min-width:0}
+.d .hname{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-weight:800;font-size:17px}
+.d .pill{font-size:14px;font-weight:800;border-radius:999px;padding:2px 10px;background:var(--amber-soft);color:var(--amber-ink)}
+.d .done .pill{background:var(--accent-soft);color:var(--accent-ink)}
+.d .meta{display:block;color:var(--muted);font-size:15px;margin-top:2px}
+.d .mini{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
+.d .mini i{display:block;height:100%;background:var(--amber);border-radius:3px;transition:width .4s ease}
+.d .chev{flex:none;width:22px;height:22px;stroke:var(--muted);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s}
+.d .open .chev{transform:rotate(180deg)}
+.d .xp{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}
+.d .open .xp{grid-template-rows:1fr}
+.d .xp>div{overflow:hidden;min-height:0}
+.d .body{padding:2px 16px 18px}
+.d .fld{display:block}
+.d .fld span{display:block;font-weight:800;font-size:14px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.d .big{width:100%;font-family:var(--display);font-size:46px;letter-spacing:1px;line-height:1;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);text-align:center}
+.d .big:focus{border-color:var(--band);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 40%,transparent)}
+.d .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.d .quick button{background:var(--accent-soft);color:var(--accent-ink);border:0;border-radius:12px;font-weight:800;font-size:17px;padding:12px 4px;min-height:48px;cursor:pointer}
+.d .quick button:active{transform:scale(.97)}
+.d .goal{margin-top:16px}
+.d .goal .row{display:flex;justify-content:space-between;font-weight:800;font-size:15px;margin-bottom:6px;gap:10px}
+.d .goal .bar{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.d .goal .bar i{display:block;height:100%;background:var(--amber);border-radius:6px;transition:width .3s ease}
+.d .goal.hit .row span:last-child{color:var(--accent-ink);background:var(--accent-soft);border-radius:999px;padding:0 10px}
+.d .route-add{margin:12px 0 0;font-size:15px;color:var(--muted)}
+.d .route-add b{color:var(--ink)}
+.d .sg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.d .sg button,.d .tiles button{background:var(--bg);border:2px solid var(--line);border-radius:12px;font-weight:800;font-size:17px;min-height:52px;cursor:pointer}
+.d .sg button[aria-pressed="true"],.d .tiles button[aria-pressed="true"]{background:var(--band);border-color:var(--band);color:#fff}
+.d .tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.d .sect{margin-top:16px}
+.d .small{width:100%;font-size:20px;font-weight:800;padding:11px 14px;border-radius:12px;border:2px solid var(--line);background:var(--bg);margin-top:8px}
+.d .small:focus{border-color:var(--band);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 40%,transparent)}
+.d .mins{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.d .mins button{background:var(--accent-soft);color:var(--accent-ink);border:2px solid transparent;border-radius:12px;font-weight:800;font-size:16px;min-height:48px;cursor:pointer}
+.d .mins button[aria-pressed="true"]{border-color:var(--band)}
+.d .tot{margin-top:16px}
+.d .tot .row{display:flex;justify-content:space-between;font-weight:800;font-size:15px;margin-bottom:6px;gap:10px}
+.d .tot .bar{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.d .tot .bar i{display:block;height:100%;background:var(--amber);border-radius:6px;transition:width .3s}
+.d .tot .tag{color:var(--accent-ink);background:var(--accent-soft);border-radius:999px;padding:0 10px}
+.d .glasses{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+.d .glass{background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:10px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:84px;cursor:pointer;color:var(--muted);font-weight:800;font-size:14px}
+.d .glass svg{width:34px;height:44px;display:block}
+.d .glass .shell{fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.d .glass .wat{fill:var(--accent);opacity:0;transition:opacity .2s,transform .2s;transform-origin:50% 100%;transform:scaleY(.4)}
+.d .glass[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.d .glass[aria-pressed="true"] .wat{opacity:1;transform:none}
+.d .glass:active{transform:scale(.96)}
+.d .wnote{margin:12px 0 0;color:var(--muted);font-size:15px}
+.d .extra{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-weight:700}
+.d .extra button{background:var(--accent-soft);color:var(--accent-ink);border:0;border-radius:12px;font-weight:800;font-size:16px;min-height:48px;padding:0 16px;cursor:pointer}
+.d .stepper{display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;margin-top:12px}
+.d .stepper .sq{width:56px;height:56px;font-size:28px}
+.d .hv{text-align:center;font-weight:700;color:var(--muted)}
+.d .hv b{font-family:var(--display);font-weight:400;font-size:52px;line-height:1;color:var(--ink);letter-spacing:1px;margin-right:6px}
+.d .times{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.d .times .fld{min-width:0}
+.d .tin{width:100%;min-width:0;font-family:var(--body);font-size:21px;font-weight:800;text-align:center;padding:12px 4px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);min-height:56px}
+.d .tin:focus{border-color:var(--band);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 40%,transparent)}
+.d .calcx{margin:12px 0 0;text-align:center;font-weight:700;color:var(--muted);font-size:15px}
+.d .calcx b{font-family:var(--display);font-weight:400;font-size:40px;color:var(--ink);letter-spacing:1px;margin-right:6px;vertical-align:-3px}
+.d .nightwrap{position:relative;height:32px;margin-top:18px}
+.d .night{position:absolute;left:0;right:0;top:9px;height:14px;border-radius:7px;background:#17243F;overflow:hidden}
+.d .zone{position:absolute;top:0;bottom:0;background:var(--accent);opacity:.9}
+.d .moon{position:absolute;top:2px;width:28px;height:28px;border-radius:50%;background:#FFF3C4;transform:translateX(-50%);box-shadow:0 0 0 3px #17243F,0 0 14px rgba(255,243,196,.55);overflow:hidden;transition:left .25s ease}
+.d .moon::after{content:"";position:absolute;width:24px;height:24px;border-radius:50%;background:#17243F;top:-4px;left:9px}
+.d .ticks{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--muted);margin-top:2px}
+.d .status{margin:10px 0 0;font-weight:700;font-size:16px;text-align:center}
+.d .status.ok{color:var(--accent-ink);background:var(--accent-soft);border-radius:12px;padding:8px 12px}
+.d .status.no{color:var(--amber-ink);background:var(--amber-soft);border-radius:12px;padding:8px 12px}
+.d .hq{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.d .hq button{background:var(--accent-soft);color:var(--accent-ink);border:2px solid transparent;border-radius:12px;font-weight:800;font-size:17px;min-height:48px;cursor:pointer}
+.d .hq button[aria-pressed="true"]{border-color:var(--band)}
+.d .signhead{display:block;width:100%;background:none;border:0;color:inherit;text-align:left;padding:0;cursor:pointer;font:inherit}
+.d .srow{display:flex;justify-content:space-between;align-items:center}
+.d .rsign .chev{stroke:#fff}
+.d .rsign h2{font-size:26px;margin:2px 0 6px}
+.d .roadwrap{position:relative;height:30px}
+.d .roadwrap .rd{position:absolute;left:0;right:0;top:7px;margin:0}
+.d .pin{position:absolute;top:2px;width:26px;height:26px;border-radius:50%;background:#fff;border:5px solid var(--amber);transform:translateX(-50%);box-shadow:0 2px 6px rgba(0,0,0,.35);transition:left .4s ease}
+.d .rsign .km{margin-top:6px}
+.d .chipk{background:rgba(245,158,11,.25);color:#FFE3A3;border-radius:999px;padding:3px 10px;font-weight:800;font-size:15px}
+.d .signbody{padding-top:12px}
+.d .signbody p{margin:0 0 4px;font-weight:700}
+.d .sbtn{margin-top:12px;width:100%;min-height:48px;border-radius:12px;border:2px solid rgba(255,255,255,.55);background:transparent;color:#fff;font-weight:800;font-size:16px;cursor:pointer}
+.d .sbtn.solid{background:var(--amber);border-color:var(--amber);color:#2B1A00}
+.d .back{align-self:flex-start;background:none;border:0;color:var(--ink);font-weight:800;font-size:16px;min-height:44px;padding:0;cursor:pointer;text-decoration:underline}
+.d .rchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.d .rchips button{background:var(--card);border:1.5px solid var(--line);border-radius:999px;font-weight:800;font-size:15px;padding:9px 14px;min-height:44px;cursor:pointer;color:var(--ink)}
+.d .rchips button[aria-pressed="true"]{background:var(--band);border-color:var(--band);color:#fff}
+.d .rchips button.amb[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#2B1A00}
+.d .rlist{display:flex;flex-direction:column;gap:8px}
+.d .rt{display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--ink);min-height:64px}
+.d .rt[aria-pressed="true"]{border-color:var(--band);box-shadow:0 0 0 2px var(--band) inset}
+.d .rt .rn{font-weight:800;font-size:17px}
+.d .rt .rk{font-weight:800;font-size:16px;color:var(--muted);white-space:nowrap}
+.d .rt .rh{grid-column:1/3;font-size:15px;font-weight:700}
+.d .rt .rh.fin{color:var(--accent-ink)}
+.d .rt .rh.str{color:var(--amber-ink)}
+.d .here{font-size:13px;font-weight:800;background:var(--accent-soft);color:var(--accent-ink);border-radius:999px;padding:1px 8px;margin-left:8px;vertical-align:2px}
+.d .lkb{position:sticky;bottom:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:2px solid var(--band);border-radius:16px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 18px rgba(0,0,0,.15);margin-top:6px}
+.d .lkb b{flex:1 1 100%;min-width:0;font-size:17px}
+.d .lkb .go{flex:1;background:var(--band);color:#fff;border:0;border-radius:12px;font-weight:800;font-size:16px;min-height:48px;padding:0 18px;cursor:pointer}
+.d .lkb .no{background:none;border:0;font-weight:700;font-size:16px;color:var(--muted);text-decoration:underline;min-height:48px;cursor:pointer}
+.d .sum{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.d .bigscore{font-family:var(--display);font-size:68px;line-height:1}
+.d .bigscore{text-align:right;flex:none}
+.d .bigscore small{display:block;font-family:var(--body);font-size:16px;font-weight:700;color:var(--muted);margin:0}
+.d .sumtxt h2{font-size:30px}
+.d .sumtxt p{margin:4px 0 0;color:var(--muted);font-weight:600;font-size:16px}
+.d .bdgs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:14px}
+.d .bdg{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--muted)}
+.d .bdg .disc{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:26px;border:2px dashed var(--line);color:var(--muted)}
+.d .bdg.on .disc{background:var(--amber);border:0;color:#2B1A00}
+.d .bdg.on{color:var(--ink)}
+.d .nb{height:12px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:14px}
+.d .nb i{display:block;height:100%;background:var(--amber);border-radius:6px}
+.d .nbt{margin:8px 0 0;font-weight:700;font-size:16px}
+.d .catch{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--amber-soft);color:var(--amber-ink);border-radius:14px;padding:12px 14px;font-weight:700;margin-top:12px}
+.d .catch button{background:var(--band);color:#fff;border:0;border-radius:12px;font-weight:800;font-size:16px;min-height:44px;padding:0 16px;cursor:pointer}
+.d .cal{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:12px}
+.d .cal div{position:relative;aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:16px;border:2px solid transparent}
+.d .cal .s1{background:var(--c1);color:var(--t1)}
+.d .cal .s2{background:var(--c2);color:var(--t2)}
+.d .cal .s3{background:var(--c3);color:var(--t3)}
+.d .cal .miss{border:2px dashed var(--amber);color:var(--amber-ink)}
+.d .cal .future{border:2px solid var(--line);color:var(--muted);opacity:.65}
+.d .cal .today{border-color:var(--ink)}
+.d .cal .mark::after{content:"";position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--amber)}
+.d .key{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:14px;font-weight:700;color:var(--muted)}
+.d .key span{display:inline-flex;align-items:center;gap:6px}
+.d .key i{width:16px;height:16px;border-radius:5px;display:inline-block;border:2px solid transparent}
+.d .story{width:min(100%,280px);aspect-ratio:9/16;margin:14px auto 0;border-radius:22px;background:var(--sign);color:#fff;padding:22px 18px;display:flex;flex-direction:column;border:3px solid rgba(255,255,255,.25)}
+.d .story .sb{font-family:var(--display);font-size:24px;letter-spacing:1.5px}
+.d .story .sb span{color:var(--accent)}
+.d .story .wk{font-size:13px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--band-soft);margin-top:2px}
+.d .story .sday{font-family:var(--display);font-size:64px;line-height:1;margin-top:auto}
+.d .story .sday small{font-family:var(--body);font-size:16px;font-weight:700;margin-left:6px;color:var(--band-soft)}
+.d .story .rn2{font-weight:800;font-size:16px;margin-top:10px}
+.d .story .rd{margin-top:6px}
+.d .story .kmrow{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-top:6px;color:var(--band-soft)}
+.d .story .mini3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px;text-align:center}
+.d .story .mini3 b{display:block;font-family:var(--display);font-weight:400;font-size:26px;line-height:1}
+.d .story .mini3 span{font-size:12px;font-weight:700;color:var(--band-soft)}
+.d .sharebtn{width:100%;margin-top:16px;background:var(--amber);color:#2B1A00;border:0;border-radius:14px;font-weight:800;font-size:18px;min-height:56px;cursor:pointer}
+.d .win{margin:12px 0 0;background:var(--amber-soft);color:var(--amber-ink);border-radius:12px;padding:12px 14px;font-weight:800;font-size:16px;text-align:center;line-height:1.4}
+.d .rsign .comm{background:rgba(255,255,255,.14);color:#fff;margin-top:12px;font-size:15px}
+.d .mfilters{display:flex;gap:8px;overflow-x:auto;padding:2px 16px 8px;margin:0 -16px;scrollbar-width:none;scroll-snap-type:x proximity}
+.d .mfilters::-webkit-scrollbar{display:none}
+.d .mfilters button{flex:none;scroll-snap-align:start;background:var(--card);border:1.5px solid var(--line);border-radius:999px;font-weight:800;font-size:15px;padding:9px 14px;min-height:44px;cursor:pointer;color:var(--ink);white-space:nowrap}
+.d .mfilters button[aria-pressed="true"]{background:var(--band);border-color:var(--band);color:#fff}
+.d .mfilters button.amb[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#2B1A00}
+.d .mcount{margin:0;color:var(--muted);font-weight:700;font-size:15px}
+.d .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.d .mcard{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:0;text-align:left;cursor:pointer;overflow:hidden;color:var(--ink);display:flex;flex-direction:column;min-width:0}
+.d .mcard:active{transform:scale(.985)}
+.d .mpic{position:relative;aspect-ratio:4/3;width:100%;overflow:hidden}
+.d .mpic img{width:100%;height:100%;object-fit:cover;display:block}
+.d .mtile{display:flex;flex-direction:column;justify-content:flex-end;padding:10px 12px;height:100%;width:100%}
+.d .mtile b{font-family:var(--display);font-weight:400;font-size:44px;line-height:.9}
+.d .mtile span{font-size:14px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;opacity:.85}
+.d .mbadge{position:absolute;top:8px;left:8px;background:rgba(16,32,23,.82);color:#fff;font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;border-radius:999px;padding:3px 9px}
+.d .mtxt{padding:10px 12px 12px}
+.d .mtxt b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:16px;line-height:1.25;min-height:40px}
+.d .mtxt span{display:block;margin-top:4px;font-size:14px;font-weight:700;color:var(--muted)}
+.d .sheet{position:fixed;inset:0;z-index:30;background:var(--bg);overflow-y:auto;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.d .sheet .in{max-width:440px;margin:0 auto}
+.d .sheetbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--bg);padding-top:6px;padding-bottom:6px}
+.d .sheet .mpic{aspect-ratio:4/3;border-radius:18px;margin-top:4px}
+.d .sheet h1{font-size:40px;margin-top:14px}
+.d .sheet .mtag{font-size:14px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.d .sheet .mac{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.d .sheet .sec h3{font-family:var(--display);font-weight:400;font-size:26px;letter-spacing:.5px;margin:22px 0 6px}
+.d .sheet ul,.d .sheet ol{margin:0;padding-left:22px;line-height:1.6;font-size:16px}
+.d .sheet li{margin-bottom:4px}
+.d .sheet .word{background:var(--accent-soft);color:var(--accent-ink);border-radius:14px;padding:12px 14px;margin-top:14px;font-size:16px;line-height:1.5}
+.d .sheet .word b{display:block;font-size:13px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.d .sheetfoot{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--card);border-top:1.5px solid var(--line);padding-top:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+.d .sheetfoot .in{max-width:440px;margin:0 auto}
+.d .scrim{position:fixed;inset:0;z-index:40;background:rgba(8,16,11,.6);display:grid;place-items:center;padding:16px}
+.d .dlgbox{background:var(--card);color:var(--ink);border-radius:20px;padding:20px;width:100%;max-width:400px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.d .dlgbox h2{font-size:30px}
+.d .dlgbox p{margin:10px 0 0;font-size:16px;line-height:1.5}
+.d .dlgbox .big{font-size:40px;margin-top:10px}
+.d .dlgbox .calc2{background:var(--accent-soft);color:var(--accent-ink);border-radius:12px;padding:10px 12px;font-weight:800;margin-top:12px;font-size:16px}
+.d .dlgbox .warn{background:var(--amber-soft);color:var(--amber-ink);border-radius:12px;padding:10px 12px;font-weight:700;margin-top:12px;font-size:15px}
+.d .tiles2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.d .tile{background:var(--bg);border-radius:14px;padding:14px}
+.d .tile b{display:block;font-family:var(--display);font-weight:400;font-size:38px;line-height:1}
+.d .tile span{font-size:15px;color:var(--muted);font-weight:700}
+.d .comm{margin-top:12px;background:var(--accent-soft);color:var(--accent-ink);border-radius:12px;padding:10px 14px;font-weight:700}
+.d .logged{margin-top:18px;border-top:1.5px solid var(--line);padding-top:12px}
+.d .entry{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--accent-soft);color:var(--accent-ink);border-radius:12px;padding:6px 6px 6px 14px;margin-top:8px;font-weight:700}
+.d .entry button{background:var(--card);border:0;border-radius:10px;width:44px;height:44px;font-size:22px;font-weight:800;color:var(--ink);cursor:pointer}
+.d .primary{width:100%;margin-top:16px;background:var(--band);color:#fff;border:0;border-radius:14px;font-weight:800;font-size:18px;min-height:54px;cursor:pointer}
+.d .primary:active{transform:scale(.99)}
+.d .linkish{display:block;margin:10px auto 0;background:none;border:0;color:var(--muted);font-weight:700;font-size:15px;text-decoration:underline;min-height:44px;cursor:pointer}
+.d .ctl{flex:none;display:flex;gap:8px}
+.d .sq{width:48px;height:48px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-weight:800;font-size:22px;cursor:pointer}
+.d .sq.fill{background:var(--band);border-color:var(--band);color:#fff}
+.d .tog{min-width:104px;height:48px;border-radius:12px;border:1.5px solid var(--band);background:var(--card);color:var(--ink);font-weight:800;font-size:16px;padding:0 14px;cursor:pointer}
+.d .tog[aria-pressed="true"]{background:var(--band);color:#fff}
+.d .hint{display:flex;gap:12px;align-items:center;background:var(--accent-soft);color:var(--accent-ink);border-radius:16px;padding:14px 16px;font-size:16px;font-weight:600}
+.d .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -244,8 +523,9 @@ try{ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }catch(e){
 const ITEMS={steps:["Steps","10,000 a day, fills your route bar"],workout:["Workout","Gym or home"],calories:["Calories","Type a number, it adds to your day"],protein:["Protein check","Tick when you've hit it"],water:["Water","Glasses a day"],sleep:["Sleep","Hours last night"],alcohol:["Alcohol-free day","Tick it off"]};
 // Stefan's recipes come from recipes.js (the same file the dashboard uses); the extra ideas below are general meal ideas.
 const EXTRA_RECIPES=[{"n": "Oats, Berry and Protein Smoothie", "cats": ["smoothie", "breakfast"], "k": 400, "macros": [["400", "kcal"], ["39g", "Protein"], ["8g", "Fibre"]], "i": ["1/3 cup (30g) rolled oats", "1 cup (150g) frozen mixed berries", "1 scoop (30g) vanilla protein powder", "250ml milk of choice"], "s": ["Add all ingredients to a blender.", "Blend until smooth, adding a splash more milk if it's too thick."]}, {"n": "Spinach, Mango and Chia Smoothie", "cats": ["smoothie", "breakfast"], "k": 320, "macros": [["320", "kcal"], ["30g", "Protein"], ["7g", "Fibre"]], "i": ["1 handful (30g) baby spinach", "1 cup (150g) frozen mango", "1 tbsp (12g) chia seeds", "1 scoop (30g) vanilla protein powder", "250ml coconut water or water"], "s": ["Add all ingredients to a blender.", "Blend until smooth and no spinach flecks remain."]}, {"n": "Pear, Flax and Greek Yoghurt Smoothie", "cats": ["smoothie", "breakfast"], "k": 420, "macros": [["420", "kcal"], ["47g", "Protein"], ["8g", "Fibre"]], "i": ["1 pear, chopped (about 180g)", "1 tbsp (10g) ground flaxseed", "150g Greek yoghurt", "1 scoop (30g) vanilla protein powder", "150ml milk of choice"], "s": ["Add all ingredients to a blender.", "Blend until smooth."]}, {"n": "Choc Banana Oat Smoothie", "cats": ["smoothie", "breakfast"], "k": 450, "macros": [["450", "kcal"], ["41g", "Protein"], ["9g", "Fibre"]], "i": ["1 frozen banana", "1/3 cup (30g) rolled oats", "1 tbsp (8g) unsweetened cocoa powder", "1 scoop (30g) chocolate protein powder", "250ml milk of choice"], "s": ["Add all ingredients to a blender.", "Blend until smooth and creamy."]}, {"n": "Pineapple, Spinach and Chia Smoothie", "cats": ["smoothie", "breakfast"], "k": 300, "macros": [["300", "kcal"], ["29g", "Protein"], ["7g", "Fibre"]], "i": ["1 cup (150g) frozen pineapple", "1 handful (30g) baby spinach", "1 tbsp (12g) chia seeds", "1 scoop (30g) vanilla protein powder", "200ml coconut water"], "s": ["Add all ingredients to a blender.", "Blend until smooth, adding a splash more coconut water if needed."]}, {"n": "Rice Cake, Avocado and Chicken", "cats": ["snack"], "k": 315, "macros": [["315", "kcal"], ["34g", "Protein"]], "i": ["2 rice cakes", "1/2 avocado, mashed", "100g cooked chicken breast, sliced", "Squeeze of lemon, salt and pepper"], "s": ["Top the rice cakes with mashed avocado.", "Add the sliced chicken on top.", "Finish with a squeeze of lemon and season to taste."]}, {"n": "Rice Cake, Avocado and Tuna", "cats": ["snack"], "k": 260, "macros": [["260", "kcal"], ["28g", "Protein"]], "i": ["2 rice cakes", "1/2 avocado, mashed", "1 small tin (95g) tuna in springwater, drained", "Squeeze of lemon, salt and pepper"], "s": ["Top the rice cakes with mashed avocado.", "Flake the tuna over the top.", "Finish with lemon and season to taste."]}, {"n": "Rice Cake and Scrambled Eggs", "cats": ["snack"], "k": 210, "macros": [["210", "kcal"], ["13g", "Protein"]], "i": ["2 rice cakes", "2 eggs, scrambled", "Salt, pepper and chives, to taste"], "s": ["Scramble the eggs in a non-stick pan over medium heat.", "Pile the scrambled eggs onto the rice cakes.", "Season and top with chives."]}, {"n": "Rice Cake, Hummus and Cucumber", "cats": ["snack"], "k": 144, "macros": [["144", "kcal"], ["5g", "Protein"]], "i": ["2 rice cakes", "2 tbsp (40g) hummus", "1/4 cucumber, sliced", "Pinch of paprika"], "s": ["Spread hummus over the rice cakes.", "Top with cucumber slices.", "Finish with a pinch of paprika."]}, {"n": "Apple and Peanut Butter", "cats": ["snack"], "k": 190, "macros": [["190", "kcal"], ["5g", "Protein"]], "i": ["1 apple, sliced", "1 tbsp (16g) natural peanut butter"], "s": ["Slice the apple.", "Serve with the peanut butter for dipping."]}, {"n": "Greek Yoghurt and Berries", "cats": ["snack"], "k": 180, "macros": [["180", "kcal"], ["21g", "Protein"]], "i": ["200g Greek yoghurt", "1/2 cup (75g) mixed berries", "Drizzle of honey (optional)"], "s": ["Spoon yoghurt into a bowl.", "Top with berries and a drizzle of honey if using."]}, {"n": "Boiled Eggs and Carrot Sticks", "cats": ["snack"], "k": 240, "macros": [["240", "kcal"], ["19g", "Protein"]], "i": ["3 boiled eggs", "1 carrot, cut into sticks", "Pinch of salt"], "s": ["Boil the eggs for 8 to 10 minutes, then peel.", "Serve with carrot sticks and a pinch of salt."]}, {"n": "Turkey and Cheese Roll-Ups", "cats": ["snack"], "k": 200, "macros": [["200", "kcal"], ["24g", "Protein"]], "i": ["4 slices (80g) deli turkey breast", "2 slices (40g) reduced-fat cheese", "Baby spinach leaves"], "s": ["Lay out the turkey slices.", "Top each with a piece of cheese and a few spinach leaves.", "Roll up tightly and serve."]}, {"n": "Egg White Omelette Wrap with Chicken", "cats": ["snack"], "k": 245, "macros": [["245", "kcal"], ["48g", "Protein"]], "i": ["150g liquid egg whites", "100g cooked chicken breast, shredded", "Baby spinach and cherry tomatoes"], "s": ["Pour the egg whites into a hot non-stick pan and cook like a thin omelette, 2 to 3 minutes, without flipping.", "Once set, place the shredded chicken, spinach and tomato down the centre.", "Roll the omelette up like a wrap and slice in half."]}, {"n": "Rice Cake and Cottage Cheese", "cats": ["snack"], "k": 140, "macros": [["140", "kcal"], ["13g", "Protein"]], "i": ["2 rice cakes", "100g low-fat cottage cheese", "Cracked pepper, to taste"], "s": ["Spread the cottage cheese over the rice cakes.", "Finish with cracked pepper."]}, {"n": "Chicken, Brown Rice and Broccoli Bowl", "cats": ["lunch"], "k": 450, "macros": [["450", "kcal"], ["53g", "Protein"]], "i": ["150g chicken breast, cooked and sliced", "1 cup (150g) cooked brown rice", "1 cup (90g) steamed broccoli", "1 tbsp soy sauce"], "s": ["Cook the chicken breast and slice.", "Steam the broccoli.", "Combine with the brown rice in a bowl and drizzle with soy sauce."]}, {"n": "Tuna and Brown Rice Salad", "cats": ["lunch"], "k": 460, "macros": [["460", "kcal"], ["52g", "Protein"]], "i": ["1 tin (185g) tuna in springwater, drained", "1 cup (150g) cooked brown rice", "Cherry tomatoes, cucumber and red onion", "1 tsp olive oil and lemon dressing"], "s": ["Flake the tuna into a bowl with the brown rice.", "Add the chopped vegetables.", "Dress with olive oil and lemon juice, toss and serve."]}, {"n": "Turkey and Avocado Wrap", "cats": ["lunch"], "k": 400, "macros": [["400", "kcal"], ["25g", "Protein"]], "i": ["1 wholemeal wrap", "100g sliced turkey breast", "1/4 avocado, sliced", "Lettuce and tomato"], "s": ["Lay the turkey, avocado, lettuce and tomato on the wrap.", "Roll up tightly and slice in half."]}, {"n": "Chicken Caesar Lettuce Wrap", "cats": ["lunch"], "k": 350, "macros": [["350", "kcal"], ["54g", "Protein"]], "i": ["150g grilled chicken breast, sliced", "Cos lettuce leaves", "2 tbsp Greek yoghurt Caesar dressing", "Shaved parmesan"], "s": ["Spoon the chicken into the lettuce leaves.", "Drizzle with the yoghurt Caesar dressing.", "Top with shaved parmesan and wrap to eat."]}, {"n": "Prawn and Quinoa Salad", "cats": ["lunch"], "k": 400, "macros": [["400", "kcal"], ["43g", "Protein"]], "i": ["150g cooked prawns", "1 cup (150g) cooked quinoa", "Cherry tomatoes, cucumber and parsley", "Lemon and olive oil dressing"], "s": ["Toss the prawns and quinoa with the chopped vegetables.", "Dress with lemon juice and a little olive oil.", "Season and serve."]}, {"n": "Beef and Veggie Stir Fry Bowl", "cats": ["lunch"], "k": 500, "macros": [["500", "kcal"], ["46g", "Protein"]], "i": ["150g lean beef strips", "1 cup (150g) cooked brown rice", "2 cups mixed stir-fry vegetables", "1 tbsp oyster sauce"], "s": ["Sear the beef strips in a hot pan, set aside.", "Stir-fry the vegetables for 3 to 4 minutes, add the beef back in with the oyster sauce.", "Serve over the brown rice."]}, {"n": "Salmon and Sweet Potato Bowl", "cats": ["lunch"], "k": 480, "macros": [["480", "kcal"], ["36g", "Protein"]], "i": ["150g salmon fillet, cooked", "1 cup (150g) roasted sweet potato", "Steamed greens", "Lemon wedge"], "s": ["Roast the sweet potato until tender.", "Pan-sear or bake the salmon.", "Serve together with steamed greens and a squeeze of lemon."]}, {"n": "Chickpea and Tuna Salad", "cats": ["lunch"], "k": 480, "macros": [["480", "kcal"], ["45g", "Protein"]], "i": ["1 tin (185g) tuna in springwater, drained", "3/4 cup (120g) chickpeas, rinsed", "Cherry tomatoes, red onion and parsley", "Lemon and olive oil dressing"], "s": ["Combine the tuna and chickpeas in a bowl.", "Add the chopped vegetables.", "Dress with lemon juice and a little olive oil, toss and serve."]}, {"n": "Egg and Avocado Rice Cake Stack", "cats": ["lunch"], "k": 320, "macros": [["320", "kcal"], ["16g", "Protein"]], "i": ["3 rice cakes", "2 boiled eggs, sliced", "1/2 avocado, sliced", "Chilli flakes and salt"], "s": ["Top each rice cake with avocado and egg slices.", "Season with chilli flakes and salt."]}, {"n": "Turkey Mince Lettuce Cups", "cats": ["lunch"], "k": 300, "macros": [["300", "kcal"], ["42g", "Protein"]], "i": ["150g lean turkey mince", "1 tsp garlic and ginger, minced", "1 tbsp soy sauce", "Cos lettuce, carrot and spring onion"], "s": ["Brown the turkey mince with garlic and ginger.", "Stir through the soy sauce.", "Spoon into lettuce cups and top with shredded carrot and spring onion."]}, {"n": "Chicken and Veggie Soba Noodles", "cats": ["lunch"], "k": 410, "macros": [["410", "kcal"], ["50g", "Protein"]], "i": ["150g chicken breast, sliced", "100g soba noodles, cooked", "Mixed stir-fry vegetables", "1 tbsp soy sauce"], "s": ["Cook the soba noodles according to packet instructions.", "Stir-fry the chicken and vegetables together.", "Toss through the noodles and soy sauce."]}, {"n": "Greek Chicken Salad", "cats": ["lunch"], "k": 380, "macros": [["380", "kcal"], ["51g", "Protein"]], "i": ["150g grilled chicken breast, sliced", "Cucumber, cherry tomatoes and red onion", "30g reduced-fat feta", "Olive oil and oregano dressing"], "s": ["Combine the chicken with the chopped vegetables.", "Crumble the feta over the top.", "Dress with olive oil and oregano."]}, {"n": "Tuna Pasta Salad", "cats": ["lunch"], "k": 460, "macros": [["460", "kcal"], ["55g", "Protein"]], "i": ["1 tin (185g) tuna in springwater, drained", "1 cup (150g) cooked wholemeal pasta", "Cherry tomatoes, cucumber and red onion", "2 tbsp Greek yoghurt or light mayo"], "s": ["Mix the pasta, tuna and vegetables in a bowl.", "Stir through the yoghurt or light mayo.", "Season and serve."]}, {"n": "Chicken Burrito Bowl", "cats": ["lunch"], "k": 520, "macros": [["520", "kcal"], ["55g", "Protein"]], "i": ["150g chicken breast, cooked and sliced", "1 cup (150g) cooked brown rice", "1/2 cup (90g) black beans, rinsed", "Salsa, lettuce and lime"], "s": ["Warm the chicken, rice and beans.", "Build in a bowl over lettuce.", "Top with salsa and a squeeze of lime."]}, {"n": "Steak and Roast Potato Bowl", "cats": ["lunch"], "k": 500, "macros": [["500", "kcal"], ["50g", "Protein"]], "i": ["150g lean steak, grilled and sliced", "1 cup (150g) roasted potato", "Steamed green beans", "1 tsp olive oil"], "s": ["Roast the potato until golden.", "Grill the steak to your liking and slice.", "Serve together with steamed green beans."]}, {"n": "Smoked Salmon and Cottage Cheese Bagel", "cats": ["lunch"], "k": 420, "macros": [["420", "kcal"], ["37g", "Protein"]], "i": ["1 wholemeal bagel", "100g low-fat cottage cheese", "80g smoked salmon", "Capers and dill"], "s": ["Toast the bagel.", "Spread with cottage cheese.", "Top with smoked salmon, capers and dill."]}, {"n": "Chicken and Hummus Wrap", "cats": ["lunch"], "k": 500, "macros": [["500", "kcal"], ["55g", "Protein"]], "i": ["1 wholemeal wrap", "150g grilled chicken breast, sliced", "2 tbsp (40g) hummus", "Lettuce and tomato"], "s": ["Spread hummus over the wrap.", "Layer with chicken, lettuce and tomato.", "Roll up tightly and slice."]}, {"n": "Tofu and Veggie Stir Fry", "cats": ["lunch"], "k": 510, "macros": [["510", "kcal"], ["38g", "Protein"]], "i": ["200g firm tofu, cubed", "2 cups mixed stir-fry vegetables", "1 tbsp soy sauce", "1 cup (150g) cooked brown rice"], "s": ["Pan-fry the tofu until golden.", "Stir-fry the vegetables, add the tofu back with the soy sauce.", "Serve over the brown rice."]}, {"n": "Turkey and Sweet Potato Hash", "cats": ["lunch"], "k": 400, "macros": [["400", "kcal"], ["45g", "Protein"]], "i": ["150g lean turkey mince", "1 cup (150g) diced sweet potato", "1/2 onion, diced", "Paprika and garlic"], "s": ["Pan-fry the diced sweet potato until tender, about 10 minutes.", "Add the turkey mince and onion, cook through.", "Season with paprika and garlic."]}, {"n": "Prawn and Avocado Rice Paper Rolls", "cats": ["lunch"], "k": 380, "macros": [["380", "kcal"], ["38g", "Protein"]], "i": ["150g cooked prawns", "1/2 avocado, sliced", "Rice paper wrappers", "Carrot, cucumber and mint, julienned"], "s": ["Soften the rice paper wrappers in warm water.", "Layer prawns, avocado, carrot, cucumber and mint, then roll up tightly.", "Serve with a dipping sauce of choice."]}, {"n": "Lean Beef and Veg Stir Fry", "cats": ["dinner"], "k": 500, "macros": [["500", "kcal"], ["46g", "Protein"]], "i": ["150g lean beef strips", "2 cups mixed stir-fry vegetables", "1 tbsp oyster sauce", "1 cup (150g) cooked brown rice"], "s": ["Sear the beef, set aside.", "Stir-fry the vegetables, add the beef and sauce back in.", "Serve over the brown rice."]}, {"n": "Grilled Chicken and Roast Vegetables", "cats": ["dinner"], "k": 460, "macros": [["460", "kcal"], ["57g", "Protein"]], "i": ["180g chicken breast, grilled", "2 cups mixed roast vegetables (pumpkin, zucchini, capsicum)", "1 tsp olive oil", "Herbs of choice"], "s": ["Toss the vegetables in olive oil and roast at 200°C for 25 minutes.", "Grill the chicken breast until cooked through.", "Serve together with herbs."]}, {"n": "Grilled Salmon and Asparagus", "cats": ["dinner"], "k": 390, "macros": [["390", "kcal"], ["36g", "Protein"]], "i": ["150g salmon fillet", "1 bunch asparagus, trimmed", "Lemon and dill", "1 tsp olive oil"], "s": ["Grill the salmon skin-side down until just cooked through.", "Grill the asparagus alongside for a few minutes.", "Finish with lemon, dill and a drizzle of olive oil."]}, {"n": "Turkey Mince Chilli", "cats": ["dinner"], "k": 580, "macros": [["580", "kcal"], ["56g", "Protein"]], "i": ["150g lean turkey mince", "1/2 tin kidney beans", "1/2 tin crushed tomatoes", "Chilli, cumin and paprika", "1 cup (150g) cooked brown rice"], "s": ["Brown the turkey mince with the spices.", "Add the tomatoes and beans, simmer for 15 minutes.", "Serve over the brown rice."]}, {"n": "Lemon Herb Chicken and Brown Rice", "cats": ["dinner"], "k": 500, "macros": [["500", "kcal"], ["58g", "Protein"]], "i": ["180g chicken breast", "Lemon juice, garlic and mixed herbs", "1 cup (150g) cooked brown rice", "Steamed greens"], "s": ["Marinate the chicken in lemon juice, garlic and herbs for at least 15 minutes.", "Grill or pan-fry until cooked through.", "Serve with brown rice and steamed greens."]}, {"n": "Beef and Broccoli Stir Fry", "cats": ["dinner"], "k": 480, "macros": [["480", "kcal"], ["47g", "Protein"]], "i": ["150g lean beef strips", "2 cups broccoli florets", "1 tbsp oyster sauce", "1 cup (150g) cooked brown rice"], "s": ["Sear the beef, set aside.", "Stir-fry the broccoli for 3 to 4 minutes, add the beef and sauce back in.", "Serve over the brown rice."]}, {"n": "Baked Cod and Sweet Potato Mash", "cats": ["dinner"], "k": 350, "macros": [["350", "kcal"], ["44g", "Protein"]], "i": ["180g cod fillet", "1 cup (150g) sweet potato, mashed", "Steamed greens", "Lemon and dill"], "s": ["Bake the cod at 200°C for 15 minutes until flaky.", "Steam and mash the sweet potato.", "Serve together with greens and a squeeze of lemon."]}, {"n": "Chicken Fajita Bowl", "cats": ["dinner"], "k": 480, "macros": [["480", "kcal"], ["50g", "Protein"]], "i": ["150g chicken breast, sliced", "Capsicum and onion, sliced", "Fajita seasoning", "1 cup (150g) cooked brown rice"], "s": ["Pan-fry the chicken, capsicum and onion with the fajita seasoning until cooked through.", "Serve over the brown rice."]}, {"n": "Lean Beef Tacos", "cats": ["dinner"], "k": 370, "macros": [["370", "kcal"], ["40g", "Protein"]], "i": ["150g lean beef mince", "Taco seasoning", "Cos lettuce leaves (as the shell)", "Tomato, avocado and lime"], "s": ["Brown the beef mince with the taco seasoning.", "Spoon into lettuce leaves.", "Top with tomato, avocado and a squeeze of lime."]}, {"n": "Garlic Prawn and Zucchini Noodles", "cats": ["dinner"], "k": 300, "macros": [["300", "kcal"], ["50g", "Protein"]], "i": ["200g prawns", "2 zucchinis, spiralised", "Garlic, chilli and lemon", "1 tsp olive oil"], "s": ["Sauté the garlic and chilli in olive oil.", "Add the prawns and cook until pink.", "Toss through the zucchini noodles and a squeeze of lemon."]}, {"n": "Chicken and Veggie Curry", "cats": ["dinner"], "k": 600, "macros": [["600", "kcal"], ["58g", "Protein"]], "i": ["180g chicken breast, diced", "Mixed vegetables", "2 tbsp curry paste", "1/2 cup light coconut milk", "1 cup (150g) cooked brown rice"], "s": ["Brown the chicken, then add the curry paste and cook for a minute.", "Add the vegetables and coconut milk, simmer for 15 minutes.", "Serve over the brown rice."]}, {"n": "Turkey Meatballs and Marinara", "cats": ["dinner"], "k": 600, "macros": [["600", "kcal"], ["60g", "Protein"]], "i": ["200g lean turkey mince", "1 egg", "Herbs and garlic", "1 cup marinara sauce", "1 cup (150g) cooked brown rice or wholemeal pasta"], "s": ["Combine the turkey mince, egg, herbs and garlic, roll into meatballs.", "Pan-fry until browned, then simmer in the marinara sauce for 10 minutes.", "Serve over rice or pasta."]}, {"n": "Grilled Steak and Sweet Potato", "cats": ["dinner"], "k": 600, "macros": [["600", "kcal"], ["58g", "Protein"]], "i": ["180g lean steak", "1 cup (150g) roasted sweet potato", "Steamed greens", "1 tsp olive oil"], "s": ["Roast the sweet potato until tender.", "Grill the steak to your liking.", "Serve together with steamed greens."]}, {"n": "Baked Chicken Thighs and Green Beans", "cats": ["dinner"], "k": 430, "macros": [["430", "kcal"], ["52g", "Protein"]], "i": ["200g skinless chicken thighs", "2 cups green beans", "Lemon, garlic and herbs", "1 tsp olive oil"], "s": ["Marinate the chicken thighs in lemon, garlic and herbs.", "Bake at 200°C for 25 minutes until cooked through.", "Steam the green beans and serve alongside."]}, {"n": "Tuna Steak and Quinoa Salad", "cats": ["dinner"], "k": 510, "macros": [["510", "kcal"], ["55g", "Protein"]], "i": ["180g tuna steak, seared", "1 cup (150g) cooked quinoa", "Cherry tomatoes, cucumber and parsley", "Lemon and olive oil"], "s": ["Sear the tuna steak for 1 to 2 minutes each side, keeping the centre pink.", "Toss the quinoa with the chopped vegetables.", "Slice the tuna over the salad and dress with lemon and olive oil."]}, {"n": "Pork Fillet and Roast Potatoes", "cats": ["dinner"], "k": 430, "macros": [["430", "kcal"], ["50g", "Protein"]], "i": ["180g pork fillet", "1 cup (150g) roasted potato", "Steamed greens", "Rosemary and garlic"], "s": ["Season the pork fillet with rosemary and garlic, roast at 200°C for 20 minutes.", "Roast the potatoes alongside until golden.", "Serve with steamed greens."]}, {"n": "Chicken and Veggie Skewers", "cats": ["dinner"], "k": 510, "macros": [["510", "kcal"], ["58g", "Protein"]], "i": ["180g chicken breast, cubed", "Capsicum, zucchini and red onion, cubed", "Lemon and herb marinade", "1 cup (150g) cooked brown rice"], "s": ["Marinate the chicken and vegetables in lemon and herbs.", "Thread onto skewers and grill, turning occasionally, until cooked through.", "Serve with the brown rice."]}, {"n": "Baked White Fish and Brown Rice", "cats": ["dinner"], "k": 380, "macros": [["380", "kcal"], ["42g", "Protein"]], "i": ["180g white fish fillet (e.g. barramundi)", "1 cup (150g) cooked brown rice", "Steamed greens", "Lemon and dill"], "s": ["Bake the fish at 200°C for 15 minutes until flaky.", "Serve with the brown rice and steamed greens.", "Finish with lemon and dill."]}, {"n": "Beef Mince and Potato Bake", "cats": ["dinner"], "k": 520, "macros": [["520", "kcal"], ["55g", "Protein"]], "i": ["200g lean beef mince", "1 cup (150g) diced potato", "1/2 onion, diced", "1 cup beef stock", "Herbs"], "s": ["Brown the beef mince and onion.", "Layer with the diced potato in a baking dish, pour over the stock.", "Bake at 180°C for 30 minutes until the potato is tender."]}, {"n": "Chicken and Potato Tray Bake", "cats": ["dinner"], "k": 530, "macros": [["530", "kcal"], ["53g", "Protein"]], "i": ["200g chicken thigh fillets", "1 cup (150g) baby potatoes, halved", "Mixed vegetables", "Lemon, garlic and rosemary"], "s": ["Toss the chicken, potatoes and vegetables with lemon, garlic and rosemary.", "Spread on a tray and roast at 200°C for 30 to 35 minutes, turning once."]}];
-const MEALS=[...(typeof RECIPES!=="undefined"?RECIPES:[]).map(r=>({n:r.title,img:r.image,d:r.desc,cats:r.meal||[],stefan:true,k:parseInt(String(r.macros[0][0]).match(/\d+/)),macros:r.macros,i:r.ingredients,s:r.instructions})),
+const MEALS=[...(typeof RECIPES!=="undefined"?RECIPES:[]).map(r=>({n:r.title,img:r.image,d:r.desc,cats:r.meal||[],stefan:true,k:parseInt(String(r.macros[0][0]).match(/\d+/)),macros:r.macros,i:r.ingredients,s:r.instructions,b:r.blurb,notes:r.notes})),
   ...EXTRA_RECIPES.map(r=>({...r,stefan:false}))];
+MEALS.forEach(m=>{m.kl=(m.macros[0]||[])[1]||"kcal";const pm=m.macros.find(x=>/protein/i.test(x[1]));m.p=pm?parseInt(String(pm[0]).replace(/[^0-9]/g,""))||0:0});
 const WORKOUT_KCAL=300, BADGES=[3,7,14,21,30];
 const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const fmt=n=>Math.round(n).toLocaleString("en-AU");
@@ -351,23 +631,29 @@ async function restartChallenge(){
   mlayer.innerHTML="";S.start=today;S.logs={};await loadLogs();logDay=1;pendingRoute=null;tab="today";render();window.scrollTo(0,0);toast("Day 1. Here we go again.");
 }
 async function loadCommunity(){
-  try{const {data,error}=await sb.rpc("beast_challenge_community_km");if(!error){communityKm=+data;if(page==="app"&&tab==="progress")render()}}catch(e){}
+  try{const {data,error}=await sb.rpc("beast_challenge_community_km");if(!error){communityKm=+data;document.querySelectorAll("[data-community]").forEach(el=>{el.innerHTML=communityText();el.hidden=!communityKm})}}catch(e){}
 }
 
 // ---------- screens ----------
 const screen=document.getElementById("screen");
-function go(p){page=p;render();window.scrollTo(0,0)}
+function go(p){page=p;render();window.scrollTo(0,0);if(p==="app")loadCommunity()}
 function render(){
   document.getElementById("signout").hidden=!user;
+  document.body.classList.remove("inapp");
   if(page==="loading"){screen.innerHTML=`<p class="loading">Loading…</p>`;return}
   if(page==="intro"||!S){screen.innerHTML=vIntro();bindIntro();return}
   if(logDay==null)logDay=currentDay();
-  screen.innerHTML=`<div class="tabs" role="tablist">${["today","route","progress","meals"].map(t=>`<button role="tab" data-tab="${t}" aria-selected="${t===tab}">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div>
+  document.body.classList.add("inapp");
+  const y=window.scrollY;
+  screen.innerHTML=`<div class="d">
+   <div class="dband"><div class="dtabs" role="tablist">${[["today","Today"],["progress","Progress"],["meals","Meals"]].map(([t,n])=>`<button role="tab" data-tab="${t}" aria-selected="${t===(tab==="route"?"today":tab)}">${n}</button>`).join("")}</div></div>
    ${finished()?`<div class="catchup"><p><b>Your 30 days are done.</b> Check your Progress tab, share your card, then start another 30 if you want to keep going.</p><button class="btn" data-restart>Start a new 30 days</button></div>`:""}
    ${{today:vToday,route:vRoute,progress:vProgress,meals:vMeals}[tab]()}
+   </div>
    <div class="panel support-mini"><p>This challenge is free, always free. If you'd like to buy me a coffee for the time and knowledge that went into it, it's $5 — totally optional, no obligation. Otherwise, enjoy it.</p><button class="btn accent" data-support>Buy me a coffee ($5)</button></div>
    <p class="note" style="text-align:center">General information, not medical advice. <button class="linkbtn" data-disclaimer>Read the disclaimer</button></p>`;
   bindApp();
+  window.scrollTo(0,y);
 }
 
 const DISCLAIMER=`<div class="disclaimer">
@@ -426,87 +712,268 @@ function vIntro(){
   <button class="btn big" data-start>${cta}</button>`;
 }
 
+// ---------- app views (redesign) ----------
+const ORDER=["steps","workout","calories","protein","water","sleep","alcohol"];
+const HNAME={steps:"Steps",workout:"Workout",calories:"Log meals",protein:"Protein check",water:"Water",sleep:"Sleep",alcohol:"Alcohol-free"};
+const EXPANDS=["steps","workout","calories","water","sleep"];
+const ICON={
+  steps:'<path d="M8 3c2 0 3 2 3 4.5S10 11 8 11 5 9.5 5 7.5 6 3 8 3z"/><path d="M16 11c2 0 3 2 3 4.5S18 20 16 20s-3-2-3-4.5 1-4.5 3-4.5z"/>',
+  workout:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',
+  calories:'<path d="M7 3v7a2 2 0 0 0 4 0V3M9 3v18M17 3c-2 2-3 4.5-3 7.5 0 1.5 1 2.5 3 2.5V21"/>',
+  protein:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/>',
+  water:'<path d="M12 3s6 6.2 6 10.5a6 6 0 0 1-12 0C6 9.2 12 3 12 3z"/>',
+  sleep:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  alcohol:'<path d="M7 3h10l-1 7a4 4 0 0 1-8 0z"/><path d="M12 14v6M8 20h8"/>'
+};
+const CHEV='<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+const MONTH_KM=STEP_GOAL*M_PER_STEP/1000*30;
+let openHab=null, dSteps=0, dw={where:"Gym",type:"Strength",min:""}, dk="", dSleep=7.5, routeRegion=null, only30=false, signOpen=false, mealProt=false;
+const fh=h=>h%1===0?String(h):h.toFixed(1);
+const dayWord=(d,cd)=>d===cd?"today":d===cd-1?"yesterday":"2 days ago";
+const dayChip=(d,cd)=>d===cd?"Today":d===cd-1?"Yesterday":"2 days ago";
+
 function signHTML(){
   const [,name,km]=ROUTES[S.route];const done=Math.min(km,kmWalked());const pct=done/km*100;
-  const left=Math.max(0,km-done), daysLeft=Math.max(1,30-currentDay()+1);
-  const need=Math.ceil(left*1000/M_PER_STEP/daysLeft);
-  return `<div class="sign"><div class="row"><div class="dest">${name}</div><div class="km">${Math.round(done)}<span style="font-size:18px;opacity:.8"> / ${km} km</span></div></div>
-  <div class="road"><i style="width:${pct.toFixed(1)}%"></i></div>
-  <div class="sub">${left<=0?"You made it. Pick another route to keep going.":finished()?"Distances are approximate.":need>STEP_GOAL*1.5?`Epic journey: ${fmt(need)} steps a day would finish it by day 30, so go as far as you can · approx. distances`:`${fmt(need)} steps a day gets you there by day 30 · approx. distances`}</div></div>`;
+  const left=Math.max(0,Math.round(km-done)), fin=done>=km;
+  const todayKm=((S.logs[currentDay()]||{}).steps||0)*M_PER_STEP/1000;
+  const parts=name.split(" → "), hint=routeHint(km);
+  return `<section class="rsign${signOpen?" open":""}" aria-label="Your route">
+   <button class="signhead" data-signtoggle aria-expanded="${signOpen}"><div class="srow"><span class="label">Your route</span>${CHEV}</div>
+    <h2>${esc(name)}</h2>
+    <div class="roadwrap"><div class="rd" role="img" aria-label="${Math.round(pct)} percent of the route"><i style="width:${pct.toFixed(1)}%"></i></div><span class="pin" style="left:${Math.max(3,Math.min(97,pct)).toFixed(1)}%"></span></div>
+    ${fin?`<div class="km"><b>You made it. ${km} km done.</b></div>`:`<div class="km"><span><b>${fmt(left)} km</b> to go</span>${todayKm>0&&!finished()?`<span class="chipk">+${todayKm.toFixed(1)} km today</span>`:""}</div>`}
+   </button>
+   ${fin?`<button class="sbtn solid" data-goroute>Pick a new route</button>`:""}
+   <div class="xp"><div><div class="signbody"><p><b>${fmt(Math.round(done))}</b> of ${km} km · ${Math.round(pct)}%</p>
+    ${parts.length===2?`<div class="ends"><span>${esc(parts[0])}</span><span>${esc(parts[1])}</span></div>`:""}
+    <div class="tip">At ${fmt(STEP_GOAL)} steps a day: ${esc(hint.charAt(0).toLowerCase()+hint.slice(1))}. Distances are approximate.</div>
+    ${communityHTML("comm")}
+    ${fin?"":`<button class="sbtn" data-goroute>Change route</button>`}
+   </div></div></div></section>`;
 }
-function dayLabel(d,cd){const w=DOW[dayDate(d).getDay()];return d===cd?"Today":d===cd-1?`Yesterday · ${w}`:`${w} · day ${d}`}
-const shortLabel=(d,cd)=>d===cd-1?"yesterday":DOW[dayDate(d).getDay()];
+function communityHTML(cls){return `<div class="${cls}" data-community${communityKm?"":" hidden"}>${communityText()}</div>`}
+function communityText(){return communityKm?`Together, everyone in the Beast Challenge has walked about <b>${fmt(communityKm)} km</b>.`:""}
+
+function habMeta(k,l){
+  switch(k){
+    case"steps":return `${fmt(l.steps||0)} of ${fmt(STEP_GOAL)} steps`;
+    case"workout":return l.workouts.length?esc(l.workouts.map(w=>w.type+(w.min?" "+w.min+" min":"")).join(", ")):(S.workoutDays.length?`Planned ${S.workoutDays.map(d=>DOW[d]).join(", ")}`:"Gym or home");
+    case"calories":{const t=kcalTotal(l);return `${fmt(t)} of ${fmt(S.targets.calories)} cal${t&&Math.abs(t-S.targets.calories)<=S.targets.calories*.1?" · on target":""}`}
+    case"protein":return `Target ${S.targets.protein} g`;
+    case"water":return `${l.water||0} of ${S.targets.water} glasses`;
+    case"sleep":return l.sleep==null?`Aim for ${fh(S.targets.sleep)} hours`:`${fh(l.sleep)} hours. Aim for ${fh(S.targets.sleep)}`;
+    case"alcohol":return hit("alcohol",l)?"Stayed off it":"Stayed off it?";
+  }
+}
+function stepsPanel(l){
+  const left=Math.max(0,STEP_GOAL-dSteps), pct=Math.min(100,dSteps/STEP_GOAL*100);
+  const km=ROUTES[S.route][2], now=Math.max(0,Math.min(km,kmWalked()-(l.steps||0)*M_PER_STEP/1000+dSteps*M_PER_STEP/1000));
+  return `<div class="xp"><div><div class="body">
+   <label class="fld"><span>Your total for the day</span><input class="big" id="stepsIn" inputmode="numeric" autocomplete="off" value="${fmt(dSteps)}"></label>
+   <div class="quick" role="group" aria-label="Add steps"><button data-add="1000">+1,000</button><button data-add="2000">+2,000</button><button data-add="5000">+5,000</button></div>
+   <div class="goal ${dSteps>=STEP_GOAL?"hit":""}" id="goal"><div class="row"><span>Goal ${fmt(STEP_GOAL)}</span><span>${dSteps>=STEP_GOAL?"Goal hit":fmt(left)+" to go"}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>
+   <p class="route-add" id="stepsHelp">That puts you at <b>${now.toFixed(1)} km</b> of ${km} on your route.</p>
+   <button class="primary" id="saveSteps">Save steps</button><button class="linkish" id="cancelSteps">Cancel</button>
+  </div></div></div>`;
+}
+const pickBtns=(items,key,cur)=>items.map(v=>`<button data-pick="${key}" data-v="${v}" aria-pressed="${cur===v}">${v}</button>`).join("");
+function workoutPanel(l){
+  const list=l.workouts.length?`<div class="logged"><div class="label">Logged</div>${l.workouts.map((w,i)=>`<div class="entry"><span>${esc(w.where)} · ${esc(w.type)}${w.min?" · "+w.min+" min":""}</span><button data-delw="${i}" aria-label="Remove this workout">×</button></div>`).join("")}</div>`:"";
+  return `<div class="xp"><div><div class="body">
+   <div class="label" style="margin-bottom:6px">Where</div><div class="sg" role="group" aria-label="Where">${pickBtns(["Gym","Home"],"where",dw.where)}</div>
+   <div class="sect"><div class="label" style="margin-bottom:6px">What</div><div class="tiles" role="group" aria-label="Type of workout">${pickBtns(["Strength","Cardio","Class","Walk"],"type",dw.type)}</div></div>
+   <div class="sect"><div class="label">How long (optional)</div><div class="mins" role="group" aria-label="Minutes" style="margin-top:6px">${[20,30,45,60].map(m=>`<button data-min="${m}" aria-pressed="${String(m)===String(dw.min)}">${m}</button>`).join("")}</div>
+   <input class="small" id="minIn" inputmode="numeric" autocomplete="off" placeholder="Or type minutes" aria-label="Minutes" value="${esc(dw.min)}"></div>
+   <button class="primary" id="logW">Log workout</button><button class="linkish" id="cancelW">Cancel</button>${list}
+  </div></div></div>`;
+}
+function mealsPanel(l){
+  const t=kcalTotal(l), T=S.targets.calories, on=t&&Math.abs(t-T)<=T*.1, pct=Math.min(100,t/T*100);
+  const list=l.kcal.length?`<div class="logged"><div class="label">Logged</div>${l.kcal.map((k,i)=>`<div class="entry"><span>${fmt(k.k)} cal</span><button data-delk="${i}" aria-label="Remove ${k.k} calories">×</button></div>`).join("")}</div>`:"";
+  return `<div class="xp"><div><div class="body">
+   <label class="fld"><span>Calories in this meal or snack</span><input class="big" id="kIn" inputmode="numeric" autocomplete="off" placeholder="e.g. 500" value="${esc(dk)}"></label>
+   <div class="quick" role="group" aria-label="Common amounts"><button data-kq="300">300</button><button data-kq="500">500</button><button data-kq="700">700</button></div>
+   <button class="primary" id="addK">Add to my day</button>
+   <div class="tot"><div class="row"><span>${fmt(t)} of ${fmt(T)}</span>${on?`<span class="tag">On target</span>`:`<span>${t>=T?fmt(t-T)+" over":fmt(T-t)+" to go"}</span>`}</div><div class="bar"><i style="width:${pct}%"></i></div></div>
+   ${list}<button class="linkish" id="closeK">Done</button>
+  </div></div></div>`;
+}
+function waterPanel(l){
+  const n=S.targets.water, w=l.water||0;let g="";
+  for(let i=1;i<=n;i++)g+=`<button class="glass" data-glass="${i}" aria-pressed="${w>=i}" aria-label="Glass ${i}${w>=i?", filled":", empty"}"><svg viewBox="0 0 34 44" aria-hidden="true"><path class="wat" d="M7.5 15h19l-1.8 22.2a3 3 0 0 1-3 2.8H12.3a3 3 0 0 1-3-2.8z"/><path class="shell" d="M5 4h24l-2.4 33.6a4 4 0 0 1-4 3.4H11.4a4 4 0 0 1-4-3.4z"/></svg><span>${i}</span></button>`;
+  const extra=w>n?w-n:0;
+  return `<div class="xp"><div><div class="body">
+   <div class="glasses" role="group" aria-label="Glasses of water">${g}</div>
+   <p class="wnote">${w>=n?"Target reached. Nice work.":"Tap a glass to fill up to it. Tap the last full glass to take it back."}</p>
+   ${w>=n?`<div class="extra"><span>${extra?"+"+extra+" extra":"Drank more?"}</span><button data-glass-extra="1">+1 extra glass</button></div>`:""}
+   <button class="linkish" id="closeW">Done</button>
+  </div></div></div>`;
+}
+function sleepStatus(h){const t=S.targets.sleep,lo=t-.5,hi=t+.5;
+  if(h>=lo&&h<=hi)return["ok","In the sweet spot. This counts as done."];
+  if(h<lo)return["no",`A little short. Done counts ${fh(lo)} to ${fh(hi)} hours.`];
+  return["no",`A bit over. Done counts ${fh(lo)} to ${fh(hi)} hours.`]}
+function sleepVisual(h){
+  const min=4,max=12,pos=Math.max(0,Math.min(100,(h-min)/(max-min)*100)),zl=Math.max(0,(S.targets.sleep-.5-min)/(max-min)*100),zw=1/(max-min)*100,s2=sleepStatus(h);
+  return `<div class="nightwrap" aria-hidden="true"><div class="night"><div class="zone" style="left:${zl}%;width:${zw}%"></div></div><div class="moon" style="left:${pos}%"></div></div>
+   <div class="ticks" aria-hidden="true"><span>4 h</span><span>8 h</span><span>12 h</span></div>
+   <p class="status ${s2[0]}" role="status">${s2[1]}</p>`;
+}
+function sleepPanel(){
+  return `<div class="xp"><div><div class="body">
+   <div class="label">Hours slept last night</div>
+   <div class="stepper"><button class="sq" data-sh="-0.5" aria-label="Half an hour less">−</button><div class="hv"><b id="hv">${fh(dSleep)}</b>hours</div><button class="sq fill" data-sh="0.5" aria-label="Half an hour more">+</button></div>
+   <div class="hq" role="group" aria-label="Common amounts">${[6,7,8,9].map(v=>`<button data-sq="${v}" aria-pressed="${dSleep===v}">${v}</button>`).join("")}</div>
+   <div id="sleepvis">${sleepVisual(dSleep)}</div>
+   <button class="primary" id="saveSleep">Save sleep</button><button class="linkish" id="cancelSleep">Cancel</button>
+  </div></div></div>`;
+}
+function habRow(k,l,due){
+  const done=hit(k,l), isDue=due.includes(k), isOpen=openHab===k&&EXPANDS.includes(k);
+  const pill=!isDue&&!done?`<span class="pill rest">Rest day</span>`:`<span class="pill">${done?"Done":"Not yet"}</span>`;
+  const inner=`<span class="htxt"><span class="hname">${HNAME[k]}${pill}</span><span class="meta">${habMeta(k,l)}</span>${k==="steps"?`<span class="mini"><i style="width:${Math.min(100,(l.steps||0)/STEP_GOAL*100)}%"></i></span>`:""}</span>`;
+  const ico=`<span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg></span>`;
+  const cls=`habit${done?" done":""}${isOpen?" open":""}`;
+  if(EXPANDS.includes(k)){
+    const panel={steps:stepsPanel,workout:workoutPanel,calories:mealsPanel,water:waterPanel,sleep:sleepPanel}[k](l);
+    return `<article class="${cls}" data-k="${k}"><button class="hrow" aria-expanded="${isOpen}" data-open="${k}">${ico}${inner}${CHEV}</button>${isOpen?panel:""}</article>`;
+  }
+  const on=k==="protein"?!!l.protein:!!l.alcohol;
+  const label=k==="protein"?(on?"Hit it ✓":"I hit it"):(on?"Yes ✓":"Yes");
+  return `<article class="${cls}" data-k="${k}"><div class="hrow">${ico}${inner}<div class="ctl"><button class="tog" data-act="${k}" aria-pressed="${on}">${label}</button></div></div></article>`;
+}
 function vToday(){
-  const cd=currentDay();const l=L(logDay);
-  const win=finished()?[]:[cd-2,cd-1,cd].filter(d=>d>=1);
-  if(!finished()&&!win.includes(logDay))logDay=cd;
-  const missed=win.filter(d=>d<cd&&!logged(d));
-  const chips=win.map(d=>`<button data-logday="${d}" aria-pressed="${d===logDay}">${d<cd&&!logged(d)?'<i class="dot"></i>':""}${dayLabel(d,cd)}</button>`).join("");
-  const due=dueItems(logDay);
-  const row=(k,ctrl,meta)=>{const isDue=due.includes(k);const p=!isDue?`<span class="pill off">Rest day</span>`:hit(k,l)?`<span class="pill hit">Done</span>`:`<span class="pill miss">Not yet</span>`;
-    return `<div class="item"><div class="name">${ITEMS[k][0]}</div>${p}${meta?`<div class="meta">${meta}</div>`:""}${ctrl}</div>`};
-  const parts={
-    steps:()=>row("steps",`<div class="ctrl"><input id="in-steps" type="number" inputmode="numeric" min="0" max="60000" placeholder="Steps" aria-label="Steps" value="${l.steps??""}"><button class="btn" data-act="steps">Save</button></div>`,`${fmt(l.steps||0)} of ${fmt(STEP_GOAL)}`),
-    workout:()=>row("workout",`<div class="ctrl"><select id="in-where" aria-label="Where"><option>Gym</option><option>Home</option></select><select id="in-type" aria-label="Type"><option>Strength</option><option>Cardio</option><option>Class</option><option>Walk</option></select><input id="in-min" type="number" inputmode="numeric" placeholder="Min" aria-label="Minutes" style="max-width:80px"><button class="btn" data-act="workout">Log</button></div>${l.workouts.length?`<div class="entries">${l.workouts.map((w,i)=>`<span>${esc(w.where)} · ${esc(w.type)}${w.min?" · "+w.min+" min":""}<button aria-label="Remove" data-delw="${i}">×</button></span>`).join("")}</div>`:""}`,S.workoutDays.length?`Planned on ${S.workoutDays.map(d=>DOW[d]).join(", ")}`:""),
-    calories:()=>{const tot=kcalTotal(l);return row("calories",`<div class="ctrl"><input id="in-kcal" type="number" inputmode="numeric" placeholder="e.g. 500" aria-label="Calories"><button class="btn" data-act="kcal">Add</button></div>${l.kcal.length?`<div class="entries">${l.kcal.map((k,i)=>`<span>${fmt(k.k)} cal<button aria-label="Remove" data-delk="${i}">×</button></span>`).join("")}</div>`:""}`,`${fmt(tot)} of ${fmt(S.targets.calories)} cal${tot&&Math.abs(tot-S.targets.calories)<=S.targets.calories*.1?" · on target":""}`)},
-    protein:()=>row("protein",`<div class="ctrl toggle"><button class="btn ${l.protein?"":"alt"}" data-act="protein">${l.protein?"Hit my protein ✓":"Hit my protein"}</button></div>`,`Target ${S.targets.protein} g`),
-    water:()=>row("water",`<div class="ctrl"><button class="btn alt" data-act="water-" aria-label="Remove a glass">−</button><button class="btn" data-act="water+">+1 glass</button></div>`,`${l.water||0} of ${S.targets.water} glasses`),
-    sleep:()=>row("sleep",`<div class="ctrl"><input id="in-sleep" type="number" step="0.5" min="0" max="14" placeholder="Hours" value="${l.sleep??""}" aria-label="Hours slept"><button class="btn" data-act="sleep">Save</button></div>`,`Ideal ${S.targets.sleep} h`),
-    alcohol:()=>row("alcohol",`<div class="ctrl toggle"><button class="btn ${l.alcohol?"":"alt"}" data-act="alcohol">${l.alcohol?"Alcohol-free ✓":"Alcohol-free"}</button></div>`,"")
-  };
-  const st=streaks();
-  return `<div class="panel">
-    <div class="toprow"><div class="label">Day ${cd} of 30 · ${st.cur}-day streak</div><button class="btn alt tiny" data-restart-ask aria-label="Restart challenge">↺ Restart</button></div>
-    <div class="hello"><div><h2>Hey ${esc(S.name)}</h2></div><div class="score">${dayScore(logDay)}<small>/100</small></div></div>
-    <p class="note">Log each habit below as you go — steps, workouts, protein, water, sleep and staying alcohol-free — and your score for the day updates automatically.</p>
-    ${S.why?`<div class="why">"${esc(S.why)}"</div>`:""}
-  </div>
-  ${S.tracked.includes("steps")?signHTML():""}
-  ${finished()?"":`<div class="panel"><div class="label">Log ${logDay===cd?"today":dayLabel(logDay,cd).toLowerCase()}</div>
-  ${missed.length&&logDay===cd?`<div class="catchup"><p>Missed ${missed.map(d=>shortLabel(d,cd)).join(" and ")}? You can still log it.</p><button class="btn" data-logday="${missed[missed.length-1]}">Log ${shortLabel(missed[missed.length-1],cd)}</button></div>`:""}
-  <div class="day-chips">${chips}</div><div>${S.tracked.map(k=>parts[k]()).join("")}</div>
-  <p class="note">You can log today and catch up on the two days before.</p></div>`}`;
+  const cd=currentDay(), st=streaks(), fin=finished();
+  if(!fin&&![cd-2,cd-1,cd].includes(logDay))logDay=cd;
+  const l=L(logDay), due=dueItems(logDay), items=ORDER.filter(k=>S.tracked.includes(k));
+  const nDue=due.length, nHit=due.filter(k=>hit(k,l)).length, score=dayScore(logDay);
+  const win=fin?[]:[cd,cd-1,cd-2].filter(d=>d>=1);
+  const chips=win.map(d=>`<button data-logday="${d}" aria-pressed="${d===logDay}">${dayChip(d,cd)}${d<cd&&!logged(d)?'<i class="dot"></i>':""}</button>`).join("");
+  return `<div class="stack">
+   <div class="statbar"><div><span class="chip dark">Day ${cd} of 30</span><span class="chip soft">${st.cur}-day streak</span></div><button class="ghost" data-restart-ask aria-label="Restart challenge">↺ Restart</button></div>
+   <section class="card hello" aria-label="Your score"><div class="ring" role="img" aria-label="Score ${score} out of 100"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="tr" cx="50" cy="50" r="44" fill="none" stroke-width="9"/><circle class="fg" cx="50" cy="50" r="44" fill="none" stroke-width="9" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="${(276.46*(1-score/100)).toFixed(2)}"/></svg><b><span>${score}</span><small>/ 100</small></b></div>
+    <div><div class="label">${logDay===cd?"Today's score":"Score for "+dayWord(logDay,cd)}</div><h1>Hey ${esc(S.name)}</h1><p>${nHit} of ${nDue} habits done.${nDue&&nHit===nDue?" Perfect day.":""}</p></div></section>
+   ${S.why?`<p class="why2">“${esc(S.why)}”</p>`:""}
+   ${S.tracked.includes("steps")?signHTML():""}
+   ${fin?"":`<div class="days" role="group" aria-label="Choose a day">${chips}</div>
+   <div class="hhead"><h2>Log ${dayWord(logDay,cd)}</h2><span class="count">${nHit} of ${nDue} done</span></div>
+   <div class="stack" style="gap:10px">${items.map(k=>habRow(k,l,due)).join("")}</div>
+   <div class="hint"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>Tap a row to log it.${items.includes("protein")||items.includes("alcohol")?" Protein and Alcohol-free are one tap.":""} You can catch up on the two days before today.</span></div>`}
+  </div>`;
 }
-function restartPanel(){return `<div class="panel restart"><div class="label">Start over</div><p>Want a fresh go? Restart begins Day 1 again today. Your route and targets stay the same.</p><button class="btn alt" data-restart-ask>Restart challenge</button></div>`}
 function vRoute(){
   if(pendingRoute===S.route)pendingRoute=null;
+  const cur=ROUTES[S.route], km=Math.min(cur[2],Math.round(kmWalked()));
+  const regions=[...new Set(ROUTES.map(r=>r[0]))];
+  if(!routeRegion||!regions.includes(routeRegion))routeRegion=cur[0];
+  const list=ROUTES.map((r,i)=>[r,i]).filter(([r])=>r[0]===routeRegion&&(!only30||r[2]<=MONTH_KM));
   const sel=pendingRoute==null?S.route:pendingRoute;
-  let h=`${signHTML()}<div class="panel"><div class="label">Pick your route · 10,000 steps a day ≈ 8 km</div><p class="note">Tap a route, then lock it in.</p><div class="routes">`;let last="";
-  ROUTES.forEach((r,i)=>{if(r[0]!==last){h+=`<div class="label region-h">${r[0]}</div>`;last=r[0]}
-    h+=`<button class="route" data-route="${i}" aria-pressed="${i===sel}"><span>${r[1]}${i===S.route?'<span class="cur">Current</span>':""}<small class="rh">${routeHint(r[2])}</small></span><b>${r[2]} km</b></button>`});
-  h+=`</div><p class="note">Distances are approximate. Progress carries over if you switch.</p>`;
-  if(pendingRoute!=null){const [,pn,pk]=ROUTES[pendingRoute];
-    h+=`<div class="lockbar"><div><b>${pn}</b><span>${pk} km · ${routeHint(pk)}</span></div><div class="lockbtns"><button class="btn alt" data-route-cancel>Cancel</button><button class="btn accent" data-route-lock>Lock in route</button></div></div>`}
-  return h+`</div>${restartPanel()}`;
+  return `<div class="stack">
+   <button class="back" data-routeback>← Back to Today</button><h1 class="h40">Change your route</h1>
+   <section class="card"><div class="label">Your route now</div><h2 style="font-size:28px;margin-top:4px">${esc(cur[1])}</h2><p class="meta" style="font-size:16px;margin-top:6px">${km} of ${cur[2]} km walked. ${esc(routeHint(cur[2]))}.</p></section>
+   <div><div class="label">Where</div><div class="rchips" role="group" aria-label="Region">${regions.map(r=>`<button data-region="${esc(r)}" aria-pressed="${r===routeRegion}">${esc(r)}</button>`).join("")}</div></div>
+   <div class="rchips" style="margin-top:-4px"><button class="amb" data-only30 aria-pressed="${only30}">Only routes I can finish in 30 days</button></div>
+   <div class="rlist" role="group" aria-label="Routes">${list.length?list.map(([r,i])=>`<button class="rt" data-route="${i}" aria-pressed="${i===sel}"><span class="rn">${esc(r[1])}${i===S.route?'<span class="here">Your route</span>':""}</span><span class="rk">${r[2]} km</span><span class="rh ${r[2]<=MONTH_KM?"fin":"str"}">${esc(routeHint(r[2]))}</span></button>`).join(""):`<p class="meta">No routes match. Turn off the filter to see all of them.</p>`}</div>
+   <p class="meta">Distances are approximate. Progress carries over if you switch.</p>
+   ${pendingRoute!=null?`<div class="lkb" role="region" aria-label="Confirm route"><b>${esc(ROUTES[pendingRoute][1])}</b><button class="no" data-route-cancel>Cancel</button><button class="go" data-route-lock>Lock in route</button></div>`:""}
+  </div>`;
 }
 function vProgress(){
-  const cd=currentDay();let cells="";
-  for(let d=1;d<=30;d++){const sc=dayScore(d);const c=d>cd?"future":!logged(d)?"":sc>=80?"s3":sc>=50?"s2":"s1";cells+=`<div class="${c}${d===cd&&!finished()?" today":""}" title="Day ${d}">${d}</div>`}
-  const vals=Object.entries(S.logs).filter(([d])=>d>=1&&d<=30).map(([,l])=>l),st=streaks();
-  const workouts=vals.reduce((a,l)=>a+l.workouts.length,0),prot=vals.filter(l=>l.protein).length,alc=vals.filter(l=>l.alcohol).length,days=Array.from({length:cd},(_,i)=>i+1).filter(logged).length;
-  const next=BADGES.find(b=>b>st.best);
-  return `<div class="panel"><div class="hello"><div><div class="label">Challenge score ${finished()?"":"so far"}</div><h2>${days} of ${cd} days logged</h2></div><div class="score">${challengeScore()}<small>/100</small></div></div>
-  <div class="grid30">${cells}</div><p class="note">Darker green = more of your items hit that day. Missed days count as 0.</p></div>
-  <div class="panel"><div class="label">Streak badges</div>
-   <div class="badges">${BADGES.map(b=>`<div class="badge ${st.best>=b?"on":""}"><div class="disc">${b}</div>${b} days</div>`).join("")}</div>
-   <p class="note">Current streak ${st.cur} ${st.cur===1?"day":"days"} · best ${st.best}.${next?` ${Math.max(1,next-st.cur)} more days in a row for the ${next}-day badge.`:" Every badge earned."}</p></div>
-  <div class="panel"><div class="stats">
-   <div class="stat"><b>${Math.round(kmWalked())} km</b><span>walked</span></div>
-   <div class="stat"><b>${workouts}</b><span>workouts</span></div>
-   <div class="stat"><b>${prot}</b><span>protein days</span></div>
-   <div class="stat"><b>${alc}</b><span>alcohol-free days</span></div></div>
-   ${communityKm?`<div class="community">Together, everyone in the Beast Challenge has walked <b>${fmt(communityKm)} km</b>.</div>`:""}</div>
-  <div class="panel"><div class="label">${finished()?"Your 30-day":"Week "+Math.min(4,Math.ceil(cd/7))} share card</div><canvas id="card" width="1080" height="1920" aria-label="Share card preview"></canvas>
-   <button class="btn" id="share">Share to story</button><p class="note">Your weight never appears on the card.</p></div>${restartPanel()}`;
+  const cd=currentDay(), st=streaks(), fin=finished();let cells="";
+  for(let d=1;d<=30;d++){
+    const sc=dayScore(d);let c;
+    if(d>cd||(d===cd&&!logged(d)&&!fin))c="future";else if(!logged(d))c="miss";else c=sc>=80?"s3":sc>=50?"s2":"s1";
+    cells+=`<div class="${c}${d===cd&&!fin?" today":""}${BADGES.includes(d)?" mark":""}" aria-label="Day ${d}${c==="future"?", still to come":c==="miss"?", not logged":", score "+sc}">${d}</div>`;
+  }
+  const vals=Object.entries(S.logs).filter(([d])=>d>=1&&d<=30).map(([,l])=>l);
+  const workouts=vals.reduce((a,l)=>a+l.workouts.length,0),prot=vals.filter(l=>l.protein).length,alc=vals.filter(l=>l.alcohol).length;
+  const days=Array.from({length:cd},(_,i)=>i+1).filter(logged).length;
+  const next=BADGES.find(b=>b>st.best), wk=Math.min(4,Math.ceil(cd/7));
+  const missedYest=!fin&&cd>1&&!logged(cd-1);
+  return `<div class="stack">
+   <section class="card sum"><div class="sumtxt"><div class="label">Challenge score ${fin?"":"so far"}</div><h2>${days} of ${cd} days logged</h2><p>Days you skip score 0. Catch up on the last two days to lift it.</p></div><div class="bigscore">${challengeScore()}<small>/ 100</small></div></section>
+   <section class="card"><div class="label">Streak</div><h2 style="font-size:30px;margin-top:2px">${st.cur} ${st.cur===1?"day":"days"} in a row</h2><p class="meta" style="font-size:16px;margin-top:4px">Best so far: ${st.best} ${st.best===1?"day":"days"}.</p>
+    <div class="bdgs">${BADGES.map(b=>`<div class="bdg${st.best>=b?" on":""}"><div class="disc">${b}</div>${b} days</div>`).join("")}</div>
+    ${next?`<div class="nb" role="img" aria-label="${st.cur} of ${next} days"><i style="width:${Math.min(100,st.cur/next*100)}%"></i></div><p class="nbt">${Math.max(1,next-st.cur)} more days in a row for the ${next}-day badge.</p>`:`<p class="nbt">Every badge earned.</p>`}</section>
+   <section class="card"><div class="label">Your 30 days</div>
+    ${missedYest?`<div class="catch"><span>You missed yesterday. You can still log it.</span><button data-logyest>Log yesterday</button></div>`:""}
+    <div class="cal" role="img" aria-label="30 day calendar">${cells}</div>
+    <div class="key"><span><i style="background:var(--c3)"></i>80 or more</span><span><i style="background:var(--c2)"></i>50 to 79</span><span><i style="background:var(--c1)"></i>Under 50</span><span><i style="border-color:var(--amber);border-style:dashed"></i>Not logged</span><span><i style="background:var(--amber);border-radius:50%;width:10px;height:10px"></i>Badge day</span></div></section>
+   <section class="card"><div class="label">${fin?"Your 30-day":"Week "+wk} share card</div><canvas id="card" width="1080" height="1920" aria-label="Share card preview"></canvas>
+    <button class="sharebtn" id="share">Share to story</button>
+    <p class="win">Share it to your story, send me the screenshot and stand a chance to win The Discipline Path, worth $27.</p>
+    <p class="meta" style="text-align:center;margin:8px 0 0">Your weight never appears on the card.</p></section>
+   <section class="card"><div class="label">Your totals</div><div class="tiles2" style="margin-top:10px"><div class="tile"><b>${Math.round(kmWalked())} km</b><span>walked</span></div><div class="tile"><b>${workouts}</b><span>workouts</span></div><div class="tile"><b>${prot}</b><span>protein days</span></div><div class="tile"><b>${alc}</b><span>alcohol-free days</span></div></div>
+    ${communityHTML("comm")}</section>
+  </div>`;
+}
+const TILE={breakfast:["#F5B74A","#2B1A00"],lunch:["#74C69D","#06281A"],dinner:["#2D6A4F","#FFFFFF"],snack:["#E8A07A","#2B1000"],smoothie:["#8FD3C9","#06281A"],"protein powder":["#C9D88A","#1F2A00"]};
+const CATNAME={breakfast:"Breakfast",lunch:"Lunch",dinner:"Dinner",snack:"Snack",smoothie:"Smoothie","protein powder":"Protein powder"};
+const tagOf=r=>r.cats.map(c=>CATNAME[c]||c).join(" · ");
+function picHtml(r){
+  const badge=r.stefan?'<span class="mbadge">Stefan</span>':"";
+  if(r.img)return `<div class="mpic"><img src="${esc(r.img)}" alt="${esc(r.n)}" loading="lazy">${badge}</div>`;
+  const c=TILE[r.cats[0]]||TILE.lunch;
+  return `<div class="mpic" style="background:${c[0]};color:${c[1]}"><div class="mtile"><b>${fmt(r.k||0)}</b><span>kcal</span></div>${badge}</div>`;
 }
 function vMeals(){
   const F=[["all","All"],["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"],["snack","Snacks"],["smoothie","Smoothies"],["stefan","Stefan's recipes"]];
   const list=MEALS.map((r,i)=>[r,i]).filter(([r])=>mealFilter==="all"||(mealFilter==="stefan"?r.stefan:r.cats.includes(mealFilter)));
-  const tagOf=r=>r.stefan?"Stefan's recipe":r.cats.map(c=>c==="smoothie"?"Smoothie":c[0].toUpperCase()+c.slice(1)).join(" · ");
-  return `<div class="panel"><div class="label">Meal ideas</div>
-  <div class="filters" role="group" aria-label="Filter recipes">${F.map(([k,t])=>`<button data-mf="${k}" aria-pressed="${k===mealFilter}">${t}</button>`).join("")}</div>
-  <div class="meals">${list.map(([m,i])=>`<button class="meal" data-recipe="${i}">${m.img?`<img src="${esc(m.img)}" alt="" loading="lazy">`:`<div class="ph">${tagOf(m)}</div>`}<p>${esc(m.n)}</p><small>${m.macros.slice(0,2).map(x=>x.join(" ")).join(" · ")}</small><span class="tag">${tagOf(m)}</span></button>`).join("")||`<p class="note">Nothing here yet.</p>`}</div>
-  <p class="note">Stefan's recipes are the ones from his social media. Tap any recipe to open it.</p></div>`;
+  list.sort((a,b)=>{
+    if(mealProt)return (b[0].p||0)-(a[0].p||0);
+    const ra=a[0].stefan&&a[0].img?0:a[0].stefan?1:2, rb=b[0].stefan&&b[0].img?0:b[0].stefan?1:2;
+    return ra-rb||a[1]-b[1];
+  });
+  return `<div class="stack"><h1 class="h40">Meal ideas</h1><p class="mcount" style="margin-top:-6px">Stefan’s recipes come from his social media. Tap any recipe to open it.</p>
+   <div class="mfilters" role="group" aria-label="Filter recipes">${F.map(([k,t])=>`<button data-mf="${k}" aria-pressed="${k===mealFilter}">${t}</button>`).join("")}<button class="amb" data-mprot aria-pressed="${mealProt}">Most protein first</button></div>
+   <p class="mcount">${list.length} recipes</p>
+   <div class="mgrid">${list.map(([r,i])=>`<button class="mcard" data-recipe="${i}">${picHtml(r)}<div class="mtxt"><b>${esc(r.n)}</b><span>${fmt(r.k||0)} kcal · ${fmt(r.p||0)} g protein</span></div></button>`).join("")}</div></div>`;
+}
+function openMeal(i){
+  const r=MEALS[i], cd=currentDay();
+  const canAdd=S.tracked.includes("calories")&&!finished()&&r.k>0;
+  const mac=r.macros.map(m=>`<div class="tile"><b>${esc(m[0])}</b><span>${esc(m[1])}</span></div>`).join("");
+  layer.innerHTML=`<div class="d"><div class="sheet pad" role="dialog" aria-modal="true" aria-label="${esc(r.n)}"><div class="in">
+   <div class="sheetbar"><button class="back" id="sheetBack">← Back to meals</button></div>
+   ${picHtml(r)}<h1>${esc(r.n)}</h1><div class="mtag">${esc(tagOf(r))}${r.stefan?" · Stefan’s recipe":""}</div>
+   ${r.d?`<p style="margin:10px 0 0;font-size:16px;line-height:1.5;color:var(--muted)">${esc(r.d)}</p>`:""}
+   <div class="mac">${mac}</div>
+   ${r.b?`<div class="word"><b>A word from Stefan</b>${esc(r.b)}</div>`:""}
+   <div class="sec"><h3>Ingredients</h3><ul>${r.i.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+   <div class="sec"><h3>Instructions</h3><ol>${r.s.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>
+   ${r.notes&&r.notes.length?`<div class="sec"><h3>Notes</h3><ul>${r.notes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+  </div></div>
+  ${canAdd?`<div class="sheetfoot pad"><div class="in"><button class="primary" id="addDay" style="margin-top:0">Add to my day</button></div></div>`:""}</div>`;
+  document.body.style.overflow="hidden";
+  document.getElementById("sheetBack").onclick=closeMeal;
+  const a=document.getElementById("addDay");if(a)a.onclick=()=>confirmAdd(r);
+  layer.querySelector(".sheet").scrollTop=0;
+}
+function closeMeal(){layer.innerHTML="";document.body.style.overflow=""}
+function confirmAdd(r){
+  const cd=currentDay(), d=logDay, word=dayWord(d,cd), batch=/batch/i.test(r.kl||""), odd=(r.kl||"kcal")!=="kcal"&&!batch;
+  let n=1;const t=kcalTotal(L(d));
+  const note=batch?`<div class="warn">The calories on this recipe are for the whole batch. We’ll add that amount for each serving, so check it suits what you ate.</div>`:odd?`<div class="warn">The calories on this recipe are listed ${esc((r.kl||"").replace(/^kcal\s*/,""))}. We’ll add that amount for each serving.</div>`:"";
+  mlayer.innerHTML=`<div class="d"><div class="scrim" id="dlg"><div class="dlgbox" role="dialog" aria-modal="true" aria-labelledby="dlgT"><h2 id="dlgT">Add to ${word==="2 days ago"?"that day’s":word+"’s"} calories?</h2><p id="dlgP"></p>${note}
+   <div class="stepper" style="margin-top:14px"><button class="sq" id="sMinus" aria-label="Half a serving less">−</button><div class="hv"><b id="sN">1</b><span id="sW">serving</span></div><button class="sq fill" id="sPlus" aria-label="Half a serving more">+</button></div>
+   <div class="calc2" id="dlgCalc"></div><button class="primary" id="dlgYes">Yes, add it</button><button class="linkish" id="dlgNo">Cancel</button></div></div></div>`;
+  const cals=()=>Math.round(r.k*n), sv=()=>n%1===0?String(n):n.toFixed(1);
+  const upd=()=>{
+    document.getElementById("sN").textContent=sv();document.getElementById("sW").textContent=n===1?"serving":"servings";
+    document.getElementById("dlgP").innerHTML=`This adds <b>${sv()} ${n===1?"serving":"servings"}</b> of <b>${esc(r.n)}</b> (${fmt(cals())} cal) to Log meals. You can remove it there if you change your mind.`;
+    document.getElementById("dlgCalc").textContent=`${fmt(t)} cal → ${fmt(t+cals())} cal (target ${fmt(S.targets.calories)})`;
+  };
+  document.getElementById("sMinus").onclick=()=>{n=Math.max(.5,n-.5);upd()};
+  document.getElementById("sPlus").onclick=()=>{n=Math.min(6,n+.5);upd()};
+  upd();
+  const close=()=>{mlayer.innerHTML=""};
+  document.getElementById("dlgNo").onclick=close;
+  document.getElementById("dlg").onclick=e=>{if(e.target.id==="dlg")close()};
+  document.getElementById("dlgYes").onclick=async()=>{
+    const v=cals();if(!(v>=1&&v<=5000)){toast("That is over the 5,000 cal limit for one entry. Try fewer servings.");return}
+    close();await addKcal(d,v);
+  };
+  document.getElementById("dlgYes").focus();
 }
 
 // ---------- events ----------
@@ -529,44 +996,130 @@ document.addEventListener("click",e=>{
   if(e.target.closest("[data-support]")){e.preventDefault();openSupport()}
 });
 function bindIntro(){screen.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>{if(S){go("app")}else onboarding()})}
+function setTab(t){tab=t;pendingRoute=null;openHab=null;closeMeal();render();window.scrollTo(0,0);if(t==="progress"||t==="today")loadCommunity()}
+function openRoutePicker(){tab="route";pendingRoute=null;routeRegion=ROUTES[S.route][0];only30=false;render();window.scrollTo(0,0)}
+function refreshSteps(){
+  const el=screen.querySelector('.habit[data-k="steps"]');if(!el)return;const l=L(logDay);
+  const g=el.querySelector("#goal");g.classList.toggle("hit",dSteps>=STEP_GOAL);
+  g.querySelector(".row span:last-child").textContent=dSteps>=STEP_GOAL?"Goal hit":fmt(Math.max(0,STEP_GOAL-dSteps))+" to go";
+  g.querySelector(".bar i").style.width=Math.min(100,dSteps/STEP_GOAL*100)+"%";
+  const km=ROUTES[S.route][2], now=Math.max(0,Math.min(km,kmWalked()-(l.steps||0)*M_PER_STEP/1000+dSteps*M_PER_STEP/1000));
+  el.querySelector("#stepsHelp").innerHTML=`That puts you at <b>${now.toFixed(1)} km</b> of ${km} on your route.`;
+}
+function refreshSleep(){
+  const v=document.getElementById("sleepvis");if(!v)return;v.innerHTML=sleepVisual(dSleep);
+  const hv=document.getElementById("hv");if(hv)hv.textContent=fh(dSleep);
+  screen.querySelectorAll("[data-sq]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.sq===dSleep)));
+}
 function bindApp(){
-  screen.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;pendingRoute=null;render();if(tab==="progress")loadCommunity()});
-  screen.querySelectorAll("[data-logday]").forEach(b=>b.onclick=()=>{logDay=+b.dataset.logday;render()});
-  screen.querySelectorAll("[data-route]").forEach(b=>b.onclick=()=>{pendingRoute=+b.dataset.route;const y=window.scrollY;render();window.scrollTo(0,y)});
-  screen.querySelectorAll("[data-route-cancel]").forEach(b=>b.onclick=()=>{pendingRoute=null;const y=window.scrollY;render();window.scrollTo(0,y)});
+  screen.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+  screen.querySelectorAll("[data-logday]").forEach(b=>b.onclick=()=>{logDay=+b.dataset.logday;openHab=null;render()});
+  screen.querySelectorAll("[data-logyest]").forEach(b=>b.onclick=()=>{logDay=currentDay()-1;setTab("today")});
+  screen.querySelectorAll("[data-signtoggle]").forEach(b=>b.onclick=()=>{signOpen=!signOpen;render()});
+  screen.querySelectorAll("[data-goroute]").forEach(b=>b.onclick=openRoutePicker);
+  screen.querySelectorAll("[data-routeback]").forEach(b=>b.onclick=()=>setTab("today"));
+  screen.querySelectorAll("[data-region]").forEach(b=>b.onclick=()=>{routeRegion=b.dataset.region;render()});
+  screen.querySelectorAll("[data-only30]").forEach(b=>b.onclick=()=>{only30=!only30;render()});
+  screen.querySelectorAll("[data-route]").forEach(b=>b.onclick=()=>{const i=+b.dataset.route;pendingRoute=pendingRoute===i?null:i;render()});
+  screen.querySelectorAll("[data-route-cancel]").forEach(b=>b.onclick=()=>{pendingRoute=null;render()});
   screen.querySelectorAll("[data-route-lock]").forEach(b=>b.onclick=async()=>{
     const i=pendingRoute;if(i==null)return;b.disabled=true;
     const {error}=await sb.from("beast_challenge_profiles").update({route:ROUTES[i][1],updated_at:new Date().toISOString()}).eq("user_id",user.id);
     if(error){b.disabled=false;return failed(error)}
-    S.route=i;pendingRoute=null;tab="today";render();window.scrollTo(0,0);toast(`Locked in: ${ROUTES[i][1]}`)});
+    S.route=i;pendingRoute=null;signOpen=false;tab="today";render();window.scrollTo(0,0);toast(`Locked in: ${ROUTES[i][1]}`)});
   screen.querySelectorAll("[data-restart-ask]").forEach(b=>b.onclick=()=>{
     modal(`<h3 style="font-size:28px">Restart your challenge?</h3><p>This starts Day 1 again today and clears anything you've logged from today onwards. Your route and targets stay the same.</p><button class="btn accent" id="restart-yes">Yes, restart from Day 1</button>`);
     document.getElementById("restart-yes").onclick=async e=>{e.currentTarget.disabled=true;await restartChallenge()}});
-  screen.querySelectorAll("[data-delk]").forEach(b=>b.onclick=async()=>{const l=L(logDay);const [e]=l.kcal.splice(+b.dataset.delk,1);render();
-    const {error}=await sb.from("beast_challenge_calories").delete().eq("id",e.id);if(error)failed(error)});
+  screen.querySelectorAll("[data-restart]").forEach(b=>b.onclick=async()=>{b.disabled=true;await restartChallenge()});
+  screen.querySelectorAll("[data-mf]").forEach(b=>b.onclick=()=>{mealFilter=b.dataset.mf;render();window.scrollTo(0,0)});
+  screen.querySelectorAll("[data-mprot]").forEach(b=>b.onclick=()=>{mealProt=!mealProt;render()});
+  screen.querySelectorAll("[data-recipe]").forEach(b=>b.onclick=()=>openMeal(+b.dataset.recipe));
+
+  // open / close a habit row
+  screen.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{
+    const k=b.dataset.open;
+    if(openHab===k){openHab=null;render();return}
+    const l=L(logDay);openHab=k;dSteps=l.steps||0;dk="";dSleep=l.sleep==null?S.targets.sleep:l.sleep;dw={where:"Gym",type:"Strength",min:""};
+    render();
+    const f=document.getElementById(k==="steps"?"stepsIn":k==="calories"?"kIn":"");
+    if(f){setTimeout(()=>{try{f.focus({preventScroll:true});if(k==="steps")f.select()}catch(e){}},250)}
+  });
+
+  // steps
+  const sIn=document.getElementById("stepsIn");
+  if(sIn){
+    const parse=v=>{const n=parseInt(String(v).replace(/[^0-9]/g,""),10);return isNaN(n)?0:Math.min(60000,n)};
+    sIn.oninput=()=>{dSteps=parse(sIn.value);refreshSteps()};
+    sIn.onblur=()=>{sIn.value=fmt(dSteps)};
+    sIn.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();document.getElementById("saveSteps").click()}};
+    screen.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{dSteps=Math.min(60000,dSteps+(+b.dataset.add));sIn.value=fmt(dSteps);refreshSteps()});
+    document.getElementById("saveSteps").onclick=async()=>{
+      const d=logDay,l=L(d);l.steps=Math.round(dSteps);openHab=null;render();await saveDay(d);
+      toast(dSteps>=STEP_GOAL?"Steps saved. Goal hit.":`Steps saved. ${fmt(STEP_GOAL-dSteps)} to go.`)};
+    document.getElementById("cancelSteps").onclick=()=>{openHab=null;render()};
+  }
+
+  // workout
+  screen.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{dw[b.dataset.pick]=b.dataset.v;render()});
+  screen.querySelectorAll("[data-min]").forEach(b=>b.onclick=()=>{dw.min=String(dw.min)===b.dataset.min?"":b.dataset.min;render()});
+  const mi=document.getElementById("minIn");
+  if(mi)mi.oninput=()=>{dw.min=mi.value.replace(/[^0-9]/g,"").slice(0,3);screen.querySelectorAll("[data-min]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.min===dw.min)))};
+  const lw=document.getElementById("logW");
+  if(lw){
+    lw.onclick=async()=>{
+      const d=logDay,l=L(d),min=dw.min===""?null:+dw.min;
+      if(min!=null&&!(min>=1&&min<=600)){toast("Minutes should be between 1 and 600");return}
+      lw.disabled=true;
+      const w={where:dw.where,type:dw.type,min};
+      const {data,error}=await sb.from("beast_challenge_workouts").insert({user_id:user.id,day:dateStr(dayDate(d)),location:w.where,type:w.type,minutes:w.min}).select("id").single();
+      if(error)return failed(error);
+      w.id=data.id;l.workouts.push(w);openHab=null;render();toast("Workout logged");
+    };
+    document.getElementById("cancelW").onclick=()=>{openHab=null;render()};
+  }
   screen.querySelectorAll("[data-delw]").forEach(b=>b.onclick=async()=>{const l=L(logDay);const [w]=l.workouts.splice(+b.dataset.delw,1);render();
     const {error}=await sb.from("beast_challenge_workouts").delete().eq("id",w.id);if(error)failed(error)});
-  screen.querySelectorAll("[data-mf]").forEach(b=>b.onclick=()=>{mealFilter=b.dataset.mf;render()});
-  screen.querySelectorAll("[data-recipe]").forEach(b=>b.onclick=()=>{const r=MEALS[+b.dataset.recipe];
-    const canAdd=S.tracked.includes("calories")&&!finished()&&r.k>0;
-    modal(`<div class="recipe" style="display:flex;flex-direction:column;gap:10px">${r.img?`<img src="${esc(r.img)}" alt="${esc(r.n)}">`:""}<h3 style="font-size:30px">${esc(r.n)}</h3>${r.d?`<p class="note">${esc(r.d)}</p>`:""}<div class="chips">${r.macros.map(m=>`<span>${esc(m.join(" "))}</span>`).join("")}</div><div class="label">Ingredients</div><ul>${r.i.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><div class="label">Method</div><ol>${r.s.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${canAdd?`<button class="btn" id="addmeal">Add ${r.k} cal to ${logDay===currentDay()?"today":"this day"}</button>`:""}</div>`);
-    const a=document.getElementById("addmeal");if(a)a.onclick=async()=>{mlayer.innerHTML="";await addKcal(logDay,r.k)}});
-  screen.querySelectorAll("[data-restart]").forEach(b=>b.onclick=async()=>{b.disabled=true;await restartChallenge()});
+
+  // log meals (calories)
+  const kIn=document.getElementById("kIn");
+  if(kIn){
+    kIn.oninput=()=>{dk=kIn.value.replace(/[^0-9]/g,"").slice(0,4)};
+    screen.querySelectorAll("[data-kq]").forEach(b=>b.onclick=()=>{dk=b.dataset.kq;kIn.value=dk;kIn.focus()});
+    const add=async()=>{
+      const n=+dk;if(!(n>0&&n<=5000)){toast("Enter calories between 1 and 5,000");kIn.focus();return}
+      dk="";await addKcal(logDay,Math.round(n));
+    };
+    document.getElementById("addK").onclick=add;
+    kIn.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();add()}};
+    document.getElementById("closeK").onclick=()=>{openHab=null;render()};
+  }
+  screen.querySelectorAll("[data-delk]").forEach(b=>b.onclick=async()=>{const l=L(logDay);const [e]=l.kcal.splice(+b.dataset.delk,1);render();
+    const {error}=await sb.from("beast_challenge_calories").delete().eq("id",e.id);if(error)failed(error)});
+
+  // water
+  screen.querySelectorAll("[data-glass]").forEach(b=>b.onclick=async()=>{
+    const d=logDay,l=L(d),n=+b.dataset.glass;l.water=(l.water||0)===n?n-1:n;render();await saveDay(d)});
+  screen.querySelectorAll("[data-glass-extra]").forEach(b=>b.onclick=async()=>{
+    const d=logDay,l=L(d);l.water=Math.min(40,(l.water||0)+1);render();await saveDay(d)});
+  const cw=document.getElementById("closeW");if(cw)cw.onclick=()=>{openHab=null;render()};
+
+  // sleep
+  screen.querySelectorAll("[data-sh]").forEach(b=>b.onclick=()=>{dSleep=Math.max(.5,Math.min(14,dSleep+parseFloat(b.dataset.sh)));refreshSleep()});
+  screen.querySelectorAll("[data-sq]").forEach(b=>b.onclick=()=>{dSleep=+b.dataset.sq;refreshSleep()});
+  const ss=document.getElementById("saveSleep");
+  if(ss){
+    ss.onclick=async()=>{const d=logDay,l=L(d);l.sleep=dSleep;openHab=null;render();await saveDay(d);toast(`Sleep saved. ${fh(dSleep)} hours.`)};
+    document.getElementById("cancelSleep").onclick=()=>{openHab=null;render()};
+  }
+
+  // one-tap habits
   screen.querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{
-    const d=logDay,l=L(d),a=b.dataset.act,v=id=>document.getElementById(id).value;
-    if(a==="steps"){const n=+v("in-steps");if(v("in-steps")===""||!(n>=0&&n<=60000)){toast("Steps must be between 0 and 60,000");return}l.steps=Math.round(n);render();await saveDay(d);toast("Steps saved");return}
-    if(a==="kcal"){const n=+v("in-kcal");if(!(n>0&&n<=5000)){toast("Enter calories between 1 and 5,000");return}await addKcal(d,Math.round(n));return}
-    if(a==="workout"){const w={where:v("in-where"),type:v("in-type"),min:+v("in-min")||null};
-      if(w.min!=null&&!(w.min>=1&&w.min<=600)){toast("Minutes should be between 1 and 600");return}
-      b.disabled=true;const {data,error}=await sb.from("beast_challenge_workouts").insert({user_id:user.id,day:dateStr(dayDate(d)),location:w.where,type:w.type,minutes:w.min}).select("id").single();
-      if(error)return failed(error);w.id=data.id;l.workouts.push(w);render();toast("Workout logged");return}
-    if(a==="sleep"){const n=+v("in-sleep");if(!(n>0&&n<=14)){toast("Enter hours between 0.5 and 14");return}l.sleep=n;render();await saveDay(d);toast("Sleep saved");return}
+    const d=logDay,l=L(d),a=b.dataset.act;
     if(a==="protein")l.protein=!l.protein;
     if(a==="alcohol")l.alcohol=!l.alcohol;
-    if(a==="water+")l.water=Math.min(40,(l.water||0)+1);
-    if(a==="water-")l.water=Math.max(0,(l.water||0)-1);
     render();await saveDay(d);
   });
+
   const c=document.getElementById("card");if(c){drawCard(c);document.fonts&&document.fonts.ready.then(()=>{if(document.getElementById("card")===c)drawCard(c)})}
   const sh=document.getElementById("share");if(sh)sh.onclick=()=>shareCard(c);
 }
@@ -574,6 +1127,7 @@ async function addKcal(d,k){
   const {data,error}=await sb.from("beast_challenge_calories").insert({user_id:user.id,day:dateStr(dayDate(d)),kcal:k}).select("id").single();
   if(error)return failed(error);
   L(d).kcal.push({id:data.id,k});render();toast(`Added. ${fmt(kcalTotal(L(d)))} cal that day`);
+  if(openHab==="calories"){const f=document.getElementById("kIn");if(f)try{f.focus({preventScroll:true})}catch(e){}}
 }
 function shareCard(c){
   c.toBlob(async blob=>{
@@ -767,6 +1321,7 @@ async function start(){
   }catch(e){console.error(e);page="intro"}
   if(params.get("intro")!==null)page="intro";
   render();
+  if(page==="app")loadCommunity();
   // Coming from the public landing page (/30-day-challenge): open sign up straight away.
   if(params.get("join")!==null&&page==="intro"&&!S){history.replaceState({},"",location.pathname);onboarding()}
   if(params.get("support")==="thanks"){
