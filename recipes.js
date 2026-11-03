@@ -372,25 +372,6 @@ const RECIPES = [
     blurb: "I wanted a version I could cook on the stove without turning the oven on, this is that one."
   },
   {
-    id: "strawberry-chia-jam",
-    meal: ["breakfast", "snack"],
-    chip: "Strawberry Chia Jam",
-    title: "Strawberry Chia Jam",
-    desc: "Strawberries, a date, honey, and chia seeds turn into a thick jam in about fifteen minutes, no added sugar needed.",
-    ingredients: ["150g strawberries", "1 medjool date, pitted", "1 tsp honey", "1 tbsp (12g) chia seeds"],
-    instructions: ["Mash or roughly blend the strawberries with the date.", "Warm gently in a small saucepan for 5 minutes.", "Stir in the honey and chia seeds, then take off the heat and let it sit for 10 to 15 minutes to thicken into a jam.", "Store in the fridge, keeps about a week."],
-    macros: [["194", "kcal (batch)"], ["3g", "Protein"], ["40g", "Carbs (9g fiber)"], ["4g", "Fat"]],
-    kcal: 194,
-    protein: 3,
-    fibre: 9,
-    carbs: 40,
-    fat: 4,
-    difficulty: "Easy",
-    healthScore: 9,
-    dateAdded: "2026-10-27",
-    blurb: "I keep a jar of this in the fridge all week, goes on everything."
-  },
-  {
     id: "pre-workout-rice-cake-banana",
     meal: ["snack"],
     chip: "Pre-Workout Rice Cake",
