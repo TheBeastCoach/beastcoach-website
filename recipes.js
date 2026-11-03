@@ -481,5 +481,37 @@ const RECIPES = [
     healthScore: 9,
     dateAdded: "2026-11-01",
     blurb: "I wanted a protein powder I could actually put a name to every ingredient in. This one is mostly cottage cheese, seeds and pumpkin flour, and one batch lasts a while. It's nutty, so sweeten it properly in a smoothie."
+  },
+  {
+    id: "strawberry-date-chia-jam",
+    meal: ["breakfast", "snack"],
+    chip: "Strawberry Date Chia Jam",
+    image: "recipe-img/strawberry-date-chia-jam.jpg",
+    title: "Strawberry Date Chia Jam",
+    desc: "Strawberries, dates and chia cooked down into a thick jam with no added sugar. It's jam, so a teaspoon is a serving.",
+    ingredients: ["200g strawberries, cut into small chunks", "2 dates, cut into small chunks", "20g chia seeds", "Warm water, for soaking the chia", "A little water, for the pan"],
+    instructions: [
+      "Soak the 20g chia seeds in warm water for about 10 minutes, until they have expanded.",
+      "Cut the 200g strawberries and 2 dates into small chunks.",
+      "Cook the strawberries and dates in a frying pan for about 10 minutes, until soft.",
+      "Add a little water and mash to the consistency you want.",
+      "Stir in the soaked chia seeds and mix together.",
+      "Allow to cool before putting the lid on, then keep it in the fridge."
+    ],
+    notes: [
+      "A teaspoon is a serving. It's jam, so a little goes a long way.",
+      "Keep it in the fridge and use within about 5 days. There's no added sugar or preservative.",
+      "The numbers are approximate for the whole batch. Dates vary a lot by size, so weigh them if you want it exact."
+    ],
+    macros: [["~295", "kcal (batch)"], ["~6g", "Protein"], ["~60g", "Carbs (14g fibre)"], ["~7g", "Fat"]],
+    kcal: 295,
+    protein: 6,
+    fibre: 14,
+    carbs: 60,
+    fat: 7,
+    difficulty: "Easy",
+    healthScore: 9,
+    dateAdded: "2026-11-03",
+    blurb: "It's jam, so a teaspoon does the job. No added sugar, just strawberries, dates and chia."
   }
 ];
