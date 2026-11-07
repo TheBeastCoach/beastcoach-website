@@ -99,6 +99,17 @@
 
   .signout { font-size: 13px; color: var(--muted); background: none; border: none; text-decoration: underline; cursor: pointer; font-family: 'Manrope', sans-serif; }
 
+
+  .formula-card { background: var(--green-dark); color: var(--white); border-radius: 18px; padding: 24px; margin-bottom: 20px; }
+  .formula-card .eq { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px,6vw,30px); letter-spacing: 1px; line-height: 1.25; margin: 6px 0 12px; color: var(--green-light); }
+  .formula-card p { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 6px; }
+  .formula-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; }
+  .wk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .wk-result { background: var(--green); color: var(--white); border-radius: 14px; padding: 18px 20px; margin-top: 4px; }
+  .wk-result .big { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 1px; line-height: 1; }
+  .wk-result .big small { font-size: 22px; margin-left: 6px; }
+  .wk-result .rng { font-size: 14px; opacity: .9; }
+  .study-link { display: inline-block; margin-top: 8px; font-weight: 700; color: var(--green); }
   .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 480px) { .tile-grid { grid-template-columns: 1fr; } }
   .tile { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px; cursor: pointer; text-decoration: none; display: block; }
@@ -375,6 +386,7 @@
       <a class="tile" href="/challenge"><h3>30-Day Challenge</h3><p>Log today's entry and see your progress.</p></a>
       <a class="tile" data-nav="calculator"><h3>BMI &amp; Macro Calculator</h3><p>Your calories, macros, and BMI.</p></a>
       <a class="tile" data-nav="recipes"><h3>Recipes</h3><p>Healthy alternatives from social media.</p></a>
+      <a class="tile" data-nav="study"><h3>The Walking Study</h3><p>The research behind my walking calorie estimate.</p></a>
       <a class="tile" data-nav="shop"><h3>Shop</h3><p>Coming soon.</p></a>
       <a class="tile" href="/#early-access"><h3>App Beta</h3><p>Get free lifetime access, early.</p></a>
     </div>
@@ -467,6 +479,42 @@
     </div>
   </section>
 
+  <!-- ===================== WALKING STUDY ===================== -->
+  <section class="view" id="view-study">
+    <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
+    <h1 class="page-title">The Walking Study</h1>
+    <p class="page-sub">Weyand et al. 2010 measured what it costs the body to walk. It found that cost per kilo is set mostly by how tall you are.</p>
+
+    <div class="card">
+      <h3>The study</h3>
+      <p>48 people aged 5 to 32 walked on a flat treadmill at six speeds while their energy use was measured. The researchers subtracted resting burn, so the result is the cost of walking itself. Walking a distance equal to your height costs about 0.94 calories per kilo of body weight, whoever you are.</p>
+      <a class="study-link" href="https://journals.biologists.com/jeb/article/213/23/3972/10061/The-mass-specific-energy-cost-of-human-walking-is" target="_blank" rel="noopener">Read the study (Journal of Experimental Biology) &rarr;</a>
+    </div>
+
+    <div class="formula-card">
+      <h3>The formula</h3>
+      <div class="eq">kcal = 0.94 &times; weight (kg) &times; distance &divide; height</div>
+      <p>Distance and height in the same unit. Result is calories above resting.</p>
+      <p>Example: 70 kg, 175 cm, 5 km is about 190 kcal.</p>
+    </div>
+
+    <div class="card">
+      <h3>What I built</h3>
+      <p>A walking calorie estimate based on that formula. It shows a range, not a single exact number, because the study reported about 9% average error.</p>
+      <div class="wk-row" style="margin-top:14px;">
+        <div><label class="field-label" for="wk-w">Weight (kg)</label><input class="form-input" id="wk-w" type="number" inputmode="decimal" value="70"></div>
+        <div><label class="field-label" for="wk-h">Height (cm)</label><input class="form-input" id="wk-h" type="number" inputmode="decimal" value="175"></div>
+      </div>
+      <label class="field-label" for="wk-d">Distance (km)</label>
+      <input class="form-input" id="wk-d" type="number" inputmode="decimal" value="5" style="margin-bottom:14px;">
+      <div class="wk-result"><div class="big"><span id="wk-mid">0</span><small>kcal</small></div><div class="rng" id="wk-rng"></div></div>
+    </div>
+
+    <div class="card">
+      <h3>Read this before you trust it</h3>
+      <p>It counts walking only, not the calories you would burn sitting still, so it reads lower than most watches. The study covered ages 5 to 32 on flat, firm ground, so hills, soft ground, heavy loads and running are not covered.</p>
+    </div>
+  </section>
   <!-- ===================== SHOP ===================== -->
   <section class="view" id="view-shop">
     <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
@@ -962,6 +1010,21 @@ document.getElementById("idea-submit-btn").addEventListener("click", async () =>
 });
 
 /* ---------- View switching ---------- */
+
+(function () {
+  var w = document.getElementById("wk-w"), h = document.getElementById("wk-h"), d = document.getElementById("wk-d");
+  if (!w) return;
+  function calc() {
+    var kg = parseFloat(w.value), cm = parseFloat(h.value), km = parseFloat(d.value);
+    var mid = document.getElementById("wk-mid"), rng = document.getElementById("wk-rng");
+    if (!(kg > 0 && cm > 0 && km >= 0)) { mid.textContent = "0"; rng.textContent = "Enter your weight, height and distance."; return; }
+    var k = 0.94 * kg * (km * 1000) / (cm / 100) / 1000;
+    mid.textContent = Math.round(k).toLocaleString();
+    rng.textContent = "Likely range " + Math.round(k * 0.85) + " to " + Math.round(k * 1.15) + " kcal";
+  }
+  [w, h, d].forEach(function (el) { el.addEventListener("input", calc); });
+  calc();
+})();
 function showView(name) {
   document.querySelectorAll(".view").forEach(v => v.classList.remove("visible"));
   document.getElementById("view-" + name).classList.add("visible");
@@ -1093,7 +1156,7 @@ function enterPortal(user) {
   document.getElementById("dash-greeting").textContent = "Welcome back, " + name;
   showView("dashboard");
   const hash = window.location.hash.replace("#", "");
-  if (hash === "calculator" || hash === "shop" || hash === "recipes") {
+  if (hash === "calculator" || hash === "shop" || hash === "recipes" || hash === "study") {
     showView(hash);
   }
   checkDisciplinePurchase(user);
