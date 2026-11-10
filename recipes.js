@@ -496,11 +496,12 @@ const RECIPES = [
     blurb: "It's jam, so a teaspoon does the job. No added sugar, just strawberries, dates and chia."
   },
   {
-    id: "magnesium-chocolate-bark",
+    id: "magnesium-chocolate-bar",
     meal: ["snack"],
-    chip: "Magnesium Chocolate Bark",
-    title: "Magnesium Chocolate Bark",
-    desc: "Dark chocolate, pepitas and chia, set into a bark that actually snaps. Three ingredients, one bowl, and about 280mg of magnesium for the whole batch.",
+    chip: "Magnesium Chocolate Bar",
+    image: "recipe-img/magnesium-chocolate-bar.jpg",
+    title: "Magnesium Chocolate Bar",
+    desc: "Dark chocolate, pepitas and chia, set into a bar that actually snaps. Three ingredients, one bowl, and about 280mg of magnesium for the whole batch.",
     ingredients: ["60g 85% dark chocolate, broken into pieces", "20g pumpkin seeds (pepitas)", "10g chia seeds"],
     instructions: [
       "Put the chocolate in a microwave-safe bowl and microwave for 30 seconds. No longer.",
