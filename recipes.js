@@ -494,5 +494,37 @@ const RECIPES = [
     healthScore: 9,
     dateAdded: "2026-11-03",
     blurb: "It's jam, so a teaspoon does the job. No added sugar, just strawberries, dates and chia."
+  },
+  {
+    id: "magnesium-chocolate-bark",
+    meal: ["snack"],
+    chip: "Magnesium Chocolate Bark",
+    title: "Magnesium Chocolate Bark",
+    desc: "Dark chocolate, pepitas and chia, set into a bark that actually snaps. Three ingredients, one bowl, and about 280mg of magnesium for the whole batch.",
+    ingredients: ["60g 85% dark chocolate, broken into pieces", "20g pumpkin seeds (pepitas)", "10g chia seeds"],
+    instructions: [
+      "Put the chocolate in a microwave-safe bowl and microwave for 30 seconds. No longer.",
+      "Take it out and stir. Put it back in for another 30 seconds, then stir for about 30 seconds.",
+      "If it's all melted, stop. Do not put it back in the microwave. Keep stirring until the last lumps melt.",
+      "If there are still lumps after stirring, microwave for 10 seconds at a time, stirring in between. Don't be tempted to give it a long blast.",
+      "Stir in the pepitas and chia seeds until they are evenly coated.",
+      "Pour into a mould, or spread onto baking paper.",
+      "Let it set in a cool room. It doesn't need the fridge, but you can use it if you want to."
+    ],
+    notes: [
+      "The lumps you melt by stirring keep the chocolate in temper, which is why it sets glossy and snaps. Overheat it and you lose that.",
+      "The numbers are approximate for the whole batch, based on typical 85% dark chocolate. Brands vary, so check your label if you want it exact.",
+      "Want more magnesium for the calories? Add more pepitas rather than more chocolate."
+    ],
+    macros: [["~515", "kcal (batch)"], ["~15g", "Protein"], ["~19g", "Carbs (13g fibre)"], ["~41g", "Fat"]],
+    kcal: 515,
+    protein: 15,
+    fibre: 13,
+    carbs: 19,
+    fat: 41,
+    difficulty: "Easy",
+    healthScore: 8,
+    dateAdded: "2026-11-10",
+    blurb: "Same idea as the magnesium reel, but you can pick it up and eat it. Dark chocolate, pepitas, chia, and it snaps."
   }
 ];
