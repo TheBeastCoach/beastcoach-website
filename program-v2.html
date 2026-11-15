@@ -20,6 +20,13 @@
   window.__sb = sb;
   window.__dpGate = new Promise(function (resolve) {
     function lock(dest) { window.location.replace(dest); }
+    /* TEMPORARY DRAFT-ONLY VIEWING BYPASS. Must be removed before this goes live. */
+    if (location.hash === '#draft-preview' && /\.vercel\.app$/.test(location.hostname)) {
+      var g0 = document.getElementById('dp-gate-style'); if (g0) g0.remove();
+      window.__dpPreviewOnly = true;
+      resolve(null);
+      return;
+    }
     sb.auth.getSession().then(function (res) {
       var session = res.data && res.data.session;
       if (!session || !session.user || !session.user.email) { lock('/dashboard'); return; }
@@ -2711,6 +2718,7 @@ class Component extends DCLogic {
 
   if (window.__dpGate) {
     window.__dpGate.then(function (u) {
+      if (!u) return;
       user = u;
       window.__sb.from('discipline_path_progress').select('data,updated_at').eq('user_id', u.id).maybeSingle().then(function (r) {
         if (r.error) return;
