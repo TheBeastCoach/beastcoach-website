@@ -16,18 +16,24 @@ Rules:
 - Never include markdown, code blocks or any text outside the JSON object`;
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Only the Beast Coach site may call this (it spends API credit).
+  const origin = req.headers.origin || '';
+  const okOrigin = /^https:\/\/(www\.)?beastcoach\.fit$/.test(origin) || /^https:\/\/beastcoach-website[a-z0-9-]*\.vercel\.app$/.test(origin);
+  if (okOrigin) res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') { return res.status(200).end(); }
   if (req.method !== 'POST') { return res.status(405).json({ error: 'Method not allowed' }); }
 
+  if (!okOrigin) { return res.status(403).json({ error: 'Not allowed' }); }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) { return res.status(500).json({ error: 'API not configured' }); }
 
   const { meal } = req.body || {};
-  if (!meal || typeof meal !== 'string' || meal.trim().length < 2) {
+  if (!meal || typeof meal !== 'string' || meal.trim().length < 2 || meal.length > 300) {
     return res.status(400).json({ error: 'Please describe a meal' });
   }
 
