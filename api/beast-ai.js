@@ -41,6 +41,14 @@ Rules:
 - If the text is not about food, return {"error":"not_food"}.
 - No markdown and no text outside the JSON.`;
 
+function svcHeaders(key, extra) {
+  const h = Object.assign({ apikey: key }, extra || {});
+  if (String(key).startsWith('eyJ')) h.Authorization = 'Bearer ' + key;   // legacy JWT keys; new sb_secret_ keys go in apikey only
+  return h;
+}
+
+class Step extends Error { constructor(stage, detail) { super(stage); this.stage = stage; this.detail = String(detail || '').slice(0, 160); } }
+
 function send(res, status, body) {
   res.status(status).json(body);
 }
@@ -49,15 +57,16 @@ async function getUser(token) {
   const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` }
   });
-  if (!r.ok) return null;
+  if (r.status === 401 || r.status === 403) return null;
+  if (!r.ok) throw new Step('auth', r.status + ' ' + (await r.text()));
   const u = await r.json();
   return u && u.id && u.email ? { id: u.id, email: String(u.email).toLowerCase().trim() } : null;
 }
 
 async function hasPurchased(email, serviceKey) {
   const url = `${SUPABASE_URL}/rest/v1/purchases?select=id&email=eq.${encodeURIComponent(email)}&product=eq.${PRODUCT}&limit=1`;
-  const r = await fetch(url, { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } });
-  if (!r.ok) throw new Error('purchase check failed');
+  const r = await fetch(url, { headers: svcHeaders(serviceKey) });
+  if (!r.ok) throw new Step('purchase', r.status + ' ' + (await r.text()));
   const rows = await r.json();
   return Array.isArray(rows) && rows.length > 0;
 }
@@ -65,10 +74,10 @@ async function hasPurchased(email, serviceKey) {
 async function useOne(userId, serviceKey) {
   const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/beast_ai_use`, {
     method: 'POST',
-    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json' },
+    headers: svcHeaders(serviceKey, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ p_user: userId, p_limit: DAILY_LIMIT })
   });
-  if (!r.ok) throw new Error('usage check failed');
+  if (!r.ok) throw new Step('usage', r.status + ' ' + (await r.text()));
   const rows = await r.json();
   const row = Array.isArray(rows) ? rows[0] : rows;
   return { allowed: !!(row && row.allowed), used: row ? row.used : 0 };
@@ -126,7 +135,7 @@ module.exports = async function handler(req, res) {
 
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!anthropicKey || !serviceKey) return send(res, 500, { error: 'not_configured' });
+  if (!anthropicKey || !serviceKey) return send(res, 500, { error: 'not_configured', stage: 'env', detail: (!anthropicKey ? 'ANTHROPIC_API_KEY ' : '') + (!serviceKey ? 'SUPABASE_SERVICE_ROLE_KEY' : '') + ' missing' });
 
   const auth = req.headers.authorization || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
@@ -165,9 +174,11 @@ module.exports = async function handler(req, res) {
           : text }]
       })
     });
-    if (!ai.ok) throw new Error('ai ' + ai.status);
+    if (!ai.ok) throw new Step('ai', ai.status + ' ' + (await ai.text()));
     const data = await ai.json();
-    const parsed = parseJson(data.content && data.content[0] && data.content[0].text);
+    let parsed;
+    try { parsed = parseJson(data.content && data.content[0] && data.content[0].text); }
+    catch (pe) { throw new Step('parse', pe.message); }
     if (parsed.error) return send(res, 422, { error: 'not_food' });
 
     const result = mode === 'log' ? cleanLog(parsed) : mode === 'fridge' ? cleanFridge(parsed) : cleanCreate(parsed);
@@ -175,8 +186,8 @@ module.exports = async function handler(req, res) {
     if (mode === 'fridge' && result.items.length === 0) return send(res, 422, { error: 'not_food' });
     return send(res, 200, { result, used: use.used, limit: DAILY_LIMIT });
   } catch (e) {
-    console.error('beast-ai error:', e && e.message);
-    return send(res, 502, { error: 'try_again' });
+    console.error('beast-ai error:', e && e.stage, e && e.detail, e && e.message);
+    return send(res, 502, { error: 'try_again', stage: (e && e.stage) || 'server', detail: (e && e.detail) || String(e && e.message || '').slice(0, 160) });
   }
 };
 

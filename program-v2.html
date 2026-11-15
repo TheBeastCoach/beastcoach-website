@@ -1619,7 +1619,7 @@ class Component extends DCLogic {
     let res;
     try { res = await fetch('/api/beast-ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify(image ? { mode, image } : { mode, text }) }); } catch (e) { throw { code: 'network' }; }
     let body = {}; try { body = await res.json(); } catch (e) {}
-    if (!res.ok) throw { code: body.error || 'try_again', limit: body.limit };
+    if (!res.ok) throw { code: body.error || 'try_again', limit: body.limit, stage: body.stage, detail: body.detail };
     return body;
   }
   aiMessage(e) {
@@ -1631,7 +1631,7 @@ class Component extends DCLogic {
     if (c === 'empty' || c === 'too_long') return 'Keep it short: a few lines about what you ate or have.';
     if (c === 'bad_image' || c === 'image_too_big' || c === 'bad_photo') return 'Could not use that photo. Try a different one, or type what you have.';
     if (c === 'network') return 'No connection. Check your internet and try again.';
-    return 'Beast AI could not do that just now. Try again in a moment.';
+    return 'Beast AI could not do that just now. Try again in a moment.' + (e && e.stage ? ' (code: ' + e.stage + (e.detail ? ', ' + e.detail : '') + ')' : '');
   }
   shrinkPhoto(file) {
     return new Promise((resolve, reject) => {
