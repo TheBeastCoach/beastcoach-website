@@ -31,15 +31,19 @@ Rules:
 - If there is no food or drink in the photo, return {"error":"not_food"}.
 - No markdown and no text outside the JSON.`;
 
-const CREATE_PROMPT = `You are a practical meal coach for Beast Coach. The person gives what food they have and optional targets.
+const CREATE_PROMPT = `You are a practical meal coach for Beast Coach. The person lists the food they have, and may give targets for the meal.
 Return ONLY valid JSON in exactly this shape:
-{"meals":[{"name":"short name, max 40 chars","calories":0,"protein":0,"carbs":0,"fat":0,"uses":["ingredient"],"steps":["short step"],"tip":"one short sentence"}]}
+{"meals":[{"name":"short name, max 40 chars","calories":0,"protein":0,"carbs":0,"fat":0,"fibre":0,"uses":["150 g chicken breast"],"pantry":["1 tsp olive oil"],"steps":["short step"],"tip":"one short sentence"}]}
 Rules:
-- Give 1 to 3 meals. All numbers are integers.
-- Mostly use what they have. You may add basic pantry items (oil, salt, spices) and say so in tip.
-- Aim for their targets if given, otherwise a balanced high protein meal around 500 kcal.
+- Give 1 to 3 different meals. All numbers are integers, your best estimate for the exact amounts you list.
+- "uses" may contain ONLY foods the person listed, each with an amount. Never add a food they did not list. No pickles, sauces, cheese, lemon, herbs, stock or anything else unless it is in their list.
+- "pantry" may contain ONLY cooking oil, salt, pepper, water and plain dried herbs or spices, with amounts. Leave it empty if not needed.
+- The steps may only mention foods from "uses" and "pantry".
+- If their list cannot make a great meal, make the best one from it and say in "tip" what one extra item would help.
+- Follow the meal type, effort and anything to avoid. Match the targets if given: calories are the aim, protein and fibre are minimums, fat is a maximum. If a target cannot be met with their food, get as close as you can and say so in "tip".
 - If the text is not about food, return {"error":"not_food"}.
 - No markdown and no text outside the JSON.`;
+
 
 function svcHeaders(key, extra) {
   const h = Object.assign({ apikey: key }, extra || {});
@@ -119,14 +123,67 @@ function cleanFridge(p) {
 }
 
 function cleanCreate(p) {
+  const list = (x, n, len) => Array.isArray(x) ? x.slice(0, n).map(i => String(i).slice(0, len)) : [];
   const meals = Array.isArray(p.meals) ? p.meals.slice(0, 3).map(m => ({
     name: String(m.name || 'Meal').slice(0, 40),
-    calories: int(m.calories, 5000), protein: int(m.protein, 500), carbs: int(m.carbs, 800), fat: int(m.fat, 500),
-    uses: Array.isArray(m.uses) ? m.uses.slice(0, 12).map(x => String(x).slice(0, 40)) : [],
-    steps: Array.isArray(m.steps) ? m.steps.slice(0, 8).map(x => String(x).slice(0, 200)) : [],
+    calories: int(m.calories, 5000), protein: int(m.protein, 500), carbs: int(m.carbs, 800), fat: int(m.fat, 500), fibre: int(m.fibre, 200),
+    uses: list(m.uses, 12, 50), pantry: list(m.pantry, 6, 40), steps: list(m.steps, 8, 200),
     tip: String(m.tip || '').slice(0, 200)
   })) : [];
   return { meals };
+}
+
+// ---- Meal Creator: keep meals to the food the person listed ----
+const STAPLE = /^(?:[\d./\s]*(?:g|ml|tsp|tbsp|teaspoons?|tablespoons?|cups?|pinch(?:es)?|splash|dash)?\s*(?:of\s+)?)?(?:extra virgin |light )?(?:olive oil|cooking oil|vegetable oil|oil|cooking spray|salt|sea salt|pepper|black pepper|water|garlic powder|onion powder|paprika|smoked paprika|cumin|chilli flakes|chili flakes|chilli powder|dried herbs|mixed herbs|dried oregano|oregano|dried basil|dried thyme|curry powder|cinnamon|turmeric|spices?|herbs|seasoning)\b/i;
+const IGNORE = new Set(['cooked', 'tinned', 'canned', 'fresh', 'frozen', 'raw', 'sliced', 'chopped', 'diced', 'small', 'large', 'medium', 'whole', 'boiled', 'baked', 'grilled', 'steamed', 'plain', 'low', 'fat', 'the', 'and', 'with', 'extra', 'drained', 'rinsed', 'leftover', 'half', 'some', 'piece', 'pieces', 'slice', 'slices', 'cup', 'cups', 'tbsp', 'tsp', 'of']);
+function stem(w) {
+  w = w.toLowerCase().replace(/[^a-z]/g, '');
+  if (w.length > 4 && w.endsWith('ies')) return w.slice(0, -3) + 'y';
+  if (w.length > 4 && w.endsWith('oes')) return w.slice(0, -2);
+  if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) return w.slice(0, -1);
+  return w;
+}
+function stems(text) { return String(text || '').split(/[^A-Za-z]+/).map(stem).filter(w => w.length >= 3 && !IGNORE.has(w)); }
+function inList(item, haveStems) {
+  const toks = stems(item);
+  if (!toks.length) return false;
+  return toks.some(t => haveStems.some(h => h === t || (t.length >= 4 && h.length >= 4 && (h.startsWith(t) || t.startsWith(h)))));
+}
+function ingredientProblems(meal, have) {
+  const hs = stems(have), bad = [];
+  meal.uses.forEach(u => { if (!inList(u, hs)) bad.push(u); });
+  meal.pantry.forEach(u => { if (!STAPLE.test(u.trim())) bad.push(u); });
+  return bad;
+}
+function offTarget(m, t) {
+  const miss = [];
+  if (t.calories && Math.abs(m.calories - t.calories) > t.calories * 0.15) miss.push('calories');
+  if (t.protein && m.protein < t.protein * 0.9) miss.push('protein');
+  if (t.fibre && m.fibre < t.fibre * 0.8) miss.push('fibre');
+  if (t.fat && m.fat > t.fat * 1.1) miss.push('fat');
+  return miss;
+}
+const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+const EFFORTS = ['5 minutes', '15 minutes', "I'll properly cook"];
+function cleanTargets(t) {
+  const o = {};
+  if (t && typeof t === 'object') {
+    [['calories', 3000], ['protein', 300], ['fibre', 100], ['fat', 200]].forEach(([k, max]) => {
+      const n = Math.round(Number(t[k])); if (Number.isFinite(n) && n > 0) o[k] = Math.min(n, max);
+    });
+  }
+  return o;
+}
+function createText(b, t) {
+  const parts = ['Meal: ' + b.meal + '. Effort: ' + b.effort + '.', 'Foods I have: ' + b.have + '.'];
+  if (b.avoid) parts.push('Avoid: ' + b.avoid + '.');
+  const tg = [];
+  if (t.calories) tg.push('about ' + t.calories + ' calories');
+  if (t.protein) tg.push('at least ' + t.protein + ' g protein');
+  if (t.fibre) tg.push('at least ' + t.fibre + ' g fibre');
+  if (t.fat) tg.push('at most ' + t.fat + ' g fat');
+  if (tg.length) parts.push('Targets for this meal: ' + tg.join(', ') + '.');
+  return parts.join(' ');
 }
 
 module.exports = async function handler(req, res) {
@@ -146,9 +203,18 @@ module.exports = async function handler(req, res) {
   const text = typeof body.text === 'string' ? body.text.trim() : '';
   if (mode !== 'log' && mode !== 'create' && mode !== 'fridge') return send(res, 400, { error: 'bad_mode' });
   const image = body.image;
+  let create = null;
   if (mode === 'fridge') {
     if (!image || typeof image.data !== 'string' || !IMAGE_TYPES.includes(image.type) || !/^[A-Za-z0-9+/]+=*$/.test(image.data)) return send(res, 400, { error: 'bad_image' });
     if (image.data.length > MAX_IMAGE) return send(res, 400, { error: 'image_too_big' });
+  } else if (mode === 'create') {
+    const have = typeof body.have === 'string' ? body.have.trim() : '';
+    if (have.length < 2) return send(res, 400, { error: 'empty' });
+    if (have.length > 400) return send(res, 400, { error: 'too_long' });
+    if (!MEAL_TYPES.includes(body.meal) || !EFFORTS.includes(body.effort)) return send(res, 400, { error: 'bad_input' });
+    const avoid = typeof body.avoid === 'string' ? body.avoid.trim() : '';
+    if (avoid.length > 120) return send(res, 400, { error: 'too_long' });
+    create = { have, meal: body.meal, effort: body.effort, avoid, targets: cleanTargets(body.targets) };
   } else {
     if (text.length < 2) return send(res, 400, { error: 'empty' });
     if (text.length > MAX_TEXT) return send(res, 400, { error: 'too_long' });
@@ -162,27 +228,52 @@ module.exports = async function handler(req, res) {
     const use = await useOne(user.id, serviceKey);
     if (!use.allowed) return send(res, 429, { error: 'daily_limit', limit: DAILY_LIMIT });
 
-    const ai = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicKey, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: mode === 'log' ? 500 : mode === 'fridge' ? 500 : 1200,
-        system: mode === 'log' ? LOG_PROMPT : mode === 'fridge' ? FRIDGE_PROMPT : CREATE_PROMPT,
-        messages: [{ role: 'user', content: mode === 'fridge'
-          ? [{ type: 'image', source: { type: 'base64', media_type: image.type, data: image.data } }, { type: 'text', text: 'List the food and drink you can see.' }]
-          : text }]
-      })
-    });
-    if (!ai.ok) throw new Step('ai', ai.status + ' ' + (await ai.text()));
-    const data = await ai.json();
-    let parsed;
-    try { parsed = parseJson(data.content && data.content[0] && data.content[0].text); }
-    catch (pe) { throw new Step('parse', pe.message); }
-    if (parsed.error) return send(res, 422, { error: 'not_food' });
+    const ask = async (system, messages, maxTokens) => {
+      const ai = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, system, messages })
+      });
+      if (!ai.ok) throw new Step('ai', ai.status + ' ' + (await ai.text()));
+      const data = await ai.json();
+      const raw = data.content && data.content[0] && data.content[0].text;
+      let parsed;
+      try { parsed = parseJson(raw); } catch (pe) { throw new Step('parse', pe.message); }
+      return { raw, parsed };
+    };
 
-    const result = mode === 'log' ? cleanLog(parsed) : mode === 'fridge' ? cleanFridge(parsed) : cleanCreate(parsed);
-    if (mode === 'create' && result.meals.length === 0) throw new Error('empty result');
+    if (mode === 'create') {
+      const t = create.targets;
+      const messages = [{ role: 'user', content: createText(create, t) }];
+      let best = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const r = await ask(CREATE_PROMPT, messages, 1400);
+        if (r.parsed.error) return send(res, 422, { error: 'not_food' });
+        const all = cleanCreate(r.parsed).meals;
+        const bad = [];
+        const ok = all.filter(m => { const pr = ingredientProblems(m, create.have); pr.forEach(x => bad.push(x)); return pr.length === 0; });
+        const missed = ok.map(m => offTarget(m, t));
+        const allMiss = ok.length > 0 && Object.keys(t).length > 0 && missed.every(x => x.length > 0);
+        if (ok.length > 0 && (!best || (best.ok.length === 0))) best = { ok, missed };
+        if (ok.length > 0 && !allMiss) { best = { ok, missed }; break; }
+        if (attempt === 0) {
+          messages.push({ role: 'assistant', content: r.raw });
+          messages.push({ role: 'user', content: ok.length === 0
+            ? 'Your meals used foods I do not have: ' + bad.join(', ') + '. Redo them using ONLY the foods I listed plus the allowed pantry items.'
+            : 'Your numbers missed my targets (' + [...new Set(missed.flat())].join(', ') + '). Adjust the amounts so the meals meet them, using only my listed foods.' });
+        }
+      }
+      if (!best || best.ok.length === 0) throw new Step('ingredients', 'meals used foods not in the list');
+      const meals = best.ok.map((m, i) => Object.assign(m, { offTarget: best.missed[i].length > 0 }));
+      return send(res, 200, { result: { meals }, used: use.used, limit: DAILY_LIMIT });
+    }
+
+    const r = await ask(mode === 'log' ? LOG_PROMPT : FRIDGE_PROMPT, [{ role: 'user', content: mode === 'fridge'
+      ? [{ type: 'image', source: { type: 'base64', media_type: image.type, data: image.data } }, { type: 'text', text: 'List the food and drink you can see.' }]
+      : text }], 500);
+    const parsed = r.parsed;
+    if (parsed.error) return send(res, 422, { error: 'not_food' });
+    const result = mode === 'log' ? cleanLog(parsed) : cleanFridge(parsed);
     if (mode === 'fridge' && result.items.length === 0) return send(res, 422, { error: 'not_food' });
     return send(res, 200, { result, used: use.used, limit: DAILY_LIMIT });
   } catch (e) {
@@ -191,4 +282,4 @@ module.exports = async function handler(req, res) {
   }
 };
 
-module.exports._test = { parseJson, cleanLog, cleanCreate, cleanFridge, DAILY_LIMIT };
+module.exports._test = { parseJson, cleanLog, cleanCreate, cleanFridge, ingredientProblems, offTarget, DAILY_LIMIT };

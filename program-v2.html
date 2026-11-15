@@ -1394,14 +1394,16 @@ html{font-size:18px}
 <div><div class="bai-lab" style="margin-bottom:8px">Meal</div><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{mealTypes}}" as="t" hint-placeholder-count="4"><button class="mchip" style="background:{{t.bg}};color:{{t.fg}};border-color:{{t.bd}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for></div></div>
 <div><div class="bai-lab" style="margin-bottom:8px">How much effort?</div><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{efforts}}" as="t" hint-placeholder-count="3"><button class="mchip" style="background:{{t.bg}};color:{{t.fg}};border-color:{{t.bd}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for></div></div>
 <div><label for="ai-avoid" class="bai-lab">Anything to avoid? (optional)</label><input id="ai-avoid" class="fld" maxlength="100" placeholder="e.g. no dairy, no mushrooms" value="{{avoid}}" onChange="{{onAvoid}}"></div>
+<div><div class="bai-lab" style="margin-bottom:8px">Aim for (optional)</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label for="ai-tcal" class="bai-meta">Calories</label><input id="ai-tcal" class="fld" type="number" inputmode="numeric" min="0" max="3000" placeholder="e.g. 500" value="{{tCal}}" onChange="{{onTCal}}"></div><div><label for="ai-tpro" class="bai-meta">Protein, at least (g)</label><input id="ai-tpro" class="fld" type="number" inputmode="numeric" min="0" max="300" placeholder="e.g. 40" value="{{tPro}}" onChange="{{onTPro}}"></div><div><label for="ai-tfib" class="bai-meta">Fibre, at least (g)</label><input id="ai-tfib" class="fld" type="number" inputmode="numeric" min="0" max="100" placeholder="e.g. 8" value="{{tFib}}" onChange="{{onTFib}}"></div><div><label for="ai-tfat" class="bai-meta">Fat, at most (g)</label><input id="ai-tfat" class="fld" type="number" inputmode="numeric" min="0" max="200" placeholder="e.g. 15" value="{{tFat}}" onChange="{{onTFat}}"></div></div></div>
 <sc-if value="{{aiError}}" hint-placeholder-val="{{ false }}"><div role="alert" style="background:#FDECEA;color:#8A1C14;border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600">{{aiError}}</div></sc-if>
 <div class="bai-btns"><sc-if value="{{canGenerate}}" hint-placeholder-val="{{ true }}"><button class="primary" onClick="{{generate}}">Create my meal</button></sc-if><sc-if value="{{thinking}}" hint-placeholder-val="{{ false }}"><button class="primary" style="opacity:.7;cursor:default" aria-busy="true">Thinking...</button></sc-if></div>
 </div>
 <sc-for list="{{aiMeals}}" as="m" hint-placeholder-count="2">
 <div class="bai-card bai-feat">
 <div class="bai-name">{{m.name}}</div>
-<div class="bai-mc"><div><b>{{m.calories}}</b><span>cal</span></div><div class="pro"><b>{{m.protein}} g</b><span>protein</span></div><div><b>{{m.carbs}} g</b><span>carbs</span></div><div><b>{{m.fat}} g</b><span>fat</span></div></div>
-<div><div class="bai-lab" style="margin-bottom:8px">You need</div><ul class="bai-ing"><sc-for list="{{m.uses}}" as="u" hint-placeholder-count="4"><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><div>{{u}}</div></li></sc-for></ul></div>
+<div class="bai-mc"><div><b>{{m.calories}}</b><span>cal</span></div><div class="pro"><b>{{m.protein}} g</b><span>protein</span></div><div><b>{{m.carbs}} g</b><span>carbs</span></div><div><b>{{m.fat}} g</b><span>fat</span></div><div><b>{{m.fibre}} g</b><span>fibre</span></div></div>
+<sc-if value="{{m.offTarget}}" hint-placeholder-val="{{ false }}"><div class="bai-meta" style="font-weight:600">This is the closest Beast AI could get to your targets with the food you have.</div></sc-if>
+<div><div class="bai-lab" style="margin-bottom:8px">You need</div><ul class="bai-ing"><sc-for list="{{m.uses}}" as="u" hint-placeholder-count="4"><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><div>{{u}}</div></li></sc-for></ul><sc-if value="{{m.hasPantry}}" hint-placeholder-val="{{ false }}"><div class="bai-meta" style="margin-top:8px">Pantry: {{m.pantryText}}</div></sc-if></div>
 <div><div class="bai-lab" style="margin-bottom:8px">Method</div><ol class="bai-steps"><sc-for list="{{m.steps}}" as="st" hint-placeholder-count="3"><li>{{st}}</li></sc-for></ol></div>
 <sc-if value="{{m.tip}}" hint-placeholder-val="{{ true }}"><div class="bai-meta">{{m.tip}}</div></sc-if>
 <div class="bai-btns"><button class="primary" style="background:{{m.btnBg}};color:{{m.btnFg}}" onClick="{{m.add}}">{{m.btnLabel}}</button></div>
@@ -1617,7 +1619,7 @@ class Component extends DCLogic {
     try { const r = await window.__sb.auth.getSession(); token = r && r.data && r.data.session ? r.data.session.access_token : ''; } catch (e) {}
     if (!token) throw { code: 'sign_in' };
     let res;
-    try { res = await fetch('/api/beast-ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify(image ? { mode, image } : { mode, text }) }); } catch (e) { throw { code: 'network' }; }
+    try { res = await fetch('/api/beast-ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify(image ? { mode, image } : (text && typeof text === 'object' ? { mode, ...text } : { mode, text })) }); } catch (e) { throw { code: 'network' }; }
     let body = {}; try { body = await res.json(); } catch (e) {}
     if (!res.ok) throw { code: body.error || 'try_again', limit: body.limit, stage: body.stage, detail: body.detail };
     return body;
@@ -1628,6 +1630,7 @@ class Component extends DCLogic {
     if (c === 'not_purchased') return 'Beast AI comes with the Discipline Path. This account does not have it yet.';
     if (c === 'daily_limit') return 'You have used all ' + (e.limit || 20) + ' Beast AI requests for today. It resets tomorrow.';
     if (c === 'not_food') return 'That does not look like food. Try describing a meal or what you have.';
+    if (c === 'ingredients') return 'Beast AI could not make a meal from only the food you listed. Add a few more foods and try again.';
     if (c === 'empty' || c === 'too_long') return 'Keep it short: a few lines about what you ate or have.';
     if (c === 'bad_image' || c === 'image_too_big' || c === 'bad_photo') return 'Could not use that photo. Try a different one, or type what you have.';
     if (c === 'network') return 'No connection. Check your internet and try again.';
@@ -1675,13 +1678,11 @@ class Component extends DCLogic {
     const s = this.state, have = (s.kitchen || '').trim();
     if (!have) { this.showToast('Type what you have first'); return; }
     if (s.thinking) return;
-    const T = this.targetsFor(s.prof || {});
-    const cal = s.log.reduce((a, b) => a + b.cal, 0), pro = s.log.reduce((a, b) => a + b.pro, 0);
-    const parts = ['Meal: ' + s.mealType + '.', 'Effort: ' + s.effort + '.', 'I have: ' + have + '.'];
-    if ((s.avoid || '').trim()) parts.push('Avoid: ' + s.avoid.trim() + '.');
-    if (T) parts.push('Targets left today: ' + Math.max(0, T.calories - cal) + ' calories, ' + Math.max(0, T.protein - pro) + ' g protein.');
+    const num = (v) => { const n = Math.round(Number(v)); return n > 0 ? n : 0; };
+    const targets = { calories: num(s.tCal), protein: num(s.tPro), fibre: num(s.tFib), fat: num(s.tFat) };
+    const req = { have: have.slice(0, 400), meal: s.mealType, effort: s.effort, avoid: (s.avoid || '').trim().slice(0, 120), targets };
     this.setState({ thinking: true, aiError: '', aiMeals: [], added: {} });
-    try { const r = await this.callAI('create', parts.join(' ').slice(0, 600)); this.setState({ thinking: false, aiMeals: r.result.meals || [] }); }
+    try { const r = await this.callAI('create', req); this.setState({ thinking: false, aiMeals: r.result.meals || [] }); }
     catch (e) { this.setState({ thinking: false, aiError: this.aiMessage(e) }); }
   }
   renderVals() {
@@ -1711,7 +1712,7 @@ class Component extends DCLogic {
     };
     const aiMeals = (s.aiMeals || []).map((m, i) => {
       const done = !!(s.added || {})['m' + i];
-      return { ...m, btnBg: done ? '#B7E4C7' : '#2D6A4F', btnFg: done ? '#0A1A12' : '#FFFFFF', btnLabel: done ? 'Added to my log' : 'Log this meal',
+      return { ...m, hasPantry: (m.pantry || []).length > 0, pantryText: (m.pantry || []).join(', '), btnBg: done ? '#B7E4C7' : '#2D6A4F', btnFg: done ? '#0A1A12' : '#FFFFFF', btnLabel: done ? 'Added to my log' : 'Log this meal',
         add: () => { if ((this.state.added || {})['m' + i]) return; this.setState({ added: { ...this.state.added, ['m' + i]: true }, log: [...this.state.log, { name: m.name, cal: m.calories, pro: m.protein }], logDate: this.today() }); this.showToast('Added to your Meal Log'); } };
     });
 
@@ -2658,6 +2659,8 @@ class Component extends DCLogic {
       onPhoto: (e) => { const f = e.target.files && e.target.files[0]; this.runPhoto(f); },
       aiMeals, thinking: !!s.thinking, canGenerate: !s.thinking, canEstimate: !s.thinking, aiError: s.aiError || '',
       terms: { show: !s.termsOk, accept: () => this.setState({ termsOk: true }) },
+      tCal: s.tCal || '', tPro: s.tPro || '', tFib: s.tFib || '', tFat: s.tFat || '',
+      onTCal: (e) => this.setState({ tCal: e.target.value }), onTPro: (e) => this.setState({ tPro: e.target.value }), onTFib: (e) => this.setState({ tFib: e.target.value }), onTFat: (e) => this.setState({ tFat: e.target.value }),
       generate: () => this.runCreate(),
       draft: s.draft,
       onDraft: (e) => this.setState({ draft: e.target.value }),
