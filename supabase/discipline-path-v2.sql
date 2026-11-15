@@ -1,4 +1,4 @@
--- Beast AI: daily usage counter, used by api/beast-ai.js.
+-- Discipline Path v2: Beast AI daily usage counter and saved answers. Run once (see steps in chat).
 -- Run once in Supabase: Dashboard -> SQL Editor -> New query -> paste this file -> Run.
 -- Safe to run again.
 
@@ -44,3 +44,20 @@ $$;
 
 revoke all on function public.beast_ai_use(uuid, int) from public, anon, authenticated;
 grant execute on function public.beast_ai_use(uuid, int) to service_role;
+
+-- ---------- Discipline Path: saved answers and progress (one row per person) ----------
+create table if not exists public.discipline_path_progress (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  data       jsonb not null default '{}'::jsonb,   -- everything the person has filled in
+  updated_at timestamptz not null default now()
+);
+
+alter table public.discipline_path_progress enable row level security;
+
+drop policy if exists "own progress read"   on public.discipline_path_progress;
+drop policy if exists "own progress insert" on public.discipline_path_progress;
+drop policy if exists "own progress update" on public.discipline_path_progress;
+
+create policy "own progress read"   on public.discipline_path_progress for select using (auth.uid() = user_id);
+create policy "own progress insert" on public.discipline_path_progress for insert with check (auth.uid() = user_id);
+create policy "own progress update" on public.discipline_path_progress for update using (auth.uid() = user_id) with check (auth.uid() = user_id);

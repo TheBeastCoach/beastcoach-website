@@ -1,7 +1,7 @@
 // Beast AI for the Discipline Path (Meal Log and Meal Creator).
 // Only signed-in people who bought the Discipline Path can use it, with a daily limit.
 // Needs these Vercel environment variables: ANTHROPIC_API_KEY, SUPABASE_SERVICE_ROLE_KEY.
-// Needs supabase/beast-ai.sql to have been run once.
+// Needs supabase/discipline-path-v2.sql to have been run once.
 
 const SUPABASE_URL = 'https://jgbcgbdbmqtsozwlllfj.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw';
