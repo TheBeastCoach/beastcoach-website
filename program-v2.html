@@ -571,6 +571,7 @@ html{font-size:18px}
 <div style="display:flex;align-items:center;gap:8px;font-family:Manrope,sans-serif;font-size:12px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#52B788;padding:2px 0 4px">Kitchen tools<span style="background:#F59E0B;color:#1B1200;border-radius:999px;padding:1px 8px;font-size:11px;letter-spacing:.05em">NEW</span></div>
 <button class="sbtn" style="background:{{nav.creator.bg}};color:{{nav.creator.fg}}" onClick="{{go.creator}}">Meal Creator</button>
 <button class="sbtn" style="background:{{nav.log.bg}};color:{{nav.log.fg}}" onClick="{{go.log}}">Meal Log</button>
+<button class="sbtn" style="background:{{nav.dailylog.bg}};color:{{nav.dailylog.fg}}" onClick="{{go.dailylog}}">Daily Log</button>
 <div style="border-top:1px solid rgba(255,255,255,.12);margin:8px 0"></div>
 <button class="sbtn" style="background:{{nav.mealplan.bg}};color:{{nav.mealplan.fg}}" onClick="{{go.mealplan}}">Meal Plan Ideas</button>
 <button class="sbtn" style="background:{{nav.psychology.bg}};color:{{nav.psychology.fg}}" onClick="{{go.psychology}}">The Psychology</button>
@@ -744,15 +745,7 @@ html{font-size:18px}
 <div class="ch-addbar"><button class="ch-addbtn" style="{{ch.addStyle}}" onClick="{{ch.addSel}}">{{ch.addLabel}}</button></div>
 </sc-if>
 
-<sc-if value="{{ch.active}}" hint-placeholder-val="{{ true }}"><details class="tk"><summary>Daily basics<span class="tkc">{{ch.basicsDone}} of 7</span></summary><div class="tkb ch-list">
-<sc-for list="{{ch.habits}}" as="h" hint-placeholder-count="7">
-<button class="ch-habit" style="{{h.style}}" onClick="{{h.toggle}}">
-<span class="ch-ico" style="{{h.ico}}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="{{h.path}}"/></svg></span>
-<span class="ch-txt"><span class="ch-name">{{h.name}}<span class="ch-pill" style="{{h.pill}}">{{h.pillText}}</span></span><span class="ch-meta">{{h.meta}}</span></span>
-<span class="ch-tick" style="{{h.tick}}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
-</button>
-</sc-for>
-</div></details></sc-if>
+
 <sc-if value="{{ch.canFinish}}" hint-placeholder-val="{{ false }}"><button class="ch-demo" onClick="{{ch.finishNow}}">Show Step 1 completed</button></sc-if>
 </div>
 <sc-if value="{{sh1.has}}" hint-placeholder-val="{{ false }}">
@@ -1400,6 +1393,36 @@ html{font-size:18px}
 </div>
 </sc-if>
 
+<!-- VIEW: daily log -->
+<sc-if value="{{view.dailylog}}" hint-placeholder-val="{{ false }}">
+<div class="bai">
+<div class="bai-hero"><h1>Daily Log</h1><p>Tick off your basics and see what you have eaten today.</p></div>
+<div class="bai-card"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h2 style="font-size:22px;margin:0">Daily basics</h2><span class="tkc">{{ch.basicsDone}} of 7</span></div>
+<div class="pg" style="padding:0;background:none"><div class="ch-list">
+<sc-for list="{{ch.habits}}" as="h" hint-placeholder-count="7">
+<button class="ch-habit" style="{{h.style}}" onClick="{{h.toggle}}">
+<span class="ch-ico" style="{{h.ico}}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="{{h.path}}"/></svg></span>
+<span class="ch-txt"><span class="ch-name">{{h.name}}<span class="ch-pill" style="{{h.pill}}">{{h.pillText}}</span></span><span class="ch-meta">{{h.meta}}</span></span>
+<span class="ch-tick" style="{{h.tick}}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+</button>
+</sc-for>
+</div></div>
+</div>
+<div class="bai-btns"><button class="primary" onClick="{{go.log}}">Log a meal</button><button class="ghost" onClick="{{go.creator}}">Meal Creator</button></div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<h2 style="font-size:26px">Logged today</h2>
+<sc-if value="{{logEmpty}}" hint-placeholder-val="{{ false }}"><div style="color:#707973">Nothing logged yet.</div></sc-if>
+<sc-for list="{{log}}" as="item" hint-placeholder-count="3">
+<div style="background:#fff;border:1px solid #E4E8E6;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:16px">{{item.name}}</div><div style="font-size:14px;color:#707973">{{item.cal}} cal, {{item.pro}} g protein</div></div>
+<button aria-label="Remove this meal" style="background:#F7F9F8;border:0;border-radius:10px;width:44px;height:44px;font-size:22px;color:#1B1B1B" onClick="{{item.remove}}">&times;</button>
+</div>
+</sc-for>
+</div>
+<div style="font-size:13px;color:#707973;line-height:1.5">Estimates only, not medical or dietary advice. Numbers are rough, so use them as a guide, not a score.</div>
+</div>
+</sc-if>
+
 <!-- VIEW: meal log -->
 <sc-if value="{{view.log}}" hint-placeholder-val="{{ false }}">
 <div class="bai">
@@ -1465,6 +1488,7 @@ html{font-size:18px}
 <button style="flex:1;min-height:56px;border:0;border-radius:12px;font-size:13px;font-weight:700;background:{{nav.program.bg}};color:{{nav.program.fg}}" onClick="{{go.program}}">Program</button>
 <button style="flex:1;min-height:56px;border:0;border-radius:12px;font-size:13px;font-weight:700;background:{{nav.creator.bg}};color:{{nav.creator.fg}}" onClick="{{go.creator}}">Meal Creator</button>
 <button style="flex:1;min-height:56px;border:0;border-radius:12px;font-size:13px;font-weight:700;background:{{nav.log.bg}};color:{{nav.log.fg}}" onClick="{{go.log}}">Meal Log</button>
+<button style="flex:1;min-height:56px;border:0;border-radius:12px;font-size:13px;font-weight:700;background:{{nav.dailylog.bg}};color:{{nav.dailylog.fg}}" onClick="{{go.dailylog}}">Daily Log</button>
 </nav>
 </main>
 </div>
@@ -1674,7 +1698,7 @@ class Component extends DCLogic {
   }
   renderVals() {
     const s = this.state;
-    const IDS = ["cover", "profile", "step1", "step2", "step3", "taste", "step4", "step5", "step6", "step7", "mealplan", "psychology", "education", "program", "creator", "log"];
+    const IDS = ["cover", "profile", "step1", "step2", "step3", "taste", "step4", "step5", "step6", "step7", "mealplan", "psychology", "education", "program", "creator", "log", "dailylog"];
     const CAL_T = this.targetsFor(s.prof || {}) ? this.targetsFor(s.prof || {}).calories : 0;
     const PRO_T = this.targetsFor(s.prof || {}) ? this.targetsFor(s.prof || {}).protein : 0;
     const cal = s.log.reduce((a, b) => a + b.cal, 0);
@@ -1714,7 +1738,7 @@ class Component extends DCLogic {
           groups: [
             { title: '', hasTitle: false, items: [it('program', 'Program overview'), it('cover', 'Start Here'), it('profile', 'Your Profile')] },
             { title: 'The steps', hasTitle: true, items: [it('step1', 'Identity Reset', '1'), it('step2', 'Environment Reset', '2'), it('step3', 'Social Playbook', '3'), it('taste', 'Reprogramming Your Taste Buds', '4'), it('step4', 'Routine Build', '5'), it('step5', 'Reset Protocol', '6'), it('step6', 'Workout Plan', '7'), it('step7', 'Full System', '8')] },
-            { title: 'Kitchen tools', hasTitle: true, items: [it('creator', 'Meal Creator'), it('log', 'Meal Log')] },
+            { title: 'Kitchen tools', hasTitle: true, items: [it('creator', 'Meal Creator'), it('log', 'Meal Log'), it('dailylog', 'Daily Log')] },
             { title: 'More', hasTitle: true, items: [it('mealplan', 'Meal Plan Ideas'), it('psychology', 'The Psychology'), it('education', 'Education')] }
           ]
         };
@@ -1732,7 +1756,7 @@ class Component extends DCLogic {
         const KEPT = [["Kitchen tools", ["Log every meal in your Meal Log", "Generate a meal from what's in your kitchen"]], ["Morning & Environment Setup", ["Make your bed immediately after getting up", "Put a glass of water next to your bed before sleeping", "Drink a glass of water before coffee", "Never hit snooze again", "Open your blinds completely upon waking", "Lay out your workout clothes or sneakers the night before", "Put your gym bag or sneakers by the front door", "Charge your phone across the room or outside the bedroom", "Put your phone on airplane mode overnight", "Wash and dry cookware right after cooking, not later", "Clear your kitchen bench before bed"]], ["Nutrition & Kitchen Awareness", ["Read the nutrition label before buying something new", "Drink a glass of water before your main meal", "Walk for 5 minutes after a meal", "Swap one liquid-calorie drink for a zero-calorie option", "Treat takeaway as a once-a-month thing, not a default", "Plan your breakfasts 3 days ahead", "Eat one meal at a table, no screen", "Put your fork down between bites for a few minutes", "Batch cook an extra portion of protein for tomorrow", "Weigh or measure oil and dressing instead of free-pouring", "Choose a zero-calorie drink at a restaurant or catch-up", "Finish dinner at least 2 hours before bed", "Stop eating at 80% full and wait 10 minutes before seconds", "Swap an afternoon sugary snack for a high-protein one", "Keep a backup high-protein snack in your bag or car", "Write a grocery list before you shop", "Eat a small snack before grocery shopping hungry", "Log everything you eat today, no changes yet", "Try a food you've never had before", "Check the protein content of your next meal before eating it"]], ["Movement & Daily Activity", ["Walk for 10 minutes after your biggest meal", "Stand instead of sit for one call or task", "Park at the far end of the car park on purpose", "Pace or stand while on a phone call", "Find a reward for yourself that isn't food", "Put your workout shoes on just to do 5 push-ups", "Take a dedicated 15-minute lunchtime walk", "Take a walk while catching up with a colleague or friend", "Track your steps today, no target yet"]], ["Evening Routine & Sleep", ["Set a screens-off alarm 45 minutes before bed", "Keep your bedroom slightly cooler than the rest of the house", "Swap your phone for 5 pages of a book before sleep", "Dim the lights after 8pm", "Write tomorrow's top 3 tasks before bed instead of in bed", "Avoid caffeine after 2pm", "Set up an eye mask or blackout blind", "Commit to lights out by a fixed time tonight", "Use ambient or white noise instead of TV at night", "Skip alcohol on a weeknight and find another treat", "Go to bed at the same time every night"]], ["Identity, Mindset & Self-Talk", ["Put a photo somewhere prominent that reminds you why", "Do your body measurements once this month", "Acknowledge one physical thing your body can do, out loud", "Unfollow an account that makes you feel worse about your body", "Follow one account that teaches practical, no-nonsense habits", "Journal one sentence about how your energy felt today", "Notice a moment intentionally, like water in the shower", "Catch an excuse and write down the real friction behind it", "Ask \"would the person I'm becoming do this?\" before deciding", "Do one thing today future-you would thank you for", "Write one thing you did well today", "Replace \"I can't\" with \"I haven't yet\" once today", "Speak to yourself like someone you respect", "Say \"I choose to\" instead of \"I have to\" once today", "Acknowledge one thing you're proud of, without downplaying it"]], ["Organization & Planning", ["Throw out or donate expired pantry items", "Prep washed, chopped snack veggies into containers", "Put your supplements next to something you use every morning", "Set a recurring daily hydration reminder", "Clean your shaker bottle right after use, not later", "Move delivery apps off your home screen", "Stock your freezer with vegetables and portioned protein", "Keep a food scale next to your cutting board", "Check the calories in a cereal portion you'd normally guess", "Weigh your cooking oil once to see what free-pouring actually costs", "Keep a notepad on the counter for instant grocery logging", "Map out your 3 movement windows for next week", "Prep tomorrow's clothes tonight", "Clear one surface in your home today", "Tidy your car or bag before the day starts", "Put your phone in another room for an hour of focused work"]], ["Recovery & Mobility", ["Take a 3-minute cold rinse at the end of your shower", "Sit in silence for 5 minutes, no inputs", "Elevate your legs against a wall for 5 minutes in the evening", "Do 10 slow cat-cow movements before starting your day", "Rest your eyes on something 6 metres away for 60 seconds", "Write down one physical signal your body gave you today", "Stretch for 5 minutes before bed"]], ["Money", ["Check your bank balance without avoiding it", "Write down everything you spent today", "Skip one non-essential purchase today", "Compare a purchase to the hours worked to afford it"]], ["Discipline & Self-Trust", ["Start a task the second an alarm goes off", "Finish something you started but never completed", "Keep a promise to yourself nobody else would know about", "Reply to messages the same day you get them", "Say out loud when you'll do something, then do it exactly then", "Do the boring thing on purpose today", "Keep a promise to yourself today", "Choose consistency over motivation today", "Do one task at the same time every day this week", "Do something imperfectly rather than skip it entirely", "Show up to a commitment even when you don't feel like it"]], ["Communication & Relationships", ["Say no to something you'd normally agree to out of guilt", "Give one genuine, specific compliment today", "Tell someone a truth you've been avoiding", "Set one boundary out loud", "Ask for something you need instead of hoping someone notices", "Reach out to someone you've been meaning to contact", "Forgive one small thing you've been holding onto"]], ["Focus & Body Awareness", ["Single-task for 20 minutes, no switching", "Turn off notifications for one app all day", "Read one page of something that isn't your phone", "Sit through 5 minutes of boredom with no screen", "Do one thing slower than usual, on purpose", "Take 3 deep breaths before reacting to stress", "Roll your shoulders back and check your posture", "Unclench your jaw when you catch it", "Breathe through your nose for a set period today"]], ["Accountability", ["Own a mistake out loud instead of explaining it away", "Name one excuse you used today, honestly", "Write the real reason you didn't do something", "Follow through on something you told someone you'd do", "Take responsibility for a result you'd normally blame elsewhere"]], ["Gratitude, Rest & Small Wins", ["Write one thing you're grateful for that you usually overlook", "Notice one thing better today than a year ago", "Acknowledge progress instead of the distance left", "Recognize one habit you already do well", "Rest without guilt for a set period today", "Say no to something today to protect your energy", "Notice when you're pushing through exhaustion, and stop", "Write down your top 1 priority for the day, nothing else", "Say something you're grateful for out loud, not just in your head", "Check in with yourself once today: how am I actually doing"]]];
         const LOGH = 'Log every meal in your Meal Log', GENH = "Generate a meal from what's in your kitchen";
         const LINKS = { 'Log every meal in your Meal Log': ['Open Meal Log', 'log'], "Generate a meal from what's in your kitchen": ['Open Meal Creator', 'creator'] };
-        const dn = s.done, my = s.myHabits, tk = s.ticks;
+        const dn = (s.doneDate === this.today() ? s.done : {}), my = s.myHabits, tk = s.ticks;
         (this.__sh = this.__sh || {}).ch = { title: 'Identity Reset', sub: 'The small habits I am building', sections: my.length ? (() => { const used = new Set(); const secs = KEPT.map((k) => { const rs = my.filter((t) => k[1].includes(t)); rs.forEach((t) => used.add(t)); return { h: k[0], rows: rs }; }).filter((q) => q.rows.length); const own = my.filter((t) => !used.has(t)); if (own.length) secs.push({ h: 'My own habits', rows: own }); return secs; })() : [], print: () => { try { window.print(); } catch (e) {} } };
         const hasList = my.length > 0 && !s.s1Complete;
         const doneCount = my.filter((t) => tk[t]).length;
@@ -1808,7 +1832,7 @@ class Component extends DCLogic {
               pill: on ? 'background:#D8F3DC;color:#1B4332' : 'background:#FFF1CC;color:#6B4200',
               pillText: on ? 'Done' : 'To do',
               tick: on ? 'background:#52B788;color:#06281A' : 'background:#EEF6F0;color:#EEF6F0',
-              toggle: () => this.setState({ done: { ...this.state.done, [h[0]]: !this.state.done[h[0]] } })
+              toggle: () => this.setState({ done: { ...dn, [h[0]]: !dn[h[0]] }, doneDate: this.today() })
             };
           })
         };
