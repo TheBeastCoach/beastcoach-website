@@ -1382,7 +1382,8 @@ html{font-size:18px}
 <sc-if value="{{totals.noTargets}}" hint-placeholder-val="{{ false }}"><p style="margin:10px 0 0;font-size:14px;opacity:.85">Add your details in Your Profile and meals will aim at your targets.</p></sc-if>
 </div>
 <div class="bai-card">
-<div><label for="ai-have" class="bai-lab">What do you have?</label><textarea id="ai-have" class="fld" rows="4" maxlength="320" placeholder="e.g. eggs, tinned tuna, spinach, cooked rice, Greek yoghurt" value="{{kitchen}}" onChange="{{onKitchen}}"></textarea></div>
+<div><input id="ai-photo" type="file" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" onChange="{{onPhoto}}"><label for="ai-photo" class="ghost" style="display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;width:100%;box-sizing:border-box"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>{{photoLabel}}</span></label><div class="bai-meta" style="margin-top:8px">Take a photo or choose one. Beast AI lists what it sees, then you can edit the list.</div><sc-if value="{{photoNote}}" hint-placeholder-val="{{ false }}"><div style="margin-top:8px;font-size:14px;font-weight:600;color:#2D6A4F">{{photoNote}}</div></sc-if></div>
+<div><label for="ai-have" class="bai-lab">Or type what you have</label><textarea id="ai-have" class="fld" rows="4" maxlength="320" placeholder="e.g. eggs, tinned tuna, spinach, cooked rice, Greek yoghurt" value="{{kitchen}}" onChange="{{onKitchen}}"></textarea></div>
 <div><div class="bai-lab" style="margin-bottom:8px">Meal</div><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{mealTypes}}" as="t" hint-placeholder-count="4"><button class="mchip" style="background:{{t.bg}};color:{{t.fg}};border-color:{{t.bd}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for></div></div>
 <div><div class="bai-lab" style="margin-bottom:8px">How much effort?</div><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{efforts}}" as="t" hint-placeholder-count="3"><button class="mchip" style="background:{{t.bg}};color:{{t.fg}};border-color:{{t.bd}}" onClick="{{t.pick}}">{{t.label}}</button></sc-for></div></div>
 <div><label for="ai-avoid" class="bai-lab">Anything to avoid? (optional)</label><input id="ai-avoid" class="fld" maxlength="100" placeholder="e.g. no dairy, no mushrooms" value="{{avoid}}" onChange="{{onAvoid}}"></div>
@@ -1583,7 +1584,7 @@ class Component extends DCLogic {
       draft: '',
       pending: null,
       toast: '',
-      log: [], logDate: '', prof: {}, termsOk: false, thinking: false, aiError: '', aiMeals: [],
+      log: [], logDate: '', prof: {}, termsOk: false, thinking: false, aiError: '', aiMeals: [], photoNote: '',
     };
     this.timer = null;
   }
@@ -1604,12 +1605,12 @@ class Component extends DCLogic {
     const carbs = Math.round(Math.max(calories - protein * 4 - fatCals, 0) / 4);
     return { calories, protein, carbs, fat, fibre: Math.round(calories / 1000 * 14), water: (w * 0.035).toFixed(1) };
   }
-  async callAI(mode, text) {
+  async callAI(mode, text, image) {
     let token = '';
     try { const r = await window.__sb.auth.getSession(); token = r && r.data && r.data.session ? r.data.session.access_token : ''; } catch (e) {}
     if (!token) throw { code: 'sign_in' };
     let res;
-    try { res = await fetch('/api/beast-ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ mode, text }) }); } catch (e) { throw { code: 'network' }; }
+    try { res = await fetch('/api/beast-ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify(image ? { mode, image } : { mode, text }) }); } catch (e) { throw { code: 'network' }; }
     let body = {}; try { body = await res.json(); } catch (e) {}
     if (!res.ok) throw { code: body.error || 'try_again', limit: body.limit };
     return body;
@@ -1621,8 +1622,39 @@ class Component extends DCLogic {
     if (c === 'daily_limit') return 'You have used all ' + (e.limit || 20) + ' Beast AI requests for today. It resets tomorrow.';
     if (c === 'not_food') return 'That does not look like food. Try describing a meal or what you have.';
     if (c === 'empty' || c === 'too_long') return 'Keep it short: a few lines about what you ate or have.';
+    if (c === 'bad_image' || c === 'image_too_big' || c === 'bad_photo') return 'Could not use that photo. Try a different one, or type what you have.';
     if (c === 'network') return 'No connection. Check your internet and try again.';
     return 'Beast AI could not do that just now. Try again in a moment.';
+  }
+  shrinkPhoto(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        try {
+          const max = 1280, k = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          resolve({ type: 'image/jpeg', data: c.toDataURL('image/jpeg', 0.82).split(',')[1] });
+        } catch (e) { reject({ code: 'bad_photo' }); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject({ code: 'bad_photo' }); };
+      img.src = url;
+    });
+  }
+  async runPhoto(file) {
+    if (!file || this.state.thinking) return;
+    this.setState({ thinking: true, aiError: '', photoNote: '' });
+    try {
+      const image = await this.shrinkPhoto(file);
+      const r = await this.callAI('fridge', '', image);
+      const items = r.result.items || [];
+      let list = '';
+      for (const it of items) { const next = list ? list + ', ' + it : it; if (next.length > 320) break; list = next; }
+      this.setState({ thinking: false, kitchen: list, aiMeals: [], photoNote: 'Beast AI found ' + items.length + ' item' + (items.length === 1 ? '' : 's') + '. Edit the list if it missed anything, then create your meal.' });
+    } catch (e) {
+      this.setState({ thinking: false, aiError: (e && e.code === 'not_food') ? 'Beast AI could not see any food in that photo. Try a closer photo, or type what you have.' : this.aiMessage(e) });
+    }
   }
   async runEstimate() {
     const text = (this.state.draft || '').trim();
@@ -2615,6 +2647,8 @@ class Component extends DCLogic {
       onAvoid: (e) => this.setState({ avoid: e.target.value }),
       kitchenDummy: 0,
       prof: profVals,
+      photoNote: s.photoNote || '', photoLabel: s.thinking ? 'Working on it...' : 'Photo your fridge',
+      onPhoto: (e) => { const f = e.target.files && e.target.files[0]; this.runPhoto(f); },
       aiMeals, thinking: !!s.thinking, canGenerate: !s.thinking, canEstimate: !s.thinking, aiError: s.aiError || '',
       terms: { show: !s.termsOk, accept: () => this.setState({ termsOk: true }) },
       generate: () => this.runCreate(),
@@ -2640,7 +2674,7 @@ class Component extends DCLogic {
 
 (function () {
   var KEY = 'bc_dp2_state';
-  var TRANSIENT = ['thinking', 'aiError', 'aiMeals', 'pending', 'toast', 'menuOpen', 'added', 'generating', 'results'];
+  var TRANSIENT = ['thinking', 'aiError', 'aiMeals', 'photoNote', 'pending', 'toast', 'menuOpen', 'added', 'generating', 'results'];
   var app = new Component({});
   window.__dp = app;
 
