@@ -382,7 +382,7 @@
     </div>
     <div class="tile-grid">
       <a class="tile" href="/beast-challenge" style="border-color:var(--green)"><h3>Beast Challenge</h3><p>New &middot; Free 30 days: log your steps and walk a real city-to-city journey.</p></a>
-      <a class="tile" id="disciplineTile" href="/discipline-path"><h3>7-Step Discipline Program</h3><p>View the program and get started.</p></a>
+      <a class="tile" id="disciplineTile" href="/discipline-path"><h3>8-Step Discipline Program</h3><p>View the program and get started.</p></a>
       <a class="tile" href="/challenge"><h3>30-Day Challenge</h3><p>Log today's entry and see your progress.</p></a>
       <a class="tile" data-nav="calculator"><h3>BMI &amp; Macro Calculator</h3><p>Your calories, macros, and BMI.</p></a>
       <a class="tile" data-nav="recipes"><h3>Recipes</h3><p>Healthy alternatives from social media.</p></a>
@@ -471,7 +471,7 @@
     <div class="dp-promo">
       <h3>Ready to go deeper than a daily habit?</h3>
       <p>
-        Your numbers are step one. The Discipline Path is the full 7-step system behind them:
+        Your numbers are step one. The Discipline Path is the full 8-step system behind them:
         the exact framework from a real 70kg transformation, built to make discipline stick long
         after you've got the macros figured out.
       </p>
@@ -1244,7 +1244,7 @@ async function checkDisciplinePurchase(user) {
     if (error) { console.error("Purchase check failed:", error); return; }
     if (data && data.length > 0) {
       tile.href = "/program";
-      tile.querySelector("h3").textContent = "7-Step Discipline Program";
+      tile.querySelector("h3").textContent = "8-Step Discipline Program";
       tile.querySelector("p").textContent = "Unlocked — open your program.";
       tile.style.borderColor = "var(--green)";
     }
