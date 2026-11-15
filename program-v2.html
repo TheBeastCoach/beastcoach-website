@@ -2694,6 +2694,8 @@ class Component extends DCLogic {
 
   function needsProfile() { var P = app.state.prof || {}; return !(P.name && String(P.name).trim()) || !app.targetsFor(P); }
   if (needsProfile()) app.state.view = 'profile';
+  function forceTerms() { if (location.hash === '#terms') app.state.termsOk = false; }
+  forceTerms();
 
   var user = null, lastTs = saved ? saved.ts : 0, timer = null, syncing = false, dirty = false;
   function pushNow() {
@@ -2725,7 +2727,7 @@ class Component extends DCLogic {
           if (serverTs > lastTs) {
             Object.assign(app.state, r.data.data);
             if (app.state.logDate !== app.today()) { app.state.log = []; app.state.logDate = app.today(); }
-            lastTs = serverTs; if (needsProfile()) app.state.view = 'profile'; writeLocal(serverTs); app.render();
+            lastTs = serverTs; forceTerms(); if (needsProfile()) app.state.view = 'profile'; writeLocal(serverTs); app.render();
           } else if (lastTs > serverTs) { pushNow(); }
         } else if (lastTs > 0 || Object.keys(snapshot()).length) { pushNow(); }
       }, function () {});
