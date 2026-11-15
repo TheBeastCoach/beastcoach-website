@@ -606,15 +606,7 @@ html{font-size:18px}
 
       <p class="sub">You don't need a meal plan or a training plan to fix this. Motivation fades whatever you follow. This program builds what sits underneath both: the discipline to follow through. Meal ideas and a workout plan are in here too, but they're the bonus.</p>
 
-      <div class="card">
-        <div class="field-row">
-          <div class="field"><label>Your name</label><input type="text" placeholder="Your name"></div>
-        </div>
-        <div class="field-row">
-          <div class="field"><label>Height (cm)</label><input type="number" placeholder="e.g. 178"></div>
-          <div class="field"><label>Weight (kg)</label><input type="number" placeholder="e.g. 92"></div>
-        </div>
-      </div>
+      <div class="card"><sc-if value="{{prof.incomplete}}" hint-placeholder-val="{{ true }}"><p style="margin:0 0 12px"><b>Start with Step 0.</b> Your name, height and weight set your calorie and protein targets.</p><button class="primary" onClick="{{go.profile}}">Set up my profile</button></sc-if><sc-if value="{{prof.complete}}" hint-placeholder-val="{{ false }}"><p style="margin:0 0 12px">Profile saved. Your targets are ready.</p><button class="ghost" onClick="{{go.profile}}">View or edit my profile</button></sc-if></div>
 
       <h2>What's Ahead</h2>
       <p>One step at a time. Here's the shape of the whole thing:</p>
