@@ -625,12 +625,7 @@ html{font-size:18px}
         <p>So I built that first. I started with whole foods, nothing tracked, nothing restricted. Then I added one small thing every day. After thirty days it wasn't rules I was forcing myself through. It was just who I was. That's what this program does for you.</p>
         
         <p class="signed">Stefan</p>
-      </div></div></details><div class="disclaimer-box">
-        <div class="disclaimer-row disabled">
-          <input type="checkbox">
-          <label>I understand this is not medical advice, and I will consult a doctor or an accredited health professional before changing my diet or exercise routine. I've read the <a>full terms and health disclaimer</a>.<span class="read-hint">Tap the box, or the link above, to read the terms first. It only takes a minute.</span></label>
-        </div>
-      </div>
+      </div></div></details><div class="disclaimer-box"><div class="disclaimer-row"><input id="terms-cb" type="checkbox" checked="{{terms.checked}}" onChange="{{terms.open}}"><label for="terms-cb">I understand this is not medical advice, and I will consult a doctor or an accredited health professional before changing my diet or exercise routine. I've read the <a onClick="{{terms.open}}">full terms and health disclaimer</a>.</label></div></div>
 
       
     </div><div class="gonav"><span></span><button class="nx" onClick="{{go.profile}}">Next: Your Profile &rarr;</button></div></div>
@@ -2650,7 +2645,7 @@ class Component extends DCLogic {
       photoNote: s.photoNote || '', photoLabel: s.thinking ? 'Working on it...' : 'Photo your fridge',
       onPhoto: (e) => { const f = e.target.files && e.target.files[0]; this.runPhoto(f); },
       aiMeals, thinking: !!s.thinking, canGenerate: !s.thinking, canEstimate: !s.thinking, aiError: s.aiError || '',
-      terms: { show: !s.termsOk, accept: () => this.setState({ termsOk: true }) },
+      terms: { show: !s.termsOk || !!s.termsOpen, accept: () => this.setState({ termsOk: true, termsOpen: false }), open: () => this.setState({ termsOpen: true }), checked: s.termsOk ? 'checked' : '' },
       tCal: s.tCal || '', tPro: s.tPro || '', tFib: s.tFib || '', tFat: s.tFat || '',
       onTCal: (e) => this.setState({ tCal: e.target.value }), onTPro: (e) => this.setState({ tPro: e.target.value }), onTFib: (e) => this.setState({ tFib: e.target.value }), onTFat: (e) => this.setState({ tFat: e.target.value }),
       generate: () => this.runCreate(),
@@ -2676,7 +2671,7 @@ class Component extends DCLogic {
 
 (function () {
   var KEY = 'bc_dp2_state';
-  var TRANSIENT = ['thinking', 'aiError', 'aiMeals', 'photoNote', 'pending', 'toast', 'menuOpen', 'added', 'generating', 'results'];
+  var TRANSIENT = ['thinking', 'aiError', 'aiMeals', 'photoNote', 'termsOpen', 'pending', 'toast', 'menuOpen', 'added', 'generating', 'results'];
   var app = new Component({});
   window.__dp = app;
 
