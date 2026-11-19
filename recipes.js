@@ -532,6 +532,7 @@ const RECIPES = [
     id: "thick-dreamy-hot-chocolate",
     meal: ["snack"],
     chip: "Thick Dreamy Hot Chocolate",
+    image: "recipe-img/thick-dreamy-hot-chocolate.jpg",
     title: "Thick Dreamy Hot Chocolate",
     desc: "Sugar-free hot chocolate with a spoon of psyllium husk, frothed into something thick and creamy. About 45 calories and around 5g of fibre.",
     ingredients: ["1 portion sugar-free hot chocolate (about 30 kcal)", "6g psyllium husk", "About 200ml boiling water"],
