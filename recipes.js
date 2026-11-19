@@ -527,5 +527,36 @@ const RECIPES = [
     healthScore: 8,
     dateAdded: "2026-11-10",
     blurb: "Same idea as the magnesium reel, but you can pick it up and eat it. Dark chocolate, pepitas, chia, and it snaps."
+  },
+  {
+    id: "thick-dreamy-hot-chocolate",
+    meal: ["snack"],
+    chip: "Thick Dreamy Hot Chocolate",
+    title: "Thick Dreamy Hot Chocolate",
+    desc: "Sugar-free hot chocolate with a spoon of psyllium husk, frothed into something thick and creamy. About 45 calories and around 5g of fibre.",
+    ingredients: ["1 portion sugar-free hot chocolate (about 30 kcal)", "6g psyllium husk", "About 200ml boiling water"],
+    instructions: [
+      "Mix the hot chocolate and the 6g psyllium husk together dry in a mug. Mix them thoroughly, because any dry husk left in a clump will not break up later.",
+      "Add the boiling water slowly while you mix with a frother. Don't pour it all in at once.",
+      "Keep frothing for about 2 minutes. It will thicken into a dreamy, creamy chocolate.",
+      "Drink it while it's hot, before it sets any thicker."
+    ],
+    notes: [
+      "The slow pour is the whole trick. Add the water gradually and it goes thick and smooth. Dump it in and it clumps.",
+      "For an even creamier version, blend it after frothing.",
+      "Psyllium needs plenty of fluid. Never eat it dry, and have a glass of water with or after it. If you're new to husk, start with less than 6g, because a lot of fibre at once can cause bloating.",
+      "Psyllium can slow how quickly some medications are absorbed. If you take any, keep a gap of an hour or two between them.",
+      "The numbers are approximate and depend on your hot chocolate brand and your husk label, so check both if you want it exact."
+    ],
+    macros: [["~45", "kcal"], ["~2g", "Protein"], ["~8g", "Carbs (5g fibre)"], ["~1g", "Fat"]],
+    kcal: 45,
+    protein: 2,
+    fibre: 5,
+    carbs: 8,
+    fat: 1,
+    difficulty: "Easy",
+    healthScore: 8,
+    dateAdded: "2026-11-19",
+    blurb: "A mug of hot chocolate that eats like a pudding. Mix the dry ingredients, add the boiling water slowly and froth for two minutes."
   }
 ];
