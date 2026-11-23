@@ -559,5 +559,39 @@ const RECIPES = [
     healthScore: 8,
     dateAdded: "2026-11-19",
     blurb: "A mug of hot chocolate that eats like a pudding. Mix the dry ingredients, add the boiling water slowly and froth for two minutes."
+  },
+  {
+    id: "chocolate-psyllium-mug-cake",
+    meal: ["snack", "breakfast"],
+    chip: "Chocolate Mug Cake",
+    image: "recipe-img/chocolate-psyllium-mug-cake.jpg",
+    title: "Chocolate Mug Cake",
+    desc: "A soft chocolate mug cake made with psyllium husk and one egg, cooked in the microwave in 60 seconds. About 150 calories and around 13g of fibre.",
+    ingredients: ["16g psyllium husk", "1 portion sugar-free hot chocolate", "1 egg", "4 tablespoons unsweetened almond milk"],
+    instructions: [
+      "Combine the 16g psyllium husk and the hot chocolate powder in a mug or bowl. Mix the dry ingredients thoroughly.",
+      "Add the unsweetened almond milk slowly, stirring as you go, until you have a very thick paste.",
+      "Add the egg and mix thoroughly until it becomes a slimy paste. Make sure there are no clumps.",
+      "Microwave for 60 seconds.",
+      "Take it out and wait about a minute. It will finish setting and be ready to eat."
+    ],
+    notes: [
+      "Microwaves vary, so you may need to increase or reduce the time. If it comes out too hard, take about 5 seconds off the timer next time.",
+      "Check the egg is fully cooked through before you eat it. If it's still wet in the middle, give it another 10 seconds.",
+      "16g of psyllium is a big serve of fibre in one go. If you're new to husk, build up slowly, because a lot of fibre at once can cause bloating.",
+      "Psyllium needs plenty of fluid. Have a big glass of water with this, and drink more through the day.",
+      "Psyllium can slow how quickly some medications are absorbed. If you take any, keep a gap of an hour or two between them.",
+      "The numbers are approximate and depend on your husk label and hot chocolate brand, so check both if you want it exact."
+    ],
+    macros: [["~150", "kcal"], ["~9g", "Protein"], ["~17g", "Carbs (13g fibre)"], ["~7g", "Fat"]],
+    kcal: 150,
+    protein: 9,
+    fibre: 13,
+    carbs: 17,
+    fat: 7,
+    difficulty: "Easy",
+    healthScore: 8,
+    dateAdded: "2026-11-23",
+    blurb: "A chocolate mug cake that's mostly fibre. One egg, some psyllium and a minute in the microwave."
   }
 ];
