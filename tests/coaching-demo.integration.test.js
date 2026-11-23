@@ -51,6 +51,7 @@ function promptKind(system) {
   if (String(system).startsWith('You look at a photo')) return 'fridge';
   if (String(system).startsWith('You are a practical meal coach')) return 'create';
   if (String(system).includes('A coach typed')) return 'day';
+  if (String(system).includes('explain how to do one exercise')) return 'exercise';
   return 'log';
 }
 
@@ -259,4 +260,70 @@ test('502 try_again: AI returns something that is not JSON, page shows a friendl
     assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
     await ctx.close();
   } finally { console.error = quiet; }
+});
+
+// Coach publishes a training plan, then the client opens its training tab.
+async function publishTraining(page, text) {
+  await page.selectOption('#viewAs', 'coach');
+  await page.click('button[data-act="openClient"][data-id="c_sam"]');
+  await page.click('button[data-act="coachTab"][data-tab="plan"]');
+  await page.fill('textarea[data-inp="trainDraft"]', text);
+  await page.click('button[data-act="publish"]');
+  await page.waitForSelector('text=Published to the client.');
+  await page.selectOption('#viewAs', 'client:c_sam');
+  await page.click('button[data-act="clientTab"][data-tab="plan"]');
+}
+
+test('How to do it: a library exercise opens from the library with no AI call', SKIP, async () => {
+  state.replies = { exercise: () => { throw new Error('library exercise must not call AI'); } };
+  const start = state.upstream.length;
+  const { ctx, page } = await openPage();
+  await openSamToday(page);
+  await page.click('button[data-act="clientTab"][data-tab="plan"]');
+  await page.locator('.ex-row', { has: page.locator('span', { hasText: /^Squat 3x8$/ }) }).locator('button[data-act="howTo"]').click();
+  await page.waitForSelector('#sheetRoot .sheet');
+  const sheet = await page.textContent('#sheetRoot');
+  assert.match(sheet, /Squat/);
+  assert.match(sheet, /Keep your knees in line with your toes/);
+  assert.match(sheet, /Watch a video/);
+  assert.equal(state.upstream.length, start, 'no AI call for a library exercise');
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#sheetRoot .sheet', { state: 'detached' });
+  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
+  await ctx.close();
+});
+
+test('How to do it: an exercise not in the library is written by Beast AI and then saved in the browser', SKIP, async () => {
+  state.replies = { exercise: () => ({ name: 'Hammer curl', works: 'The biceps and forearms.',
+    steps: ['Stand tall holding a dumbbell in each hand, palms facing your sides.', 'Keep your elbows by your sides.', 'Curl the weights up, keeping your thumbs pointing up.'],
+    tips: ['Do not swing your body.'], mistakes: ['Moving your elbows forward.'], easier: 'Use lighter dumbbells.' }) };
+  const { ctx, page } = await openPage();
+  await publishTraining(page, 'Mon:\n- Hammer curl 3x10');
+  const start = state.upstream.length;
+  await page.locator('.ex-row', { hasText: 'Hammer curl' }).locator('button[data-act="howTo"]').click();
+  await page.waitForSelector('#sheetRoot .sheet');
+  const sheet = await page.textContent('#sheetRoot');
+  assert.match(sheet, /Stand tall holding a dumbbell in each hand/);
+  assert.match(sheet, /Written by Beast AI/);
+  const kinds = state.upstream.slice(start).map(u => u.kind);
+  assert.deepEqual(kinds, ['exercise']);
+  // Open it again: it is saved in the browser, so no second AI call.
+  await page.click('button[data-act="closeSheet"]');
+  await page.locator('.ex-row', { hasText: 'Hammer curl' }).locator('button[data-act="howTo"]').click();
+  await page.waitForSelector('#sheetRoot .sheet');
+  assert.equal(state.upstream.length, start + 1, 'second open uses the saved guide');
+  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
+  await ctx.close();
+});
+
+test('How to do it: not a real exercise shows the no-guide message for a Core client', SKIP, async () => {
+  state.replies = { exercise: () => ({ error: 'not_exercise' }) };
+  const { ctx, page } = await openPage();
+  await publishTraining(page, 'Mon:\n- Toast and jam 2x');
+  await page.locator('.ex-row', { hasText: 'Toast and jam' }).locator('button[data-act="howTo"]').click();
+  await page.waitForSelector('#sheetRoot .sheet');
+  assert.match(await page.textContent('#sheetRoot'), /No guide for this one yet\. Ask Stefan at your next check-in\./);
+  assert.match(await page.textContent('#toast'), /does not look like an exercise/);
+  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
+  await ctx.close();
 });

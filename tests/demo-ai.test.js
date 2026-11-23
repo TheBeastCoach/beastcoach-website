@@ -283,3 +283,65 @@ test('the 200 cap is checked before any AI call', async () => {
   await call({ mode: 'day', text: 'Lunch: rice' });
   assert.equal(aiCalled, false);
 });
+
+// ---- exercise mode: "How to do it" for exercises not in the page's library ----
+const GUIDE = {
+  name: 'Cable crossover', works: 'The chest.', steps: ['Set the pulleys.', 'Step forward.', 'Bring your hands together.', 'Return slowly.'],
+  tips: ['Keep the elbows soft.'], mistakes: ['Using too much weight.'], easier: 'Use a light weight.'
+};
+
+test('exercise returns the guide fields', async () => {
+  const calls = mockFetch({ ai: () => aiReply(JSON.stringify(GUIDE)) });
+  const res = await call({ mode: 'exercise', name: 'Cable crossover' });
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.name, 'Cable crossover');
+  assert.equal(res.body.steps.length, 4);
+  assert.deepEqual(res.body.tips, ['Keep the elbows soft.']);
+  assert.equal(res.body.easier, 'Use a light weight.');
+  const aiCall = calls.find(c => c.url.includes('anthropic'));
+  assert.equal(aiCall.body.messages[0].content, 'Cable crossover');
+  assert.equal(aiCall.body.system, handler._test.EXERCISE_PROMPT);
+});
+
+test('exercise that is not a real exercise gives 422 not_exercise', async () => {
+  mockFetch({ ai: () => aiReply('{"error":"not_exercise"}') });
+  const res = await call({ mode: 'exercise', name: 'Toast and jam' });
+  assert.equal(res.statusCode, 422);
+  assert.equal(res.body.error, 'not_exercise');
+});
+
+test('exercise rejects an empty name, a long name and a name with no letters', async () => {
+  mockFetch({ ai: () => { throw new Error('should not call AI'); } });
+  assert.equal((await call({ mode: 'exercise', name: ' ' })).body.error, 'empty');
+  assert.equal((await call({ mode: 'exercise', name: 'x'.repeat(81) })).body.error, 'too_long');
+  assert.equal((await call({ mode: 'exercise', name: '12345' })).body.error, 'bad_input');
+});
+
+test('exercise is cut to the size limits and drops empty list items', async () => {
+  mockFetch({ ai: () => aiReply(JSON.stringify({ name: 'X', works: 'w'.repeat(500),
+    steps: ['one', '', 'two', 'three', 'four', 'five', 'six'], tips: ['a', 'b', 'c', 'd'], mistakes: [], easier: 'e' })) });
+  const res = await call({ mode: 'exercise', name: 'Some move' });
+  assert.equal(res.body.works.length, 300);
+  assert.deepEqual(res.body.steps, ['one', 'two', 'three', 'four', 'five']);
+  assert.deepEqual(res.body.tips, ['a', 'b', 'c']);
+  assert.deepEqual(res.body.mistakes, []);
+});
+
+test('exercise with no steps gives 502 try_again', async () => {
+  const restore = silence();
+  mockFetch({ ai: () => aiReply(JSON.stringify({ name: 'X', steps: [] })) });
+  const res = await call({ mode: 'exercise', name: 'Some move' });
+  restore();
+  assert.equal(res.statusCode, 502);
+  assert.deepEqual(res.body, { error: 'try_again' });
+});
+
+test('exercise is behind the same demo key and daily cap', async () => {
+  let aiCalled = false;
+  mockFetch({ cap: () => jsonResponse(200, [{ allowed: false, used: 200 }]), ai: () => { aiCalled = true; return aiReply(JSON.stringify(GUIDE)); } });
+  let res = await call({ mode: 'exercise', name: 'Cable crossover' }, { key: 'wrong' });
+  assert.equal(res.statusCode, 401);
+  res = await call({ mode: 'exercise', name: 'Cable crossover' });
+  assert.equal(res.statusCode, 429);
+  assert.equal(aiCalled, false);
+});

@@ -1,4 +1,10 @@
 <!doctype html>
+<!--
+  REAL SITE NOTE (no change in the demo):
+  In the real site, a "My Coach" tile appears on the logged-in Dashboard only for accounts with
+  a coaching plan, and it opens this client screen. In this demo, the "View as" menu stands in
+  for that tile: pick Coach (Stefan), a client, or New client.
+-->
 <html lang="en-AU">
 <head>
 <meta charset="utf-8">
@@ -132,11 +138,28 @@ summary::-webkit-details-marker{display:none}
 .pi-tag{display:inline-block;background:#E8F3EC;border-radius:999px;padding:4px 11px;font-size:13px;font-weight:700;margin:0 6px 6px 0}
 .pi-tag.day{background:#d8f3e3}
 @media(max-width:899px){h3{font-size:26px}}
+
+.mchip{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:14px;color:var(--ink)}
+.mchip i{width:12px;height:12px;border-radius:50%;background:var(--mc);display:inline-block;flex:none}
+.ex-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #EEF3EF;flex-wrap:wrap}
+.ex-row span{font-weight:700}
+.pt-line{padding:7px 0;font-weight:800}
+.pt-gap{height:8px}
+.sheet-back{position:fixed;inset:0;background:rgba(15,28,20,.55);z-index:95}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:20px 20px 28px;z-index:96;box-shadow:0 -12px 40px rgba(0,0,0,.25)}
+@media(min-width:700px){.sheet{left:50%;transform:translateX(-50%);width:620px;max-width:92vw;border-radius:22px;bottom:24px}}
+@media(max-width:699px){.sheet{top:0;bottom:0;max-height:none;border-radius:0}}
+.sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:6px}
+.sheet h4{font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;font-weight:400;font-size:24px;margin:18px 0 6px;letter-spacing:.02em}
+.sheet p{margin:0 0 6px;font-size:16px}
+.sheet ol,.sheet ul{padding-left:22px;margin:0}
+.sheet li{margin:6px 0;font-size:16px}
 </style>
 </head>
 <body>
 <header class="demo-bar" id="demoBar"></header>
 <main class="wrap" id="app"></main>
+<div id="sheetRoot"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -152,7 +175,7 @@ const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const DAYS_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const WEEKS = 12;
 const PAUSE_MAX = 14;
-const CAP_TIERS = ['core','beast'];
+const CAP_TIERS = ['essential','core','beast'];
 const TIERS = {
   essential: { name:'Essential', price:110, short:'$110 one-off', recur:false,
     desc:'A plan built from your onboarding answers, delivered once. Meals, training and a check-in.' },
@@ -174,6 +197,223 @@ const FOOD_GROUPS = {
   Fruit:['Banana','Apple','Berries','Orange','Grapes','Mango','Kiwi'],
   Snacks:['Nuts','Cheese','Popcorn','Rice cakes','Dark chocolate','Protein bars']
 };
+const MACRO = {
+  calories: { label:'Calories', unit:'kcal', bar:'#F59E0B', over:'#B45309', ink:'#92400E' },
+  protein:  { label:'Protein',  unit:'g',    bar:'#2563EB', over:'#1E3A8A', ink:'#1D4ED8' },
+  carbs:    { label:'Carbs',    unit:'g',    bar:'#7C3AED', over:'#4C1D95', ink:'#6D28D9' },
+  fat:      { label:'Fat',      unit:'g',    bar:'#E11D48', over:'#9F1239', ink:'#BE123C' },
+  fibre:    { label:'Fibre',    unit:'g',    bar:'#0891B2', over:'#155E75', ink:'#0E7490' }
+};
+const WEIGH_TIMES = ['05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00'];
+function fmtTime(t) {
+  const h = Number(t.slice(0, 2)), m = t.slice(3, 5);
+  return ((h % 12) || 12) + ':' + m + (h < 12 ? 'am' : 'pm');
+}
+// Exercise library for "How to do it". Written for someone who has never trained.
+// n = name, a = other names people use, w = what it works, s = steps, t = form tips, m = common mistakes, e = easier version.
+const EXERCISES = [
+  { n:'Bench press', a:['bench'], w:'Chest, the front of the shoulders and the backs of the arms.',
+    s:['Lie on a flat bench with your eyes under the bar.','Grip the bar a little wider than your shoulders.','Unrack the bar and hold it above your chest with straight arms.','Lower the bar slowly to the middle of your chest.','Push it back up until your arms are straight.'],
+    t:['Keep your feet flat on the floor and your bottom on the bench.','Keep your wrists straight, above your elbows.'],
+    m:['Bouncing the bar off your chest.','Letting your elbows flare out wide.'],
+    e:'Do push-ups on a bench or kitchen counter, or use dumbbells lighter than the bar.' },
+  { n:'Dumbbell press', a:['dumbbell bench press','db press','db bench press'], w:'Chest, shoulders and triceps, with each arm working on its own.',
+    s:['Lie on a bench holding a dumbbell in each hand at chest height, palms facing forward.','Press both dumbbells up until your arms are straight above your chest.','Lower them slowly until your elbows are a little below the bench.','Repeat, keeping the movement smooth.'],
+    t:['Keep your feet flat and your back pressed into the bench.','Breathe out as you press up.'],
+    m:['Crashing the dumbbells together at the top.','Arching your back off the bench.'],
+    e:'Use lighter dumbbells, or press with your back on a stable chair.' },
+  { n:'Incline dumbbell press', a:['incline press','incline db press','incline dumbbell bench press'], w:'The upper part of the chest.',
+    s:['Set the bench to a slight incline, about 30 degrees.','Sit back with a dumbbell in each hand at shoulder height.','Press up until your arms are straight.','Lower slowly until your upper arms are at about a right angle to your body.'],
+    t:['Keep the bench low. A steep angle moves the work to the shoulders.','Keep your elbows at about 45 degrees to your body.'],
+    m:['Setting the bench too steep.','Dropping the weights too low.'],
+    e:'Use a lower incline, or do push-ups with your hands on a raised surface.' },
+  { n:'Push-up', a:['push up','pushup','push ups','pushups','press up'], w:'Chest, shoulders, triceps and the core.',
+    s:['Start in a plank with your hands just outside your shoulders.','Keep your body in one straight line from head to heels.','Lower your chest towards the floor, elbows at about 45 degrees.','Push the floor away until your arms are straight.'],
+    t:['Squeeze your glutes and brace your stomach.','Look at the floor just in front of your hands.'],
+    m:['Hips sagging or bottom raised in the air.','Flaring your elbows straight out to the sides.'],
+    e:'Push up with your hands on a bench or kitchen counter, or with your knees on the floor.' },
+  { n:'Shoulder press', a:['overhead press','military press','db shoulder press','dumbbell shoulder press','shoulder press dumbbell'], w:'Shoulders and triceps.',
+    s:['Sit on a bench with back support, dumbbells at shoulder height, palms facing forward.','Press the weights straight up until your arms are almost straight.','Lower them slowly back to shoulder height.','Keep your core tight the whole time.'],
+    t:['Keep your back against the bench, not arched.','Move the dumbbells in a straight line over your shoulders.'],
+    m:['Arching your lower back to lift the weight.','Pressing the dumbbells together in front of your face.'],
+    e:'Use lighter weights, or press with a resistance band under your feet.' },
+  { n:'Lateral raise', a:['side raise','lateral raises','side lateral raise','side raises'], w:'The side of the shoulders.',
+    s:['Stand tall with a light dumbbell in each hand at your sides.','Keep a soft bend in your elbows.','Raise your arms out to the sides until they are level with your shoulders.','Lower slowly, taking about 3 seconds.'],
+    t:['Lead with your elbows, not your hands.','Use light weights. This muscle is small.'],
+    m:['Swinging the weights up with momentum.','Raising your arms above shoulder height.'],
+    e:'Do it with no weights, or with a water bottle in each hand.' },
+  { n:'Seated row', a:['cable row','seated cable row','row machine','seated cable rows'], w:'The upper back and the lats (the big muscles down your sides).',
+    s:['Sit tall at the cable row with your feet on the platform and knees slightly bent.','Hold the handle with your arms straight.','Pull the handle to your belly button by squeezing your shoulder blades back.','Let your arms straighten again slowly, without rounding your back.'],
+    t:['Keep your chest up and your back flat.','Pause for a second when the handle reaches your body.'],
+    m:['Rocking your body backwards and forwards.','Shrugging your shoulders up towards your ears.'],
+    e:'Use a lighter weight, or a resistance band anchored at waist height.' },
+  { n:'Lat pulldown', a:['pulldown','lat pull down','lat pull','lat pulldowns'], w:'The lats and the biceps.',
+    s:['Sit at the machine and hook your thighs under the pads.','Hold the bar a little wider than your shoulders.','Pull the bar down to your upper chest, leading with your elbows.','Let the bar rise slowly until your arms are straight.'],
+    t:['Lean back slightly, about 10 to 15 degrees.','Think of pulling your elbows into your back pockets.'],
+    m:['Pulling the bar behind your neck.','Using your body to swing the bar down.'],
+    e:'Use a lighter weight, or do band pull-downs.' },
+  { n:'Pull-up', a:['pull up','pullup','pull ups','pullups','chin up','chin-up','chin ups'], w:'The back and the biceps.',
+    s:['Grip the bar a bit wider than your shoulders, palms facing away.','Hang with your arms fully straight and your shoulders relaxed.','Pull your chest up towards the bar, leading with your elbows.','Lower yourself slowly all the way down.'],
+    t:['Keep your core tight and your legs still.','Do fewer reps with rest between sets. Quality matters more.'],
+    m:['Kicking your legs for momentum.','Dropping quickly on the way down.'],
+    e:'Loop a resistance band over the bar and put a foot or knee in it, or use an assisted pull-up machine.' },
+  { n:'Dumbbell row', a:['one arm row','single arm row','db row','one arm dumbbell row','one arm db row'], w:'The back and the lats.',
+    s:['Put one knee and one hand on a bench, with your back flat and parallel to the floor.','Hold a dumbbell in the other hand, arm hanging straight down.','Pull the dumbbell up towards your hip, with your elbow close to your body.','Lower slowly until your arm is straight.'],
+    t:['Keep your back still. Do not twist.','Squeeze your shoulder blade at the top.'],
+    m:['Rotating your body to lift the weight.','Pulling the dumbbell out to the side instead of towards your hip.'],
+    e:'Use a lighter dumbbell, or rest your hand on a sturdy chair and row with less weight.' },
+  { n:'Bicep curl', a:['bicep curls','biceps curl','dumbbell curl','db curl','bicep curl dumbbell'], w:'The front of the upper arms (biceps).',
+    s:['Stand tall holding a dumbbell in each hand, palms facing forward.','Keep your elbows by your sides.','Curl the weights up towards your shoulders.','Lower them slowly over about 3 seconds.'],
+    t:['Do not swing your body.','Keep your wrists straight.'],
+    m:['Swinging your back to lift the weight.','Moving your elbows forward and away from your body.'],
+    e:'Use lighter dumbbells, or a resistance band under your feet.' },
+  { n:'Tricep pushdown', a:['triceps pushdown','tricep push down','cable pushdown','rope pushdown','tricep pushdowns'], w:'The back of the upper arms (triceps).',
+    s:['Stand facing a cable machine with a bar or rope at chest height.','Keep your elbows tucked by your sides.','Push the bar down until your arms are straight.','Let it return slowly until your forearms are almost level.'],
+    t:['Keep your upper arms still.','Lean forward slightly from the hips.'],
+    m:['Letting your elbows drift away from your body.','Leaning your whole body into the weight.'],
+    e:'Do overhead tricep extensions with a light dumbbell held in both hands.' },
+  { n:'Squat', a:['back squat','front squat','bodyweight squat','air squat','squats'], w:'The legs, glutes and core.',
+    s:['Stand with your feet about shoulder width apart, toes turned slightly out.','Brace your stomach and keep your chest up.','Sit your hips back and down, as if sitting onto a chair.','Go down as far as is comfortable, then stand up through your whole foot.'],
+    t:['Keep your knees in line with your toes.','Keep your heels flat on the floor.'],
+    m:['Knees caving inwards.','Lifting your heels or leaning too far forward.'],
+    e:'Squat down to a box or chair, touch it lightly, and stand back up.' },
+  { n:'Goblet squat', a:['goblet squats'], w:'The legs and glutes. The easiest squat to learn.',
+    s:['Hold one dumbbell or kettlebell upright against your chest with both hands.','Stand with your feet a little wider than shoulder width.','Sit down between your legs, keeping your chest up and elbows inside your knees.','Stand back up through your heels.'],
+    t:['Keep the weight close to your chest.','Go only as low as you can control.'],
+    m:['Letting the weight drop forward.','Rounding your back.'],
+    e:'Do it with no weight, sitting onto a chair and standing back up.' },
+  { n:'Romanian deadlift', a:['rdl','romanian deadlifts','stiff leg deadlift','romanian deadlift dumbbell'], w:'The back of the legs (hamstrings) and the glutes.',
+    s:['Stand holding a barbell or dumbbells in front of your thighs.','Keep a soft bend in your knees.','Push your hips back and let the weight slide down your legs.','Stop when you feel a stretch in your hamstrings, then stand up by pushing your hips forward.'],
+    t:['Keep your back flat and your chest up.','Keep the weight close to your legs.'],
+    m:['Rounding your lower back.','Turning it into a squat by bending the knees too much.'],
+    e:'Use dumbbells held at your sides, or practise the hip movement holding a broom handle against your back.' },
+  { n:'Deadlift', a:['conventional deadlift','barbell deadlift','deadlifts'], w:'The whole back, the glutes and the legs.',
+    s:['Stand with the bar over the middle of your feet.','Bend down and grip the bar just outside your legs.','Lift your chest, flatten your back and push the floor away through your legs.','Stand tall, then lower the bar back down under control.'],
+    t:['Keep the bar close to your shins.','Breathe in and brace your stomach before you pull.'],
+    m:['Rounding your back.','Jerking the bar off the floor.'],
+    e:'Use a light weight, or a trap bar, or Romanian deadlifts with dumbbells.' },
+  { n:'Lunges', a:['lunge','reverse lunge','reverse lunges','split squat','split squats'], w:'The legs and glutes, one side at a time.',
+    s:['Stand tall with your feet hip width apart.','Step one foot forward, about a long step.','Lower your back knee towards the floor, keeping your front heel down.','Push through your front foot to stand back up.'],
+    t:['Keep your torso upright.','Keep your front knee over your ankle.'],
+    m:['Front knee sliding far past your toes.','Leaning far forward.'],
+    e:'Hold a wall or chair for balance, or take a shorter step.' },
+  { n:'Walking lunges', a:['walking lunge','walking lunge dumbbell'], w:'The legs, glutes and balance.',
+    s:['Stand tall with no weight, or a light dumbbell in each hand.','Step forward into a lunge.','Push off your front foot and step your back foot through to the next lunge.','Keep moving forward for the set.'],
+    t:['Keep each step controlled, not rushed.','Keep your torso upright.'],
+    m:['Knees knocking inwards.','Taking steps that are too short.'],
+    e:'Do lunges on the spot, holding a wall or chair, instead of walking.' },
+  { n:'Leg press', a:['leg press machine','leg presses'], w:'The legs and glutes, with your back supported.',
+    s:['Sit in the machine with your back flat against the pad.','Place your feet hip width apart in the middle of the platform.','Release the safety catches and lower the platform until your knees are near your chest, not past it.','Push back up without locking your knees.'],
+    t:['Keep your lower back on the pad.','Keep your knees in line with your toes.'],
+    m:['Locking your knees hard at the top.','Letting your lower back lift off the pad.'],
+    e:'Use a lighter weight, or do squats to a chair.' },
+  { n:'Leg curl', a:['hamstring curl','lying leg curl','seated leg curl','leg curls'], w:'The hamstrings (the back of the thighs).',
+    s:['Lie or sit on the machine and set the pad just above your heels.','Hold the handles and brace your body.','Curl your heels towards your bottom.','Lower slowly until your legs are straight.'],
+    t:['Keep your hips down on the pad.','Use a steady, controlled speed.'],
+    m:['Lifting your hips off the pad.','Using momentum and swinging the weight.'],
+    e:'Use a lighter weight, or do glute bridges, which work the same muscles.' },
+  { n:'Leg extension', a:['leg extensions','quad extension','quad extensions'], w:'The front of the thighs (quads).',
+    s:['Sit on the machine with your back against the seat.','Put the pad just above your ankles.','Straighten your legs until they are almost straight.','Lower slowly back to the start.'],
+    t:['Keep your back against the seat.','Pause for a second at the top.'],
+    m:['Using a heavy weight and jerking your legs.','Lifting your bottom off the seat.'],
+    e:'Use a lighter weight, or do wall sits or squats to a chair.' },
+  { n:'Hip thrust', a:['barbell hip thrust','hip thrusts','glute thrust','glute thrusts'], w:'The glutes.',
+    s:['Sit on the floor with your upper back against a bench and a weight across your hips.','Roll the weight over your hips, feet flat on the floor.','Push through your heels and lift your hips until your body is in a straight line from shoulders to knees.','Squeeze your glutes at the top, then lower slowly.'],
+    t:['Tuck your chin slightly.','Keep your ribs down. Do not over-arch your back.'],
+    m:['Pushing through your toes.','Over-arching your lower back at the top.'],
+    e:'Start with glute bridges on the floor.' },
+  { n:'Glute bridge', a:['glute bridges','bridge','bridges'], w:'The glutes and hamstrings.',
+    s:['Lie on your back with your knees bent and feet flat on the floor, hip width apart.','Brace your stomach.','Push through your heels and lift your hips until your body is in a line from shoulders to knees.','Squeeze your glutes at the top, then lower slowly.'],
+    t:['Keep your ribs down.','Drive through your heels, not your toes.'],
+    m:['Arching your lower back at the top.','Pushing up with your lower back instead of your glutes.'],
+    e:'Lift only a few centimetres, and build up the height over time.' },
+  { n:'Calf raise', a:['calf raises','standing calf raise','standing calf raises','seated calf raise','calf raises standing'], w:'The calves.',
+    s:['Stand tall with the balls of your feet on a step, holding a wall for balance.','Rise up onto your toes as high as you can.','Pause at the top for a second.','Lower slowly until your heels are below the step.'],
+    t:['Use a slow, full range of movement.','Keep your knees straight but not locked.'],
+    m:['Bouncing at the bottom.','Rolling your ankles to the side.'],
+    e:'Do it on flat ground with both feet, holding a wall.' },
+  { n:'Plank', a:['front plank','forearm plank','planks'], w:'The deep core and stomach muscles.',
+    s:['Place your forearms on the floor, elbows under your shoulders.','Lift your body so you are straight from head to heels.','Squeeze your glutes and brace your stomach, as if bracing for a punch.','Hold for the time given, breathing normally.'],
+    t:['Keep your neck in line with your spine.','Stop when your form breaks, even if the time is not finished.'],
+    m:['Hips sagging towards the floor.','Holding your breath.'],
+    e:'Keep your knees on the floor, or put your hands on a bench.' },
+  { n:'Side plank', a:['side planks'], w:'The side of the core and the hips.',
+    s:['Lie on your side with your elbow directly under your shoulder.','Lift your hips so your body is straight from head to feet.','Keep your top hand on your hip, or reach up.','Hold for the time given, then switch sides.'],
+    t:['Keep your hips up. Do not let them drop.','Breathe slowly.'],
+    m:['Hips dropping towards the floor.','Leaning forward or backward.'],
+    e:'Keep your bottom knee bent on the floor for support.' },
+  { n:'Dead bug', a:['dead bugs'], w:'Deep core control.',
+    s:['Lie on your back with your arms straight up and your knees bent to 90 degrees over your hips.','Press your lower back gently into the floor.','Slowly lower one arm overhead and the opposite leg towards the floor.','Return to the start and switch sides.'],
+    t:['Move slowly.','Keep your lower back flat the whole time.'],
+    m:['Lower back arching off the floor.','Moving too fast.'],
+    e:'Move only one arm at a time, and keep your legs still.' },
+  { n:'Bird dog', a:['bird dogs'], w:'The back, glutes and balance.',
+    s:['Start on your hands and knees, hands under your shoulders and knees under your hips.','Brace your stomach and keep your back flat.','Reach one arm forward and the opposite leg back, both straight.','Hold for a second, then return and switch sides.'],
+    t:['Keep your hips level.','Reach long rather than high.'],
+    m:['Rotating your hips to lift the leg higher.','Arching your back.'],
+    e:'Lift only the arm, or only the leg, not both.' },
+  { n:'Crunch', a:['crunches','sit up','sit ups','situp','situps'], w:'The front of the stomach.',
+    s:['Lie on your back with your knees bent and feet flat on the floor.','Place your hands lightly behind your head, or across your chest.','Lift your shoulders off the floor by curling your chest towards your hips.','Lower slowly and repeat.'],
+    t:['Breathe out as you lift.','Keep your neck relaxed.'],
+    m:['Pulling your head forward with your hands.','Using momentum.'],
+    e:'Make the movement smaller, lifting just your head and shoulders a few centimetres.' },
+  { n:'Mountain climbers', a:['mountain climber'], w:'The core, shoulders and your heart rate.',
+    s:['Start in a high plank with your hands under your shoulders.','Drive one knee towards your chest.','Switch legs quickly, as if running on the spot.','Keep your hips low and your back flat.'],
+    t:['Keep your core braced.','Move at a pace you can control.'],
+    m:['Hips bouncing up in the air.','Rounding your back.'],
+    e:'Slow it down, or put your hands on a bench and step your feet instead of moving fast.' },
+  { n:'Burpees', a:['burpee'], w:'The whole body and your heart rate.',
+    s:['Stand tall, then squat down and place your hands on the floor.','Jump or step your feet back into a plank.','Jump or step your feet back in towards your hands.','Stand up tall, then reach up.'],
+    t:['Keep a steady pace.','Step instead of jumping if you need to.'],
+    m:['Rounding your back in the plank.','Rushing and losing control.'],
+    e:'Step back into the plank, leave out the jump, and skip the push-up.' },
+  { n:'Kettlebell swing', a:['kettlebell swings','kb swing','kb swings','kettlebell swing russian'], w:'The glutes and hamstrings, with a hip hinge and grip.',
+    s:['Stand with your feet slightly wider than shoulder width, with the kettlebell on the floor in front of you.','Hinge at the hips and grab the handle with both hands.','Swing the bell back between your legs, then drive your hips forward to lift it to chest height.','Let it swing back down and repeat.'],
+    t:['The power comes from your hips, not your arms.','Keep your back flat and your arms loose.'],
+    m:['Squatting the weight up.','Lifting it with your arms.'],
+    e:'Use a lighter bell, or practise the hip hinge with no weight.' },
+  { n:"Farmer's carry", a:['farmers carry','farmer carry','farmer walk','farmers walk','farmers walk dumbbell'], w:'Grip, core, shoulders and posture.',
+    s:['Hold a heavy dumbbell or kettlebell in each hand, at your sides.','Stand tall with your shoulders down and back.','Walk forward with small, steady steps for the distance or time given.','Put the weights down under control.'],
+    t:['Keep your ribs down and your stomach braced.','Do not let the weights swing.'],
+    m:['Leaning to one side.','Shrugging your shoulders up.'],
+    e:'Use lighter weights, or carry one weight at a time.' },
+  { n:'Step-ups', a:['step up','step ups','box step up','box step ups','step up box'], w:'The legs and glutes.',
+    s:['Stand in front of a sturdy step or box at about knee height.','Place one whole foot on top of the step.','Push through that foot to stand up on the step, bringing the other foot up.','Step back down slowly, leading with the same foot.'],
+    t:['Use the whole foot on the step, not just your toes.','Keep your torso upright.'],
+    m:['Pushing off the bottom foot.','Using a step that is too high.'],
+    e:'Use a lower step, or hold a rail for balance.' },
+  { n:'Wall sit', a:['wall sits'], w:'The front of the thighs (quads) and endurance.',
+    s:['Stand with your back against a wall and your feet about 60 cm out from it.','Slide down until your thighs are about parallel to the floor.','Keep your knees above your ankles and your back flat on the wall.','Hold for the time given, then slide back up.'],
+    t:['Keep your weight in your heels.','Breathe steadily.'],
+    m:['Knees going past your toes.','Holding your breath.'],
+    e:'Go only as low as you can hold, even just a few centimetres.' },
+  { n:'Band pull-apart', a:['band pull apart','band pull aparts','band pull-apart','band pull-aparts'], w:'The upper back and the rear shoulders.',
+    s:['Hold a resistance band in front of you with both hands, arms straight at shoulder height.','Pull the band apart by moving your hands out to the sides.','Squeeze your shoulder blades together at the end.','Return slowly with control.'],
+    t:['Keep your arms straight but not locked.','Keep your shoulders down, away from your ears.'],
+    m:['Shrugging up.','Bending your arms too much.'],
+    e:'Use a lighter band, or do the movement with no band.' },
+  { n:'Face pull', a:['face pulls'], w:'The rear shoulders and the upper back.',
+    s:['Set a cable at about head height with a rope attachment.','Grip the rope with palms facing down, and step back.','Pull the rope towards your face, separating the ends.','Squeeze your shoulder blades and return slowly.'],
+    t:['Pull towards your forehead or nose.','Keep your elbows high.'],
+    m:['Pulling down towards your chest.','Leaning back and using your body weight.'],
+    e:'Use a light band anchored at head height.' },
+  { n:'Bulgarian split squat', a:['bulgarian split squats','bulgarian squat','bulgarian squats'], w:'The legs and glutes, plus balance.',
+    s:['Stand about one long step in front of a bench, and rest the top of one foot on it behind you.','Hold a dumbbell in each hand, or no weight at all.','Lower your back knee towards the floor, keeping your front heel down.','Push through your front foot to stand back up.'],
+    t:['Keep your torso upright.','Keep most of your weight in the front leg.'],
+    m:['Standing too close to the bench.','Pushing off the back foot.'],
+    e:'Hold a wall or chair, and do lunges with no weight.' },
+  { n:'Cable fly', a:['cable flys','cable flies','cable crossover','cable crossovers','cable chest fly'], w:'The chest.',
+    s:['Set both pulleys at about shoulder height and hold one handle in each hand.','Step forward into a split stance, with a soft bend in your elbows.','Bring your hands together in front of your chest in a wide arc.','Let your arms open back slowly.'],
+    t:['Keep the same bend in your elbows through the movement.','Squeeze your chest at the front.'],
+    m:['Pressing the handles down like a press.','Using too much weight and swinging.'],
+    e:'Use a light weight, or do push-ups.' },
+  { n:'Treadmill or bike cardio', a:['treadmill','bike','cycle','cardio','incline walk','walk','bike cardio','treadmill cardio','stationary bike','exercise bike','intervals'], w:'The heart and lungs. It is low impact and builds your fitness.',
+    s:['Set the treadmill to a pace you can talk at, or set the bike to an easy resistance.','Warm up for 5 minutes at an easy pace.','Hold a steady pace you can keep for the time given.','Cool down for 3 to 5 minutes, then step off carefully.'],
+    t:['Hold the rails only for balance. Do not lean on them.','Use the talk test: you should be able to speak in short sentences.'],
+    m:['Going too fast on day one.','Holding on to the rails and leaning.'],
+    e:'Walk at a gentle pace, and take short breaks whenever you need them.' }
+];
+
 const EQUIPMENT = ['Full gym','Dumbbells','Barbell','Kettlebells','Resistance bands','Pull-up bar','Bench','Treadmill or bike','None'];
 const DIETS = ['No restrictions','Vegetarian','Vegan','Pescatarian','Halal','Kosher','Dairy free','Gluten free','Other'];
 const MEALS_PER_DAY = ['2','3','3 plus snacks','4 or more'];
@@ -210,8 +450,8 @@ const SLOT_OPTIONS = {
     ['Chicken thigh pasta','150g skinless chicken thigh, 200g wholemeal pasta, tomato sauce, zucchini',740,40,74,28,10]
   ]
 };
-const SAM_TRAIN = 'Mon: Full body A. Squat, row, bench press, plank. 3 sets of 8 to 10.\nWed: Intervals. 20 min easy warm up, 6 x 1 min hard on the bike, 2 min easy between.\nFri: Full body B. Deadlift, split squat, lat pulldown, dead bug.\nSat: Long walk to 8,000 steps. 15 min mobility.';
-const JORDAN_TRAIN = 'Mon: Lower body, squat focus.\nTue: Upper body, push.\nThu: Lower body, deadlift focus.\nFri: Upper body, pull.\nSat: Full body conditioning, 20 min.';
+const SAM_TRAIN = 'Mon: Full body A\n- Squat 3x8\n- Dumbbell row 3x10\n- Bench press 3x8\n- Plank 3x30 sec\nWed: Intervals\n- Treadmill or bike cardio 20 min\nFri: Full body B\n- Deadlift 3x5\n- Bulgarian split squat 3x8 each leg\n- Lat pulldown 3x10\n- Dead bug 3x8\nSat: Mobility\n- Glute bridge 2x12';
+const JORDAN_TRAIN = 'Mon: Lower body, squat focus\n- Back squat 4x5\n- Romanian deadlift 3x8\n- Leg press 3x10\n- Calf raise 3x12\nTue: Upper body, push\n- Bench press 4x6\n- Shoulder press 3x8\n- Lateral raise 3x12\n- Tricep pushdown 3x12\nThu: Lower body, deadlift focus\n- Deadlift 4x4\n- Walking lunges 3x10 each leg\n- Hip thrust 3x10\nFri: Upper body, pull\n- Pull-up 4x6\n- Seated row 3x10\n- Face pull 3x15\n- Bicep curl 3x12\nSat: Conditioning\n- Kettlebell swing 5x15\n- Farmer carry 4x40 m';
 
 /* ==========================================================================
    Storage module: the only place that reads or writes saved data.
@@ -223,7 +463,11 @@ const Store = {
       const raw = localStorage.getItem(DB_KEY);
       if (raw) {
         const d = JSON.parse(raw);
-        if (d && d.version === 1 && Array.isArray(d.clients)) return d;
+        if (d && d.version === 1 && Array.isArray(d.clients)) {
+          d.capacity = Object.assign({ essential: 100, core: 25, beast: 4 }, d.capacity);
+          d.exercises = d.exercises || {};
+          return d;
+        }
       }
     } catch (e) { /* fall through to seed */ }
     return seedDb();
@@ -333,7 +577,7 @@ function blankOb(extra) {
     likedFoods:[], likedOther:'', avoid:'', allergies:'', diet:'No restrictions',
     mealsPerDay:'3', cookTime:'15 min', whoCooks:'Me', eatsOut:'', alcohol:'', typicalDay:'',
     trainingDays:[], timeOfDay:'Varies', sessionLength:'45', place:'Gym', equipment:[], experience:'Beginner',
-    enjoys:'', hates:'', injuries:'', worked:'', didnt:'', weighInDay:'Mon',
+    enjoys:'', hates:'', injuries:'', worked:'', didnt:'', weighInDay:'Mon', weighInTime:'07:00',
     health:{ heart:null, chest:null, other:null }, healthNote:'', healthClearance:false,
     agreeTerms:false, agreeNotCoach:false, agreeConsent:false, submittedAt:null
   }, extra || {});
@@ -346,6 +590,16 @@ function mkClient(o) {
     plan:{ mealDraft: emptyDraft(), mealPublished: null, trainDraft:'', trainPublished: null, publishedAt: null },
     logs:{}, notes:''
   }, o);
+}
+// Seeded weigh-ins fall on the client's weigh-in day, strictly before today.
+function weighsOn(start, dayName, kgs) {
+  const out = [], t = todayS();
+  let d = start;
+  while (d < t && out.length < kgs.length) {
+    if (DAYS[dowNum(d) - 1] === dayName) out.push(d);
+    d = addDays(d, 1);
+  }
+  return out.map((date, i) => ({ date, kg: kgs[i] }));
 }
 function seedDb() {
   const t = todayS();
@@ -387,11 +641,11 @@ function seedDb() {
       cookTime:'15 min', whoCooks:'Me', eatsOut:'1', alcohol:'2', typicalDay:'Cereal for breakfast, a sandwich at lunch, takeaway on some nights.',
       trainingDays:['Mon','Wed','Fri','Sat'], timeOfDay:'Morning', sessionLength:'60', place:'Gym', equipment:['Full gym'],
       experience:'Some', enjoys:'Lifting, cycling', hates:'Running', injuries:'Left knee gets sore on long walks',
-      worked:'Tracking macros in an app for 6 weeks', didnt:'Cutting carbs completely', weighInDay:'Mon',
+      worked:'Tracking macros in an app for 6 weeks', didnt:'Cutting carbs completely', weighInDay:'Mon', weighInTime:'07:00',
       health:{ heart:'no', chest:'no', other:'no' }, healthClearance:false,
       agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -9) + 'T18:00:00.000Z'
     }),
-    weighIns: [ { date: addDays(t, -9), kg: 84.0 }, { date: addDays(t, -2), kg: 83.2 } ],
+    weighIns: weighsOn(addDays(t, -9), 'Mon', [83.6]),
     workouts: [
       { id: uid(), date: addDays(t, -1), what:'Full body A: squat, row, press', minutes: 55, notes:'Felt good' },
       { id: uid(), date: addDays(t, -3), what:'Bike intervals', minutes: 30, notes:'4 x 3 min hard' },
@@ -416,10 +670,10 @@ function seedDb() {
       eatsOut:'0', alcohol:'0', typicalDay:'Toast and tea, skip lunch on long shifts, pasta at night.',
       trainingDays:['Tue','Thu','Sun'], timeOfDay:'Morning', sessionLength:'45', place:'Home', equipment:['Resistance bands','Dumbbells'],
       experience:'Beginner', enjoys:'Walking, yoga', hates:'Burpees', injuries:'', worked:'Meal prep on my day off', didnt:'Gym sessions after night shifts',
-      weighInDay:'Sat', health:{ heart:'no', chest:'no', other:'yes' }, healthNote:'Asthma, I use a blue inhaler', healthClearance:true,
+      weighInDay:'Sat', weighInTime:'06:30', health:{ heart:'no', chest:'no', other:'yes' }, healthNote:'Asthma, I use a blue inhaler', healthClearance:true,
       agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -1) + 'T18:30:00.000Z'
     }),
-    weighIns: [ { date: addDays(t, -1), kg: 71.0 } ],
+    weighIns: [],
     logs: { [t]: [ { id: uid(), time:'08:10', name:'Overnight oats', calories:350, protein:22, carbs:48, fat:9, fibre:8,
       source:'typed', ai:null, edited:false, text:'' } ] },
     notes: ''
@@ -440,11 +694,11 @@ function seedDb() {
       trainingDays:['Mon','Tue','Thu','Fri','Sat'], timeOfDay:'Evening', sessionLength:'90', place:'Both',
       equipment:['Full gym','Dumbbells','Barbell','Pull-up bar','Bench'], experience:'Experienced',
       enjoys:'Heavy compound lifts', hates:'Long cardio', injuries:'Right shoulder clicks overhead',
-      worked:'Structured program with a coach', didnt:'Training alone with no accountability', weighInDay:'Wed',
+      worked:'Structured program with a coach', didnt:'Training alone with no accountability', weighInDay:'Wed', weighInTime:'07:30',
       health:{ heart:'no', chest:'no', other:'no' }, healthClearance:false,
       agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -35) + 'T20:00:00.000Z'
     }),
-    weighIns: [ -29, -22, -15, -8, -1 ].map((o, i) => ({ date: addDays(t, o), kg: [101.5, 100.8, 100.1, 99.6, 99.0][i] })),
+    weighIns: weighsOn(addDays(t, -29), 'Wed', [100.8, 100.2, 99.7, 99.2]),
     workouts: [ { id: uid(), date: addDays(t, -2), what:'Lower body, squat focus', minutes: 85, notes:'' } ],
     targets: { calories:2600, protein:190, carbs:260, fat:80, fibre:35 },
     plan: { mealDraft: jorDraft, mealPublished: jorPlan, trainDraft: JORDAN_TRAIN, trainPublished: JORDAN_TRAIN, publishedAt: addDays(t, -29) + 'T12:00:00.000Z' },
@@ -454,7 +708,8 @@ function seedDb() {
 
   return {
     version: 1,
-    capacity: { core: 25, beast: 4 },
+    capacity: { essential: 100, core: 25, beast: 4 },
+    exercises: {},
     waitlist: [],
     clients: [ sam, mia, jordan ]
   };
@@ -517,6 +772,7 @@ const AI_MSG = {
   not_food: 'That does not look like food. Describe it again, or enter the numbers yourself.',
   network: 'Beast AI could not be reached. Enter the numbers yourself.',
   not_configured: 'Beast AI is not set up on this site yet. Enter the numbers yourself.',
+  not_exercise: 'That does not look like an exercise. Check the name.',
   ingredients: 'Beast AI could not make a meal from only the food you listed. Add a few more foods and try again.',
   too_many_lines: 'Keep the day to 20 meals or fewer, then calculate again.',
   bad_image: 'Could not use that photo. Try a different one, or type what you have.',
@@ -563,7 +819,7 @@ function activationMissing(c) {
   if (!hasPlanMeals(c.plan.mealPublished)) m.push('Meal plan is not published');
   if (!c.plan.trainPublished) m.push('Training plan is not published');
   if (c.healthFlag && !c.ob.healthClearance) m.push('Client has not confirmed doctor clearance');
-  if (c.tier !== 'essential' && spotsLeft(c.tier) <= 0) m.push('No spot is free in ' + TIERS[c.tier].name);
+  if (spotsLeft(c.tier) <= 0) m.push('No spot is free in ' + TIERS[c.tier].name);
   return m;
 }
 function needsYou(c) {
@@ -584,6 +840,38 @@ function weekLabel(c) {
   return weekOf(c) + ' of ' + WEEKS;
 }
 function sortedWeighIns(c) { return c.weighIns.slice().sort((a, b) => a.date < b.date ? -1 : 1); }
+// Starting weight (from onboarding) followed by the weekly weigh-ins, oldest first.
+function weighPoints(c) {
+  const pts = [];
+  if (c.ob.weightKg != null) pts.push({ date: (c.ob.submittedAt || c.createdAt).slice(0, 10), kg: c.ob.weightKg, start: true });
+  return pts.concat(sortedWeighIns(c));
+}
+function weekStart(s) { const d = pd(s); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return ymd(d); }   // Monday
+function weighInForWeek(c, s) {
+  const ws = weekStart(s), we = addDays(ws, 6);
+  return c.weighIns.find(w => w.date >= ws && w.date <= we) || null;
+}
+function isWeighDay(c, s) { return DAYS[dowNum(s) - 1] === (c.ob.weighInDay || 'Mon'); }
+function weighTime(c) { return c.ob.weighInTime || '07:00'; }
+function weighInCard(c) {
+  const today = todayS(), unit = ui.unit, dayName = DAYS_FULL[DAYS.indexOf(c.ob.weighInDay || 'Mon')];
+  const entry = weighInForWeek(c, today);
+  const shown = entry ? (unit === 'kg' ? entry.kg : kgToLb(entry.kg)).toFixed(1) : '';
+  const rule = 'Same day, same time each week, after the toilet and before eating or drinking.';
+  if (isWeighDay(c, today) && (!entry || entry.date === today)) {
+    return `<div class="card"><h3>Weigh-in</h3>
+      <p class="mini" style="margin-top:0">Today is your weigh-in day. Weigh in at ${fmtTime(weighTime(c))}. ${rule}</p>
+      <div class="row" style="flex-wrap:nowrap"><input id="wi-val" type="number" step="0.1" inputmode="decimal" value="${shown}" placeholder="${unit}" aria-label="Weight in ${unit}" style="flex:1"><button data-act="saveWeigh">${entry ? 'Update this week' : 'Save weigh-in'} (${unit})</button></div>
+      ${entry ? '<p class="mini" style="margin:8px 0 0">You can change this entry until the end of today.</p>' : '<p class="mini" style="margin:8px 0 0">One weigh-in per week. Saving again today replaces it.</p>'}
+    </div>`;
+  }
+  const readOnly = entry ? `<p style="margin:0 0 8px"><b>This week:</b> ${shown} ${unit} on ${esc(fmtDate(entry.date))}.</p>` : '';
+  return `<div class="card"><h3>Weigh-in</h3>${readOnly}
+    <p style="margin:0"><b>Next weigh-in: ${esc(dayName)}, ${esc(fmtTime(weighTime(c)))}</b></p>
+    <p class="mini" style="margin:8px 0 0">Weigh-ins are only on your weigh-in day. ${rule}</p></div>`;
+}
+
+
 function totalsFor(c, date) { return sumNut(c.logs[date] || []); }
 function setPlanDraft(c, d, lines, meals) { c.plan.mealDraft[d] = { lines, meals }; }
 function weighChart(wi, unit) {
@@ -606,17 +894,21 @@ function weighChart(wi, unit) {
 }
 function fmtShort(s) { return pd(s).toLocaleDateString('en-AU', { day:'numeric', month:'short' }); }
 function weightText(kg, unit) { return unit === 'kg' ? kg.toFixed(1) + ' kg' : kgToLb(kg).toFixed(1) + ' lb'; }
-function barHtml(label, val, target, unit) {
-  const t = target ? tone(label === 'fibre' ? 'fibre' : label, val, target) : '';
-  if (!target) {
-    return `<div class="metric"><div class="top"><span>${NUT_LABEL[label]}</span><span>${val} ${unit}</span></div></div>`;
-  }
-  const pct = Math.min(100, Math.round(val / target * 100));
-  const diff = target - val;
-  const left = diff >= 0 ? `${diff} ${unit} left` : `${-diff} ${unit} over`;
-  return `<div class="metric">
-    <div class="top"><span><b>${NUT_LABEL[label]}</b></span><span class="${TONE_TEXT[t]}">${val} of ${target} ${unit} · ${left}</span></div>
-    <div class="bar"><span class="${t}" style="width:${pct}%"></span></div></div>`;
+function macroChip(k) { return `<span class="mchip" style="--mc:${MACRO[k].bar}"><i></i>${MACRO[k].label}</span>`; }
+function macroInk(k, val, target) {
+  const over = !!target && val > target;
+  return over ? MACRO[k].over : MACRO[k].ink;
+}
+function barHtml(k, val, target) {
+  const m = MACRO[k];
+  const over = !!target && val > target;
+  const pct = target ? Math.min(100, Math.round(val / target * 100)) : 0;
+  let status;
+  if (!target) status = `${val} ${m.unit}`;
+  else if (over) status = `${val} of ${target} ${m.unit}, <b>${val - target} ${m.unit} over</b>`;
+  else status = `${val} of ${target} ${m.unit}, ${target - val} ${m.unit} left`;
+  return `<div class="metric"><div class="top"><span>${macroChip(k)}</span><span style="color:${macroInk(k, val, target)}">${status}</span></div>
+    ${target ? `<div class="bar"><span style="width:${pct}%;background:${over ? m.over : m.bar}"></span></div>` : ''}</div>`;
 }
 function sourceLabel(m) { return SOURCES[m.source] || m.source; }
 function mealRowHtml(m, opts) {
@@ -716,9 +1008,7 @@ function renderPlanPicker() {
   const cards = Object.keys(TIERS).map(t => {
     const T = TIERS[t];
     const full = CAP_TIERS.includes(t) && spotsLeft(t) <= 0;
-    const spots = CAP_TIERS.includes(t)
-      ? (full ? '<b class="c-red">Full right now</b>' : `<b class="c-green">${spotsLeft(t)} spots left</b>`)
-      : '<span class="muted">Open all year</span>';
+    const spots = full ? '<b class="c-red">Full right now</b>' : `<b class="c-green">${spotsLeft(t)} spots left</b>`;
     const action = full
       ? `<label for="wl-${t}" class="mini">Email me when a spot opens</label>
          <div class="row" style="flex-wrap:nowrap"><input id="wl-${t}" type="email" placeholder="you@example.com" style="flex:1">
@@ -854,6 +1144,9 @@ function renderOnboardingPage(c) {
           <div class="field"><label for="ob-didnt">What has not worked?</label><textarea id="ob-didnt" data-ob="didnt">${esc(ob.didnt)}</textarea></div>
         </div>
         ${select('weighInDay','Weekly weigh-in day', DAYS)}
+        <div class="field"><label for="ob-weighInTime">Weigh-in time</label>
+          <select id="ob-weighInTime" data-ob="weighInTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${(ob.weighInTime || '07:00') === t ? 'selected' : ''}>${fmtTime(t)}</option>`).join('')}</select>
+          <p class="mini" style="margin:6px 0 0">Same day, same time each week, after the toilet and before eating or drinking.</p></div>
       </div>
       <div class="card"><h3>Health check</h3>
         <p class="muted">Answer all three.</p>
@@ -875,6 +1168,84 @@ function renderOnboardingPage(c) {
       <div class="row" style="justify-content:flex-end"><button type="button" data-act="obSubmit">Send my answers to Stefan</button></div>
     </form>`;
 }
+
+function keyOf(x) {
+  return String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean)
+    .map(w => (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) ? w.slice(0, -1) : w).join(' ');
+}
+// "- Bench press 4x8 (heavy)" -> "Bench press"
+function exerciseName(line) {
+  return String(line || '').replace(/^\s*-\s*/, '')
+    .replace(/\([^)]*\)|\[[^\]]*\]/g, ' ')
+    .replace(/\b\d+\s*[x×]\s*\d+(\s*-\s*\d+)?\b/gi, ' ')
+    .replace(/\b\d+(\s*-\s*\d+)?\s*(sets?|reps?|mins?|minutes?|secs?|seconds?|m|kg|lb|x)?\b/gi, ' ')
+    .replace(/@\s*[\d.]+\s*(kg|lb)?/gi, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+function findLibrary(line) {
+  const lineKey = ' ' + keyOf(exerciseName(line)) + ' ';
+  let best = null, bestLen = 0;
+  EXERCISES.forEach(ex => [ex.n].concat(ex.a || []).forEach(alias => {
+    const k = ' ' + keyOf(alias) + ' ';
+    if (k.trim() && lineKey.includes(k) && k.length > bestLen) { best = ex; bestLen = k.length; }
+  }));
+  return best;
+}
+function cleanGuide(d, name) {
+  const list = (x, n, len) => Array.isArray(x) ? x.map(i => String(i).trim().slice(0, len)).filter(Boolean).slice(0, n) : [];
+  return { n: String(d.name || name).slice(0, 80), w: String(d.works || '').slice(0, 300), s: list(d.steps, 5, 200),
+    t: list(d.tips, 3, 200), m: list(d.mistakes, 3, 200), e: String(d.easier || '').slice(0, 300), ai: true };
+}
+function noGuideText() {
+  const c = ui.view === 'client' ? clientById(ui.clientId) : null;
+  return c && c.tier === 'beast' ? 'No guide for this one yet. Ask Stefan on WhatsApp.' : 'No guide for this one yet. Ask Stefan at your next check-in.';
+}
+function sheetHtml(title, inner) {
+  return `<div class="sheet-back" data-act="closeSheet"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-head"><div><div class="eyebrow">How to do it</div><h3 id="sheetTitle">${esc(title)}</h3></div>
+        <button class="btn-ghost btn-sm" data-act="closeSheet">Close</button></div>
+      <div class="sheet-body">${inner}</div>
+    </div>`;
+}
+function showSheet(ex) {
+  const list = (items, tag) => items.length ? `<${tag}>${items.map(x => `<li>${esc(x)}</li>`).join('')}</${tag}>` : '<p class="mini">Not listed.</p>';
+  const inner = `${ex.ai ? '<div class="note-box mini" style="margin-bottom:10px">Written by Beast AI. Check it against what Stefan has told you.</div>' : ''}
+    <h4>What it works</h4><p>${esc(ex.w || 'Not listed.')}</p>
+    <h4>Step by step</h4>${list(ex.s || [], 'ol')}
+    <h4>Form tips</h4>${list(ex.t || [], 'ul')}
+    <h4>Common mistakes</h4>${list(ex.m || [], 'ul')}
+    <h4>Easier version</h4><p>${esc(ex.e || 'Not listed.')}</p>
+    <p style="margin-top:18px"><a class="btn btn-ghost" href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.n + ' how to do it')}" target="_blank" rel="noopener">Watch a video</a></p>`;
+  document.getElementById('sheetRoot').innerHTML = sheetHtml(ex.n, inner);
+}
+function showNoGuide(name, text) {
+  document.getElementById('sheetRoot').innerHTML = sheetHtml(name, `<div class="note-box">${esc(text)}</div>`);
+}
+function closeSheet() { document.getElementById('sheetRoot').innerHTML = ''; }
+async function openExercise(line) {
+  const name = exerciseName(line) || String(line || '').trim();
+  const lib = findLibrary(line);
+  if (lib) return showSheet(lib);
+  const key = keyOf(name);
+  if (db.exercises[key]) return showSheet(db.exercises[key]);
+  if (!localStorage.getItem(DEMO_KEY_NAME)) return showNoGuide(name, noGuideText());
+  toast('Getting the guide...');
+  const res = await askAI({ mode: 'exercise', name: name.slice(0, 80) });
+  if (!res.ok) { aiFail(res); return showNoGuide(name, noGuideText()); }
+  const ex = cleanGuide(res.data, name);
+  db.exercises[key] = ex; persist();
+  showSheet(ex);
+}
+function trainingHtml(text) {
+  return text.split('\n').map(line => {
+    const m = line.match(/^\s*-\s+(.*)$/);
+    if (m) return `<div class="ex-row"><span>${esc(m[1])}</span><button class="btn-ghost btn-sm" data-act="howTo" data-name="${esc(m[1])}">How to do it</button></div>`;
+    return line.trim() ? `<div class="pt-line">${esc(line)}</div>` : '<div class="pt-gap"></div>';
+  }).join('');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
 function obDraft() { return db.clients.find(c => c.id === ui.clientId).ob; }
 function clearObErr(key) {
   const e = document.getElementById('err-' + key);
@@ -905,12 +1276,17 @@ function validateOb(c) {
 /* ==========================================================================
    Client pages: Today / My plan / Progress
    ========================================================================== */
+function planReadyCopy(c) {
+  if (c.tier === 'beast') return 'Your plan is ready to read. Message Stefan on WhatsApp to book your call and pick a start date.';
+  if (c.tier === 'core') return 'Your plan is ready to read. Bring it to your weekly check-in to book your call and pick a start date.';
+  return 'Your plan is ready to read. Stefan will email you to book your call and pick a start date.';
+}
 function statusLine(c) {
   const s = c.status;
   if (s === 'onboarding') return 'Finish your onboarding so Stefan can build your plan.';
   if (s === 'awaiting') {
     return hasPlanMeals(c.plan.mealPublished)
-      ? 'Your plan is ready to read. Message Stefan on WhatsApp to book your call and pick a start date.'
+      ? planReadyCopy(c)
       : 'Stefan is building your plan. It will be ready within 3 business days. You can start logging meals now.';
   }
   if (s === 'active') {
@@ -933,7 +1309,8 @@ function clientStatusCard(c) {
     <div class="row"><div><div class="muted">Hi ${esc(c.name.split(' ')[0])}</div><h1>${esc(TIERS[c.tier].name)}</h1></div>
     <div>${statusPill(c.status)}</div></div>
     <p class="status-line" style="margin:12px 0 0">${esc(statusLine(c))}</p>${extra}
-    <div style="margin-top:12px"><a class="btn btn-amber btn-sm" href="https://wa.me/" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>
+    ${c.tier === 'beast' && c.status !== 'finished' && c.status !== 'selflog'
+      ? '<div style="margin-top:12px"><a class="btn btn-amber btn-sm" href="https://wa.me/" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>' : ''}
   </section>`;
 }
 function renderClientPage(c) {
@@ -948,7 +1325,7 @@ function renderToday(c) {
   const tot = sumNut(meals);
   const tg = c.targets;
   const unit = ui.unit;
-  const bars = NUT.map(k => barHtml(k, Math.round(tot[k]), tg ? tg[k] : null, k === 'calories' ? 'kcal' : 'g')).join('');
+  const bars = NUT.map(k => barHtml(k, Math.round(tot[k]), tg ? tg[k] : null)).join('');
   const mode = ui.addMode;
   const modeBtns = [['describe','Describe it'],['plan','From my plan'],['builder','Meal Builder']]
     .map(m => `<button class="tab ${mode === m[0] ? 'on' : ''}" data-act="addMode" data-m="${m[0]}">${m[1]}</button>`).join('');
@@ -966,8 +1343,6 @@ function renderToday(c) {
   const woHtml = wos.length ? wos.map(w => `<div class="meal"><div><b>${esc(w.what)}</b><div class="mini">${w.minutes} min${w.notes ? ' · ' + esc(w.notes) : ''}</div></div>
       <button class="btn-danger btn-sm" data-act="deleteWorkout" data-id="${esc(w.id)}">Delete</button></div>`).join('') : '<p class="muted">No workout logged for this day.</p>';
 
-  const wi = c.weighIns.find(w => w.date === day);
-  const wiVal = wi ? (unit === 'kg' ? wi.kg : kgToLb(wi.kg)).toFixed(1) : '';
 
   const dayNav = `<div class="row" style="margin-bottom:12px">
     <button class="btn-ghost btn-sm" data-act="dayPrev">‹ Previous</button>
@@ -995,10 +1370,7 @@ function renderToday(c) {
             <button data-act="saveWorkout">Add workout</button>
           </div>
         </div>
-        <div class="card"><h3>Weigh-in</h3>
-          <p class="mini" style="margin-top:0">One per day. Saving again replaces it.</p>
-          <div class="row" style="flex-wrap:nowrap"><input id="wi-val" type="number" step="0.1" inputmode="decimal" value="${wiVal}" placeholder="${unit}" style="flex:1"><button data-act="saveWeigh">Save weigh-in (${unit})</button></div>
-        </div>
+        ${weighInCard(c)}
       </div>
     </div>`;
 }
@@ -1086,7 +1458,7 @@ function renderClientPlan(c) {
         <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div>
         ${c.status === 'active' ? `<button class="btn-sm" data-act="logPlan" data-d="${day}" data-i="${i}" data-date="${todayS()}">Log today</button>` : ''}</div>`).join('')
       : '<p class="muted">Nothing planned for this day.</p>';
-  const training = c.plan.trainPublished ? `<p class="pre">${esc(c.plan.trainPublished)}</p>` : '<p class="muted">Your training plan is not published yet.</p>';
+  const training = c.plan.trainPublished ? `<div>${trainingHtml(c.plan.trainPublished)}</div>` : '<p class="muted">Your training plan is not published yet.</p>';
   return `${notStarted}
     <div class="card"><h3>Your targets</h3>${targets}</div>
     <div class="card"><h3>Meal plan</h3>
@@ -1099,7 +1471,7 @@ function renderClientPlan(c) {
 
 /* Progress: shared by client and coach */
 function renderProgress(c, coach) {
-  const wi = sortedWeighIns(c);
+  const wi = weighPoints(c);
   const unit = ui.unit;
   const unitBtns = `<div class="tabs" style="margin:0"><button class="tab ${unit === 'kg' ? 'on' : ''}" data-act="unit" data-u="kg">kg</button><button class="tab ${unit === 'lb' ? 'on' : ''}" data-act="unit" data-u="lb">lb</button></div>`;
   let stats = '<p class="muted">No weigh-ins yet.</p>';
@@ -1116,12 +1488,18 @@ function renderProgress(c, coach) {
       <div class="note-box"><div class="mini">Change since last weigh-in</div><b style="font-family:'Bebas Neue',Impact,sans-serif;font-size:32px">${prev == null ? 'n/a' : conv(last - prev).toFixed(1) + ' ' + dUnit}</b></div>
     </div>`;
   }
+  const logged = [];
+  for (let i = 0; i < 7; i++) { const d = addDays(todayS(), -i); if ((c.logs[d] || []).length) logged.push(sumNut(c.logs[d])); }
+  const macroCard = logged.length ? `<div class="card"><h3>Average per day, last 7 days</h3>
+    <p class="mini" style="margin-top:0">Based on ${logged.length} logged day${logged.length === 1 ? '' : 's'}.</p>
+    ${NUT.map(k => barHtml(k, Math.round(logged.reduce((x, t) => x + t[k], 0) / logged.length), c.targets ? c.targets[k] : null)).join('')}</div>` : '';
   const weekAgo = addDays(todayS(), -6);
   const wos = (c.workouts || []).filter(w => w.date >= weekAgo).sort((a, b) => a.date < b.date ? 1 : -1);
   const woList = wos.length ? wos.map(w => `<div class="meal"><div><b>${esc(w.what)}</b><div class="mini">${fmtDate(w.date)} · ${w.minutes} min${w.notes ? ' · ' + esc(w.notes) : ''}</div></div></div>`).join('')
     : '<p class="muted">No workouts in the last 7 days.</p>';
   return `<div class="card"><div class="row"><h3 style="margin:0">Weight</h3>${unitBtns}</div>
       <div style="margin-top:12px">${stats}</div>${weighChart(wi, unit)}</div>
+    ${macroCard}
     <div class="card"><h3>Workouts in the last 7 days</h3>${woList}</div>`;
 }
 
@@ -1218,8 +1596,15 @@ function overviewHtml(c) {
   } else {
     actions = '<p class="mini">Self-logging. No coaching plan is active.</p>';
   }
+  const wDay = `<select id="cWDay" data-ch="weighDay">${DAYS.map((d, i) => `<option value="${d}" ${(c.ob.weighInDay || 'Mon') === d ? 'selected' : ''}>${DAYS_FULL[i]}</option>`).join('')}</select>`;
+  const wTime = `<select id="cWTime" data-ch="weighTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${weighTime(c) === t ? 'selected' : ''}>${fmtTime(t)}</option>`).join('')}</select>`;
   return `<div class="grid2">
     <div class="card"><h3>Status</h3>${info}</div>
+    <div class="card"><h3>Weigh-in</h3>
+      <div class="field"><label for="cWDay">Weigh-in day</label>${wDay}</div>
+      <div class="field"><label for="cWTime">Weigh-in time</label>${wTime}</div>
+      <p class="mini">Saved as you change them. The client can only weigh in on this day. Same day, same time each week, after the toilet and before eating or drinking.</p>
+    </div>
     <div class="card"><h3>Actions</h3>${actions}<hr style="border:0;border-top:1px solid var(--line);margin:16px 0">${tierSel}${del}</div>
   </div>`;
 }
@@ -1238,7 +1623,7 @@ function onboardingAnswersHtml(c) {
     ['Training days', ob.trainingDays.join(', ')], ['Time of day', ob.timeOfDay], ['Session length', ob.sessionLength + ' min'],
     ['Where they train', ob.place], ['Equipment', ob.equipment.join(', ')], ['Experience', ob.experience],
     ['Enjoys', ob.enjoys], ['Hates', ob.hates], ['Injuries or limits', ob.injuries],
-    ['What has worked', ob.worked], ['What has not', ob.didnt], ['Weigh-in day', ob.weighInDay],
+    ['What has worked', ob.worked], ['What has not', ob.didnt], ['Weigh-in day', ob.weighInDay], ['Weigh-in time', fmtTime(ob.weighInTime || '07:00')],
     ['Health: heart or blood pressure', ob.health.heart], ['Health: chest pain or fainting', ob.health.chest],
     ['Health: other condition or medication', ob.health.other + (ob.healthNote ? ' (' + ob.healthNote + ')' : '')],
     ['Doctor clearance confirmed', ob.healthClearance ? 'Yes' : 'No'],
@@ -1321,7 +1706,7 @@ function planEditorHtml(c) {
           ${aiEnabled() ? '' : '<span class="mini">Beast AI is off. Calculate makes rows with zero numbers you can type over.</span>'}
         </div>
         <div class="table-wrap" style="margin-top:12px"><table>
-          <thead><tr><th>Label</th><th>Foods</th><th>kcal</th><th>P g</th><th>C g</th><th>F g</th><th>Fibre g</th><th></th></tr></thead>
+          <thead><tr><th>Label</th><th>Foods</th>${NUT.map(k => `<th>${macroChip(k)}</th>`).join('')}<th></th></tr></thead>
           <tbody>${rows}${totalRow}</tbody></table></div>
         ${dayMeals.length ? `<div class="row" style="margin-top:12px;justify-content:flex-start">
           <label for="copyTo" class="sr">Copy this day to</label>
@@ -1346,10 +1731,9 @@ function logsHtml(c) {
       const tot = sumNut(meals);
       const wo = (c.workouts || []).filter(w => w.date === date);
       const wi = c.weighIns.find(w => w.date === date);
-      const calT = t ? tone('calories', tot.calories, t.calories) : '';
-      const proT = t ? tone('protein', tot.protein, t.protein) : '';
+      const calOver = t && tot.calories > t.calories, proOver = t && tot.protein > t.protein;
       const summary = `<summary><span>${fmtDate(date)}</span>
-        <span class="mini" style="font-weight:400;margin-left:8px">${meals.length ? `<span class="${TONE_TEXT[calT]}">${tot.calories} kcal</span> · <span class="${TONE_TEXT[proT]}">P ${tot.protein}g</span> · ${meals.length} meal${meals.length === 1 ? '' : 's'}` : 'No meals logged'}
+        <span class="mini" style="font-weight:400;margin-left:8px">${meals.length ? `<span style="color:${macroInk('calories', tot.calories, t && t.calories)}">${tot.calories} kcal${calOver ? ' (over)' : ''}</span> · <span style="color:${macroInk('protein', tot.protein, t && t.protein)}">P ${tot.protein}g${proOver ? ' (over)' : ''}</span> · ${meals.length} meal${meals.length === 1 ? '' : 's'}` : 'No meals logged'}
         · ${wo.length ? 'Workout' : 'No workout'} · ${wi ? weightText(wi.kg, 'kg') : 'No weigh-in'}</span></summary>`;
       const body = meals.length ? meals.map(m => `<div class="meal" style="padding:8px 0">
           <div style="flex:1 1 200px"><span class="mini">${esc(m.time || '')}</span> <b>${esc(m.name)}</b> <span class="mini">${esc(sourceLabel(m))}</span>
@@ -1368,6 +1752,8 @@ function logsHtml(c) {
 const ACT = {};
 const CH = {};
 const INP = {};
+ACT.howTo = el => { openExercise(el.dataset.name); };
+ACT.closeSheet = () => closeSheet();
 
 ACT.reset = () => {
   if (!confirm('Reset the demo? This clears everything you have added and reseeds the sample clients.')) return;
@@ -1556,12 +1942,14 @@ ACT.deleteWorkout = el => {
 };
 ACT.saveWeigh = () => {
   const c = clientById(ui.clientId);
+  const today = todayS();
+  if (!isWeighDay(c, today)) { toast('Weigh-ins are only on ' + DAYS_FULL[DAYS.indexOf(c.ob.weighInDay || 'Mon')] + '.'); return; }
   const raw = parseFloat(document.getElementById('wi-val').value);
-  if (!(raw > 0)) { toast('Enter a weight first.'); return; }
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  if (!(raw > 0)) { toast('Enter your weight first.'); return; }
   const kg = ui.unit === 'kg' ? raw : lbToKg(raw);
-  c.weighIns = c.weighIns.filter(w => w.date !== day);
-  c.weighIns.push({ date: day, kg: Math.round(kg * 10) / 10 });
+  const ws = weekStart(today), we = addDays(ws, 6);
+  c.weighIns = c.weighIns.filter(w => !(w.date >= ws && w.date <= we));   // one per week
+  c.weighIns.push({ date: today, kg: Math.round(kg * 10) / 10 });
   persist(); render(); toast('Weigh-in saved.');
 };
 
@@ -1633,12 +2021,13 @@ ACT.obSubmit = () => {
   ob.submittedAt = new Date().toISOString();
   c.healthFlag = Object.values(ob.health).includes('yes');
   c.status = 'awaiting';
-  c.weighIns = [{ date: todayS(), kg: ob.weightKg }];
   persist(); render(); window.scrollTo(0, 0);
   toast('Thanks. Stefan is building your plan.');
 };
 
 /* --- Coach: clients and capacity --- */
+CH.weighDay = el => { const c = clientById(ui.coachClientId); c.ob.weighInDay = el.value; persist(); render(); toast('Weigh-in day saved.'); };
+CH.weighTime = el => { const c = clientById(ui.coachClientId); c.ob.weighInTime = el.value; persist(); render(); toast('Weigh-in time saved.'); };
 CH.cap = el => {
   const t = el.dataset.tier;
   db.capacity[t] = clampNum(el.value, 500);
@@ -1684,7 +2073,7 @@ ACT.changeTier = () => {
   const t = document.getElementById('newTier').value;
   if (t === c.tier) return;
   const holdsSpot = c.status === 'active' || c.status === 'paused';
-  if (holdsSpot && t !== 'essential') {
+  if (holdsSpot) {
     const freeAfterMove = db.capacity[t] - activeCount(t);
     if (freeAfterMove <= 0 && c.tier !== t) { toast('No spot is free in ' + TIERS[t].name + '.'); return; }
   }

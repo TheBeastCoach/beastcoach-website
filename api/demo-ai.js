@@ -36,6 +36,14 @@ Rules:
 - Do not add foods that are not on the line.
 - No markdown and no text outside the JSON.`;
 
+const EXERCISE_PROMPT = `You explain how to do one exercise for Beast Coach. Write for someone who has never trained.
+Return ONLY valid JSON in exactly this shape:
+{"name":"clear exercise name","works":"what it works, one short sentence","steps":["3 to 5 short steps"],"tips":["2 or 3 form tips"],"mistakes":["2 or 3 common mistakes"],"easier":"an easier version for beginners, one short sentence"}
+Rules:
+- Plain words. No jargon. Each step is one action.
+- If the text is not a real exercise, return {"error":"not_exercise"}.
+- No markdown and no text outside the JSON.`;
+
 const FRIDGE_PROMPT = `You look at a photo of the inside of a fridge, freezer, pantry or kitchen bench and list the food and drink you can actually see.
 Return ONLY valid JSON in exactly this shape:
 {"items":["eggs","Greek yoghurt","spinach"]}
@@ -161,6 +169,13 @@ function readInput(body) {
     if (lines.length > MAX_DAY_LINES) return { status: 400, error: 'too_many_lines' };
     return { input: { mode, lines } };
   }
+  if (mode === 'exercise') {
+    const name = typeof body.name === 'string' ? body.name.trim() : '';
+    if (name.length < 2) return { status: 400, error: 'empty' };
+    if (name.length > 80) return { status: 400, error: 'too_long' };
+    if (!/[a-z]/i.test(name)) return { status: 400, error: 'bad_input' };
+    return { input: { mode, name } };
+  }
   if (mode === 'fridge') {
     const image = body.image;
     if (!image || typeof image.data !== 'string' || !IMAGE_TYPES.includes(image.type) || !/^[A-Za-z0-9+/]+=*$/.test(image.data)) {
@@ -205,6 +220,23 @@ async function runDay(anthropicKey, input, res) {
   }
   if (!meals) throw new Step('count', 'day mode returned the wrong number of meals');
   return send(res, 200, { meals });
+}
+
+// "How to do it" for an exercise that is not in the page's library.
+async function runExercise(anthropicKey, input, res) {
+  const r = await ask(anthropicKey, EXERCISE_PROMPT, [{ role: 'user', content: input.name }], 700);
+  if (r.parsed.error) return send(res, 422, { error: 'not_exercise' });
+  const list = (x, n, len) => Array.isArray(x) ? x.map(i => String(i).trim().slice(0, len)).filter(Boolean).slice(0, n) : [];
+  const steps = list(r.parsed.steps, 5, 200);
+  if (!steps.length) throw new Step('parse', 'exercise reply had no steps');
+  return send(res, 200, {
+    name: String(r.parsed.name || input.name).trim().slice(0, 80),
+    works: String(r.parsed.works || '').trim().slice(0, 300),
+    steps,
+    tips: list(r.parsed.tips, 3, 200),
+    mistakes: list(r.parsed.mistakes, 3, 200),
+    easier: String(r.parsed.easier || '').trim().slice(0, 300)
+  });
 }
 
 async function runFridge(anthropicKey, input, res) {
@@ -272,6 +304,7 @@ module.exports = async function handler(req, res) {
     if (input.mode === 'log') return await runLog(anthropicKey, input, res);
     if (input.mode === 'day') return await runDay(anthropicKey, input, res);
     if (input.mode === 'fridge') return await runFridge(anthropicKey, input, res);
+    if (input.mode === 'exercise') return await runExercise(anthropicKey, input, res);
     return await runCreate(anthropicKey, input, res);
   } catch (e) {
     console.error('demo-ai error:', e && e.stage, e && e.detail, e && e.message);
@@ -279,4 +312,4 @@ module.exports = async function handler(req, res) {
   }
 };
 
-module.exports._test = { readInput, parseDayLine, cleanTargets, createText, keyMatches, DAILY_LIMIT, MAX_DAY_LINES };
+module.exports._test = { readInput, parseDayLine, cleanTargets, createText, keyMatches, DAILY_LIMIT, MAX_DAY_LINES, EXERCISE_PROMPT };
