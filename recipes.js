@@ -593,5 +593,35 @@ const RECIPES = [
     healthScore: 8,
     dateAdded: "2026-11-23",
     blurb: "A chocolate mug cake that's mostly fibre. One egg, some psyllium and a minute in the microwave."
+  },
+  {
+    id: "magnesium-smoothie-cacao-nib",
+    meal: ["smoothie", "breakfast"],
+    chip: "Cacao Nib Magnesium Smoothie",
+    image: "recipe-img/magnesium-smoothie-cacao-nib.jpg",
+    title: "Cacao Nib Magnesium Smoothie",
+    desc: "About 256mg of magnesium from three seeds: pumpkin seeds, chia and cacao nibs. The base alone carries around 19g of protein, and the seeds add another 11g on top.",
+    ingredients: ["25g pumpkin seeds (pepitas, hulled)", "15g chia seeds", "10g cacao nibs (plus a pinch for the top)", "200ml unsweetened almond milk", "100g low-fat cottage cheese", "50g Greek yoghurt", "100g frozen strawberries", "1 tablespoon honey (21g)", "A few ice cubes"],
+    instructions: [
+      "Blend the pumpkin seeds, chia seeds, cacao nibs and almond milk on high for 30 to 45 seconds first, so the seeds fully break down.",
+      "Add the cottage cheese, Greek yoghurt, strawberries, honey and ice, then blend again until smooth.",
+      "Pour it out and sprinkle a pinch of cacao nibs on top for crunch."
+    ],
+    notes: [
+      "Where the magnesium comes from (approx.): pumpkin seeds ~148mg, chia ~50mg, cacao nibs ~25mg, and the base ~35mg.",
+      "Cacao nibs vary a lot by brand, so check your label. Some almond milks are fortified and some aren't, which can shift the total a little.",
+      "Seeds contain phytates, which reduce how much magnesium you actually absorb, so think of 256mg as what's in the glass, not what your body takes in.",
+      "Want it lighter? Drop the honey to half a tablespoon, or leave out the Greek yoghurt and the base still has about 14g of protein."
+    ],
+    macros: [["~520", "kcal"], ["~30g", "Protein"], ["~44g", "Carbs (12g fibre)"], ["~26g", "Fat"]],
+    kcal: 520,
+    protein: 30,
+    fibre: 12,
+    carbs: 44,
+    fat: 26,
+    difficulty: "Easy",
+    healthScore: 8,
+    dateAdded: "2026-11-23",
+    blurb: "My magnesium smoothie again, this time with cacao nibs for a chocolate hit and a bit of crunch."
   }
 ];
