@@ -1,0 +1,1876 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Coaching demo | Beast Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1B3022;--green:#2D6A4F;--mint:#52B788;--bg:#F4F7F2;--amber:#F59E0B;--amber-hover:#FFB62E;--muted:#3B4F43;--line:#D5E0D8;--red:#b42318;--amber-text:#8a5300}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Manrope',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5}
+h1,h2,h3,.disp{font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;font-weight:400;letter-spacing:.02em;margin:0;color:var(--ink)}
+h1{font-size:clamp(48px,7vw,80px);line-height:.95}h2{font-size:clamp(36px,5vw,52px);line-height:1}h3{font-size:30px;line-height:1.05}
+p{margin:0 0 10px}
+a{color:var(--green)}a:hover{color:var(--ink)}
+:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+.wrap{max-width:1120px;margin:0 auto;padding:18px 20px}
+.muted{color:var(--muted);font-size:14px}
+.eyebrow{font-weight:800;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--green)}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px}
+.card h3{margin-bottom:12px}
+.hero{background:var(--ink);color:#fff;border-radius:22px;padding:26px 24px;margin-bottom:16px}
+.hero h1{color:#fff}.hero .muted{color:#D5E6DB}
+.hero .eyebrow{color:#8FD3B0}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr}
+.grid3{display:grid;gap:14px;grid-template-columns:1fr}
+.grid5{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+@media(min-width:900px){.grid2{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}.grid5{grid-template-columns:repeat(5,1fr)}}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.stack>*+*{margin-top:10px}
+.hidden,[hidden]{display:none !important}
+/* demo bar */
+.demo-bar{background:var(--ink);color:#fff;padding:12px 20px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+@media(min-width:900px){.demo-bar{position:sticky;top:0;z-index:50}}
+.logo{font-family:'Bebas Neue',Impact,sans-serif;font-size:24px;letter-spacing:.1em;color:#fff}
+.logo span{color:var(--mint)}
+.tag{background:var(--amber);color:#1B1200;font-weight:800;border-radius:6px;padding:3px 9px;font-size:12px;letter-spacing:1px}
+.demo-bar select{width:auto;min-width:230px;max-width:100%}
+.demo-bar .note{font-size:13px;color:#D5E6DB;flex:1 1 260px}
+.ai{font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px}
+.ai.on{background:#d8f3e3;color:#1b5e3a}.ai.off{background:#fde7c2;color:#7a4a00}
+/* form controls */
+select,input,textarea{font:inherit;color:var(--ink);background:#fff;border:1px solid #C5D3C8;border-radius:12px;padding:10px 12px;width:100%;max-width:100%}
+select option{color:var(--ink);background:#fff}
+textarea{min-height:92px;resize:vertical}
+input[type=checkbox],input[type=radio]{width:auto;margin:0;accent-color:var(--green)}
+label{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.field{margin-bottom:12px}
+.field.inline label{display:inline}
+.err{color:var(--red);font-size:13px;margin-top:4px;min-height:0}
+.err:empty{display:none}
+.invalid{border-color:var(--red)!important;box-shadow:0 0 0 2px #fbd4cf}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid #C5D3C8;border-radius:999px;padding:7px 13px;background:#fff;cursor:pointer;font-size:14px;font-weight:600;margin:0}
+.chip:has(input:checked){background:#d8f3e3;border-color:var(--mint)}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:600;margin:0 0 10px;cursor:pointer}
+.check input{margin-top:4px}
+.hl-red{background:#fdecea;border-left:4px solid var(--red);padding:9px 12px;border-radius:10px}
+.hl-amber{background:#fff6e0;border-left:4px solid var(--amber);padding:9px 12px;border-radius:10px}
+.note-box{background:#EEF5F0;border-radius:14px;padding:12px 14px;font-size:15px}
+/* buttons: amber is the primary action, as on the sales page */
+button,.btn{font:inherit;font-weight:800;border:0;border-radius:14px;padding:13px 20px;min-height:48px;cursor:pointer;background:var(--amber);color:#1B1200;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;text-align:center}
+button:hover{background:var(--amber-hover)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--ink);color:#fff}
+.btn-ghost{background:#fff;color:var(--ink);border:1px solid #C5D3C8}.btn-ghost:hover{background:#F4F7F2}
+.btn-danger{background:#fff;color:var(--red);border:1px solid #f0c4c0}.btn-danger:hover{background:#fdecea}
+.btn-sm{padding:7px 12px;min-height:36px;font-size:14px;border-radius:10px}
+.btn-link{background:none;color:var(--green);padding:0;min-height:0;text-decoration:underline;font-weight:800}.btn-link:hover{background:none;color:var(--ink)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tab{background:#fff;color:var(--ink);border:1px solid #C5D3C8;padding:9px 16px;border-radius:999px;min-height:40px}
+.tab:hover{background:#F4F7F2}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pill{display:inline-block;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:800;white-space:nowrap}
+.p-onboarding{background:#eef1f4;color:#3b4a57}.p-awaiting{background:#fff3d6;color:#8a5a00}.p-active{background:#d8f3e3;color:#1b5e3a}.p-paused{background:#e6ecff;color:#2c3e9a}.p-finished{background:#ececec;color:#444}.p-selflog{background:#f3e8ff;color:#6b2ca8}
+.need{display:inline-block;background:#fde7c2;color:#7a4a00;border-radius:8px;padding:3px 9px;font-size:12px;font-weight:800;margin:2px 4px 2px 0}
+.bar{height:10px;background:#E3EBE4;border-radius:99px;overflow:hidden}
+.bar>span{display:block;height:100%;border-radius:99px;background:var(--mint)}
+.bar>span.g{background:#2fa36b}.bar>span.a{background:var(--amber)}.bar>span.r{background:var(--red)}
+.c-green{color:#1b7a46}.c-amber{color:var(--amber-text)}.c-red{color:var(--red)}
+.metric{margin-bottom:14px}
+.metric .top{display:flex;justify-content:space-between;gap:8px;font-size:15px;margin-bottom:5px;flex-wrap:wrap}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+td input,td select{padding:7px 9px;font-size:14px}
+td.num input{width:76px}
+.meal{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);align-items:flex-start;flex-wrap:wrap}
+.meal:last-child{border-bottom:0}
+.meal .kcal{font-family:'Bebas Neue',Impact,sans-serif;font-size:28px;line-height:1;white-space:nowrap}
+.meal .acts{display:flex;gap:6px}
+.meal-edit{display:grid;gap:8px;grid-template-columns:repeat(2,1fr);width:100%}
+.meal-edit .wide{grid-column:1/-1}
+@media(min-width:700px){.meal-edit{grid-template-columns:repeat(6,1fr)}.meal-edit .wide{grid-column:span 2}}
+.mini{font-size:14px;color:var(--muted)}
+.edited{font-size:13px;color:var(--amber-text);background:#fff6e0;border-radius:8px;padding:4px 9px;display:inline-block;margin-top:5px}
+.dl{display:grid;grid-template-columns:1fr;gap:2px 14px}
+.dl dt{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:10px}
+.dl dd{margin:0 0 4px;font-size:15px}
+@media(min-width:700px){.dl{grid-template-columns:200px 1fr}.dl dt{margin-top:9px}}
+.cap-nums{display:flex;gap:24px;margin:6px 0 14px}
+.cap-nums b{font-family:'Bebas Neue',Impact,sans-serif;font-size:44px;line-height:1;display:block}
+.cap-nums span{font-size:14px;color:var(--muted)}
+.plans{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:900px){.plans{grid-template-columns:repeat(3,1fr)}}
+.plan-card{display:flex;flex-direction:column;gap:8px}
+.price{font-family:'Bebas Neue',Impact,sans-serif;font-size:52px;line-height:1}
+.chart{width:100%;height:auto;display:block;margin:10px 0}
+details{margin-bottom:10px}
+summary{cursor:pointer;font-weight:800;padding:8px 0;list-style:none}
+summary::-webkit-details-marker{display:none}
+.day-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.day-row button{padding:8px 13px;border-radius:999px;font-size:14px;min-height:38px}
+.day-row button.on{background:var(--ink);color:#fff}
+.day-row button.dot::after{content:" \2022";color:var(--mint)}
+.pre{white-space:pre-wrap;font-family:inherit;margin:0;font-size:15px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 18px;border-radius:14px;z-index:99;display:none;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast.show{display:block}
+.status-line{font-weight:700;font-size:17px;color:#fff}
+.fine{font-size:13px;color:var(--muted)}
+.list-clean{margin:6px 0 0;padding-left:18px}
+.sr{position:absolute;left:-9999px}
+.plan-inputs{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px}
+.pi-grid{display:grid;gap:18px 26px;grid-template-columns:1fr;margin-top:14px}
+@media(min-width:760px){.pi-grid{grid-template-columns:repeat(3,1fr)}}
+.pi-sec h4{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:22px;margin:0 0 8px;letter-spacing:.02em}
+.pi-sec p{margin:0 0 6px;font-size:15px}
+.pi-tag{display:inline-block;background:#E8F3EC;border-radius:999px;padding:4px 11px;font-size:13px;font-weight:700;margin:0 6px 6px 0}
+.pi-tag.day{background:#d8f3e3}
+@media(max-width:899px){h3{font-size:26px}}
+</style>
+</head>
+<body>
+<header class="demo-bar" id="demoBar"></header>
+<main class="wrap" id="app"></main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+/* ==========================================================================
+   Constants
+   ========================================================================== */
+const DB_KEY = 'bc_demo_v1';
+const UI_KEY = 'bc_demo_ui';
+const DEMO_KEY_NAME = 'bc_demo_key';
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYS_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const WEEKS = 12;
+const PAUSE_MAX = 14;
+const CAP_TIERS = ['core','beast'];
+const TIERS = {
+  essential: { name:'Essential', price:110, short:'$110 one-off', recur:false,
+    desc:'A plan built from your onboarding answers, delivered once. Meals, training and a check-in.' },
+  core: { name:'Core', price:299, short:'$299 for 12 weeks', recur:true,
+    desc:'12 weeks of coaching with your meal and training plans, weekly weigh-ins and check-ins.' },
+  beast: { name:'The Beast', price:699, short:'$699 for 12 weeks', recur:true,
+    desc:'12 weeks of close, hands-on coaching in our smallest group. Our most supported option.' }
+};
+const STATUS = {
+  onboarding:['Onboarding','p-onboarding'], awaiting:['Awaiting activation','p-awaiting'],
+  active:['Active','p-active'], paused:['Paused','p-paused'],
+  finished:['Finished','p-finished'], selflog:['Self-logging','p-selflog']
+};
+const SOURCES = { ai:'Beast AI', plan:'From plan', builder:'Meal Builder', typed:'Typed in' };
+const FOOD_GROUPS = {
+  Proteins:['Chicken','Beef','Pork','Lamb','Fish','Tuna','Salmon','Prawns','Eggs','Tofu','Tempeh','Greek yoghurt','Cottage cheese','Protein powder'],
+  Carbs:['Rice','Pasta','Potato','Sweet potato','Bread','Wraps','Oats','Noodles','Quinoa','Couscous'],
+  Vegetables:['Broccoli','Spinach','Salad leaves','Capsicum','Carrots','Zucchini','Green beans','Mushrooms','Tomatoes','Cauliflower'],
+  Fruit:['Banana','Apple','Berries','Orange','Grapes','Mango','Kiwi'],
+  Snacks:['Nuts','Cheese','Popcorn','Rice cakes','Dark chocolate','Protein bars']
+};
+const EQUIPMENT = ['Full gym','Dumbbells','Barbell','Kettlebells','Resistance bands','Pull-up bar','Bench','Treadmill or bike','None'];
+const DIETS = ['No restrictions','Vegetarian','Vegan','Pescatarian','Halal','Kosher','Dairy free','Gluten free','Other'];
+const MEALS_PER_DAY = ['2','3','3 plus snacks','4 or more'];
+const COOK_TIMES = ['5 min','15 min','30 min','I like cooking'];
+const WHO_COOKS = ['Me','Someone else','Shared'];
+const ACTIVITY = ['Mostly sitting','Mixed','On my feet','Physical work'];
+const TIME_OF_DAY = ['Morning','Lunchtime','Evening','Varies'];
+const SESSIONS = ['30','45','60','90'];
+const PLACES = ['Home','Gym','Both'];
+const EXPERIENCE = ['Beginner','Some','Experienced'];
+const MEAL_SLOTS = ['Breakfast','Lunch','Snack','Dinner'];
+const EFFORTS = ['5 minutes','15 minutes',"I'll properly cook"];
+
+/* Seed plan building blocks: [short name, foods with amounts, kcal, protein, carbs, fat, fibre] */
+const SLOT_OPTIONS = {
+  Breakfast: [
+    ['Oats with Greek yoghurt and berries','60g oats, 150g Greek yoghurt, 80g berries, 1 banana',470,34,62,11,9],
+    ['Scrambled eggs on toast','3 eggs with a handful of spinach, 2 slices wholegrain toast',480,30,34,20,6],
+    ['Protein smoothie','1 scoop whey, 1 banana, 250ml milk, 30g oats',490,40,66,9,6]
+  ],
+  Lunch: [
+    ['Chicken and rice bowl','150g chicken breast, 150g cooked rice, 100g broccoli, 1 tsp soy sauce',560,45,62,12,9],
+    ['Tuna wrap','1 wholemeal wrap, 130g tuna in springwater, salad leaves, tomato',540,42,55,14,9],
+    ['Beef and quinoa salad','120g lean beef mince, 120g cooked quinoa, mixed greens, capsicum',570,46,52,19,10]
+  ],
+  Snack: [
+    ['Greek yoghurt and almonds','200g Greek yoghurt, 20g almonds',240,22,12,11,3],
+    ['Apple, cheese and rice cakes','1 apple, 30g cheddar, 2 rice cakes',250,9,30,10,4],
+    ['Protein bar','1 protein bar (about 60g)',230,20,25,7,3]
+  ],
+  Dinner: [
+    ['Salmon with potato','150g salmon, 250g potato, 150g green beans, 1 tsp olive oil',700,42,60,30,10],
+    ['Lean beef with sweet potato','150g lean beef steak, 180g sweet potato, spinach and mushrooms',720,44,58,31,9],
+    ['Chicken thigh pasta','150g skinless chicken thigh, 200g wholemeal pasta, tomato sauce, zucchini',740,40,74,28,10]
+  ]
+};
+const SAM_TRAIN = 'Mon: Full body A. Squat, row, bench press, plank. 3 sets of 8 to 10.\nWed: Intervals. 20 min easy warm up, 6 x 1 min hard on the bike, 2 min easy between.\nFri: Full body B. Deadlift, split squat, lat pulldown, dead bug.\nSat: Long walk to 8,000 steps. 15 min mobility.';
+const JORDAN_TRAIN = 'Mon: Lower body, squat focus.\nTue: Upper body, push.\nThu: Lower body, deadlift focus.\nFri: Upper body, pull.\nSat: Full body conditioning, 20 min.';
+
+/* ==========================================================================
+   Storage module: the only place that reads or writes saved data.
+   Later this is swapped for Supabase calls with the same shapes.
+   ========================================================================== */
+const Store = {
+  load() {
+    try {
+      const raw = localStorage.getItem(DB_KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d && d.version === 1 && Array.isArray(d.clients)) return d;
+      }
+    } catch (e) { /* fall through to seed */ }
+    return seedDb();
+  },
+  save(d) {
+    try { localStorage.setItem(DB_KEY, JSON.stringify(d)); }
+    catch (e) { toast('Browser storage is full. Use Reset demo to clear it.'); }
+  },
+  loadUi() {
+    try { return JSON.parse(localStorage.getItem(UI_KEY)) || {}; } catch (e) { return {}; }
+  },
+  saveUi(u) { try { localStorage.setItem(UI_KEY, JSON.stringify(u)); } catch (e) {} }
+};
+let db = null;
+function persist() { Store.save(db); }
+
+/* ==========================================================================
+   Dates and numbers
+   ========================================================================== */
+const pad = n => String(n).padStart(2, '0');
+function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function todayS() { return ymd(new Date()); }
+function pd(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
+function addDays(s, n) { const d = pd(s); d.setDate(d.getDate() + n); return ymd(d); }
+function diffDays(a, b) { return Math.round((pd(b) - pd(a)) / 86400000); }
+function dowNum(s) { return (pd(s).getDay() + 6) % 7 + 1; }          // 1 = Mon ... 7 = Sun
+function fmtDate(s) { return s ? pd(s).toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short', year:'numeric' }) : 'Not set'; }
+function relDay(s) {
+  if (!s) return 'Never';
+  const n = diffDays(s, todayS());
+  if (n === 0) return 'Today';
+  if (n === 1) return 'Yesterday';
+  if (n < 0) return fmtDate(s);
+  return n + ' days ago';
+}
+function uid() { return 'id' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36); }
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const clampNum = (v, max) => { const x = Math.round(parseFloat(v)); return isFinite(x) ? Math.max(0, Math.min(max, x)) : 0; };
+const kgToLb = k => k * 2.20462;
+const lbToKg = l => l / 2.20462;
+const money = v => '$' + (Math.round(v * 100) / 100).toFixed(2).replace(/\.00$/, '');
+const NUT = ['calories','protein','carbs','fat','fibre'];
+const NUT_LABEL = { calories:'Calories', protein:'Protein', carbs:'Carbs', fat:'Fat', fibre:'Fibre' };
+function nutFrom(v) {
+  return { calories: clampNum(v.calories, 5000), protein: clampNum(v.protein, 500), carbs: clampNum(v.carbs, 800),
+           fat: clampNum(v.fat, 400), fibre: clampNum(v.fibre, 200) };
+}
+function sumNut(list) {
+  const t = { calories:0, protein:0, carbs:0, fat:0, fibre:0 };
+  list.forEach(m => NUT.forEach(k => { t[k] += Number(m[k]) || 0; }));
+  return t;
+}
+/* Colour rules: calories, carbs ±5% green, ±10% amber, beyond red.
+   Protein and fibre: 95% or more green, 90% or more amber. Fat: 105% or less green, 110% or less amber. */
+function tone(kind, val, target) {
+  if (!target) return '';
+  const p = val / target;
+  if (kind === 'fat') return p <= 1.05 ? 'g' : p <= 1.10 ? 'a' : 'r';
+  if (kind === 'protein' || kind === 'fibre') return p >= 0.95 ? 'g' : p >= 0.90 ? 'a' : 'r';
+  const dev = Math.abs(p - 1);
+  return dev <= 0.05 ? 'g' : dev <= 0.10 ? 'a' : 'r';
+}
+const TONE_TEXT = { g:'c-green', a:'c-amber', r:'c-red', '':'' };
+
+/* ==========================================================================
+   Seed data (test data only, relative to today)
+   ========================================================================== */
+function buildPlan(factor) {
+  const f = v => Math.round(v * factor);
+  const plan = {};
+  for (let d = 0; d < 7; d++) {
+    plan[d + 1] = [
+      mealOf('Breakfast', SLOT_OPTIONS.Breakfast[d % 3], f),
+      mealOf('Lunch', SLOT_OPTIONS.Lunch[(d + 1) % 3], f),
+      mealOf('Snack', SLOT_OPTIONS.Snack[(d + 2) % 3], f),
+      mealOf('Dinner', SLOT_OPTIONS.Dinner[d % 3], f)
+    ];
+  }
+  return plan;
+}
+function mealOf(label, o, f) {
+  return { label, name: o[0], text: o[1], calories: f(o[2]), protein: f(o[3]), carbs: f(o[4]), fat: f(o[5]), fibre: f(o[6]) };
+}
+function draftFromPlan(plan) {
+  const out = {};
+  for (let d = 1; d <= 7; d++) {
+    out[d] = { lines: plan[d].map(m => m.label + ': ' + m.text).join('\n'), meals: plan[d] };
+  }
+  return out;
+}
+function emptyDraft() {
+  const out = {};
+  for (let d = 1; d <= 7; d++) out[d] = { lines: '', meals: [] };
+  return out;
+}
+function emptyPublished() {
+  const out = {};
+  for (let d = 1; d <= 7; d++) out[d] = [];
+  return out;
+}
+function blankOb(extra) {
+  return Object.assign({
+    age:'', sex:'', heightCm:'', weight:'', weightUnit:'kg', weightKg:null, whatsapp:'',
+    timezone: (Intl.DateTimeFormat().resolvedOptions().timeZone || 'Australia/Melbourne'),
+    goal:'', goalBy:'', goalWhy:'',
+    job:'', activity:'', steps:'',
+    likedFoods:[], likedOther:'', avoid:'', allergies:'', diet:'No restrictions',
+    mealsPerDay:'3', cookTime:'15 min', whoCooks:'Me', eatsOut:'', alcohol:'', typicalDay:'',
+    trainingDays:[], timeOfDay:'Varies', sessionLength:'45', place:'Gym', equipment:[], experience:'Beginner',
+    enjoys:'', hates:'', injuries:'', worked:'', didnt:'', weighInDay:'Mon',
+    health:{ heart:null, chest:null, other:null }, healthNote:'', healthClearance:false,
+    agreeTerms:false, agreeNotCoach:false, agreeConsent:false, submittedAt:null
+  }, extra || {});
+}
+function mkClient(o) {
+  return Object.assign({
+    id: uid(), name:'', email:'', tier:'essential', status:'onboarding', paid:null, createdAt: new Date().toISOString(),
+    startDate:null, pauseUsed:0, pauseStart:null, healthFlag:false, ob: blankOb(),
+    weighIns:[], workouts:[], targets:null,
+    plan:{ mealDraft: emptyDraft(), mealPublished: null, trainDraft:'', trainPublished: null, publishedAt: null },
+    logs:{}, notes:''
+  }, o);
+}
+function seedDb() {
+  const t = todayS();
+  const samPlan = buildPlan(1);
+  const jorPlan = buildPlan(1.3);
+  const TIMES = ['07:30','12:30','16:00','19:00'];
+
+  const samLogs = {};
+  for (let o = 0; o < 7; o++) {
+    const date = addDays(t, -o);
+    let entries = samPlan[dowNum(date)].map((m, i) => ({
+      id: uid(), time: TIMES[i], name: m.name, calories: m.calories, protein: m.protein, carbs: m.carbs,
+      fat: m.fat, fibre: m.fibre, source: 'plan', ai: null, edited: false, text: m.text
+    }));
+    if (o === 0) entries = entries.slice(0, 2);
+    if (o === 2) {
+      entries[1] = Object.assign({}, entries[1], { name: 'Chicken and rice bowl', text: '150g chicken breast, 150g cooked rice, 100g broccoli, 1 tsp soy sauce',
+        calories: 560, protein: 45, carbs: 62, fat: 12, fibre: 9, source: 'ai',
+        ai: { calories: 520, protein: 38, carbs: 58, fat: 11, fibre: 7 }, edited: true });
+    }
+    if (o === 4) {
+      entries[2] = Object.assign({}, entries[2], { name: 'Protein shake', text: '1 scoop whey, 300ml milk, 1 banana',
+        calories: 330, protein: 30, carbs: 32, fat: 6, fibre: 4, source: 'ai',
+        ai: { calories: 330, protein: 30, carbs: 32, fat: 6, fibre: 4 }, edited: false });
+    }
+    samLogs[date] = entries;
+  }
+
+  const sam = mkClient({
+    id:'c_sam', name:'Sam Taylor', email:'sam@example.com', tier:'core', status:'active',
+    paid:{ date: addDays(t, -10), amount: 299 }, createdAt: addDays(t, -10) + 'T09:00:00.000Z',
+    startDate: addDays(t, -9), healthFlag:false,
+    ob: blankOb({
+      age:'34', sex:'Male', heightCm:'182', weight:'84', weightUnit:'kg', weightKg:84, whatsapp:'+61 400 000 001',
+      goal:'Lose 6 kg and get back to lifting 3 days a week', goalBy: addDays(t, 80), goalWhy:'Trip in March and my knee is sick of the extra weight',
+      job:'Software tester, mostly at a desk', activity:'Mostly sitting', steps:'5000',
+      likedFoods:['Chicken','Rice','Broccoli','Salmon','Potato','Eggs','Greek yoghurt','Oats','Banana','Berries','Beef','Nuts'],
+      likedOther:'Spicy noodles', avoid:'Mushrooms', allergies:'', diet:'No restrictions', mealsPerDay:'4 or more',
+      cookTime:'15 min', whoCooks:'Me', eatsOut:'1', alcohol:'2', typicalDay:'Cereal for breakfast, a sandwich at lunch, takeaway on some nights.',
+      trainingDays:['Mon','Wed','Fri','Sat'], timeOfDay:'Morning', sessionLength:'60', place:'Gym', equipment:['Full gym'],
+      experience:'Some', enjoys:'Lifting, cycling', hates:'Running', injuries:'Left knee gets sore on long walks',
+      worked:'Tracking macros in an app for 6 weeks', didnt:'Cutting carbs completely', weighInDay:'Mon',
+      health:{ heart:'no', chest:'no', other:'no' }, healthClearance:false,
+      agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -9) + 'T18:00:00.000Z'
+    }),
+    weighIns: [ { date: addDays(t, -9), kg: 84.0 }, { date: addDays(t, -2), kg: 83.2 } ],
+    workouts: [
+      { id: uid(), date: addDays(t, -1), what:'Full body A: squat, row, press', minutes: 55, notes:'Felt good' },
+      { id: uid(), date: addDays(t, -3), what:'Bike intervals', minutes: 30, notes:'4 x 3 min hard' },
+      { id: uid(), date: addDays(t, -5), what:'Full body B: deadlift, lunges, pull-ups', minutes: 60, notes:'' }
+    ],
+    targets: { calories:2000, protein:140, carbs:200, fat:70, fibre:28 },
+    plan: { mealDraft: draftFromPlan(samPlan), mealPublished: samPlan, trainDraft: SAM_TRAIN, trainPublished: SAM_TRAIN, publishedAt: addDays(t, -9) + 'T12:00:00.000Z' },
+    logs: samLogs,
+    notes: 'Keep the step count up. Skip heavy squats this week if the knee flares. Responds well to short voice notes.'
+  });
+
+  const mia = mkClient({
+    id:'c_mia', name:'Mia Chen', email:'mia@example.com', tier:'essential', status:'awaiting',
+    paid:{ date: addDays(t, -2), amount: 110 }, createdAt: addDays(t, -2) + 'T10:00:00.000Z',
+    startDate: null, healthFlag:true,
+    ob: blankOb({
+      age:'29', sex:'Female', heightCm:'166', weight:'71', weightUnit:'kg', weightKg:71, whatsapp:'+61 400 000 002',
+      goal:'More energy and a steady routine', goalBy: addDays(t, 90), goalWhy:'Shift work has wrecked my sleep and my eating',
+      job:'Nurse, rotating shifts', activity:'On my feet', steps:'9000',
+      likedFoods:['Tofu','Tempeh','Eggs','Spinach','Banana','Oats','Greek yoghurt'], likedOther:'', avoid:'Fish',
+      allergies:'Peanuts', diet:'Vegetarian', mealsPerDay:'3 plus snacks', cookTime:'15 min', whoCooks:'Me',
+      eatsOut:'0', alcohol:'0', typicalDay:'Toast and tea, skip lunch on long shifts, pasta at night.',
+      trainingDays:['Tue','Thu','Sun'], timeOfDay:'Morning', sessionLength:'45', place:'Home', equipment:['Resistance bands','Dumbbells'],
+      experience:'Beginner', enjoys:'Walking, yoga', hates:'Burpees', injuries:'', worked:'Meal prep on my day off', didnt:'Gym sessions after night shifts',
+      weighInDay:'Sat', health:{ heart:'no', chest:'no', other:'yes' }, healthNote:'Asthma, I use a blue inhaler', healthClearance:true,
+      agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -1) + 'T18:30:00.000Z'
+    }),
+    weighIns: [ { date: addDays(t, -1), kg: 71.0 } ],
+    logs: { [t]: [ { id: uid(), time:'08:10', name:'Overnight oats', calories:350, protein:22, carbs:48, fat:9, fibre:8,
+      source:'typed', ai:null, edited:false, text:'' } ] },
+    notes: ''
+  });
+
+  const jorDraft = draftFromPlan(jorPlan);
+  const jordan = mkClient({
+    id:'c_jordan', name:'Jordan Reid', email:'jordan@example.com', tier:'beast', status:'active',
+    paid:{ date: addDays(t, -35), amount: 699 }, createdAt: addDays(t, -35) + 'T08:00:00.000Z',
+    startDate: addDays(t, -29), healthFlag:false,
+    ob: blankOb({
+      age:'31', sex:'Male', heightCm:'178', weight:'101.5', weightUnit:'kg', weightKg:101.5, whatsapp:'+61 400 000 003',
+      goal:'Drop to 90 kg and build a stronger base', goalBy: addDays(t, 90), goalWhy:'Want to keep up with my kids and stop feeling flat',
+      job:'Warehouse supervisor, on my feet', activity:'On my feet', steps:'8000',
+      likedFoods:['Beef','Rice','Potato','Eggs','Tuna','Chicken','Banana','Apple','Popcorn','Protein powder','Protein bars','Cheese'],
+      likedOther:'', avoid:'Seafood other than tuna', allergies:'', diet:'No restrictions', mealsPerDay:'3 plus snacks',
+      cookTime:'30 min', whoCooks:'Shared', eatsOut:'2', alcohol:'4', typicalDay:'Porridge, a large lunch from the cafe, dinner at 8pm.',
+      trainingDays:['Mon','Tue','Thu','Fri','Sat'], timeOfDay:'Evening', sessionLength:'90', place:'Both',
+      equipment:['Full gym','Dumbbells','Barbell','Pull-up bar','Bench'], experience:'Experienced',
+      enjoys:'Heavy compound lifts', hates:'Long cardio', injuries:'Right shoulder clicks overhead',
+      worked:'Structured program with a coach', didnt:'Training alone with no accountability', weighInDay:'Wed',
+      health:{ heart:'no', chest:'no', other:'no' }, healthClearance:false,
+      agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -35) + 'T20:00:00.000Z'
+    }),
+    weighIns: [ -29, -22, -15, -8, -1 ].map((o, i) => ({ date: addDays(t, o), kg: [101.5, 100.8, 100.1, 99.6, 99.0][i] })),
+    workouts: [ { id: uid(), date: addDays(t, -2), what:'Lower body, squat focus', minutes: 85, notes:'' } ],
+    targets: { calories:2600, protein:190, carbs:260, fat:80, fibre:35 },
+    plan: { mealDraft: jorDraft, mealPublished: jorPlan, trainDraft: JORDAN_TRAIN, trainPublished: JORDAN_TRAIN, publishedAt: addDays(t, -29) + 'T12:00:00.000Z' },
+    logs: {},
+    notes: 'Shoulder: no overhead pressing until physio clears it.'
+  });
+
+  return {
+    version: 1,
+    capacity: { core: 25, beast: 4 },
+    waitlist: [],
+    clients: [ sam, mia, jordan ]
+  };
+}
+
+/* ==========================================================================
+   UI state (which view is open). Kept in localStorage so reloads keep place.
+   ========================================================================== */
+let ui = null;
+function initUi() { ui = Object.assign({
+  view:'coach', coachClientId:null, coachTab:'overview', clientId:null, clientTab:'today',
+  clientDay: todayS(), clientPlanDay: dowNum(todayS()), coachPlanDay: dowNum(todayS()),
+  addMode:'describe', unit:'kg', newStep:'plans', newTier:null,
+  describe:'', aiResult:null, bText:'', bMeal:'Lunch', bEffort:'15 minutes', buildResults:null,
+  editId:null, logOpen:{}, planInputsOpen:true
+}, Store.loadUi()); }
+function saveUi() { Store.saveUi(ui); }
+
+/* ==========================================================================
+   Demo key: ?key= is saved once, then removed from the address bar.
+   ========================================================================== */
+(function captureDemoKey() {
+  const u = new URL(location.href);
+  const k = u.searchParams.get('key');
+  if (k) {
+    localStorage.setItem(DEMO_KEY_NAME, k);
+    u.searchParams.delete('key');
+    history.replaceState(null, '', u.pathname + (u.search || '') + u.hash);
+  }
+})();
+let aiOk = null; // null = not tried yet, true = last call worked, false = last call failed
+
+function aiEnabled() { return !!localStorage.getItem(DEMO_KEY_NAME) && aiOk !== false; }
+function aiBadge() {
+  return aiEnabled() ? '<span class="ai on">Beast AI: on</span>' : '<span class="ai off">Beast AI: off</span>';
+}
+async function askAI(body) {
+  const key = localStorage.getItem(DEMO_KEY_NAME);
+  if (!key) return { ok:false, code:'no_key' };
+  let r, data = {};
+  try {
+    r = await fetch('/api/demo-ai', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-demo-key': key },
+      body: JSON.stringify(body)
+    });
+    try { data = await r.json(); } catch (e) { data = {}; }
+  } catch (e) {
+    aiOk = false;
+    return { ok:false, code:'network' };
+  }
+  if (r.ok) { aiOk = true; return { ok:true, data }; }
+  if (r.status === 401) aiOk = false;
+  return { ok:false, code: data.error || ('http_' + r.status) };
+}
+const AI_MSG = {
+  no_key: 'Beast AI is off in this browser. Enter the numbers yourself.',
+  demo_key: 'The demo key was not accepted. Open the page with ?key= again, or enter the numbers yourself.',
+  daily_limit: "Today's Beast AI demo calls are used up. Enter the numbers yourself.",
+  not_food: 'That does not look like food. Describe it again, or enter the numbers yourself.',
+  network: 'Beast AI could not be reached. Enter the numbers yourself.',
+  not_configured: 'Beast AI is not set up on this site yet. Enter the numbers yourself.',
+  ingredients: 'Beast AI could not make a meal from only the food you listed. Add a few more foods and try again.',
+  too_many_lines: 'Keep the day to 20 meals or fewer, then calculate again.',
+  bad_image: 'Could not use that photo. Try a different one, or type what you have.',
+  image_too_big: 'That photo is too large. Try a smaller one, or type what you have.',
+  too_long: 'That is too long. Shorten it and try again.',
+  empty: 'Add a little more detail and try again.'
+};
+function aiFail(res) { toast(AI_MSG[res.code] || 'Beast AI could not answer. Try again, or enter the numbers yourself.'); }
+
+/* ==========================================================================
+   Domain helpers
+   ========================================================================== */
+function clientById(id) { return db.clients.find(c => c.id === id); }
+function activeCount(tier) { return db.clients.filter(c => c.tier === tier && (c.status === 'active' || c.status === 'paused')).length; }
+function spotsLeft(tier) { return db.capacity[tier] - activeCount(tier); }
+function pauseTotal(c) {
+  return c.pauseUsed + (c.status === 'paused' && c.pauseStart ? Math.max(0, diffDays(c.pauseStart, todayS())) : 0);
+}
+function weekOf(c) {
+  if (!c.startDate) return 0;
+  const e = diffDays(c.startDate, todayS()) - pauseTotal(c);
+  if (e < 0) return 0;
+  return Math.min(WEEKS, Math.floor(e / 7) + 1);
+}
+function endDateOf(c) { return c.startDate ? addDays(c.startDate, WEEKS * 7 + pauseTotal(c)) : null; }
+function lastLogDate(c) {
+  const keys = Object.keys(c.logs).filter(k => (c.logs[k] || []).length).sort();
+  return keys.length ? keys[keys.length - 1] : null;
+}
+function hasPlanMeals(pub) { return !!pub && Object.values(pub).some(a => a && a.length); }
+function draftMeals(c) {
+  const out = {};
+  for (let d = 1; d <= 7; d++) out[d] = c.plan.mealDraft[d].meals;
+  return out;
+}
+function plansChanged(c) {
+  const mealsDiff = JSON.stringify(draftMeals(c)) !== JSON.stringify(c.plan.mealPublished || emptyPublished());
+  const trainDiff = (c.plan.trainDraft || '') !== (c.plan.trainPublished || '');
+  return mealsDiff || trainDiff;
+}
+function activationMissing(c) {
+  const m = [];
+  if (!c.targets) m.push('Daily targets are not set');
+  if (!hasPlanMeals(c.plan.mealPublished)) m.push('Meal plan is not published');
+  if (!c.plan.trainPublished) m.push('Training plan is not published');
+  if (c.healthFlag && !c.ob.healthClearance) m.push('Client has not confirmed doctor clearance');
+  if (c.tier !== 'essential' && spotsLeft(c.tier) <= 0) m.push('No spot is free in ' + TIERS[c.tier].name);
+  return m;
+}
+function needsYou(c) {
+  const n = [];
+  if (c.status === 'awaiting' && !hasPlanMeals(c.plan.mealPublished)) n.push('Build plan');
+  if (c.status === 'awaiting' && hasPlanMeals(c.plan.mealPublished) && c.plan.trainPublished) n.push('Book call, activate');
+  if (c.status === 'active') {
+    const last = lastLogDate(c);
+    if (!last || diffDays(last, todayS()) >= 3) n.push('No logs 3+ days');
+  }
+  return n;
+}
+function statusPill(s) { const [label, cls] = STATUS[s] || [s, '']; return `<span class="pill ${cls}">${esc(label)}</span>`; }
+function weekLabel(c) {
+  if (c.tier === 'essential' || !c.startDate) return c.tier === 'essential' ? 'n/a' : '-';
+  if (c.status === 'finished') return WEEKS + ' of ' + WEEKS;
+  if (c.status === 'onboarding' || c.status === 'awaiting') return '-';
+  return weekOf(c) + ' of ' + WEEKS;
+}
+function sortedWeighIns(c) { return c.weighIns.slice().sort((a, b) => a.date < b.date ? -1 : 1); }
+function totalsFor(c, date) { return sumNut(c.logs[date] || []); }
+function setPlanDraft(c, d, lines, meals) { c.plan.mealDraft[d] = { lines, meals }; }
+function weighChart(wi, unit) {
+  if (wi.length < 2) return '<p class="muted">Add a second weigh-in to see the trend line.</p>';
+  const W = 320, H = 150, P = 22;
+  const vals = wi.map(w => unit === 'kg' ? w.kg : kgToLb(w.kg));
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const span = (max - min) || 1;
+  const pts = vals.map((v, i) => [P + i * (W - 2 * P) / (vals.length - 1), H - P - (v - min) / span * (H - 2 * P)]);
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const dots = pts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="#2D6A4F"/>`).join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weigh-in trend">
+    <line x1="${P}" y1="${H - P}" x2="${W - P}" y2="${H - P}" stroke="#e2e9e0"/>
+    <path d="${path}" fill="none" stroke="#52B788" stroke-width="3" stroke-linejoin="round"/>${dots}
+    <text x="${P}" y="${H - 4}" font-size="11" fill="#5b6b60">${esc(fmtShort(wi[0].date))}</text>
+    <text x="${W - P}" y="${H - 4}" font-size="11" fill="#5b6b60" text-anchor="end">${esc(fmtShort(wi[wi.length - 1].date))}</text>
+    <text x="${P}" y="12" font-size="11" fill="#5b6b60">High ${max.toFixed(1)} ${unit}</text>
+    <text x="${W - P}" y="12" font-size="11" fill="#5b6b60" text-anchor="end">Low ${min.toFixed(1)} ${unit}</text>
+  </svg>`;
+}
+function fmtShort(s) { return pd(s).toLocaleDateString('en-AU', { day:'numeric', month:'short' }); }
+function weightText(kg, unit) { return unit === 'kg' ? kg.toFixed(1) + ' kg' : kgToLb(kg).toFixed(1) + ' lb'; }
+function barHtml(label, val, target, unit) {
+  const t = target ? tone(label === 'fibre' ? 'fibre' : label, val, target) : '';
+  if (!target) {
+    return `<div class="metric"><div class="top"><span>${NUT_LABEL[label]}</span><span>${val} ${unit}</span></div></div>`;
+  }
+  const pct = Math.min(100, Math.round(val / target * 100));
+  const diff = target - val;
+  const left = diff >= 0 ? `${diff} ${unit} left` : `${-diff} ${unit} over`;
+  return `<div class="metric">
+    <div class="top"><span><b>${NUT_LABEL[label]}</b></span><span class="${TONE_TEXT[t]}">${val} of ${target} ${unit} · ${left}</span></div>
+    <div class="bar"><span class="${t}" style="width:${pct}%"></span></div></div>`;
+}
+function sourceLabel(m) { return SOURCES[m.source] || m.source; }
+function mealRowHtml(m, opts) {
+  const edited = m.edited && m.ai
+    ? `<div class="edited">Changed by client. Beast AI said ${m.ai.calories} kcal, P ${m.ai.protein}g.</div>` : '';
+  const actions = opts && opts.readonly ? '' : `<div class="acts">
+      <button class="btn-ghost btn-sm" data-act="editMeal" data-id="${esc(m.id)}">Edit</button>
+      <button class="btn-danger btn-sm" data-act="deleteMeal" data-id="${esc(m.id)}">Delete</button></div>`;
+  return `<div class="meal">
+    <div style="flex:1 1 220px;min-width:0">
+      <div><b>${esc(m.name)}</b> <span class="mini">${esc(m.time || '')}${m.time ? ' · ' : ''}${esc(sourceLabel(m))}</span></div>
+      <div class="mini">P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div>
+      ${edited}
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <div class="kcal">${m.calories} kcal</div>${actions}
+    </div></div>`;
+}
+function mealEditHtml(m, prefix) {
+  return `<div class="meal" style="display:block"><div class="meal-edit">
+    <div class="field wide" style="margin:0"><label>Name</label><input id="${prefix}name" value="${esc(m.name)}"></div>
+    <div class="field" style="margin:0"><label>Calories</label><input id="${prefix}calories" type="number" min="0" inputmode="numeric" value="${m.calories}"></div>
+    <div class="field" style="margin:0"><label>Protein g</label><input id="${prefix}protein" type="number" min="0" inputmode="numeric" value="${m.protein}"></div>
+    <div class="field" style="margin:0"><label>Carbs g</label><input id="${prefix}carbs" type="number" min="0" inputmode="numeric" value="${m.carbs}"></div>
+    <div class="field" style="margin:0"><label>Fat g</label><input id="${prefix}fat" type="number" min="0" inputmode="numeric" value="${m.fat}"></div>
+    <div class="field" style="margin:0"><label>Fibre g</label><input id="${prefix}fibre" type="number" min="0" inputmode="numeric" value="${m.fibre}"></div>
+  </div>
+  <div class="row" style="margin-top:10px;justify-content:flex-start">
+    <button data-act="saveEditMeal" data-id="${esc(m.id)}">Save changes</button>
+    <button class="btn-ghost" data-act="cancelEditMeal">Cancel</button>
+  </div></div>`;
+}
+function numField(prefix, label, val, extra) {
+  return `<div class="field" style="margin:0"><label for="${prefix}${label.toLowerCase()}">${label}</label>
+    <input id="${prefix}${label.toLowerCase()}" type="number" min="0" inputmode="numeric" value="${val == null ? '' : val}" ${extra || ''}></div>`;
+}
+function readNut(prefix) {
+  const g = k => document.getElementById(prefix + k) ? document.getElementById(prefix + k).value : '';
+  return { name: (g('name') || '').trim(), ...nutFrom({ calories:g('calories'), protein:g('protein'), carbs:g('carbs'), fat:g('fat'), fibre:g('fibre') }) };
+}
+function nowHHMM() { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function addMealTo(c, date, m) {
+  c.logs[date] = c.logs[date] || [];
+  c.logs[date].push(m);
+  persist();
+}
+
+/* ==========================================================================
+   Toast
+   ========================================================================== */
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+/* ==========================================================================
+   Rendering entry point
+   ========================================================================== */
+function render() {
+  renderBar();
+  const app = document.getElementById('app');
+  if (ui.view === 'coach') {
+    const c = ui.coachClientId ? clientById(ui.coachClientId) : null;
+    app.innerHTML = c ? renderCoachClient(c) : renderCoachList();
+  } else if (ui.view === 'client') {
+    const c = clientById(ui.clientId);
+    if (!c) { ui.view = 'coach'; saveUi(); return render(); }
+    app.innerHTML = c.status === 'onboarding' ? renderOnboardingPage(c) : renderClientPage(c);
+  } else {
+    app.innerHTML = ui.newStep === 'checkout' ? renderCheckout() : renderPlanPicker();
+  }
+}
+function renderBar() {
+  const opts = [`<option value="coach" ${ui.view === 'coach' ? 'selected' : ''}>Coach (Stefan)</option>`];
+  db.clients.forEach(c => {
+    const sel = ui.view === 'client' && ui.clientId === c.id ? 'selected' : '';
+    opts.push(`<option value="client:${esc(c.id)}" ${sel}>${esc(c.name)} · ${TIERS[c.tier].name} · ${STATUS[c.status][0]}</option>`);
+  });
+  opts.push(`<option value="new" ${ui.view === 'new' ? 'selected' : ''}>New client: buy a plan</option>`);
+  document.getElementById('demoBar').innerHTML = `
+    <span class="logo">BEAST<span>COACH</span></span><span class="tag">DEMO</span>
+    <label for="viewAs" class="sr">View as</label>
+    <select id="viewAs" data-ch="viewAs" style="background:#fff;color:#1B3022">${opts.join('')}</select>
+    ${aiBadge()}
+    <span class="note">Test data only, saved in this browser. Do not enter real health info.</span>
+    <button class="btn-amber btn-sm" data-act="reset">Reset demo</button>`;
+}
+
+/* ==========================================================================
+   New client: plan picker, checkout
+   ========================================================================== */
+function renderPlanPicker() {
+  const cards = Object.keys(TIERS).map(t => {
+    const T = TIERS[t];
+    const full = CAP_TIERS.includes(t) && spotsLeft(t) <= 0;
+    const spots = CAP_TIERS.includes(t)
+      ? (full ? '<b class="c-red">Full right now</b>' : `<b class="c-green">${spotsLeft(t)} spots left</b>`)
+      : '<span class="muted">Open all year</span>';
+    const action = full
+      ? `<label for="wl-${t}" class="mini">Email me when a spot opens</label>
+         <div class="row" style="flex-wrap:nowrap"><input id="wl-${t}" type="email" placeholder="you@example.com" style="flex:1">
+         <button class="btn-amber" data-act="waitlist" data-t="${t}">Join the waitlist</button></div>
+         <div class="err" id="err-wl-${t}"></div>`
+      : `<button data-act="buy" data-t="${t}">Choose ${esc(T.name)}</button>`;
+    return `<div class="card plan-card">
+      <h3>${esc(T.name)}</h3>
+      <div class="price">$${T.price}</div>
+      <div class="muted">${esc(T.short)}</div>
+      <p>${esc(T.desc)}</p>
+      <div>${spots}</div>
+      <div style="margin-top:auto;padding-top:8px">${action}</div>
+    </div>`;
+  }).join('');
+  return `<section class="hero">
+      <h1>Choose your plan</h1>
+      <p class="muted" style="margin:0">Pick a plan, fill in onboarding, and Stefan builds it from your answers.</p>
+    </section>
+    <div class="plans">${cards}</div>
+    <p class="fine" style="margin-top:12px">Demo only. No payment is taken.</p>`;
+}
+function renderCheckout() {
+  const t = ui.newTier && TIERS[ui.newTier] ? ui.newTier : 'core';
+  const T = TIERS[t];
+  return `<section class="hero"><h1>Checkout</h1><p class="muted" style="margin:0">${esc(T.name)}, ${esc(T.short)}</p></section>
+    <div class="card" style="max-width:560px">
+      <div class="field"><label for="nc-name">Full name</label><input id="nc-name" autocomplete="name"><div class="err" id="err-nc-name"></div></div>
+      <div class="field"><label for="nc-email">Email</label><input id="nc-email" type="email" autocomplete="email"><div class="err" id="err-nc-email"></div></div>
+      <div class="note-box" style="margin-bottom:12px">No payment is taken in the demo.</div>
+      <p class="fine" style="margin-bottom:14px">Full refund any time before your plan starts. No refunds once your plan is delivered.</p>
+      <div class="row" style="justify-content:flex-start">
+        <button data-act="pay" data-t="${t}">Pay ${money(T.price)} (demo)</button>
+        <button class="btn-ghost" data-act="newBack">Back</button>
+      </div>
+    </div>`;
+}
+
+/* ==========================================================================
+   Onboarding (client). Built once; validation updates error text in place.
+   ========================================================================== */
+function renderOnboardingPage(c) {
+  const ob = c.ob;
+  const f = (k, label, type, ph, extra) => `<div class="field">
+      <label for="ob-${k}">${label}</label>
+      <input id="ob-${k}" type="${type || 'text'}" data-ob="${k}" value="${esc(ob[k])}" placeholder="${esc(ph || '')}" ${extra || ''}>
+      <div class="err" id="err-${k}"></div></div>`;
+  const radios = (k, label, opts) => `<div class="field"><label>${label}</label>
+      <div class="chips">${opts.map(o => `<label class="chip"><input type="radio" name="ob-${k}" value="${esc(o)}" data-ob="${k}" ${ob[k] === o ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>
+      <div class="err" id="err-${k}"></div></div>`;
+  const select = (k, label, opts) => `<div class="field"><label for="ob-${k}">${label}</label>
+      <select id="ob-${k}" data-ob="${k}"><option value="" ${opts.includes(ob[k]) ? '' : 'selected'}>Choose one</option>${opts.map(o => `<option ${ob[k] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>`;
+  const group = (k, opts) => `<div class="chips">${opts.map(o => `<label class="chip"><input type="checkbox" data-obgrp="${k}" value="${esc(o)}" ${ob[k].includes(o) ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`;
+  const foodGroups = Object.keys(FOOD_GROUPS).map(g => `<div style="margin-bottom:12px"><label>${g}</label>${group('likedFoods', FOOD_GROUPS[g])}</div>`).join('');
+  const health = (k, q) => `<div class="field"><label>${q}</label>
+      <div class="chips">${['yes','no'].map(v => `<label class="chip"><input type="radio" name="h-${k}" value="${v}" data-health="${k}" ${ob.health[k] === v ? 'checked' : ''}>${v === 'yes' ? 'Yes' : 'No'}</label>`).join('')}</div></div>`;
+  const anyYes = Object.values(ob.health).some(v => v === 'yes');
+  const agree = (k, text) => `<div><label class="check"><input type="checkbox" data-ob="${k}" ${ob[k] ? 'checked' : ''}><span>${text}</span></label><div class="err" id="err-${k}"></div></div>`;
+
+  return `<section class="hero">
+      <h1>Tell Stefan about you</h1>
+      <p class="muted" style="margin:0">This is everything Stefan needs to build your plan. Your answers save as you type. Nothing is sent in the demo.</p>
+    </section>
+    <form id="onboardForm" novalidate>
+      <div class="card"><h3>About you</h3>
+        <div class="grid2">
+          ${f('age','Age','number','e.g. 32','min="10" max="100" inputmode="numeric"')}
+          ${select('sex','Sex',['Prefer not to say','Female','Male','Other'])}
+          ${f('heightCm','Height (cm)','number','e.g. 175','min="100" max="250" inputmode="numeric"')}
+          <div class="field"><label for="ob-weight">Current weight</label>
+            <div class="row" style="flex-wrap:nowrap"><input id="ob-weight" type="number" step="0.1" min="0" inputmode="decimal" data-ob="weight" value="${esc(ob.weight)}" style="flex:1">
+            <select data-ob="weightUnit" style="width:90px"><option ${ob.weightUnit === 'kg' ? 'selected' : ''} value="kg">kg</option><option ${ob.weightUnit === 'lb' ? 'selected' : ''} value="lb">lb</option></select></div>
+            <div class="err" id="err-weight"></div></div>
+          ${f('whatsapp','WhatsApp number','tel','+61 4xx xxx xxx')}
+          ${f('timezone','Time zone','text','Australia/Melbourne')}
+        </div>
+      </div>
+      <div class="card"><h3>Your goal</h3>
+        <div class="grid2">
+          ${f('goal','What do you want to achieve?','text','e.g. Lose 5 kg and get stronger')}
+          ${f('goalBy','By when?','date')}
+        </div>
+        <div class="field"><label for="ob-goalWhy">Why now?</label><textarea id="ob-goalWhy" data-ob="goalWhy">${esc(ob.goalWhy)}</textarea></div>
+      </div>
+      <div class="card"><h3>Your day</h3>
+        <div class="grid2">
+          ${f('job','Job','text','e.g. Teacher, on my feet all day')}
+          ${select('activity','How active is your job?', ACTIVITY)}
+          ${f('steps','Steps on a usual day','number','e.g. 6000','min="0" inputmode="numeric"')}
+        </div>
+      </div>
+      <div class="card"><h3>Food you like</h3>
+        <p class="muted">Tick everything you like. At least 3 in total.</p>
+        ${foodGroups}
+        <div class="field"><label for="ob-likedOther">Anything else you love?</label><input id="ob-likedOther" data-ob="likedOther" value="${esc(ob.likedOther)}"></div>
+        <div class="err" id="err-likedFoods"></div>
+      </div>
+      <div class="card"><h3>Food to avoid and how you eat</h3>
+        <div class="grid2">
+          <div class="field"><label for="ob-avoid">Foods you will not eat</label><textarea id="ob-avoid" data-ob="avoid">${esc(ob.avoid)}</textarea></div>
+          <div class="field"><label for="ob-allergies">Allergies or intolerances</label><textarea id="ob-allergies" data-ob="allergies">${esc(ob.allergies)}</textarea></div>
+        </div>
+        ${radios('diet','Dietary style', DIETS)}
+        ${radios('mealsPerDay','Meals per day', MEALS_PER_DAY)}
+        ${radios('cookTime','Cooking time per meal', COOK_TIMES)}
+        ${radios('whoCooks','Who cooks?', WHO_COOKS)}
+        <div class="grid2">
+          ${f('eatsOut','Times you eat out or get takeaway per week','number','e.g. 2','min="0" inputmode="numeric"')}
+          ${f('alcohol','Alcoholic drinks per week','number','e.g. 3','min="0" inputmode="numeric"')}
+        </div>
+        <div class="field"><label for="ob-typicalDay">A typical day of eating</label><textarea id="ob-typicalDay" data-ob="typicalDay">${esc(ob.typicalDay)}</textarea></div>
+      </div>
+      <div class="card"><h3>Training</h3>
+        <div class="field"><label>Days you can train (tick at least one)</label>
+          <div class="chips">${DAYS.map(d => `<label class="chip"><input type="checkbox" data-obgrp="trainingDays" value="${d}" ${ob.trainingDays.includes(d) ? 'checked' : ''}>${d}</label>`).join('')}</div>
+          <div class="err" id="err-trainingDays"></div></div>
+        <div class="grid2">
+          ${radios('timeOfDay','Preferred time of day', TIME_OF_DAY)}
+          ${radios('sessionLength','Session length (minutes)', SESSIONS)}
+          ${radios('place','Where you train', PLACES)}
+          ${radios('experience','Experience', EXPERIENCE)}
+        </div>
+        <div class="field"><label>Equipment you have</label>${group('equipment', EQUIPMENT)}</div>
+        <div class="grid2">
+          ${f('enjoys','Activities you enjoy','text','e.g. Cycling, lifting')}
+          ${f('hates','Activities you hate','text','e.g. Running')}
+        </div>
+        <div class="field"><label for="ob-injuries">Injuries or anything that limits training</label><textarea id="ob-injuries" data-ob="injuries">${esc(ob.injuries)}</textarea></div>
+      </div>
+      <div class="card"><h3>What you have tried</h3>
+        <div class="grid2">
+          <div class="field"><label for="ob-worked">What has worked before?</label><textarea id="ob-worked" data-ob="worked">${esc(ob.worked)}</textarea></div>
+          <div class="field"><label for="ob-didnt">What has not worked?</label><textarea id="ob-didnt" data-ob="didnt">${esc(ob.didnt)}</textarea></div>
+        </div>
+        ${select('weighInDay','Weekly weigh-in day', DAYS)}
+      </div>
+      <div class="card"><h3>Health check</h3>
+        <p class="muted">Answer all three.</p>
+        ${health('heart','Has a doctor ever said you have a heart condition or high blood pressure?')}
+        ${health('chest','Do you get chest pain, dizziness or fainting during exercise?')}
+        ${health('other','Do you have any other condition or take medication that could affect exercise or diet?')}
+        <div class="field" id="otherWrap" ${ob.health.other === 'yes' ? '' : 'hidden'}><label for="ob-healthNote">Tell us briefly</label><input id="ob-healthNote" data-ob="healthNote" value="${esc(ob.healthNote)}"></div>
+        <div class="err" id="err-health"></div>
+        <div class="hl-amber" id="clearWrap" ${anyYes ? '' : 'hidden'} style="margin-top:10px">
+          <label class="check"><input type="checkbox" data-ob="healthClearance" ${ob.healthClearance ? 'checked' : ''}><span>I have checked with my doctor that I can start exercise and diet changes.</span></label>
+          <div class="err" id="err-healthClearance"></div>
+        </div>
+      </div>
+      <div class="card"><h3>Agreements</h3>
+        ${agree('agreeTerms','I have read the terms. Full refund any time before your plan starts. No refunds once your plan is delivered.')}
+        ${agree('agreeNotCoach','I understand Stefan is a coach, not a dietitian or doctor, and this is general guidance, not medical advice.')}
+        ${agree('agreeConsent','I agree Stefan can see the meals, workouts and weights I log.')}
+      </div>
+      <div class="row" style="justify-content:flex-end"><button type="button" data-act="obSubmit">Send my answers to Stefan</button></div>
+    </form>`;
+}
+function obDraft() { return db.clients.find(c => c.id === ui.clientId).ob; }
+function clearObErr(key) {
+  const e = document.getElementById('err-' + key);
+  if (e) e.textContent = '';
+  document.querySelectorAll(`[data-ob="${key}"]`).forEach(el => el.classList.remove('invalid'));
+}
+function validateOb(c) {
+  const ob = c.ob;
+  const errs = {};
+  const num = v => parseFloat(v);
+  if (!(num(ob.age) >= 10 && num(ob.age) <= 100)) errs.age = 'Enter your age (10 to 100).';
+  if (!(num(ob.heightCm) >= 100 && num(ob.heightCm) <= 250)) errs.heightCm = 'Enter your height in cm (100 to 250).';
+  if (!(num(ob.weight) > 0)) errs.weight = 'Enter your current weight.';
+  if (!ob.goal.trim()) errs.goal = 'Tell us what you want to achieve.';
+  if (ob.whatsapp.replace(/\D/g, '').length < 6) errs.whatsapp = 'Enter a WhatsApp number so Stefan can reach you.';
+  if (!ob.trainingDays.length) errs.trainingDays = 'Tick at least one training day.';
+  const liked = ob.likedFoods.length + ob.likedOther.split(',').map(s => s.trim()).filter(Boolean).length;
+  if (liked < 3) errs.likedFoods = 'Tick at least 3 foods you like.';
+  const answers = Object.values(ob.health);
+  if (answers.some(v => v === null)) errs.health = 'Answer all three health questions.';
+  if (answers.includes('yes') && !ob.healthClearance) errs.healthClearance = 'Tick this to confirm your doctor has cleared you.';
+  if (!ob.agreeTerms) errs.agreeTerms = 'Please agree to the terms.';
+  if (!ob.agreeNotCoach) errs.agreeNotCoach = 'Please confirm you understand this is coaching, not medical advice.';
+  if (!ob.agreeConsent) errs.agreeConsent = 'Please agree so Stefan can see your logs.';
+  return errs;
+}
+
+/* ==========================================================================
+   Client pages: Today / My plan / Progress
+   ========================================================================== */
+function statusLine(c) {
+  const s = c.status;
+  if (s === 'onboarding') return 'Finish your onboarding so Stefan can build your plan.';
+  if (s === 'awaiting') {
+    return hasPlanMeals(c.plan.mealPublished)
+      ? 'Your plan is ready to read. Message Stefan on WhatsApp to book your call and pick a start date.'
+      : 'Stefan is building your plan. It will be ready within 3 business days. You can start logging meals now.';
+  }
+  if (s === 'active') {
+    if (c.tier === 'essential') return 'Your plan is active. Weigh-in day: ' + (DAYS_FULL[DAYS.indexOf(c.ob.weighInDay)] || c.ob.weighInDay) + '.';
+    return `Week ${weekOf(c)} of ${WEEKS}. Ends ${fmtDate(endDateOf(c))}. Weigh-in day: ${DAYS_FULL[DAYS.indexOf(c.ob.weighInDay)] || c.ob.weighInDay}.`;
+  }
+  if (s === 'paused') return `Paused since ${fmtDate(c.pauseStart)}. Pause days used: ${c.pauseUsed + diffDays(c.pauseStart || todayS(), todayS())} of ${PAUSE_MAX}. Stefan will resume you when you are ready.`;
+  if (s === 'finished') return 'Your plan is finished. Renew with 20% off and keep your place, or keep logging for AUD $15 per 12 weeks.';
+  if (s === 'selflog') return 'Self-logging. $15 per 12 weeks.';
+  return '';
+}
+function clientStatusCard(c) {
+  let extra = '';
+  if (c.status === 'finished') {
+    extra = `<div class="row" style="margin-top:10px;justify-content:flex-start">
+      ${c.tier !== 'essential' ? `<button data-act="renew">Renew with 20% off: ${money(TIERS[c.tier].price * 0.8)}</button>` : ''}
+      <button class="btn-ghost" data-act="keepLogging">Keep logging for $15 per 12 weeks</button></div>`;
+  }
+  return `<section class="hero">
+    <div class="row"><div><div class="muted">Hi ${esc(c.name.split(' ')[0])}</div><h1>${esc(TIERS[c.tier].name)}</h1></div>
+    <div>${statusPill(c.status)}</div></div>
+    <p class="status-line" style="margin:12px 0 0">${esc(statusLine(c))}</p>${extra}
+    <div style="margin-top:12px"><a class="btn btn-amber btn-sm" href="https://wa.me/" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>
+  </section>`;
+}
+function renderClientPage(c) {
+  const tabs = [['today','Today'],['plan','My plan'],['progress','Progress']];
+  const body = ui.clientTab === 'plan' ? renderClientPlan(c) : ui.clientTab === 'progress' ? renderProgress(c, false) : renderToday(c);
+  return clientStatusCard(c) + `<nav class="tabs">${tabs.map(t => `<button class="tab ${ui.clientTab === t[0] ? 'on' : ''}" data-act="clientTab" data-tab="${t[0]}">${t[1]}</button>`).join('')}</nav>` + body;
+}
+function renderToday(c) {
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const isToday = day === todayS();
+  const meals = c.logs[day] || [];
+  const tot = sumNut(meals);
+  const tg = c.targets;
+  const unit = ui.unit;
+  const bars = NUT.map(k => barHtml(k, Math.round(tot[k]), tg ? tg[k] : null, k === 'calories' ? 'kcal' : 'g')).join('');
+  const mode = ui.addMode;
+  const modeBtns = [['describe','Describe it'],['plan','From my plan'],['builder','Meal Builder']]
+    .map(m => `<button class="tab ${mode === m[0] ? 'on' : ''}" data-act="addMode" data-m="${m[0]}">${m[1]}</button>`).join('');
+
+  let addPanel = '';
+  if (mode === 'describe') addPanel = describePanel(c);
+  else if (mode === 'plan') addPanel = planPanel(c, day);
+  else addPanel = builderPanel(c);
+
+  const mealsHtml = meals.length
+    ? meals.map(m => ui.editId === m.id ? mealEditHtml(m, 'e-') : mealRowHtml(m)).join('')
+    : '<p class="muted">No meals logged for this day yet.</p>';
+
+  const wos = (c.workouts || []).filter(w => w.date === day);
+  const woHtml = wos.length ? wos.map(w => `<div class="meal"><div><b>${esc(w.what)}</b><div class="mini">${w.minutes} min${w.notes ? ' · ' + esc(w.notes) : ''}</div></div>
+      <button class="btn-danger btn-sm" data-act="deleteWorkout" data-id="${esc(w.id)}">Delete</button></div>`).join('') : '<p class="muted">No workout logged for this day.</p>';
+
+  const wi = c.weighIns.find(w => w.date === day);
+  const wiVal = wi ? (unit === 'kg' ? wi.kg : kgToLb(wi.kg)).toFixed(1) : '';
+
+  const dayNav = `<div class="row" style="margin-bottom:12px">
+    <button class="btn-ghost btn-sm" data-act="dayPrev">‹ Previous</button>
+    <div style="text-align:center"><b>${isToday ? 'Today' : pd(day).toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'short' })}</b>
+      <div class="mini">${fmtDate(day)}</div></div>
+    <button class="btn-ghost btn-sm" data-act="dayNext" ${isToday ? 'disabled' : ''}>Next ›</button></div>`;
+
+  return `${dayNav}
+    <div class="grid2">
+      <div>
+        <div class="card"><h3>Totals</h3>${tg ? '' : '<p class="muted">Your targets will appear here once Stefan has set them. Totals only for now.</p>'}${bars}</div>
+        <div class="card"><h3>Meals</h3>${mealsHtml}</div>
+      </div>
+      <div>
+        <div class="card"><h3>Add a meal</h3>
+          <div class="tabs">${modeBtns}</div>
+          ${addPanel}
+        </div>
+        <div class="card"><h3>Workout</h3>
+          ${woHtml}
+          <div class="stack" style="margin-top:12px">
+            <div class="field" style="margin:0"><label for="wo-what">What</label><input id="wo-what" placeholder="e.g. Full body A"></div>
+            <div class="grid2"><div class="field" style="margin:0"><label for="wo-min">Minutes</label><input id="wo-min" type="number" min="0" inputmode="numeric"></div>
+            <div class="field" style="margin:0"><label for="wo-notes">Notes</label><input id="wo-notes"></div></div>
+            <button data-act="saveWorkout">Add workout</button>
+          </div>
+        </div>
+        <div class="card"><h3>Weigh-in</h3>
+          <p class="mini" style="margin-top:0">One per day. Saving again replaces it.</p>
+          <div class="row" style="flex-wrap:nowrap"><input id="wi-val" type="number" step="0.1" inputmode="decimal" value="${wiVal}" placeholder="${unit}" style="flex:1"><button data-act="saveWeigh">Save weigh-in (${unit})</button></div>
+        </div>
+      </div>
+    </div>`;
+}
+function describePanel(c) {
+  const r = ui.aiResult;
+  const aiPart = r ? `
+    <div class="note-box stack">
+      <div class="field" style="margin:0"><label for="r-name">Name</label><input id="r-name" value="${esc(r.name || 'Meal')}"></div>
+      <div class="meal-edit" style="grid-template-columns:repeat(2,1fr)">
+        ${numField('r-','Calories', r.calories)}${numField('r-','Protein', r.protein)}${numField('r-','Carbs', r.carbs)}
+        ${numField('r-','Fat', r.fat)}${numField('r-','Fibre', r.fibre)}
+      </div>
+      ${Array.isArray(r.items) && r.items.length ? `<div class="mini">Items: ${r.items.map(i => esc(i.name || i) + (i.grams ? ' (' + i.grams + 'g)' : '')).join(', ')}</div>` : ''}
+      ${r.note ? `<div class="mini">${esc(r.note)}</div>` : ''}
+      ${r.confidence ? `<div class="mini">Confidence: ${esc(r.confidence)}. Check the numbers before saving.</div>` : ''}
+      <div class="row" style="justify-content:flex-start"><button data-act="saveDescribe">Save meal</button><button class="btn-ghost" data-act="clearAi">Start over</button></div>
+    </div>` : '';
+  return `<div class="field"><label for="describe">What did you eat? (up to 600 characters)</label>
+      <textarea id="describe" data-ui="describe" maxlength="600" placeholder="e.g. Two slices of toast with peanut butter and a banana">${esc(ui.describe)}</textarea></div>
+    ${r ? '' : '<button data-act="aiDescribe">Estimate with Beast AI</button>'}
+    ${aiPart}
+    <details ${aiEnabled() ? '' : 'open'} style="margin-top:12px"><summary>Enter the numbers yourself</summary>
+      ${manualForm('m-')}
+      <button style="margin-top:10px" data-act="saveTyped">Save meal</button>
+    </details>`;
+}
+function manualForm(prefix) {
+  return `<div class="meal-edit" style="grid-template-columns:repeat(2,1fr)">
+    <div class="field wide" style="margin:0"><label for="${prefix}name">Meal name</label><input id="${prefix}name"></div>
+    ${numField(prefix, 'Calories', '')}${numField(prefix, 'Protein', '')}${numField(prefix, 'Carbs', '')}${numField(prefix, 'Fat', '')}${numField(prefix, 'Fibre', '')}
+  </div>`;
+}
+function planPanel(c, day) {
+  const pub = c.plan.mealPublished;
+  if (!hasPlanMeals(pub)) return '<p class="muted">No plan is published yet. Stefan is working on it.</p>';
+  const meals = pub[dowNum(day)] || [];
+  if (!meals.length) return '<p class="muted">Nothing planned for this day.</p>';
+  return meals.map((m, i) => `<div class="meal">
+    <div style="flex:1 1 200px"><b>${esc(m.label)}: ${esc(m.name)}</b><div class="mini">${esc(m.text)}</div>
+    <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div>
+    <button data-act="logPlan" data-d="${dowNum(day)}" data-i="${i}" data-date="${day}" class="btn-sm">Log</button></div>`).join('');
+}
+function builderPanel(c) {
+  const t = c.targets;
+  const eaten = totalsFor(c, ui.clientDay > todayS() ? todayS() : ui.clientDay);
+  let aim = '';
+  if (t) {
+    const calLeft = Math.min(900, Math.max(0, t.calories - eaten.calories));
+    const proLeft = Math.min(60, Math.max(0, t.protein - eaten.protein));
+    aim = `<div class="note-box mini" style="margin-bottom:10px">Aiming at what is left today: about ${calLeft} kcal and ${proLeft}g protein.</div>`;
+  }
+  const res = ui.buildResults;
+  const resHtml = res ? res.map((m, i) => `<div class="meal">
+      <div style="flex:1 1 240px"><b>${esc(m.name)}</b><div class="mini">${esc(m.text || '')}</div>
+      <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div>
+      ${m.steps && m.steps.length ? `<ol class="list-clean mini">${m.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>` : ''}
+      ${m.tip ? `<div class="mini"><b>Tip:</b> ${esc(m.tip)}</div>` : ''}
+      ${m.offTarget ? '<div class="edited">Close to your targets, not exact</div>' : ''}</div>
+      <button class="btn-sm" data-act="logBuilt" data-i="${i}">Log this meal</button></div>`).join('') : '';
+  return `${aim}
+    <div class="field"><label for="fridgeFile">Photo of your fridge (optional)</label><input id="fridgeFile" type="file" accept="image/*"></div>
+    <div class="field"><label for="bText">Or type what you have</label><textarea id="bText" data-ui="bText" placeholder="e.g. chicken thighs, rice, spinach, eggs">${esc(ui.bText)}</textarea></div>
+    <div class="grid2">
+      <div class="field" style="margin:0"><label for="bMeal">Meal</label><select id="bMeal" data-ui="bMeal">${MEAL_SLOTS.filter(s => s !== 'Snack').concat(['Snack']).map(s => `<option ${ui.bMeal === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+      <div class="field" style="margin:0"><label for="bEffort">Effort</label><select id="bEffort" data-ui="bEffort">${EFFORTS.map(s => `<option ${ui.bEffort === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></div>
+    </div>
+    <div style="margin:12px 0"><button data-act="build">Get meal ideas</button></div>
+    ${resHtml}
+    <details style="margin-top:8px"><summary>Enter the numbers yourself</summary>${manualForm('b-')}<button style="margin-top:10px" data-act="saveBuilderManual">Save meal</button></details>`;
+}
+function renderClientPlan(c) {
+  const pub = c.plan.mealPublished;
+  const day = ui.clientPlanDay;
+  const meals = pub ? (pub[day] || []) : [];
+  const tot = sumNut(meals);
+  const notStarted = (c.status === 'awaiting' || c.status === 'onboarding')
+    ? '<div class="note-box" style="margin-bottom:12px"><b>Not started yet.</b> Your plan starts when Stefan activates you.</div>' : '';
+  const targets = c.targets
+    ? `<div class="grid5" style="margin-bottom:6px">${NUT.map(k => `<div class="note-box"><div class="mini">${NUT_LABEL[k]}</div><b style="font-family:'Bebas Neue',Impact,sans-serif;font-size:28px">${c.targets[k]}${k === 'calories' ? ' kcal' : 'g'}</b></div>`).join('')}</div>`
+    : '<p class="muted">Targets are not set yet.</p>';
+  const dayBtns = DAYS.map((d, i) => `<button class="tab ${day === i + 1 ? 'on' : ''}" data-act="clientPlanDay" data-d="${i + 1}">${d}</button>`).join('');
+  const list = !pub ? '<p class="muted">Your meal plan is not published yet.</p>'
+    : meals.length ? meals.map((m, i) => `<div class="meal">
+        <div style="flex:1 1 200px"><b>${esc(m.label)}: ${esc(m.name)}</b><div class="mini">${esc(m.text)}</div>
+        <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div>
+        ${c.status === 'active' ? `<button class="btn-sm" data-act="logPlan" data-d="${day}" data-i="${i}" data-date="${todayS()}">Log today</button>` : ''}</div>`).join('')
+      : '<p class="muted">Nothing planned for this day.</p>';
+  const training = c.plan.trainPublished ? `<p class="pre">${esc(c.plan.trainPublished)}</p>` : '<p class="muted">Your training plan is not published yet.</p>';
+  return `${notStarted}
+    <div class="card"><h3>Your targets</h3>${targets}</div>
+    <div class="card"><h3>Meal plan</h3>
+      <div class="day-row">${dayBtns}</div>
+      ${list}
+      ${meals.length ? `<div class="note-box mini" style="margin-top:10px"><b>Day total:</b> ${tot.calories} kcal · P ${tot.protein}g · C ${tot.carbs}g · F ${tot.fat}g · Fibre ${tot.fibre}g</div>` : ''}
+    </div>
+    <div class="card"><h3>Training plan</h3>${training}</div>`;
+}
+
+/* Progress: shared by client and coach */
+function renderProgress(c, coach) {
+  const wi = sortedWeighIns(c);
+  const unit = ui.unit;
+  const unitBtns = `<div class="tabs" style="margin:0"><button class="tab ${unit === 'kg' ? 'on' : ''}" data-act="unit" data-u="kg">kg</button><button class="tab ${unit === 'lb' ? 'on' : ''}" data-act="unit" data-u="lb">lb</button></div>`;
+  let stats = '<p class="muted">No weigh-ins yet.</p>';
+  if (wi.length) {
+    const first = wi[0].kg, last = wi[wi.length - 1].kg;
+    const prev = wi.length > 1 ? wi[wi.length - 2].kg : null;
+    const change = last - first;
+    const pct = first ? (change / first * 100) : 0;
+    const dUnit = unit === 'kg' ? 'kg' : 'lb';
+    const conv = v => unit === 'kg' ? v : kgToLb(v);
+    stats = `<div class="grid3">
+      <div class="note-box"><div class="mini">Latest weight</div><b style="font-family:'Bebas Neue',Impact,sans-serif;font-size:32px">${weightText(last, unit)}</b></div>
+      <div class="note-box"><div class="mini">Change since start</div><b class="${change <= 0 ? 'c-green' : 'c-red'}" style="font-family:'Bebas Neue',Impact,sans-serif;font-size:32px">${(conv(change)).toFixed(1)} ${dUnit} (${pct.toFixed(1)}%)</b></div>
+      <div class="note-box"><div class="mini">Change since last weigh-in</div><b style="font-family:'Bebas Neue',Impact,sans-serif;font-size:32px">${prev == null ? 'n/a' : conv(last - prev).toFixed(1) + ' ' + dUnit}</b></div>
+    </div>`;
+  }
+  const weekAgo = addDays(todayS(), -6);
+  const wos = (c.workouts || []).filter(w => w.date >= weekAgo).sort((a, b) => a.date < b.date ? 1 : -1);
+  const woList = wos.length ? wos.map(w => `<div class="meal"><div><b>${esc(w.what)}</b><div class="mini">${fmtDate(w.date)} · ${w.minutes} min${w.notes ? ' · ' + esc(w.notes) : ''}</div></div></div>`).join('')
+    : '<p class="muted">No workouts in the last 7 days.</p>';
+  return `<div class="card"><div class="row"><h3 style="margin:0">Weight</h3>${unitBtns}</div>
+      <div style="margin-top:12px">${stats}</div>${weighChart(wi, unit)}</div>
+    <div class="card"><h3>Workouts in the last 7 days</h3>${woList}</div>`;
+}
+
+/* ==========================================================================
+   Coach: client list
+   ========================================================================== */
+function renderCoachList() {
+  const cards = CAP_TIERS.map(t => {
+    const left = spotsLeft(t);
+    return `<div class="card">
+      <div class="row"><h3 style="margin:0">${TIERS[t].name}</h3><span class="muted">${TIERS[t].short}</span></div>
+      <div class="cap-nums"><div><b>${activeCount(t)}</b><span>active or paused</span></div>
+        <div><b class="${left > 0 ? 'c-green' : 'c-red'}">${Math.max(0, left)}</b><span>spots left</span></div></div>
+      <label for="cap-${t}">Capacity</label>
+      <input id="cap-${t}" type="number" min="0" max="500" inputmode="numeric" value="${db.capacity[t]}" data-ch="cap" data-tier="${t}" style="max-width:160px">
+    </div>`;
+  }).join('');
+  const wl = db.waitlist.length
+    ? db.waitlist.map(w => `<div class="meal"><div><b>${esc(w.email)}</b><div class="mini">${TIERS[w.tier].name} · ${fmtDate(w.at.slice(0, 10))}</div></div></div>`).join('')
+    : '<p class="muted">No one on the waitlist yet.</p>';
+  const rows = db.clients.slice().sort((a, b) => a.name.localeCompare(b.name)).map(c => `<tr>
+      <td><button class="btn-link" data-act="openClient" data-id="${esc(c.id)}">${esc(c.name)}</button><div class="mini">${esc(c.email)}</div></td>
+      <td>${TIERS[c.tier].name}</td>
+      <td>${statusPill(c.status)}</td>
+      <td>${weekLabel(c)}</td>
+      <td>${relDay(lastLogDate(c))}</td>
+      <td>${needsYou(c).map(n => `<span class="need">${esc(n)}</span>`).join('') || '<span class="mini">Nothing</span>'}</td>
+    </tr>`).join('');
+  return `<section class="hero"><h1>Clients</h1><p class="muted" style="margin:0">Spots, waitlist and who needs you today.</p></section>
+    <div class="grid2">${cards}
+      <div class="card" style="grid-column:1/-1"><h3>Waitlist</h3>${wl}</div>
+    </div>
+    <div class="card"><h3>All clients</h3><div class="table-wrap"><table>
+      <thead><tr><th>Client</th><th>Tier</th><th>Status</th><th>Week</th><th>Last logged</th><th>Needs you</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6">No clients yet.</td></tr>'}</tbody></table></div></div>`;
+}
+
+/* ==========================================================================
+   Coach: client page
+   ========================================================================== */
+function renderCoachClient(c) {
+  const tabs = [['overview','Overview'],['onboarding','Onboarding'],['plan','Targets and plan'],['logs','Logs'],['progress','Progress'],['notes','Notes']];
+  let body = '';
+  if (ui.coachTab === 'overview') body = overviewHtml(c);
+  else if (ui.coachTab === 'onboarding') body = onboardingAnswersHtml(c);
+  else if (ui.coachTab === 'plan') body = planEditorHtml(c);
+  else if (ui.coachTab === 'logs') body = logsHtml(c);
+  else if (ui.coachTab === 'progress') body = renderProgress(c, true);
+  else body = `<div class="card"><h3>Private notes</h3><p class="mini">Only you see these. Saved as you type.</p>
+    <textarea data-inp="notes" style="min-height:160px">${esc(c.notes)}</textarea></div>`;
+  return `<div class="row" style="margin-bottom:10px"><button class="btn-ghost btn-sm" data-act="backClients">‹ All clients</button></div>
+    <section class="hero"><div class="row"><div>
+      <h1>${esc(c.name)}</h1>
+      <div class="muted">${esc(c.email)} · ${esc(c.ob.whatsapp || 'No WhatsApp')} · ${TIERS[c.tier].name}</div>
+    </div><div>${statusPill(c.status)}</div></div></section>
+    <nav class="tabs">${tabs.map(t => `<button class="tab ${ui.coachTab === t[0] ? 'on' : ''}" data-act="coachTab" data-tab="${t[0]}">${t[1]}</button>`).join('')}</nav>
+    ${body}`;
+}
+function overviewHtml(c) {
+  const paid = c.paid ? `${fmtDate(c.paid.date)}, ${money(c.paid.amount)}` : 'Not recorded';
+  const flag = c.healthFlag ? (c.ob.healthClearance ? 'Flagged. Client has confirmed clearance.' : 'Flagged. Clearance not confirmed.') : 'No flags';
+  const info = `<dl class="dl">
+    <dt>Tier</dt><dd>${TIERS[c.tier].name}</dd>
+    <dt>Paid</dt><dd>${esc(paid)}</dd>
+    <dt>Start date</dt><dd>${esc(fmtDate(c.startDate))}</dd>
+    <dt>Week</dt><dd>${esc(weekLabel(c))}</dd>
+    <dt>End date</dt><dd>${c.startDate ? esc(fmtDate(endDateOf(c))) : 'Not started'}</dd>
+    <dt>Pause days used</dt><dd>${c.pauseUsed + (c.status === 'paused' && c.pauseStart ? diffDays(c.pauseStart, todayS()) : 0)} of ${PAUSE_MAX}</dd>
+    <dt>Health</dt><dd>${esc(flag)}${c.healthFlag && c.ob.healthNote ? ' (' + esc(c.ob.healthNote) + ')' : ''}</dd>
+  </dl>`;
+  let actions = '';
+  const tierSel = `<div class="field"><label for="newTier">Change tier</label><div class="row" style="flex-wrap:nowrap">
+    <select id="newTier" style="flex:1">${Object.keys(TIERS).map(t => `<option value="${t}" ${t === c.tier ? 'selected' : ''}>${TIERS[t].name}</option>`).join('')}</select>
+    <button class="btn-ghost" data-act="changeTier">Apply</button></div></div>`;
+  const del = `<button class="btn-danger" data-act="deleteClient" data-id="${esc(c.id)}">Delete client and data</button>`;
+  if (c.status === 'onboarding') {
+    actions = '<p class="muted">Waiting for the client to finish onboarding.</p>';
+  } else if (c.status === 'awaiting') {
+    const miss = activationMissing(c);
+    actions = `<h3>Activate</h3>
+      <div class="field"><label for="startDate">Start date</label><input id="startDate" type="date" value="${todayS()}"></div>
+      ${miss.length ? `<div class="hl-amber"><b>Still needed:</b><ul class="list-clean">${miss.map(m => `<li>${esc(m)}</li>`).join('')}</ul></div>` : '<div class="note-box">Everything is ready to activate.</div>'}
+      <div class="row" style="margin-top:10px;justify-content:flex-start"><button data-act="activate" ${miss.length ? 'disabled' : ''}>Activate</button></div>`;
+  } else if (c.status === 'active') {
+    const canPause = c.tier !== 'essential' && c.pauseUsed < PAUSE_MAX;
+    actions = `<div class="row" style="justify-content:flex-start">
+      ${c.tier !== 'essential' ? `<button class="btn-ghost" data-act="pause" ${canPause ? '' : 'disabled'}>Pause</button>` : ''}
+      <button class="btn-ghost" data-act="finish">Finish</button></div>
+      ${c.tier !== 'essential' && !canPause ? '<p class="mini">Pause allowance is used up.</p>' : ''}`;
+  } else if (c.status === 'paused') {
+    actions = `<div class="row" style="justify-content:flex-start"><button data-act="resume">Resume</button><button class="btn-ghost" data-act="finish">Finish</button></div>`;
+  } else if (c.status === 'finished') {
+    actions = '<p class="mini">Client can renew or keep logging from their Today screen.</p>';
+  } else {
+    actions = '<p class="mini">Self-logging. No coaching plan is active.</p>';
+  }
+  return `<div class="grid2">
+    <div class="card"><h3>Status</h3>${info}</div>
+    <div class="card"><h3>Actions</h3>${actions}<hr style="border:0;border-top:1px solid var(--line);margin:16px 0">${tierSel}${del}</div>
+  </div>`;
+}
+function onboardingAnswersHtml(c) {
+  const ob = c.ob;
+  const rows = [
+    ['Age', ob.age], ['Sex', ob.sex], ['Height', ob.heightCm ? ob.heightCm + ' cm' : ''],
+    ['Weight', ob.weightKg != null ? weightText(ob.weightKg, 'kg') + ' (' + weightText(ob.weightKg, 'lb') + ')' : ''],
+    ['WhatsApp', ob.whatsapp], ['Time zone', ob.timezone],
+    ['Goal', ob.goal], ['Achieve by', fmtDate(ob.goalBy)], ['Why now', ob.goalWhy],
+    ['Job', ob.job], ['Activity', ob.activity], ['Steps a day', ob.steps],
+    ['Foods they like', ob.likedFoods.concat(ob.likedOther ? [ob.likedOther] : []).join(', ')],
+    ['Foods they will not eat', ob.avoid], ['Allergies or intolerances', ob.allergies],
+    ['Dietary style', ob.diet], ['Meals per day', ob.mealsPerDay], ['Cooking time', ob.cookTime], ['Who cooks', ob.whoCooks],
+    ['Eats out per week', ob.eatsOut], ['Alcoholic drinks per week', ob.alcohol], ['Typical day', ob.typicalDay],
+    ['Training days', ob.trainingDays.join(', ')], ['Time of day', ob.timeOfDay], ['Session length', ob.sessionLength + ' min'],
+    ['Where they train', ob.place], ['Equipment', ob.equipment.join(', ')], ['Experience', ob.experience],
+    ['Enjoys', ob.enjoys], ['Hates', ob.hates], ['Injuries or limits', ob.injuries],
+    ['What has worked', ob.worked], ['What has not', ob.didnt], ['Weigh-in day', ob.weighInDay],
+    ['Health: heart or blood pressure', ob.health.heart], ['Health: chest pain or fainting', ob.health.chest],
+    ['Health: other condition or medication', ob.health.other + (ob.healthNote ? ' (' + ob.healthNote + ')' : '')],
+    ['Doctor clearance confirmed', ob.healthClearance ? 'Yes' : 'No'],
+    ['Submitted', ob.submittedAt ? fmtDate(ob.submittedAt.slice(0, 10)) : 'Not yet']
+  ];
+  return `<div class="card"><h3>Onboarding answers</h3><dl class="dl">${rows.map(r => `<dt>${esc(r[0])}</dt><dd>${esc(r[1] || '-')}</dd>`).join('')}</dl></div>`;
+}
+function chipList(items) { return items.length ? items.map(i => `<span class="need" style="background:#eef6ef;color:var(--ink)">${esc(i)}</span>`).join('') : '<span class="mini">None given</span>'; }
+function planInputsHtml(c) {
+  const ob = c.ob;
+  const open = ui.planInputsOpen !== false;
+  const head = `<div class="row"><div><div class="eyebrow">From onboarding</div><h3 style="margin:0">Plan inputs</h3></div>
+    <button class="btn-ghost btn-sm" data-act="togglePlanInputs">${open ? 'Hide plan inputs' : 'Show plan inputs'}</button></div>`;
+  if (!open) return `<section class="plan-inputs">${head}</section>`;
+  const liked = Object.keys(FOOD_GROUPS).map(g => {
+    const p = FOOD_GROUPS[g].filter(f => ob.likedFoods.includes(f));
+    return p.length ? `<div class="mini" style="margin-top:6px">${g}</div><div>${p.map(x => `<span class="pi-tag">${esc(x)}</span>`).join('')}</div>` : '';
+  }).join('') + (ob.likedOther ? `<p class="mini" style="margin-top:6px">Also: ${esc(ob.likedOther)}</p>` : '');
+  const sec = (title, body) => `<div class="pi-sec"><h4>${title}</h4>${body}</div>`;
+  return `<section class="plan-inputs">${head}<div class="pi-grid">
+    ${sec('Goal and body', `<p><b>${esc(ob.goal || '-')}</b></p>
+      <p class="mini">By ${esc(ob.goalBy ? fmtDate(ob.goalBy) : '-')}. Why now: ${esc(ob.goalWhy || '-')}</p>
+      <p>${esc(ob.age)} years, ${esc(ob.sex)}, ${esc(ob.heightCm)} cm, ${ob.weightKg != null ? weightText(ob.weightKg, 'kg') : '-'}</p>
+      <p class="mini">${esc(ob.job || '-')}. ${esc(ob.activity || '-')}, ${esc(ob.steps || '-')} steps a day. Diet: ${esc(ob.diet)}</p>`)}
+    ${sec('Food they like', liked || '<p class="mini">None given</p>')}
+    ${sec('Food to avoid', `<p>${esc(ob.avoid || 'Nothing listed')}</p>
+      ${ob.allergies ? `<div class="hl-red" style="margin:8px 0"><b>Allergies: ${esc(ob.allergies)}</b></div>` : '<p class="mini">No allergies given</p>'}
+      <p class="mini">${esc(ob.mealsPerDay)} meals a day. Cooking time ${esc(ob.cookTime)}, cooked by ${esc(ob.whoCooks)}. Eats out ${esc(ob.eatsOut || '0')} times and drinks ${esc(ob.alcohol || '0')} a week.</p>`)}
+    ${sec('Training days', `<div>${ob.trainingDays.map(d => `<span class="pi-tag day">${d}</span>`).join('') || '<span class="mini">None given</span>'}</div>
+      <p class="mini" style="margin-top:8px">${esc(ob.timeOfDay)}, ${esc(ob.sessionLength)} min, ${esc(ob.place)}. Experience: ${esc(ob.experience)}.</p>`)}
+    ${sec('Equipment', `<p>${esc(ob.equipment.join(', ') || 'None given')}</p>`)}
+    ${sec('Injuries', ob.injuries ? `<div class="hl-amber">${esc(ob.injuries)}</div>` : '<p class="mini">None given</p>')}
+    ${sec('What worked and what did not', `<p><b>Worked:</b> ${esc(ob.worked || '-')}</p><p><b>Did not:</b> ${esc(ob.didnt || '-')}</p>
+      <p class="mini">Enjoys: ${esc(ob.enjoys || '-')}. Hates: ${esc(ob.hates || '-')}.</p>`)}
+  </div></section>`;
+}
+function planEditorHtml(c) {
+  const d = ui.coachPlanDay;
+  const dayDraft = c.plan.mealDraft[d];
+  const t = c.targets || { calories:0, protein:0, carbs:0, fat:0, fibre:0 };
+  const targetsCard = `<div class="card"><h3>Daily targets</h3>
+    <div class="grid5">${NUT.map(k => `<div class="field" style="margin:0"><label for="t-${k}">${NUT_LABEL[k]}${k === 'calories' ? ' (kcal)' : ' (g)'}</label>
+      <input id="t-${k}" type="number" min="0" inputmode="numeric" value="${c.targets ? c.targets[k] : ''}" data-ch="target" data-k="${k}"></div>`).join('')}</div>
+    <p class="mini">Targets show to the client straight away.</p></div>`;
+  const dayBtns = DAYS.map((x, i) => {
+    const n = i + 1;
+    const has = c.plan.mealDraft[n].meals.length > 0;
+    return `<button class="tab ${d === n ? 'on' : ''} ${has ? 'dot' : ''}" data-act="pDay" data-d="${n}">${x}</button>`;
+  }).join('');
+  const dayMeals = dayDraft.meals;
+  const sum = sumNut(dayMeals);
+  const rows = dayMeals.map((m, i) => `<tr>
+      <td style="min-width:120px"><input value="${esc(m.label)}" data-ch="row" data-i="${i}" data-f="label" aria-label="Label"></td>
+      <td style="min-width:220px"><input value="${esc(m.text)}" data-ch="row" data-i="${i}" data-f="text" aria-label="Foods"></td>
+      ${NUT.map(k => `<td class="num"><input type="number" min="0" inputmode="numeric" value="${m[k]}" data-ch="row" data-i="${i}" data-f="${k}" aria-label="${NUT_LABEL[k]}"></td>`).join('')}
+      <td><button class="btn-danger btn-sm" data-act="delRow" data-i="${i}">Remove</button></td></tr>`).join('');
+  const totalRow = dayMeals.length ? `<tr><td colspan="2"><b>Day total</b></td>${NUT.map(k => {
+      const tn = c.targets ? tone(k, sum[k], c.targets[k]) : '';
+      return `<td class="num ${TONE_TEXT[tn]}"><b>${Math.round(sum[k])}</b>${c.targets ? '<div class="mini">of ' + c.targets[k] + '</div>' : ''}</td>`;
+    }).join('')}<td></td></tr>` : '';
+  const copyOpts = DAYS.map((x, i) => i + 1).filter(n => n !== d)
+    .map(n => `<option value="${n}">${DAYS_FULL[n - 1]}</option>`).join('');
+  const dayText = dayDraft.lines;
+  const trainLines = c.plan.trainDraft;
+  const changed = plansChanged(c);
+  const status = changed
+    ? '<b class="c-amber">Changes not published yet</b>'
+    : c.plan.publishedAt ? `<span class="mini">Published ${esc(fmtDate(c.plan.publishedAt.slice(0, 10)))}</span>` : '<span class="mini">Nothing published yet</span>';
+
+  return `${planInputsHtml(c)}
+    <div>
+      ${targetsCard}
+      <div class="card"><h3>Meal plan</h3>
+        <div class="day-row">${dayBtns}</div>
+        <div class="field"><label for="dayLines">${DAYS_FULL[d - 1]}: one meal per line, "Label: foods with amounts"</label>
+          <textarea id="dayLines" data-inp="dayLines" data-d="${d}" placeholder="Breakfast: 60g oats, 150g Greek yoghurt, 1 banana&#10;Lunch: 150g chicken, 150g rice, broccoli">${esc(dayText)}</textarea></div>
+        <div class="row" style="justify-content:flex-start">
+          <button data-act="calcDay" data-d="${d}">Calculate with Beast AI</button>
+          <button class="btn-ghost" data-act="addRow" data-d="${d}">Add a row</button>
+          ${aiEnabled() ? '' : '<span class="mini">Beast AI is off. Calculate makes rows with zero numbers you can type over.</span>'}
+        </div>
+        <div class="table-wrap" style="margin-top:12px"><table>
+          <thead><tr><th>Label</th><th>Foods</th><th>kcal</th><th>P g</th><th>C g</th><th>F g</th><th>Fibre g</th><th></th></tr></thead>
+          <tbody>${rows}${totalRow}</tbody></table></div>
+        ${dayMeals.length ? `<div class="row" style="margin-top:12px;justify-content:flex-start">
+          <label for="copyTo" class="sr">Copy this day to</label>
+          <select id="copyTo" style="width:auto;min-width:200px"><option value="all">All other days</option>${copyOpts}</select>
+          <button class="btn-ghost" data-act="copyDay" data-d="${d}">Copy this day</button></div>` : ''}
+      </div>
+      <div class="card"><h3>Training plan</h3>
+        <textarea data-inp="trainDraft" style="min-height:150px" placeholder="Mon: Full body A...">${esc(trainLines)}</textarea>
+        <div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn-ghost" data-act="trainStart">Start from their training days</button></div>
+      </div>
+      <div class="card"><div class="row"><div>${status}</div><button data-act="publish">Approve and publish</button></div>
+        <p class="mini" style="margin:8px 0 0">Publishes the meal plan and training plan to the client.</p></div>
+    </div>`;
+}
+function logsHtml(c) {
+  const t = c.targets;
+  const days = [];
+  for (let i = 0; i < 21; i++) days.push(addDays(todayS(), -i));
+  return `<div class="card"><h3>Last 21 days</h3><p class="mini" style="margin-top:0">Newest first. Tap a day to open it.</p>
+    ${days.map((date, idx) => {
+      const meals = c.logs[date] || [];
+      const tot = sumNut(meals);
+      const wo = (c.workouts || []).filter(w => w.date === date);
+      const wi = c.weighIns.find(w => w.date === date);
+      const calT = t ? tone('calories', tot.calories, t.calories) : '';
+      const proT = t ? tone('protein', tot.protein, t.protein) : '';
+      const summary = `<summary><span>${fmtDate(date)}</span>
+        <span class="mini" style="font-weight:400;margin-left:8px">${meals.length ? `<span class="${TONE_TEXT[calT]}">${tot.calories} kcal</span> · <span class="${TONE_TEXT[proT]}">P ${tot.protein}g</span> · ${meals.length} meal${meals.length === 1 ? '' : 's'}` : 'No meals logged'}
+        · ${wo.length ? 'Workout' : 'No workout'} · ${wi ? weightText(wi.kg, 'kg') : 'No weigh-in'}</span></summary>`;
+      const body = meals.length ? meals.map(m => `<div class="meal" style="padding:8px 0">
+          <div style="flex:1 1 200px"><span class="mini">${esc(m.time || '')}</span> <b>${esc(m.name)}</b> <span class="mini">${esc(sourceLabel(m))}</span>
+          <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div>
+          ${m.edited && m.ai ? `<div class="edited">Changed by client. Beast AI said ${m.ai.calories} kcal, P ${m.ai.protein}g.</div>` : ''}</div></div>`).join('')
+        : '<p class="mini">No meals logged.</p>';
+      const woTxt = wo.length ? '<div class="mini">Workout: ' + wo.map(w => esc(w.what) + ' (' + w.minutes + ' min)').join(', ') + '</div>' : '';
+      return `<details ${idx === 0 ? 'open' : ''}>${summary}<div style="padding:4px 0 6px">${body}${woTxt}</div></details>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ==========================================================================
+   Actions
+   ========================================================================== */
+const ACT = {};
+const CH = {};
+const INP = {};
+
+ACT.reset = () => {
+  if (!confirm('Reset the demo? This clears everything you have added and reseeds the sample clients.')) return;
+  db = Store.reset();
+  persist();
+  ui = { view:'coach', coachClientId:null, coachTab:'overview', clientId:null, clientTab:'today',
+    clientDay: todayS(), clientPlanDay: dowNum(todayS()), coachPlanDay: dowNum(todayS()),
+    addMode:'describe', unit:'kg', newStep:'plans', newTier:null, describe:'', aiResult:null, bText:'',
+    bMeal:'Lunch', bEffort:'15 minutes', buildResults:null, editId:null, logOpen:{} };
+  saveUi(); render(); toast('Demo reset.');
+};
+ACT.backClients = () => { ui.coachClientId = null; saveUi(); render(); };
+ACT.openClient = el => { ui.coachClientId = el.dataset.id; ui.coachTab = 'overview'; saveUi(); render(); window.scrollTo(0, 0); };
+ACT.coachTab = el => { ui.coachTab = el.dataset.tab; saveUi(); render(); };
+ACT.togglePlanInputs = () => { ui.planInputsOpen = ui.planInputsOpen === false; saveUi(); render(); };
+ACT.unit = el => { ui.unit = el.dataset.u; saveUi(); render(); };
+ACT.clientTab = el => { ui.clientTab = el.dataset.tab; saveUi(); render(); };
+ACT.clientPlanDay = el => { ui.clientPlanDay = Number(el.dataset.d); saveUi(); render(); };
+
+ACT.dayPrev = () => { ui.clientDay = addDays(ui.clientDay, -1); ui.editId = null; saveUi(); render(); };
+ACT.dayNext = () => { if (ui.clientDay < todayS()) { ui.clientDay = addDays(ui.clientDay, 1); ui.editId = null; saveUi(); render(); } };
+ACT.addMode = el => { ui.addMode = el.dataset.m; saveUi(); render(); };
+
+/* --- Describe it --- */
+ACT.aiDescribe = async () => {
+  const text = (ui.describe || '').trim();
+  if (!text) { toast('Describe what you ate first.'); return; }
+  if (!localStorage.getItem(DEMO_KEY_NAME)) { toast(AI_MSG.no_key); return; }
+  toast('Estimating...');
+  const res = await askAI({ mode: 'log', text: text.slice(0, 600) });
+  if (!res.ok) { aiFail(res); render(); return; }
+  ui.aiResult = Object.assign({}, res.data, nutFrom(res.data));
+  ui.aiResult.name = (res.data.name || 'Meal').toString().slice(0, 80);
+  ui.aiResult.estimate = nutFrom(res.data);
+  saveUi(); render();
+};
+ACT.clearAi = () => { ui.aiResult = null; saveUi(); render(); };
+ACT.saveDescribe = () => {
+  const c = clientById(ui.clientId);
+  const r = ui.aiResult;
+  if (!r) return;
+  const n = readNut('r-');
+  const est = r.estimate;
+  const edited = NUT.some(k => n[k] !== est[k]);
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  addMealTo(c, day, { id: uid(), time: day === todayS() ? nowHHMM() : '', name: n.name || r.name || 'Meal',
+    calories: n.calories, protein: n.protein, carbs: n.carbs, fat: n.fat, fibre: n.fibre,
+    source:'ai', ai: est, edited, text: ui.describe });
+  ui.aiResult = null; ui.describe = ''; saveUi(); render(); toast('Meal saved.');
+};
+ACT.saveTyped = () => {
+  const c = clientById(ui.clientId);
+  const n = readNut('m-');
+  if (!n.name) { toast('Give the meal a name.'); return; }
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  addMealTo(c, day, { id: uid(), time: day === todayS() ? nowHHMM() : '', name: n.name, calories: n.calories, protein: n.protein,
+    carbs: n.carbs, fat: n.fat, fibre: n.fibre, source:'typed', ai:null, edited:false, text:'' });
+  render(); toast('Meal saved.');
+};
+
+/* --- From my plan --- */
+ACT.logPlan = el => {
+  const c = clientById(ui.clientId);
+  const pub = c.plan.mealPublished;
+  if (!pub) return;
+  const m = (pub[Number(el.dataset.d)] || [])[Number(el.dataset.i)];
+  if (!m) return;
+  const date = el.dataset.date || ui.clientDay;
+  addMealTo(c, date, { id: uid(), time: date === todayS() ? nowHHMM() : '', name: m.name, calories: m.calories, protein: m.protein,
+    carbs: m.carbs, fat: m.fat, fibre: m.fibre, source:'plan', ai:null, edited:false, text: m.text });
+  render(); toast('Logged from your plan.');
+};
+
+/* --- Meal Builder --- */
+function resizeToJpeg(file, max) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const s = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * s); canvas.height = Math.round(img.height * s);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('image')); };
+    img.src = url;
+  });
+}
+ACT.build = async () => {
+  const c = clientById(ui.clientId);
+  const fileEl = document.getElementById('fridgeFile');
+  const file = fileEl && fileEl.files && fileEl.files[0];
+  let have = (ui.bText || '').trim();
+  if (file) {
+    if (file.size > 12 * 1024 * 1024) { toast('That photo is too large. Try a smaller one.'); return; }
+    toast('Looking in your fridge...');
+    try {
+      const b64 = await resizeToJpeg(file, 1280);
+      if (b64.length > 2800000) { toast('That photo is too large after resizing.'); return; }
+      const res = await askAI({ mode: 'fridge', image: { type: 'image/jpeg', data: b64 } });
+      if (res.ok) {
+        const items = (res.data.items || []).map(i => typeof i === 'string' ? i : (i && i.name) || '').filter(Boolean);
+        have = [items.join(', '), have].filter(Boolean).join(', ');
+        ui.bText = have;
+      } else { aiFail(res); }
+    } catch (e) { toast('That photo could not be read. Type what you have instead.'); }
+  }
+  if (!have) { toast('Add a photo or type what you have.'); return; }
+  const t = c.targets;
+  const eaten = totalsFor(c, ui.clientDay > todayS() ? todayS() : ui.clientDay);
+  const body = { mode: 'create', have: have.slice(0, 600), meal: ui.bMeal, effort: ui.bEffort };
+  if (t) body.targets = {
+    calories: Math.min(900, Math.max(0, t.calories - eaten.calories)),
+    protein: Math.min(60, Math.max(0, t.protein - eaten.protein)),
+    fibre: Math.max(0, t.fibre - eaten.fibre)
+  };
+  toast('Thinking up meals...');
+  const res = await askAI(body);
+  if (!res.ok) { aiFail(res); ui.buildResults = null; saveUi(); render(); return; }
+  const list = (res.data.meals || []).map(m => ({
+    name: String(m.name || 'Meal').slice(0, 80),
+    text: [].concat(m.uses || [], m.pantry || []).join(', '),
+    steps: Array.isArray(m.steps) ? m.steps.slice(0, 8) : [],
+    tip: String(m.tip || '').slice(0, 200),
+    offTarget: !!m.offTarget,
+    calories: clampNum(m.calories, 5000), protein: clampNum(m.protein, 500), carbs: clampNum(m.carbs, 800),
+    fat: clampNum(m.fat, 400), fibre: clampNum(m.fibre, 200)
+  }));
+  ui.buildResults = list.length ? list : null;
+  if (!list.length) toast('No meals came back. Try again or enter the numbers yourself.');
+  saveUi(); render();
+};
+ACT.logBuilt = el => {
+  const c = clientById(ui.clientId);
+  const m = (ui.buildResults || [])[Number(el.dataset.i)];
+  if (!m) return;
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  addMealTo(c, day, Object.assign({ id: uid(), time: day === todayS() ? nowHHMM() : '', source:'builder', ai:null, edited:false }, m));
+  ui.buildResults = null; saveUi(); render(); toast('Meal logged.');
+};
+ACT.saveBuilderManual = () => {
+  const c = clientById(ui.clientId);
+  const n = readNut('b-');
+  if (!n.name) { toast('Give the meal a name.'); return; }
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  addMealTo(c, day, { id: uid(), time: day === todayS() ? nowHHMM() : '', name: n.name, calories: n.calories, protein: n.protein,
+    carbs: n.carbs, fat: n.fat, fibre: n.fibre, source:'typed', ai:null, edited:false, text:'' });
+  render(); toast('Meal saved.');
+};
+
+/* --- Edit / delete meals and workouts --- */
+ACT.editMeal = el => { ui.editId = el.dataset.id; saveUi(); render(); };
+ACT.cancelEditMeal = () => { ui.editId = null; saveUi(); render(); };
+ACT.saveEditMeal = el => {
+  const c = clientById(ui.clientId);
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const m = (c.logs[day] || []).find(x => x.id === el.dataset.id);
+  if (!m) return;
+  const n = readNut('e-');
+  if (n.name) m.name = n.name;
+  NUT.forEach(k => { m[k] = n[k]; });
+  m.edited = !!(m.source === 'ai' && m.ai && NUT.some(k => m[k] !== m.ai[k]));
+  ui.editId = null; persist(); saveUi(); render(); toast('Meal updated.');
+};
+ACT.deleteMeal = el => {
+  const c = clientById(ui.clientId);
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  c.logs[day] = (c.logs[day] || []).filter(x => x.id !== el.dataset.id);
+  persist(); render(); toast('Meal deleted.');
+};
+ACT.saveWorkout = () => {
+  const c = clientById(ui.clientId);
+  const what = (document.getElementById('wo-what').value || '').trim();
+  const mins = clampNum(document.getElementById('wo-min').value, 600);
+  if (!what) { toast('Add what you did.'); return; }
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  c.workouts.push({ id: uid(), date: day, what: what.slice(0, 120), minutes: mins, notes: (document.getElementById('wo-notes').value || '').trim().slice(0, 300) });
+  persist(); render(); toast('Workout saved.');
+};
+ACT.deleteWorkout = el => {
+  const c = clientById(ui.clientId);
+  c.workouts = c.workouts.filter(w => w.id !== el.dataset.id);
+  persist(); render();
+};
+ACT.saveWeigh = () => {
+  const c = clientById(ui.clientId);
+  const raw = parseFloat(document.getElementById('wi-val').value);
+  if (!(raw > 0)) { toast('Enter a weight first.'); return; }
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const kg = ui.unit === 'kg' ? raw : lbToKg(raw);
+  c.weighIns = c.weighIns.filter(w => w.date !== day);
+  c.weighIns.push({ date: day, kg: Math.round(kg * 10) / 10 });
+  persist(); render(); toast('Weigh-in saved.');
+};
+
+/* --- Client status actions --- */
+ACT.renew = () => {
+  const c = clientById(ui.clientId);
+  c.status = 'awaiting'; c.startDate = null; c.pauseUsed = 0; c.pauseStart = null;
+  c.paid = { date: todayS(), amount: Math.round(TIERS[c.tier].price * 0.8 * 100) / 100, renewal: true };
+  persist(); render(); toast('Renewal saved. Stefan will confirm your start date.');
+};
+ACT.keepLogging = () => {
+  const c = clientById(ui.clientId);
+  c.status = 'selflog'; persist(); render(); toast('You are now self-logging.');
+};
+
+/* --- New client flow --- */
+ACT.buy = el => { ui.newTier = el.dataset.t; ui.newStep = 'checkout'; saveUi(); render(); };
+ACT.newBack = () => { ui.newStep = 'plans'; saveUi(); render(); };
+ACT.waitlist = el => {
+  const t = el.dataset.t;
+  const input = document.getElementById('wl-' + t);
+  const err = document.getElementById('err-wl-' + t);
+  const email = (input.value || '').trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Enter a valid email.'; input.classList.add('invalid'); return; }
+  db.waitlist.push({ email, tier: t, at: new Date().toISOString() });
+  persist(); toast('You are on the waitlist. We will email you if a spot opens.');
+  input.value = ''; err.textContent = ''; input.classList.remove('invalid');
+};
+ACT.pay = el => {
+  const t = el.dataset.t;
+  const name = (document.getElementById('nc-name').value || '').trim();
+  const email = (document.getElementById('nc-email').value || '').trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const nameEl = document.getElementById('nc-name'), emailEl = document.getElementById('nc-email');
+  document.getElementById('err-nc-name').textContent = name ? '' : 'Enter your name.';
+  document.getElementById('err-nc-email').textContent = emailOk ? '' : 'Enter a valid email.';
+  nameEl.classList.toggle('invalid', !name);
+  emailEl.classList.toggle('invalid', !emailOk);
+  if (!name || !emailOk) return;
+  if (CAP_TIERS.includes(t) && spotsLeft(t) <= 0) { toast('That tier just filled up. Join the waitlist instead.'); ui.newStep = 'plans'; saveUi(); render(); return; }
+  const c = mkClient({ name, email, tier: t, status: 'onboarding', paid: { date: todayS(), amount: TIERS[t].price } });
+  c.ob = blankOb();
+  db.clients.push(c);
+  persist();
+  ui.view = 'client'; ui.clientId = c.id; ui.clientTab = 'today'; ui.newStep = 'plans';
+  saveUi(); render(); window.scrollTo(0, 0);
+  toast('Thanks. Finish your onboarding so Stefan can build your plan.');
+};
+
+/* --- Onboarding submit --- */
+ACT.obSubmit = () => {
+  const c = clientById(ui.clientId);
+  const errs = validateOb(c);
+  const keys = ['age','heightCm','weight','goal','whatsapp','trainingDays','likedFoods','health','healthClearance','agreeTerms','agreeNotCoach','agreeConsent'];
+  keys.forEach(k => {
+    const e = document.getElementById('err-' + k);
+    if (e) e.textContent = errs[k] || '';
+    document.querySelectorAll(`[data-ob="${k}"], [data-obgrp="${k}"]`).forEach(el => el.classList.toggle('invalid', !!errs[k] && el.type !== 'radio'));
+  });
+  const first = Object.keys(errs).find(k => keys.includes(k));
+  if (first) {
+    const target = document.getElementById('err-' + first) || document.querySelector(`[data-ob="${first}"]`);
+    if (target && target.scrollIntoView) target.scrollIntoView({ behavior:'smooth', block:'center' });
+    toast('Please fix the highlighted answers.');
+    return;
+  }
+  const ob = c.ob;
+  ob.weightKg = Math.round((ob.weightUnit === 'kg' ? parseFloat(ob.weight) : lbToKg(parseFloat(ob.weight))) * 10) / 10;
+  ob.submittedAt = new Date().toISOString();
+  c.healthFlag = Object.values(ob.health).includes('yes');
+  c.status = 'awaiting';
+  c.weighIns = [{ date: todayS(), kg: ob.weightKg }];
+  persist(); render(); window.scrollTo(0, 0);
+  toast('Thanks. Stefan is building your plan.');
+};
+
+/* --- Coach: clients and capacity --- */
+CH.cap = el => {
+  const t = el.dataset.tier;
+  db.capacity[t] = clampNum(el.value, 500);
+  persist(); render();
+};
+ACT.deleteClient = el => {
+  const c = clientById(el.dataset.id);
+  if (!c) return;
+  if (!confirm(`Delete ${c.name} and all their data? This cannot be undone.`)) return;
+  db.clients = db.clients.filter(x => x.id !== c.id);
+  ui.coachClientId = null; persist(); saveUi(); render(); toast('Client deleted.');
+};
+ACT.activate = () => {
+  const c = clientById(ui.coachClientId);
+  const miss = activationMissing(c);
+  if (miss.length) { toast('Still needed: ' + miss[0]); return; }
+  const start = document.getElementById('startDate').value;
+  if (!start) { toast('Pick a start date.'); return; }
+  c.status = 'active'; c.startDate = start; c.pauseUsed = 0; c.pauseStart = null;
+  persist(); render(); toast('Activated. Week 1 starts ' + fmtDate(start) + '.');
+};
+ACT.pause = () => {
+  const c = clientById(ui.coachClientId);
+  if (c.tier === 'essential' || c.pauseUsed >= PAUSE_MAX) return;
+  c.status = 'paused'; c.pauseStart = todayS();
+  persist(); render(); toast('Paused. The end date moves when you resume.');
+};
+ACT.resume = () => {
+  const c = clientById(ui.coachClientId);
+  const elapsed = c.pauseStart ? diffDays(c.pauseStart, todayS()) : 0;
+  c.pauseUsed = Math.min(PAUSE_MAX, c.pauseUsed + Math.max(0, elapsed));
+  c.pauseStart = null; c.status = 'active';
+  persist(); render(); toast('Resumed.');
+};
+ACT.finish = () => {
+  const c = clientById(ui.coachClientId);
+  if (!confirm(`Mark ${c.name} as finished?`)) return;
+  if (c.status === 'paused' && c.pauseStart) { c.pauseUsed = Math.min(PAUSE_MAX, c.pauseUsed + diffDays(c.pauseStart, todayS())); c.pauseStart = null; }
+  c.status = 'finished'; persist(); render(); toast('Marked as finished.');
+};
+ACT.changeTier = () => {
+  const c = clientById(ui.coachClientId);
+  const t = document.getElementById('newTier').value;
+  if (t === c.tier) return;
+  const holdsSpot = c.status === 'active' || c.status === 'paused';
+  if (holdsSpot && t !== 'essential') {
+    const freeAfterMove = db.capacity[t] - activeCount(t);
+    if (freeAfterMove <= 0 && c.tier !== t) { toast('No spot is free in ' + TIERS[t].name + '.'); return; }
+  }
+  c.tier = t; persist(); render(); toast('Tier changed to ' + TIERS[t].name + '.');
+};
+
+/* --- Coach: targets and plan --- */
+CH.target = el => {
+  const c = clientById(ui.coachClientId);
+  if (!c.targets) c.targets = { calories:0, protein:0, carbs:0, fat:0, fibre:0 };
+  c.targets[el.dataset.k] = clampNum(el.value, el.dataset.k === 'calories' ? 10000 : 1000);
+  persist(); render();
+};
+ACT.pDay = el => { ui.coachPlanDay = Number(el.dataset.d); saveUi(); render(); };
+INP.dayLines = el => {
+  const c = clientById(ui.coachClientId);
+  const d = Number(el.dataset.d);
+  c.plan.mealDraft[d].lines = el.value;
+  persist();
+};
+INP.trainDraft = el => {
+  const c = clientById(ui.coachClientId);
+  c.plan.trainDraft = el.value; persist();
+};
+INP.notes = el => {
+  const c = clientById(ui.coachClientId);
+  c.notes = el.value; persist();
+};
+function parseLines(text) {
+  return text.split('\n').map(s => s.trim()).filter(Boolean).map((line, i) => {
+    const idx = line.indexOf(':');
+    if (idx > 0) return { label: line.slice(0, idx).trim().slice(0, 40), text: line.slice(idx + 1).trim().slice(0, 300) };
+    return { label: 'Meal ' + (i + 1), text: line.slice(0, 300) };
+  });
+}
+function zeroMeal(p) { return Object.assign({ label: p.label, text: p.text }, { calories:0, protein:0, carbs:0, fat:0, fibre:0 }); }
+ACT.calcDay = async el => {
+  const c = clientById(ui.coachClientId);
+  const d = Number(el.dataset.d);
+  const lines = c.plan.mealDraft[d].lines.split('\n').map(s => s.trim()).filter(Boolean);
+  if (!lines.length) { toast('Type the meals first, one per line.'); return; }
+  toast('Calculating...');
+  const res = await askAI({ mode: 'day', text: lines.join('\n').slice(0, 2000) });
+  if (res.ok && Array.isArray(res.data.meals) && res.data.meals.length === lines.length) {
+    const meals = res.data.meals.map((m, i) => Object.assign({ label: String(m.label || parseLines(lines[i])[0].label), text: String(m.text || parseLines(lines[i])[0].text) },
+      nutFrom(m)));
+    c.plan.mealDraft[d] = { lines: c.plan.mealDraft[d].lines, meals };
+    persist(); render(); toast('Numbers calculated. Check them before you publish.');
+    return;
+  }
+  if (!res.ok) aiFail(res); else toast('Beast AI returned a different number of meals. Check the numbers by hand.');
+  c.plan.mealDraft[d] = { lines: c.plan.mealDraft[d].lines, meals: parseLines(lines.join('\n')).map(zeroMeal) };
+  persist(); render();
+};
+ACT.addRow = el => {
+  const c = clientById(ui.coachClientId);
+  const d = Number(el.dataset.d);
+  c.plan.mealDraft[d].meals.push({ label: 'Meal', text: '', calories:0, protein:0, carbs:0, fat:0, fibre:0 });
+  persist(); render();
+};
+ACT.delRow = el => {
+  const c = clientById(ui.coachClientId);
+  const d = ui.coachPlanDay;
+  c.plan.mealDraft[d].meals.splice(Number(el.dataset.i), 1);
+  persist(); render();
+};
+CH.row = el => {
+  const c = clientById(ui.coachClientId);
+  const d = ui.coachPlanDay;
+  const meal = c.plan.mealDraft[d].meals[Number(el.dataset.i)];
+  if (!meal) return;
+  const f = el.dataset.f;
+  if (f === 'label' || f === 'text') meal[f] = el.value.slice(0, f === 'label' ? 40 : 300);
+  else meal[f] = clampNum(el.value, f === 'calories' ? 5000 : 500);
+  c.plan.mealDraft[d].lines = c.plan.mealDraft[d].meals.map(m => m.label + ': ' + m.text).join('\n');
+  persist(); render();
+};
+ACT.copyDay = el => {
+  const c = clientById(ui.coachClientId);
+  const from = Number(el.dataset.d);
+  const to = document.getElementById('copyTo').value;
+  const targets = to === 'all' ? DAYS.map((x, i) => i + 1).filter(n => n !== from) : [Number(to)];
+  const source = c.plan.mealDraft[from];
+  const overwrite = targets.some(n => c.plan.mealDraft[n].meals.length);
+  if (overwrite && !confirm('This replaces the meals already on the chosen day(s). Continue?')) return;
+  targets.forEach(n => {
+    c.plan.mealDraft[n] = { lines: source.lines, meals: JSON.parse(JSON.stringify(source.meals)) };
+  });
+  persist(); render(); toast('Copied.');
+};
+ACT.trainStart = () => {
+  const c = clientById(ui.coachClientId);
+  const lines = c.plan.trainDraft ? c.plan.trainDraft.split('\n') : [];
+  DAYS.forEach((d, i) => {
+    if (!c.ob.trainingDays.includes(d)) return;
+    if (!lines.some(l => l.trim().startsWith(d))) lines.push(d + ': ');
+  });
+  c.plan.trainDraft = lines.filter((l, i, arr) => l.trim() !== '' || i < arr.length - 1).join('\n');
+  persist(); render();
+};
+ACT.publish = () => {
+  const c = clientById(ui.coachClientId);
+  c.plan.mealPublished = JSON.parse(JSON.stringify(draftMeals(c)));
+  c.plan.trainPublished = c.plan.trainDraft;
+  c.plan.publishedAt = new Date().toISOString();
+  persist(); render(); toast('Published to the client.');
+};
+
+/* ==========================================================================
+   Event wiring (one delegated listener each)
+   ========================================================================== */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const fn = ACT[el.dataset.act];
+  if (fn) fn(el, e);
+});
+const OB_SEL = '#onboardForm [data-ob], #onboardForm [data-obgrp], #onboardForm [data-health]';
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.ch === 'viewAs') {
+    const v = el.value;
+    if (v === 'coach') { ui.view = 'coach'; ui.coachClientId = null; }
+    else if (v === 'new') { ui.view = 'new'; ui.newStep = 'plans'; }
+    else if (v.startsWith('client:')) { ui.view = 'client'; ui.clientId = v.slice(7); ui.clientTab = 'today'; ui.clientDay = todayS(); ui.editId = null; }
+    saveUi(); render(); window.scrollTo(0, 0);
+    return;
+  }
+  if (el.dataset && el.dataset.ch && CH[el.dataset.ch]) { CH[el.dataset.ch](el, e); return; }
+  if (el.dataset && el.dataset.ui) { ui[el.dataset.ui] = el.value; saveUi(); return; }
+  if (el.matches && el.matches(OB_SEL)) handleObInput(el);
+});
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.ui) { ui[el.dataset.ui] = el.value; saveUi(); return; }
+  if (el.dataset && el.dataset.inp && INP[el.dataset.inp]) { INP[el.dataset.inp](el, e); return; }
+  if (el.matches && el.matches(OB_SEL)) handleObInput(el);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches && e.target.matches('#nc-name, #nc-email')) {
+    const btn = document.querySelector('[data-act="pay"]');
+    if (btn) btn.click();
+  }
+});
+
+function handleObInput(el) {
+  const c = clientById(ui.clientId);
+  if (!c) return;
+  const ob = c.ob;
+  if (el.dataset.health) {
+    ob.health[el.dataset.health] = el.value;
+    const anyYes = Object.values(ob.health).some(v => v === 'yes');
+    document.getElementById('clearWrap').hidden = !anyYes;
+    document.getElementById('otherWrap').hidden = ob.health.other !== 'yes';
+    clearObErr('health');
+    persist();
+    return;
+  }
+  if (el.dataset.obgrp) {
+    const k = el.dataset.obgrp;
+    const set = new Set(ob[k]);
+    if (el.checked) set.add(el.value); else set.delete(el.value);
+    ob[k] = Array.from(set);
+    clearObErr(k);
+    persist();
+    return;
+  }
+  const k = el.dataset.ob;
+  if (el.type === 'checkbox') ob[k] = el.checked;
+  else if (el.type === 'radio') { if (el.checked) ob[k] = el.value; }
+  else ob[k] = el.value;
+  if (k === 'healthClearance') { clearObErr('healthClearance'); }
+  else clearObErr(k);
+  if (k === 'weightUnit' || k === 'weight') clearObErr('weight');
+  persist();
+}
+
+/* ==========================================================================
+   Boot
+   ========================================================================== */
+db = Store.load();
+initUi();
+if (ui.view === 'client' && !clientById(ui.clientId)) { ui.view = 'coach'; ui.clientId = null; }
+ui.clientDay = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+saveUi();
+render();
+</script>
+</body>
+</html>
