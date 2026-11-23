@@ -154,6 +154,12 @@ summary::-webkit-details-marker{display:none}
 .sheet p{margin:0 0 6px;font-size:16px}
 .sheet ol,.sheet ul{padding-left:22px;margin:0}
 .sheet li{margin:6px 0;font-size:16px}
+
+.banner{background:#FFF6E0;border:2px solid var(--amber);color:#4a2c00;border-radius:14px;padding:13px 16px;margin-bottom:14px;font-weight:700}
+.progress{height:10px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;margin-top:14px}
+.progress span{display:block;height:100%;background:var(--amber);border-radius:99px}
+.ob-nav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:4px 0 24px}
+@media(max-width:699px){.ob-nav{flex-direction:column-reverse}.ob-nav button,.ob-nav .btn-ghost{width:100%}.ob-nav span{display:none}}
 </style>
 </head>
 <body>
@@ -570,13 +576,13 @@ function emptyPublished() {
 }
 function blankOb(extra) {
   return Object.assign({
-    age:'', sex:'', heightCm:'', weight:'', weightUnit:'kg', weightKg:null, whatsapp:'',
+    age:'', sex:'', heightUnit:'cm', heightCm:'', heightFt:'', heightIn:'', weight:'', weightUnit:'kg', weightKg:null, whatsapp:'',
     timezone: (Intl.DateTimeFormat().resolvedOptions().timeZone || 'Australia/Melbourne'),
-    goal:'', goalBy:'', goalWhy:'',
+    goal:'', timeframe:'', goalWhy:'',
     job:'', activity:'', steps:'',
-    likedFoods:[], likedOther:'', avoid:'', allergies:'', diet:'No restrictions',
-    mealsPerDay:'3', cookTime:'15 min', whoCooks:'Me', eatsOut:'', alcohol:'', typicalDay:'',
-    trainingDays:[], timeOfDay:'Varies', sessionLength:'45', place:'Gym', equipment:[], experience:'Beginner',
+    likedFoods:[], likedOther:'', avoid:'', allergies:'', diet:'',
+    mealsPerDay:'', cookTime:'', whoCooks:'', eatsOut:'', alcohol:'', typicalDay:'',
+    trainingDays:[], timeOfDay:'', sessionLength:'', place:'', equipment:[], experience:'',
     enjoys:'', hates:'', injuries:'', worked:'', didnt:'', weighInDay:'Mon', weighInTime:'07:00',
     health:{ heart:null, chest:null, other:null }, healthNote:'', healthClearance:false,
     agreeTerms:false, agreeNotCoach:false, agreeConsent:false, submittedAt:null
@@ -585,7 +591,7 @@ function blankOb(extra) {
 function mkClient(o) {
   return Object.assign({
     id: uid(), name:'', email:'', tier:'essential', status:'onboarding', paid:null, createdAt: new Date().toISOString(),
-    startDate:null, pauseUsed:0, pauseStart:null, healthFlag:false, ob: blankOb(),
+    startDate:null, pauseUsed:0, pauseStart:null, healthFlag:false, ob: blankOb(), obStep: 1,
     weighIns:[], workouts:[], targets:null,
     plan:{ mealDraft: emptyDraft(), mealPublished: null, trainDraft:'', trainPublished: null, publishedAt: null },
     logs:{}, notes:''
@@ -633,8 +639,8 @@ function seedDb() {
     paid:{ date: addDays(t, -10), amount: 299 }, createdAt: addDays(t, -10) + 'T09:00:00.000Z',
     startDate: addDays(t, -9), healthFlag:false,
     ob: blankOb({
-      age:'34', sex:'Male', heightCm:'182', weight:'84', weightUnit:'kg', weightKg:84, whatsapp:'+61 400 000 001',
-      goal:'Lose 6 kg and get back to lifting 3 days a week', goalBy: addDays(t, 80), goalWhy:'Trip in March and my knee is sick of the extra weight',
+      age:'34', sex:'Male', heightUnit:'cm', heightCm:'182', weight:'84', weightUnit:'kg', weightKg:84, whatsapp:'+61 400 000 001',
+      goal:'Lose 6 kg and get back to lifting 3 days a week', timeframe:'3 months', goalWhy:'Trip in March and my knee is sick of the extra weight',
       job:'Software tester, mostly at a desk', activity:'Mostly sitting', steps:'5000',
       likedFoods:['Chicken','Rice','Broccoli','Salmon','Potato','Eggs','Greek yoghurt','Oats','Banana','Berries','Beef','Nuts'],
       likedOther:'Spicy noodles', avoid:'Mushrooms', allergies:'', diet:'No restrictions', mealsPerDay:'4 or more',
@@ -662,8 +668,8 @@ function seedDb() {
     paid:{ date: addDays(t, -2), amount: 110 }, createdAt: addDays(t, -2) + 'T10:00:00.000Z',
     startDate: null, healthFlag:true,
     ob: blankOb({
-      age:'29', sex:'Female', heightCm:'166', weight:'71', weightUnit:'kg', weightKg:71, whatsapp:'+61 400 000 002',
-      goal:'More energy and a steady routine', goalBy: addDays(t, 90), goalWhy:'Shift work has wrecked my sleep and my eating',
+      age:'29', sex:'Female', heightUnit:'cm', heightCm:'166', weight:'71', weightUnit:'kg', weightKg:71, whatsapp:'+61 400 000 002',
+      goal:'More energy and a steady routine', timeframe:'3 months', goalWhy:'Shift work has wrecked my sleep and my eating',
       job:'Nurse, rotating shifts', activity:'On my feet', steps:'9000',
       likedFoods:['Tofu','Tempeh','Eggs','Spinach','Banana','Oats','Greek yoghurt'], likedOther:'', avoid:'Fish',
       allergies:'Peanuts', diet:'Vegetarian', mealsPerDay:'3 plus snacks', cookTime:'15 min', whoCooks:'Me',
@@ -685,8 +691,8 @@ function seedDb() {
     paid:{ date: addDays(t, -35), amount: 699 }, createdAt: addDays(t, -35) + 'T08:00:00.000Z',
     startDate: addDays(t, -29), healthFlag:false,
     ob: blankOb({
-      age:'31', sex:'Male', heightCm:'178', weight:'101.5', weightUnit:'kg', weightKg:101.5, whatsapp:'+61 400 000 003',
-      goal:'Drop to 90 kg and build a stronger base', goalBy: addDays(t, 90), goalWhy:'Want to keep up with my kids and stop feeling flat',
+      age:'31', sex:'Male', heightUnit:'cm', heightCm:'178', weight:'101.5', weightUnit:'kg', weightKg:101.5, whatsapp:'+61 400 000 003',
+      goal:'Drop to 90 kg and build a stronger base', timeframe:'6 months', goalWhy:'Want to keep up with my kids and stop feeling flat',
       job:'Warehouse supervisor, on my feet', activity:'On my feet', steps:'8000',
       likedFoods:['Beef','Rice','Potato','Eggs','Tuna','Chicken','Banana','Apple','Popcorn','Protein powder','Protein bars','Cheese'],
       likedOther:'', avoid:'Seafood other than tuna', allergies:'', diet:'No restrictions', mealsPerDay:'3 plus snacks',
@@ -1050,125 +1056,6 @@ function renderCheckout() {
 /* ==========================================================================
    Onboarding (client). Built once; validation updates error text in place.
    ========================================================================== */
-function renderOnboardingPage(c) {
-  const ob = c.ob;
-  const f = (k, label, type, ph, extra) => `<div class="field">
-      <label for="ob-${k}">${label}</label>
-      <input id="ob-${k}" type="${type || 'text'}" data-ob="${k}" value="${esc(ob[k])}" placeholder="${esc(ph || '')}" ${extra || ''}>
-      <div class="err" id="err-${k}"></div></div>`;
-  const radios = (k, label, opts) => `<div class="field"><label>${label}</label>
-      <div class="chips">${opts.map(o => `<label class="chip"><input type="radio" name="ob-${k}" value="${esc(o)}" data-ob="${k}" ${ob[k] === o ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>
-      <div class="err" id="err-${k}"></div></div>`;
-  const select = (k, label, opts) => `<div class="field"><label for="ob-${k}">${label}</label>
-      <select id="ob-${k}" data-ob="${k}"><option value="" ${opts.includes(ob[k]) ? '' : 'selected'}>Choose one</option>${opts.map(o => `<option ${ob[k] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>`;
-  const group = (k, opts) => `<div class="chips">${opts.map(o => `<label class="chip"><input type="checkbox" data-obgrp="${k}" value="${esc(o)}" ${ob[k].includes(o) ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`;
-  const foodGroups = Object.keys(FOOD_GROUPS).map(g => `<div style="margin-bottom:12px"><label>${g}</label>${group('likedFoods', FOOD_GROUPS[g])}</div>`).join('');
-  const health = (k, q) => `<div class="field"><label>${q}</label>
-      <div class="chips">${['yes','no'].map(v => `<label class="chip"><input type="radio" name="h-${k}" value="${v}" data-health="${k}" ${ob.health[k] === v ? 'checked' : ''}>${v === 'yes' ? 'Yes' : 'No'}</label>`).join('')}</div></div>`;
-  const anyYes = Object.values(ob.health).some(v => v === 'yes');
-  const agree = (k, text) => `<div><label class="check"><input type="checkbox" data-ob="${k}" ${ob[k] ? 'checked' : ''}><span>${text}</span></label><div class="err" id="err-${k}"></div></div>`;
-
-  return `<section class="hero">
-      <h1>Tell Stefan about you</h1>
-      <p class="muted" style="margin:0">This is everything Stefan needs to build your plan. Your answers save as you type. Nothing is sent in the demo.</p>
-    </section>
-    <form id="onboardForm" novalidate>
-      <div class="card"><h3>About you</h3>
-        <div class="grid2">
-          ${f('age','Age','number','e.g. 32','min="10" max="100" inputmode="numeric"')}
-          ${select('sex','Sex',['Prefer not to say','Female','Male','Other'])}
-          ${f('heightCm','Height (cm)','number','e.g. 175','min="100" max="250" inputmode="numeric"')}
-          <div class="field"><label for="ob-weight">Current weight</label>
-            <div class="row" style="flex-wrap:nowrap"><input id="ob-weight" type="number" step="0.1" min="0" inputmode="decimal" data-ob="weight" value="${esc(ob.weight)}" style="flex:1">
-            <select data-ob="weightUnit" style="width:90px"><option ${ob.weightUnit === 'kg' ? 'selected' : ''} value="kg">kg</option><option ${ob.weightUnit === 'lb' ? 'selected' : ''} value="lb">lb</option></select></div>
-            <div class="err" id="err-weight"></div></div>
-          ${f('whatsapp','WhatsApp number','tel','+61 4xx xxx xxx')}
-          ${f('timezone','Time zone','text','Australia/Melbourne')}
-        </div>
-      </div>
-      <div class="card"><h3>Your goal</h3>
-        <div class="grid2">
-          ${f('goal','What do you want to achieve?','text','e.g. Lose 5 kg and get stronger')}
-          ${f('goalBy','By when?','date')}
-        </div>
-        <div class="field"><label for="ob-goalWhy">Why now?</label><textarea id="ob-goalWhy" data-ob="goalWhy">${esc(ob.goalWhy)}</textarea></div>
-      </div>
-      <div class="card"><h3>Your day</h3>
-        <div class="grid2">
-          ${f('job','Job','text','e.g. Teacher, on my feet all day')}
-          ${select('activity','How active is your job?', ACTIVITY)}
-          ${f('steps','Steps on a usual day','number','e.g. 6000','min="0" inputmode="numeric"')}
-        </div>
-      </div>
-      <div class="card"><h3>Food you like</h3>
-        <p class="muted">Tick everything you like. At least 3 in total.</p>
-        ${foodGroups}
-        <div class="field"><label for="ob-likedOther">Anything else you love?</label><input id="ob-likedOther" data-ob="likedOther" value="${esc(ob.likedOther)}"></div>
-        <div class="err" id="err-likedFoods"></div>
-      </div>
-      <div class="card"><h3>Food to avoid and how you eat</h3>
-        <div class="grid2">
-          <div class="field"><label for="ob-avoid">Foods you will not eat</label><textarea id="ob-avoid" data-ob="avoid">${esc(ob.avoid)}</textarea></div>
-          <div class="field"><label for="ob-allergies">Allergies or intolerances</label><textarea id="ob-allergies" data-ob="allergies">${esc(ob.allergies)}</textarea></div>
-        </div>
-        ${radios('diet','Dietary style', DIETS)}
-        ${radios('mealsPerDay','Meals per day', MEALS_PER_DAY)}
-        ${radios('cookTime','Cooking time per meal', COOK_TIMES)}
-        ${radios('whoCooks','Who cooks?', WHO_COOKS)}
-        <div class="grid2">
-          ${f('eatsOut','Times you eat out or get takeaway per week','number','e.g. 2','min="0" inputmode="numeric"')}
-          ${f('alcohol','Alcoholic drinks per week','number','e.g. 3','min="0" inputmode="numeric"')}
-        </div>
-        <div class="field"><label for="ob-typicalDay">A typical day of eating</label><textarea id="ob-typicalDay" data-ob="typicalDay">${esc(ob.typicalDay)}</textarea></div>
-      </div>
-      <div class="card"><h3>Training</h3>
-        <div class="field"><label>Days you can train (tick at least one)</label>
-          <div class="chips">${DAYS.map(d => `<label class="chip"><input type="checkbox" data-obgrp="trainingDays" value="${d}" ${ob.trainingDays.includes(d) ? 'checked' : ''}>${d}</label>`).join('')}</div>
-          <div class="err" id="err-trainingDays"></div></div>
-        <div class="grid2">
-          ${radios('timeOfDay','Preferred time of day', TIME_OF_DAY)}
-          ${radios('sessionLength','Session length (minutes)', SESSIONS)}
-          ${radios('place','Where you train', PLACES)}
-          ${radios('experience','Experience', EXPERIENCE)}
-        </div>
-        <div class="field"><label>Equipment you have</label>${group('equipment', EQUIPMENT)}</div>
-        <div class="grid2">
-          ${f('enjoys','Activities you enjoy','text','e.g. Cycling, lifting')}
-          ${f('hates','Activities you hate','text','e.g. Running')}
-        </div>
-        <div class="field"><label for="ob-injuries">Injuries or anything that limits training</label><textarea id="ob-injuries" data-ob="injuries">${esc(ob.injuries)}</textarea></div>
-      </div>
-      <div class="card"><h3>What you have tried</h3>
-        <div class="grid2">
-          <div class="field"><label for="ob-worked">What has worked before?</label><textarea id="ob-worked" data-ob="worked">${esc(ob.worked)}</textarea></div>
-          <div class="field"><label for="ob-didnt">What has not worked?</label><textarea id="ob-didnt" data-ob="didnt">${esc(ob.didnt)}</textarea></div>
-        </div>
-        ${select('weighInDay','Weekly weigh-in day', DAYS)}
-        <div class="field"><label for="ob-weighInTime">Weigh-in time</label>
-          <select id="ob-weighInTime" data-ob="weighInTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${(ob.weighInTime || '07:00') === t ? 'selected' : ''}>${fmtTime(t)}</option>`).join('')}</select>
-          <p class="mini" style="margin:6px 0 0">Same day, same time each week, after the toilet and before eating or drinking.</p></div>
-      </div>
-      <div class="card"><h3>Health check</h3>
-        <p class="muted">Answer all three.</p>
-        ${health('heart','Has a doctor ever said you have a heart condition or high blood pressure?')}
-        ${health('chest','Do you get chest pain, dizziness or fainting during exercise?')}
-        ${health('other','Do you have any other condition or take medication that could affect exercise or diet?')}
-        <div class="field" id="otherWrap" ${ob.health.other === 'yes' ? '' : 'hidden'}><label for="ob-healthNote">Tell us briefly</label><input id="ob-healthNote" data-ob="healthNote" value="${esc(ob.healthNote)}"></div>
-        <div class="err" id="err-health"></div>
-        <div class="hl-amber" id="clearWrap" ${anyYes ? '' : 'hidden'} style="margin-top:10px">
-          <label class="check"><input type="checkbox" data-ob="healthClearance" ${ob.healthClearance ? 'checked' : ''}><span>I have checked with my doctor that I can start exercise and diet changes.</span></label>
-          <div class="err" id="err-healthClearance"></div>
-        </div>
-      </div>
-      <div class="card"><h3>Agreements</h3>
-        ${agree('agreeTerms','I have read the terms. Full refund any time before your plan starts. No refunds once your plan is delivered.')}
-        ${agree('agreeNotCoach','I understand Stefan is a coach, not a dietitian or doctor, and this is general guidance, not medical advice.')}
-        ${agree('agreeConsent','I agree Stefan can see the meals, workouts and weights I log.')}
-      </div>
-      <div class="row" style="justify-content:flex-end"><button type="button" data-act="obSubmit">Send my answers to Stefan</button></div>
-    </form>`;
-}
-
 function keyOf(x) {
   return String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean)
     .map(w => (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) ? w.slice(0, -1) : w).join(' ');
@@ -1246,41 +1133,226 @@ function trainingHtml(text) {
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
 
+const OB_STEPS = ['About you', 'Your goal and your day', 'Food you like', 'Food to avoid and how you eat', 'Training', 'Weigh-ins, what you have tried, health check and agreements'];
+const TIMEFRAMES = ['1 month', '3 months', '6 months', '12 months', 'No rush'];
+const OB_CHOOSE = 'Choose one.';
+function obStepOf(c) { return Math.min(6, Math.max(1, c.obStep || 1)); }
+function obInput(ob, k, label, type, ph, extra) {
+  return `<div class="field"><label for="ob-${k}">${label}</label>
+    <input id="ob-${k}" type="${type || 'text'}" data-ob="${k}" value="${esc(ob[k])}" placeholder="${esc(ph || '')}" ${extra || ''}>
+    <div class="err" id="err-${k}"></div></div>`;
+}
+function obRadios(ob, k, label, opts, hint) {
+  return `<div class="field"><label>${label}</label>${hint ? `<p class="mini" style="margin:0 0 8px">${hint}</p>` : ''}
+    <div class="chips">${opts.map(o => `<label class="chip"><input type="radio" name="ob-${k}" value="${esc(o)}" data-ob="${k}" ${ob[k] === o ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>
+    <div class="err" id="err-${k}"></div></div>`;
+}
+function obSelect(ob, k, label, opts) {
+  return `<div class="field"><label for="ob-${k}">${label}</label>
+    <select id="ob-${k}" data-ob="${k}"><option value="" ${opts.includes(ob[k]) ? '' : 'selected'}>Choose one</option>${opts.map(o => `<option ${ob[k] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>`;
+}
+function obGroup(ob, k, opts) {
+  return `<div class="chips">${opts.map(o => `<label class="chip"><input type="checkbox" data-obgrp="${k}" value="${esc(o)}" ${ob[k].includes(o) ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`;
+}
+function obAgree(ob, k, text) {
+  return `<div><label class="check"><input type="checkbox" data-ob="${k}" ${ob[k] ? 'checked' : ''}><span>${text}</span></label><div class="err" id="err-${k}"></div></div>`;
+}
+function stepAbout(ob) {
+  const unitChip = (val, label) => `<label class="chip"><input type="radio" name="ob-heightUnit" value="${val}" data-ob="heightUnit" ${(ob.heightUnit || 'cm') === val ? 'checked' : ''}>${label}</label>`;
+  const height = (ob.heightUnit || 'cm') === 'cm'
+    ? obInput(ob, 'heightCm', 'Height (cm)', 'number', 'e.g. 175', 'min="100" max="250" inputmode="numeric"')
+    : `<div class="grid2">
+        <div class="field"><label for="ob-heightFt">Feet</label><input id="ob-heightFt" type="number" min="3" max="8" inputmode="numeric" data-ob="heightFt" value="${esc(ob.heightFt)}"></div>
+        <div class="field"><label for="ob-heightIn">Inches</label><input id="ob-heightIn" type="number" min="0" max="11" inputmode="numeric" data-ob="heightIn" value="${esc(ob.heightIn)}"></div>
+       </div><div class="err" id="err-heightCm"></div>`;
+  return `<div class="card"><h3>About you</h3>
+    <div class="grid2">
+      ${obInput(ob, 'age', 'Age', 'number', 'e.g. 32', 'min="10" max="100" inputmode="numeric"')}
+      ${obSelect(ob, 'sex', 'Sex', ['Prefer not to say', 'Female', 'Male', 'Other'])}
+    </div>
+    <div class="field"><label>Height unit</label><div class="chips">${unitChip('cm', 'cm')}${unitChip('ftin', 'ft / in')}</div></div>
+    ${height}
+    <div class="field"><label for="ob-weight">Current weight</label>
+      <div class="row" style="flex-wrap:nowrap"><input id="ob-weight" type="number" step="0.1" min="0" inputmode="decimal" data-ob="weight" value="${esc(ob.weight)}" style="flex:1">
+      <select data-ob="weightUnit" style="width:90px"><option value="kg" ${ob.weightUnit === 'kg' ? 'selected' : ''}>kg</option><option value="lb" ${ob.weightUnit === 'lb' ? 'selected' : ''}>lb</option></select></div>
+      <div class="err" id="err-weight"></div></div>
+    <div class="grid2">
+      ${obInput(ob, 'whatsapp', 'WhatsApp number', 'tel', '+61 4xx xxx xxx')}
+      ${obInput(ob, 'timezone', 'Time zone', 'text', 'Australia/Melbourne')}
+    </div></div>`;
+}
+function stepGoal(ob) {
+  return `<div class="card"><h3>Your goal</h3>
+    ${obInput(ob, 'goal', 'What do you want to achieve?', 'text', 'e.g. Lose 5 kg and get stronger')}
+    ${obRadios(ob, 'timeframe', 'How long do you want to take?', TIMEFRAMES)}
+    <div class="field"><label for="ob-goalWhy">Why now?</label><textarea id="ob-goalWhy" data-ob="goalWhy">${esc(ob.goalWhy)}</textarea></div>
+  </div>
+  <div class="card"><h3>Your day</h3>
+    <div class="grid2">
+      ${obInput(ob, 'job', 'Job', 'text', 'e.g. Teacher, on my feet all day')}
+      ${obSelect(ob, 'activity', 'How active is your job?', ACTIVITY)}
+      ${obInput(ob, 'steps', 'Steps on a usual day', 'number', 'e.g. 6000', 'min="0" inputmode="numeric"')}
+    </div></div>`;
+}
+function stepLikes(ob) {
+  const groups = Object.keys(FOOD_GROUPS).map(g => `<div style="margin-bottom:14px"><label>${g}</label>${obGroup(ob, 'likedFoods', FOOD_GROUPS[g])}</div>`).join('');
+  return `<div class="card"><h3>Food you like</h3>
+    <p class="muted">Tick everything you like. At least 3 in total, including anything you type below.</p>
+    ${groups}
+    <div class="field"><label for="ob-likedOther">Anything else you love?</label><input id="ob-likedOther" data-ob="likedOther" value="${esc(ob.likedOther)}"></div>
+    <div class="err" id="err-likedFoods"></div></div>`;
+}
+function stepEat(ob) {
+  return `<div class="card"><h3>Food to avoid</h3>
+    <div class="grid2">
+      <div class="field"><label for="ob-avoid">Foods you will not eat</label><textarea id="ob-avoid" data-ob="avoid">${esc(ob.avoid)}</textarea></div>
+      <div class="field"><label for="ob-allergies">Allergies or intolerances</label><textarea id="ob-allergies" data-ob="allergies">${esc(ob.allergies)}</textarea></div>
+    </div></div>
+  <div class="card"><h3>How you eat</h3>
+    ${obRadios(ob, 'diet', 'Dietary style', DIETS, 'Choose No restrictions if none applies.')}
+    ${obRadios(ob, 'mealsPerDay', 'Meals per day', MEALS_PER_DAY)}
+    ${obRadios(ob, 'cookTime', 'Cooking time per meal', COOK_TIMES)}
+    ${obRadios(ob, 'whoCooks', 'Who cooks?', WHO_COOKS)}
+    <div class="grid2">
+      ${obInput(ob, 'eatsOut', 'Times you eat out or get takeaway per week', 'number', 'e.g. 2', 'min="0" inputmode="numeric"')}
+      ${obInput(ob, 'alcohol', 'Alcoholic drinks per week', 'number', 'e.g. 3', 'min="0" inputmode="numeric"')}
+    </div>
+    <div class="field"><label for="ob-typicalDay">A typical day of eating</label><textarea id="ob-typicalDay" data-ob="typicalDay">${esc(ob.typicalDay)}</textarea></div>
+  </div>`;
+}
+function stepTrain(ob) {
+  return `<div class="card"><h3>Training</h3>
+    <div class="field"><label>Days you can train (tick at least one)</label>
+      <div class="chips">${DAYS.map(d => `<label class="chip"><input type="checkbox" data-obgrp="trainingDays" value="${d}" ${ob.trainingDays.includes(d) ? 'checked' : ''}>${d}</label>`).join('')}</div>
+      <div class="err" id="err-trainingDays"></div></div>
+    ${obRadios(ob, 'timeOfDay', 'Preferred time of day', TIME_OF_DAY)}
+    ${obRadios(ob, 'sessionLength', 'Session length (minutes)', SESSIONS)}
+    ${obRadios(ob, 'place', 'Where you train', PLACES)}
+    ${obRadios(ob, 'experience', 'Experience', EXPERIENCE)}
+    <div class="field"><label>Equipment you have</label>${obGroup(ob, 'equipment', EQUIPMENT)}</div>
+    <div class="grid2">
+      ${obInput(ob, 'enjoys', 'Activities you enjoy', 'text', 'e.g. Cycling, lifting')}
+      ${obInput(ob, 'hates', 'Activities you hate', 'text', 'e.g. Running')}
+    </div>
+    <div class="field"><label for="ob-injuries">Injuries or anything that limits training</label><textarea id="ob-injuries" data-ob="injuries">${esc(ob.injuries)}</textarea></div>
+  </div>`;
+}
+function stepFinish(ob) {
+  const health = (k, q) => `<div class="field"><label>${q}</label>
+      <div class="chips">${['yes', 'no'].map(v => `<label class="chip"><input type="radio" name="h-${k}" value="${v}" data-health="${k}" ${ob.health[k] === v ? 'checked' : ''}>${v === 'yes' ? 'Yes' : 'No'}</label>`).join('')}</div></div>`;
+  const anyYes = Object.values(ob.health).some(v => v === 'yes');
+  return `<div class="card"><h3>Weigh-ins</h3>
+    <p class="muted" style="margin-top:0">Weigh-ins happen once a week, on the day and time you choose here.</p>
+    <div class="grid2">
+      ${obSelect(ob, 'weighInDay', 'Weekly weigh-in day', DAYS)}
+      <div class="field"><label for="ob-weighInTime">Weigh-in time</label>
+        <select id="ob-weighInTime" data-ob="weighInTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${(ob.weighInTime || '07:00') === t ? 'selected' : ''}>${fmtTime(t)}</option>`).join('')}</select>
+        <p class="mini" style="margin:6px 0 0">Same day, same time each week, after the toilet and before eating or drinking.</p></div>
+    </div></div>
+  <div class="card"><h3>What you have tried</h3>
+    <div class="grid2">
+      <div class="field"><label for="ob-worked">What has worked before?</label><textarea id="ob-worked" data-ob="worked">${esc(ob.worked)}</textarea></div>
+      <div class="field"><label for="ob-didnt">What has not worked?</label><textarea id="ob-didnt" data-ob="didnt">${esc(ob.didnt)}</textarea></div>
+    </div></div>
+  <div class="card"><h3>Health check</h3>
+    <p class="muted">Answer all three.</p>
+    ${health('heart', 'Has a doctor ever said you have a heart condition or high blood pressure?')}
+    ${health('chest', 'Do you get chest pain, dizziness or fainting during exercise?')}
+    ${health('other', 'Do you have any other condition or take medication that could affect exercise or diet?')}
+    <div class="field" id="otherWrap" ${ob.health.other === 'yes' ? '' : 'hidden'}><label for="ob-healthNote">Tell us briefly</label><input id="ob-healthNote" data-ob="healthNote" value="${esc(ob.healthNote)}"></div>
+    <div class="err" id="err-health"></div>
+    <div class="hl-amber" id="clearWrap" ${anyYes ? '' : 'hidden'} style="margin-top:10px">
+      <label class="check"><input type="checkbox" data-ob="healthClearance" ${ob.healthClearance ? 'checked' : ''}><span>I have checked with my doctor that I can start exercise and diet changes.</span></label>
+      <div class="err" id="err-healthClearance"></div>
+    </div></div>
+  <div class="card"><h3>Agreements</h3>
+    ${obAgree(ob, 'agreeTerms', 'I have read the terms. Full refund any time before your plan starts. No refunds once your plan is delivered.')}
+    ${obAgree(ob, 'agreeNotCoach', 'I understand Stefan is a coach, not a dietitian or doctor, and this is general guidance, not medical advice.')}
+    ${obAgree(ob, 'agreeConsent', 'I agree Stefan can see the meals, workouts and weights I log.')}
+  </div>`;
+}
+const OB_STEP_HTML = [null, stepAbout, stepGoal, stepLikes, stepEat, stepTrain, stepFinish];
+function renderOnboardingPage(c) {
+  const step = obStepOf(c), ob = c.ob;
+  const banner = step === 1 ? '<div class="banner" role="status">Payment received. Finish these 6 short steps so Stefan can build your plan.</div>' : '';
+  const last = step === 6;
+  return `${banner}
+    <section class="hero">
+      <div class="eyebrow">Step ${step} of 6: ${esc(OB_STEPS[step - 1])}</div>
+      <h1 style="margin-top:6px">Tell Stefan about you</h1>
+      <div class="progress" role="progressbar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="${step}"><span style="width:${Math.round(step / 6 * 100)}%"></span></div>
+      <p class="muted" style="margin:10px 0 0">Answers save as you type. You can leave and come back to this step.</p>
+    </section>
+    <form id="onboardForm" novalidate>
+      ${OB_STEP_HTML[step](ob)}
+      <div class="ob-nav">
+        ${step > 1 ? '<button type="button" class="btn-ghost" data-act="obBack">Back</button>' : '<span></span>'}
+        <button type="button" data-act="${last ? 'obSubmit' : 'obNext'}">${last ? 'Send my answers to Stefan' : 'Next'}</button>
+      </div>
+    </form>`;
+}
 function obDraft() { return db.clients.find(c => c.id === ui.clientId).ob; }
 function clearObErr(key) {
   const e = document.getElementById('err-' + key);
   if (e) e.textContent = '';
-  document.querySelectorAll(`[data-ob="${key}"]`).forEach(el => el.classList.remove('invalid'));
+  document.querySelectorAll(`[data-ob="${key}"], [data-obgrp="${key}"]`).forEach(el => el.classList.remove('invalid'));
 }
-function validateOb(c) {
-  const ob = c.ob;
-  const errs = {};
-  const num = v => parseFloat(v);
-  if (!(num(ob.age) >= 10 && num(ob.age) <= 100)) errs.age = 'Enter your age (10 to 100).';
-  if (!(num(ob.heightCm) >= 100 && num(ob.heightCm) <= 250)) errs.heightCm = 'Enter your height in cm (100 to 250).';
-  if (!(num(ob.weight) > 0)) errs.weight = 'Enter your current weight.';
-  if (!ob.goal.trim()) errs.goal = 'Tell us what you want to achieve.';
-  if (ob.whatsapp.replace(/\D/g, '').length < 6) errs.whatsapp = 'Enter a WhatsApp number so Stefan can reach you.';
-  if (!ob.trainingDays.length) errs.trainingDays = 'Tick at least one training day.';
-  const liked = ob.likedFoods.length + ob.likedOther.split(',').map(s => s.trim()).filter(Boolean).length;
-  if (liked < 3) errs.likedFoods = 'Tick at least 3 foods you like.';
-  const answers = Object.values(ob.health);
-  if (answers.some(v => v === null)) errs.health = 'Answer all three health questions.';
-  if (answers.includes('yes') && !ob.healthClearance) errs.healthClearance = 'Tick this to confirm your doctor has cleared you.';
-  if (!ob.agreeTerms) errs.agreeTerms = 'Please agree to the terms.';
-  if (!ob.agreeNotCoach) errs.agreeNotCoach = 'Please confirm you understand this is coaching, not medical advice.';
-  if (!ob.agreeConsent) errs.agreeConsent = 'Please agree so Stefan can see your logs.';
-  return errs;
+// Errors for one step. Blank answers that shape the plan are missing, so they are flagged.
+function obErrors(ob, step) {
+  const e = {}, n = v => parseFloat(v);
+  if (step === 1) {
+    if (!(n(ob.age) >= 10 && n(ob.age) <= 100)) e.age = 'Enter your age (10 to 100).';
+    if (ob.heightUnit === 'ftin') {
+      if (!(n(ob.heightFt) >= 3 && n(ob.heightFt) <= 8 && n(ob.heightIn) >= 0 && n(ob.heightIn) <= 11)) e.heightCm = 'Enter your height: feet (3 to 8) and inches (0 to 11).';
+    } else if (!(n(ob.heightCm) >= 100 && n(ob.heightCm) <= 250)) e.heightCm = 'Enter your height in cm (100 to 250).';
+    if (!(n(ob.weight) > 0)) e.weight = 'Enter your current weight.';
+    if (ob.whatsapp.replace(/\D/g, '').length < 6) e.whatsapp = 'Enter a WhatsApp number so Stefan can reach you.';
+  }
+  if (step === 2) {
+    if (!ob.goal.trim()) e.goal = 'Tell us what you want to achieve.';
+    if (!TIMEFRAMES.includes(ob.timeframe)) e.timeframe = OB_CHOOSE;
+  }
+  if (step === 3) {
+    const liked = ob.likedFoods.length + ob.likedOther.split(',').map(x => x.trim()).filter(Boolean).length;
+    if (liked < 3) e.likedFoods = 'Tick at least 3 foods you like.';
+  }
+  if (step === 4) {
+    if (!DIETS.includes(ob.diet)) e.diet = 'Choose one. Pick No restrictions if none applies.';
+    if (!MEALS_PER_DAY.includes(ob.mealsPerDay)) e.mealsPerDay = OB_CHOOSE;
+    if (!COOK_TIMES.includes(ob.cookTime)) e.cookTime = OB_CHOOSE;
+    if (!WHO_COOKS.includes(ob.whoCooks)) e.whoCooks = OB_CHOOSE;
+  }
+  if (step === 5) {
+    if (!ob.trainingDays.length) e.trainingDays = 'Tick at least one training day.';
+    if (!TIME_OF_DAY.includes(ob.timeOfDay)) e.timeOfDay = OB_CHOOSE;
+    if (!SESSIONS.includes(ob.sessionLength)) e.sessionLength = OB_CHOOSE;
+    if (!PLACES.includes(ob.place)) e.place = OB_CHOOSE;
+    if (!EXPERIENCE.includes(ob.experience)) e.experience = OB_CHOOSE;
+  }
+  if (step === 6) {
+    const answers = Object.values(ob.health);
+    if (answers.some(v => v === null)) e.health = 'Answer all three health questions.';
+    if (answers.includes('yes') && !ob.healthClearance) e.healthClearance = 'Tick this to confirm your doctor has cleared you.';
+    if (!ob.agreeTerms) e.agreeTerms = 'Please agree to the terms.';
+    if (!ob.agreeNotCoach) e.agreeNotCoach = 'Please confirm you understand this is coaching, not medical advice.';
+    if (!ob.agreeConsent) e.agreeConsent = 'Please agree so Stefan can see your logs.';
+  }
+  return e;
+}
+// Writes messages into the error boxes already on the page. Nothing is re-rendered, so typed answers stay put.
+function setObErrors(errs) {
+  document.querySelectorAll('#onboardForm .err').forEach(el => { el.textContent = ''; });
+  document.querySelectorAll('#onboardForm .invalid').forEach(el => el.classList.remove('invalid'));
+  Object.keys(errs).forEach(k => {
+    const box = document.getElementById('err-' + k);
+    if (box) box.textContent = errs[k];
+    document.querySelectorAll(`[data-ob="${k}"], [data-obgrp="${k}"]`).forEach(el => { if (el.type !== 'radio') el.classList.add('invalid'); });
+  });
+  const first = Object.keys(errs)[0];
+  const target = first && (document.getElementById('err-' + first) || document.querySelector(`[data-ob="${first}"]`));
+  if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-/* ==========================================================================
-   Client pages: Today / My plan / Progress
-   ========================================================================== */
-function planReadyCopy(c) {
-  if (c.tier === 'beast') return 'Your plan is ready to read. Message Stefan on WhatsApp to book your call and pick a start date.';
-  if (c.tier === 'core') return 'Your plan is ready to read. Bring it to your weekly check-in to book your call and pick a start date.';
-  return 'Your plan is ready to read. Stefan will email you to book your call and pick a start date.';
-}
 function statusLine(c) {
   const s = c.status;
   if (s === 'onboarding') return 'Finish your onboarding so Stefan can build your plan.';
@@ -1611,10 +1683,10 @@ function overviewHtml(c) {
 function onboardingAnswersHtml(c) {
   const ob = c.ob;
   const rows = [
-    ['Age', ob.age], ['Sex', ob.sex], ['Height', ob.heightCm ? ob.heightCm + ' cm' : ''],
+    ['Age', ob.age], ['Sex', ob.sex], ['Height', ob.heightCm ? ob.heightCm + ' cm (entered as ' + (ob.heightUnit === 'ftin' ? ob.heightFt + ' ft ' + ob.heightIn + ' in' : ob.heightCm + ' cm') + ')' : ''],
     ['Weight', ob.weightKg != null ? weightText(ob.weightKg, 'kg') + ' (' + weightText(ob.weightKg, 'lb') + ')' : ''],
     ['WhatsApp', ob.whatsapp], ['Time zone', ob.timezone],
-    ['Goal', ob.goal], ['Achieve by', fmtDate(ob.goalBy)], ['Why now', ob.goalWhy],
+    ['Goal', ob.goal], ['Timeframe', ob.timeframe || '-'], ['Why now', ob.goalWhy],
     ['Job', ob.job], ['Activity', ob.activity], ['Steps a day', ob.steps],
     ['Foods they like', ob.likedFoods.concat(ob.likedOther ? [ob.likedOther] : []).join(', ')],
     ['Foods they will not eat', ob.avoid], ['Allergies or intolerances', ob.allergies],
@@ -1645,8 +1717,8 @@ function planInputsHtml(c) {
   const sec = (title, body) => `<div class="pi-sec"><h4>${title}</h4>${body}</div>`;
   return `<section class="plan-inputs">${head}<div class="pi-grid">
     ${sec('Goal and body', `<p><b>${esc(ob.goal || '-')}</b></p>
-      <p class="mini">By ${esc(ob.goalBy ? fmtDate(ob.goalBy) : '-')}. Why now: ${esc(ob.goalWhy || '-')}</p>
-      <p>${esc(ob.age)} years, ${esc(ob.sex)}, ${esc(ob.heightCm)} cm, ${ob.weightKg != null ? weightText(ob.weightKg, 'kg') : '-'}</p>
+      <p class="mini">Timeframe: ${esc(ob.timeframe || '-')}. Why now: ${esc(ob.goalWhy || '-')}</p>
+      <p>${esc(ob.age)} years, ${esc(ob.sex || '-')}, ${esc(ob.heightCm)} cm (${ob.heightUnit === 'ftin' ? esc(ob.heightFt) + ' ft ' + esc(ob.heightIn) + ' in' : 'entered in cm'}), ${ob.weightKg != null ? weightText(ob.weightKg, 'kg') : '-'}</p>
       <p class="mini">${esc(ob.job || '-')}. ${esc(ob.activity || '-')}, ${esc(ob.steps || '-')} steps a day. Diet: ${esc(ob.diet)}</p>`)}
     ${sec('Food they like', liked || '<p class="mini">None given</p>')}
     ${sec('Food to avoid', `<p>${esc(ob.avoid || 'Nothing listed')}</p>
@@ -1993,38 +2065,41 @@ ACT.pay = el => {
   const c = mkClient({ name, email, tier: t, status: 'onboarding', paid: { date: todayS(), amount: TIERS[t].price } });
   c.ob = blankOb();
   db.clients.push(c);
-  persist();
+  c.obStep = 1; persist();
   ui.view = 'client'; ui.clientId = c.id; ui.clientTab = 'today'; ui.newStep = 'plans';
   saveUi(); render(); window.scrollTo(0, 0);
-  toast('Thanks. Finish your onboarding so Stefan can build your plan.');
 };
 
 /* --- Onboarding submit --- */
-ACT.obSubmit = () => {
+ACT.obNext = () => {
+  const c = clientById(ui.clientId), step = obStepOf(c);
+  const errs = obErrors(c.ob, step);
+  if (Object.keys(errs).length) { setObErrors(errs); toast('Please answer the questions marked in red.'); return; }
+  c.obStep = Math.min(6, step + 1); persist(); render(); window.scrollTo(0, 0);
+};
+ACT.obBack = () => {
   const c = clientById(ui.clientId);
-  const errs = validateOb(c);
-  const keys = ['age','heightCm','weight','goal','whatsapp','trainingDays','likedFoods','health','healthClearance','agreeTerms','agreeNotCoach','agreeConsent'];
-  keys.forEach(k => {
-    const e = document.getElementById('err-' + k);
-    if (e) e.textContent = errs[k] || '';
-    document.querySelectorAll(`[data-ob="${k}"], [data-obgrp="${k}"]`).forEach(el => el.classList.toggle('invalid', !!errs[k] && el.type !== 'radio'));
-  });
-  const first = Object.keys(errs).find(k => keys.includes(k));
-  if (first) {
-    const target = document.getElementById('err-' + first) || document.querySelector(`[data-ob="${first}"]`);
-    if (target && target.scrollIntoView) target.scrollIntoView({ behavior:'smooth', block:'center' });
-    toast('Please fix the highlighted answers.');
-    return;
+  c.obStep = Math.max(1, obStepOf(c) - 1); persist(); render(); window.scrollTo(0, 0);
+};
+ACT.obSubmit = () => {
+  const c = clientById(ui.clientId), ob = c.ob;
+  for (let step = 1; step <= 6; step++) {
+    const errs = obErrors(ob, step);
+    if (Object.keys(errs).length) {
+      c.obStep = step; persist(); render(); setObErrors(errs); window.scrollTo(0, 0);
+      toast('Please answer the questions marked in red.');
+      return;
+    }
   }
-  const ob = c.ob;
+  ob.heightCm = ob.heightUnit === 'ftin' ? Math.round(parseFloat(ob.heightFt) * 30.48 + parseFloat(ob.heightIn) * 2.54) : parseFloat(ob.heightCm);
   ob.weightKg = Math.round((ob.weightUnit === 'kg' ? parseFloat(ob.weight) : lbToKg(parseFloat(ob.weight))) * 10) / 10;
   ob.submittedAt = new Date().toISOString();
   c.healthFlag = Object.values(ob.health).includes('yes');
   c.status = 'awaiting';
+  c.weighIns = [];
   persist(); render(); window.scrollTo(0, 0);
   toast('Thanks. Stefan is building your plan.');
 };
-
 /* --- Coach: clients and capacity --- */
 CH.weighDay = el => { const c = clientById(ui.coachClientId); c.ob.weighInDay = el.value; persist(); render(); toast('Weigh-in day saved.'); };
 CH.weighTime = el => { const c = clientById(ui.coachClientId); c.ob.weighInTime = el.value; persist(); render(); toast('Weigh-in time saved.'); };
@@ -2245,10 +2320,11 @@ function handleObInput(el) {
   if (el.type === 'checkbox') ob[k] = el.checked;
   else if (el.type === 'radio') { if (el.checked) ob[k] = el.value; }
   else ob[k] = el.value;
-  if (k === 'healthClearance') { clearObErr('healthClearance'); }
-  else clearObErr(k);
-  if (k === 'weightUnit' || k === 'weight') clearObErr('weight');
   persist();
+  if (k === 'heightUnit') { render(); return; }            // swaps the height inputs; answers are kept
+  if (k === 'heightFt' || k === 'heightIn') { clearObErr('heightCm'); return; }
+  if (k === 'weightUnit' || k === 'weight') { clearObErr('weight'); return; }
+  clearObErr(k);
 }
 
 /* ==========================================================================
