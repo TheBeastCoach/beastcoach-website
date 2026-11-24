@@ -81,7 +81,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .tab:hover{background:#F4F7F2}
 .tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .pill{display:inline-block;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:800;white-space:nowrap}
-.p-onboarding{background:#eef1f4;color:#3b4a57}.p-awaiting{background:#fff3d6;color:#8a5a00}.p-active{background:#d8f3e3;color:#1b5e3a}.p-paused{background:#e6ecff;color:#2c3e9a}.p-finished{background:#ececec;color:#444}.p-selflog{background:#f3e8ff;color:#6b2ca8}
+.p-onboarding{background:#eef1f4;color:#3b4a57}.p-awaiting{background:#fff3d6;color:#8a5a00}.p-active{background:#d8f3e3;color:#1b5e3a}.p-paused{background:#e6ecff;color:#2c3e9a}.p-finished{background:#ececec;color:#444}
 .need{display:inline-block;background:#fde7c2;color:#7a4a00;border-radius:8px;padding:3px 9px;font-size:12px;font-weight:800;margin:2px 4px 2px 0}
 .bar{height:10px;background:#E3EBE4;border-radius:99px;overflow:hidden}
 .bar>span{display:block;height:100%;border-radius:99px;background:var(--mint)}
@@ -160,6 +160,19 @@ summary::-webkit-details-marker{display:none}
 .progress span{display:block;height:100%;background:var(--amber);border-radius:99px}
 .ob-nav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:4px 0 24px}
 @media(max-width:699px){.ob-nav{flex-direction:column-reverse}.ob-nav button,.ob-nav .btn-ghost{width:100%}.ob-nav span{display:none}}
+
+.ob-msg{color:var(--red);font-weight:700;margin:4px 0 12px;min-height:0}
+.ob-msg:empty{display:none}
+.target-row{display:flex;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);align-items:center}
+.target-row:last-child{border-bottom:0}
+.target-val{font-family:'Bebas Neue',Impact,sans-serif;font-size:40px;line-height:1;white-space:nowrap}
+.target-val small{font-size:16px}
+.wo-set{display:grid;grid-template-columns:44px 1fr 1fr auto;gap:8px;align-items:center;margin-top:6px}
+.wo-set input{padding:8px 10px}
+.wo-head{font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.log-ex{padding:4px 0}
+.up-badge{display:inline-block;background:#d8f3e3;color:#1b5e3a;border:1px solid var(--mint);border-radius:999px;padding:1px 9px;font-size:12px;font-weight:800;margin-left:4px}
+.plans{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
 </style>
 </head>
 <body>
@@ -168,32 +181,35 @@ summary::-webkit-details-marker{display:none}
 <div id="sheetRoot"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<script src="/basic-targets.js"></script>
 <script>
 'use strict';
 
 /* ==========================================================================
    Constants
    ========================================================================== */
-const DB_KEY = 'bc_demo_v1';
+const DB_KEY = 'bc_demo_v2';
 const UI_KEY = 'bc_demo_ui';
 const DEMO_KEY_NAME = 'bc_demo_key';
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const DAYS_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const WEEKS = 12;
 const PAUSE_MAX = 14;
-const CAP_TIERS = ['essential','core','beast'];
+const CAP_TIERS = ['essential','core','beast'];          // capped: coach places
+const COACHED = ['essential','core','beast'];              // 12-week coaching plans
 const TIERS = {
-  essential: { name:'Essential', price:110, short:'$110 one-off', recur:false,
-    desc:'A plan built from your onboarding answers, delivered once. Meals, training and a check-in.' },
-  core: { name:'Core', price:299, short:'$299 for 12 weeks', recur:true,
-    desc:'12 weeks of coaching with your meal and training plans, weekly weigh-ins and check-ins.' },
-  beast: { name:'The Beast', price:699, short:'$699 for 12 weeks', recur:true,
+  basic: { name:'Basic', price:30, big:'$2.50', bigNote:'a week', short:'$2.50 a week, $30 billed every 12 weeks', recur:true, unlimited:true,
+    desc:'Self-run. Beast AI meal logging, daily steps, your weekly weigh-in and targets worked out for you. No coach, no plans, no calls.' },
+  essential: { name:'Essential', price:110, big:'$110', bigNote:'for 12 weeks', short:'$110 for 12 weeks', recur:true,
+    desc:'A meal and training plan built from your onboarding answers, with a coach behind it.' },
+  core: { name:'Core', price:299, big:'$299', bigNote:'for 12 weeks', short:'$299 for 12 weeks', recur:true,
+    desc:'12 weeks of coaching with your meal and training plans, weekly check-ins, and Stefan reviews the sets and reps you log.' },
+  beast: { name:'The Beast', price:699, big:'$699', bigNote:'for 12 weeks', short:'$699 for 12 weeks', recur:true,
     desc:'12 weeks of close, hands-on coaching in our smallest group. Our most supported option.' }
 };
 const STATUS = {
   onboarding:['Onboarding','p-onboarding'], awaiting:['Awaiting activation','p-awaiting'],
-  active:['Active','p-active'], paused:['Paused','p-paused'],
-  finished:['Finished','p-finished'], selflog:['Self-logging','p-selflog']
+  active:['Active','p-active'], paused:['Paused','p-paused'], finished:['Finished','p-finished']
 };
 const SOURCES = { ai:'Beast AI', plan:'From plan', builder:'Meal Builder', typed:'Typed in' };
 const FOOD_GROUPS = {
@@ -578,7 +594,7 @@ function blankOb(extra) {
   return Object.assign({
     age:'', sex:'', heightUnit:'cm', heightCm:'', heightFt:'', heightIn:'', weight:'', weightUnit:'kg', weightKg:null, whatsapp:'',
     timezone: (Intl.DateTimeFormat().resolvedOptions().timeZone || 'Australia/Melbourne'),
-    goal:'', timeframe:'', goalWhy:'',
+    goal:'', timeframe:'', goalWhy:'', goalKind:'', jobMult:'', trainingSessions:'', trainingIntensity:'',
     job:'', activity:'', steps:'',
     likedFoods:[], likedOther:'', avoid:'', allergies:'', diet:'',
     mealsPerDay:'', cookTime:'', whoCooks:'', eatsOut:'', alcohol:'', typicalDay:'',
@@ -592,6 +608,7 @@ function mkClient(o) {
   return Object.assign({
     id: uid(), name:'', email:'', tier:'essential', status:'onboarding', paid:null, createdAt: new Date().toISOString(),
     startDate:null, pauseUsed:0, pauseStart:null, healthFlag:false, ob: blankOb(), obStep: 1,
+    steps:{}, nextBilling:null, basicStage:null,
     weighIns:[], workouts:[], targets:null,
     plan:{ mealDraft: emptyDraft(), mealPublished: null, trainDraft:'', trainPublished: null, publishedAt: null },
     logs:{}, notes:''
@@ -607,11 +624,48 @@ function weighsOn(start, dayName, kgs) {
   }
   return out.map((date, i) => ({ date, kg: kgs[i] }));
 }
+// Seeded set and rep sessions: the last 7 days are 2.5 kg heavier on every other weighted exercise.
+function seedWorkouts(t, schedule) {
+  const out = [];
+  for (let back = 1; back <= 14; back++) {
+    const date = addDays(t, -back);
+    const day = schedule[DAYS[dowNum(date) - 1]];
+    if (!day) continue;
+    const recent = back <= 7;
+    const exercises = day.ex.map((e, i) => {
+      const [name, sets, reps, kg, unit] = e;
+      const up = recent && i % 2 === 0 && kg != null;
+      return {
+        name, planned: sets + 'x' + reps + (unit ? ' ' + unit : ''), skipped: false,
+        sets: Array.from({ length: sets }, (_, j) => ({
+          kg: kg == null ? null : (up ? kg + 2.5 : kg),
+          reps: (!recent && j === sets - 1) ? reps - 1 : reps
+        }))
+      };
+    });
+    out.push({ id: uid(), date, what: day.title, minutes: null, notes: '', session: { exercises } });
+  }
+  return out;
+}
+// Seeded steps for the last 14 days, a little different each day.
+function seedSteps(t, base) {
+  const out = {};
+  for (let back = 1; back <= 14; back++) out[addDays(t, -back)] = Math.round(base + ((back * 397) % 1700) - 600);
+  return out;
+}
 function seedDb() {
   const t = todayS();
   const samPlan = buildPlan(1);
   const jorPlan = buildPlan(1.3);
   const TIMES = ['07:30','12:30','16:00','19:00'];
+  const SAM_SCHEDULE = {
+    Mon: { title:'Full body A', ex:[['Squat',3,8,60],['Dumbbell row',3,10,22],['Bench press',3,8,50],['Plank',3,30,null,'sec']] },
+    Fri: { title:'Full body B', ex:[['Deadlift',3,5,80],['Bulgarian split squat',3,8,14],['Lat pulldown',3,10,45],['Dead bug',3,8,null]] }
+  };
+  const JORDAN_SCHEDULE = {
+    Mon: { title:'Lower body, squat focus', ex:[['Back squat',4,5,100],['Romanian deadlift',3,8,80],['Leg press',3,10,160],['Calf raise',3,12,60]] },
+    Thu: { title:'Lower body, deadlift focus', ex:[['Deadlift',4,4,120],['Walking lunges',3,10,20],['Hip thrust',3,10,90]] }
+  };
 
   const samLogs = {};
   for (let o = 0; o < 7; o++) {
@@ -652,12 +706,11 @@ function seedDb() {
       agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -9) + 'T18:00:00.000Z'
     }),
     weighIns: weighsOn(addDays(t, -9), 'Mon', [83.6]),
-    workouts: [
-      { id: uid(), date: addDays(t, -1), what:'Full body A: squat, row, press', minutes: 55, notes:'Felt good' },
-      { id: uid(), date: addDays(t, -3), what:'Bike intervals', minutes: 30, notes:'4 x 3 min hard' },
-      { id: uid(), date: addDays(t, -5), what:'Full body B: deadlift, lunges, pull-ups', minutes: 60, notes:'' }
-    ],
-    targets: { calories:2000, protein:140, carbs:200, fat:70, fibre:28 },
+    workouts: seedWorkouts(t, SAM_SCHEDULE).concat([
+      { id: uid(), date: addDays(t, -3), what:'Bike intervals', minutes: 30, notes:'4 x 3 min hard' }
+    ]),
+    steps: seedSteps(t, 6600),
+    targets: { calories:2000, protein:140, carbs:200, fat:70, fibre:28, steps:8000 },
     plan: { mealDraft: draftFromPlan(samPlan), mealPublished: samPlan, trainDraft: SAM_TRAIN, trainPublished: SAM_TRAIN, publishedAt: addDays(t, -9) + 'T12:00:00.000Z' },
     logs: samLogs,
     notes: 'Keep the step count up. Skip heavy squats this week if the knee flares. Responds well to short voice notes.'
@@ -680,6 +733,7 @@ function seedDb() {
       agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -1) + 'T18:30:00.000Z'
     }),
     weighIns: [],
+    steps: seedSteps(t, 9000),
     logs: { [t]: [ { id: uid(), time:'08:10', name:'Overnight oats', calories:350, protein:22, carbs:48, fat:9, fibre:8,
       source:'typed', ai:null, edited:false, text:'' } ] },
     notes: ''
@@ -705,19 +759,47 @@ function seedDb() {
       agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -35) + 'T20:00:00.000Z'
     }),
     weighIns: weighsOn(addDays(t, -29), 'Wed', [100.8, 100.2, 99.7, 99.2]),
-    workouts: [ { id: uid(), date: addDays(t, -2), what:'Lower body, squat focus', minutes: 85, notes:'' } ],
-    targets: { calories:2600, protein:190, carbs:260, fat:80, fibre:35 },
+    workouts: seedWorkouts(t, JORDAN_SCHEDULE).concat([
+      { id: uid(), date: addDays(t, -2), what:'Conditioning, 20 min bike', minutes: 20, notes:'' }
+    ]),
+    steps: seedSteps(t, 8800),
+    targets: { calories:2600, protein:190, carbs:260, fat:80, fibre:35, steps:9000 },
     plan: { mealDraft: jorDraft, mealPublished: jorPlan, trainDraft: JORDAN_TRAIN, trainPublished: JORDAN_TRAIN, publishedAt: addDays(t, -29) + 'T12:00:00.000Z' },
     logs: {},
     notes: 'Shoulder: no overhead pressing until physio clears it.'
   });
 
+  // Basic client: targets from the same maths as the calculator page.
+  const alexStart = addDays(t, -20);
+  const alexT = BasicTargets.calcTargets({ sex:'male', age:29, heightCm:180, weightKg:92, activity:1.15, steps:6000, trainingSessions:3, trainingIntensity:350, goal:'fatloss' });
+  const alex = mkClient({
+    id:'c_alex', name:'Alex Lee', email:'alex@example.com', tier:'basic', status:'active',
+    paid:{ date: alexStart, amount: 30 }, createdAt: alexStart + 'T09:00:00.000Z',
+    startDate: alexStart, nextBilling: addDays(alexStart, 84),
+    ob: blankOb({
+      age:'29', sex:'Male', heightUnit:'cm', heightCm:'180', weight:'92', weightUnit:'kg', weightKg:92, whatsapp:'',
+      goalKind:'fatloss', jobMult:'1.15', steps:'6000', trainingSessions:'3', trainingIntensity:'350',
+      weighInDay:'Sat', weighInTime:'08:00', agreeNotCoach:true, agreeTerms:true, submittedAt: alexStart + 'T09:00:00.000Z'
+    }),
+    weighIns: weighsOn(alexStart, 'Sat', [91.2]),
+    steps: seedSteps(t, 5600),
+    targets: Object.assign({}, alexT, { steps: BasicTargets.stepsTarget(6000) }),
+    logs: {
+      [t]: [
+        { id: uid(), time:'07:45', name:'Greek yoghurt with berries', calories:320, protein:24, carbs:34, fat:8, fibre:5, source:'ai',
+          ai:{ calories:320, protein:24, carbs:34, fat:8, fibre:5 }, edited:false, text:'200g Greek yoghurt, 80g berries, 10g honey' },
+        { id: uid(), time:'13:10', name:'Chicken wrap', calories:560, protein:38, carbs:52, fat:18, fibre:6, source:'ai',
+          ai:{ calories:520, protein:36, carbs:50, fat:17, fibre:5 }, edited:true, text:'1 wrap, 120g chicken breast, salad, sauce' }
+      ]
+    }
+  });
+
   return {
     version: 1,
     capacity: { essential: 100, core: 25, beast: 4 },
-    exercises: {},
     waitlist: [],
-    clients: [ sam, mia, jordan ]
+    clients: [ sam, mia, jordan, alex ],
+    exercises: {}
   };
 }
 
@@ -840,7 +922,7 @@ function needsYou(c) {
 }
 function statusPill(s) { const [label, cls] = STATUS[s] || [s, '']; return `<span class="pill ${cls}">${esc(label)}</span>`; }
 function weekLabel(c) {
-  if (c.tier === 'essential' || !c.startDate) return c.tier === 'essential' ? 'n/a' : '-';
+  if (!c.startDate) return '-';
   if (c.status === 'finished') return WEEKS + ' of ' + WEEKS;
   if (c.status === 'onboarding' || c.status === 'awaiting') return '-';
   return weekOf(c) + ' of ' + WEEKS;
@@ -986,7 +1068,7 @@ function render() {
   } else if (ui.view === 'client') {
     const c = clientById(ui.clientId);
     if (!c) { ui.view = 'coach'; saveUi(); return render(); }
-    app.innerHTML = c.status === 'onboarding' ? renderOnboardingPage(c) : renderClientPage(c);
+    app.innerHTML = c.status === 'onboarding' ? (c.tier === 'basic' ? renderBasicPage(c) : renderOnboardingPage(c)) : renderClientPage(c);
   } else {
     app.innerHTML = ui.newStep === 'checkout' ? renderCheckout() : renderPlanPicker();
   }
@@ -1010,11 +1092,16 @@ function renderBar() {
 /* ==========================================================================
    New client: plan picker, checkout
    ========================================================================== */
+/* ==========================================================================
+   New client: plan picker (four plans) and checkout
+   ========================================================================== */
 function renderPlanPicker() {
-  const cards = Object.keys(TIERS).map(t => {
+  const order = ['basic', 'essential', 'core', 'beast'];
+  const cards = order.map(t => {
     const T = TIERS[t];
     const full = CAP_TIERS.includes(t) && spotsLeft(t) <= 0;
-    const spots = full ? '<b class="c-red">Full right now</b>' : `<b class="c-green">${spotsLeft(t)} spots left</b>`;
+    const spots = T.unlimited ? '<b class="c-green">Unlimited spots</b>'
+      : full ? '<b class="c-red">Full right now</b>' : `<b class="c-green">${spotsLeft(t)} spots left</b>`;
     const action = full
       ? `<label for="wl-${t}" class="mini">Email me when a spot opens</label>
          <div class="row" style="flex-wrap:nowrap"><input id="wl-${t}" type="email" placeholder="you@example.com" style="flex:1">
@@ -1023,8 +1110,9 @@ function renderPlanPicker() {
       : `<button data-act="buy" data-t="${t}">Choose ${esc(T.name)}</button>`;
     return `<div class="card plan-card">
       <h3>${esc(T.name)}</h3>
-      <div class="price">$${T.price}</div>
-      <div class="muted">${esc(T.short)}</div>
+      <div class="price">${esc(T.big)}</div>
+      <div class="muted">${esc(T.bigNote)}</div>
+      <div class="mini">${esc(T.short)}</div>
       <p>${esc(T.desc)}</p>
       <div>${spots}</div>
       <div style="margin-top:auto;padding-top:8px">${action}</div>
@@ -1032,7 +1120,7 @@ function renderPlanPicker() {
   }).join('');
   return `<section class="hero">
       <h1>Choose your plan</h1>
-      <p class="muted" style="margin:0">Pick a plan, fill in onboarding, and Stefan builds it from your answers.</p>
+      <p class="muted" style="margin:0">Pick a plan. Coaching plans get a start date from Stefan. Basic you run yourself.</p>
     </section>
     <div class="plans">${cards}</div>
     <p class="fine" style="margin-top:12px">Demo only. No payment is taken.</p>`;
@@ -1040,22 +1128,131 @@ function renderPlanPicker() {
 function renderCheckout() {
   const t = ui.newTier && TIERS[ui.newTier] ? ui.newTier : 'core';
   const T = TIERS[t];
-  return `<section class="hero"><h1>Checkout</h1><p class="muted" style="margin:0">${esc(T.name)}, ${esc(T.short)}</p></section>
+  const what = t === 'basic'
+    ? 'Basic: $2.50 a week, $30 billed every 12 weeks. No meal plan, no training plan, no calls and no contact with Stefan.'
+    : `${T.name}: ${T.short}.`;
+  return `<section class="hero"><h1>Checkout</h1><p class="muted" style="margin:0">${esc(what)}</p></section>
     <div class="card" style="max-width:560px">
       <div class="field"><label for="nc-name">Full name</label><input id="nc-name" autocomplete="name"><div class="err" id="err-nc-name"></div></div>
       <div class="field"><label for="nc-email">Email</label><input id="nc-email" type="email" autocomplete="email"><div class="err" id="err-nc-email"></div></div>
       <div class="note-box" style="margin-bottom:12px">No payment is taken in the demo.</div>
       <p class="fine" style="margin-bottom:14px">Full refund any time before your plan starts. No refunds once your plan is delivered.</p>
       <div class="row" style="justify-content:flex-start">
-        <button data-act="pay" data-t="${t}">Pay ${money(T.price)} (demo)</button>
+        <button data-act="pay" data-t="${t}">Pay ${money(T.price)}${t === 'basic' ? ' every 12 weeks' : ''} (demo)</button>
         <button class="btn-ghost" data-act="newBack">Back</button>
       </div>
     </div>`;
 }
 
 /* ==========================================================================
-   Onboarding (client). Built once; validation updates error text in place.
+   Basic: one-screen onboarding, then the daily targets screen
    ========================================================================== */
+const BASIC_GOALS = [['fatloss', 'Lose fat'], ['maintain', 'Maintain'], ['muscle', 'Build muscle']];
+const BASIC_JOBS = [['1.15', 'Desk job, mostly sitting'], ['1.25', 'On my feet sometimes'], ['1.35', 'Physically demanding job']];
+const BASIC_INTENSITY = [['200', 'Light'], ['350', 'Moderate'], ['500', 'Hard']];
+function obRadioMap(ob, k, label, pairs) {
+  return `<div class="field"><label>${label}</label>
+    <div class="chips">${pairs.map(([v, l]) => `<label class="chip"><input type="radio" name="ob-${k}" value="${esc(v)}" data-ob="${k}" ${ob[k] === v ? 'checked' : ''}>${esc(l)}</label>`).join('')}</div>
+    <div class="err" id="err-${k}"></div></div>`;
+}
+function basicInputs(ob, weightKg) {
+  return {
+    sex: ob.sex === 'Female' ? 'female' : 'male', age: parseFloat(ob.age), heightCm: parseFloat(ob.heightCm), weightKg,
+    activity: parseFloat(ob.jobMult), steps: parseFloat(ob.steps), trainingSessions: parseFloat(ob.trainingSessions),
+    trainingIntensity: parseFloat(ob.trainingIntensity), goal: ob.goalKind
+  };
+}
+function basicErrors(ob) {
+  const e = {}, n = v => parseFloat(v);
+  if (!(n(ob.age) >= 18 && n(ob.age) <= 100)) e.age = n(ob.age) > 0 && n(ob.age) < 18 ? 'Coaching is for adults 18 and over.' : 'Enter your age (18 to 100).';
+  if (!['Male', 'Female'].includes(ob.sex)) e.sex = OB_CHOOSE;
+  if (ob.heightUnit === 'ftin') {
+    if (!(n(ob.heightFt) >= 3 && n(ob.heightFt) <= 8 && n(ob.heightIn) >= 0 && n(ob.heightIn) <= 11)) e.heightCm = 'Enter your height: feet (3 to 8) and inches (0 to 11).';
+  } else if (!(n(ob.heightCm) >= 100 && n(ob.heightCm) <= 250)) e.heightCm = 'Enter your height in cm (100 to 250).';
+  if (!(n(ob.weight) > 0)) e.weight = 'Enter your current weight.';
+  if (!BASIC_GOALS.some(([v]) => v === ob.goalKind)) e.goalKind = OB_CHOOSE;
+  if (!BASIC_JOBS.some(([v]) => v === ob.jobMult)) e.jobMult = OB_CHOOSE;
+  if (!(n(ob.steps) >= 0 && n(ob.steps) <= 60000) || ob.steps === '') e.steps = 'Enter your average steps a day (0 to 60,000).';
+  if (!(n(ob.trainingSessions) >= 0 && n(ob.trainingSessions) <= 14) || ob.trainingSessions === '') e.trainingSessions = 'Enter how many sessions a week (0 if none).';
+  if (!BASIC_INTENSITY.some(([v]) => v === ob.trainingIntensity)) e.trainingIntensity = OB_CHOOSE;
+  if (!ob.agreeNotCoach) e.agreeNotCoach = 'Please confirm you understand this is general guidance.';
+  if (!ob.agreeTerms) e.agreeTerms = 'Please agree to the terms and billing.';
+  return e;
+}
+function renderBasicPage(c) {
+  if (c.basicStage === 'targets') return renderBasicTargets(c);
+  const ob = c.ob;
+  const unit = ob.heightUnit || 'cm';
+  const heightBlock = unit === 'cm'
+    ? obInput(ob, 'heightCm', 'Height (cm)', 'number', 'e.g. 175', 'min="100" max="250" inputmode="numeric"')
+    : `<div class="grid2">
+        <div class="field"><label for="ob-heightFt">Feet</label><input id="ob-heightFt" type="number" min="3" max="8" inputmode="numeric" data-ob="heightFt" value="${esc(ob.heightFt)}"></div>
+        <div class="field"><label for="ob-heightIn">Inches</label><input id="ob-heightIn" type="number" min="0" max="11" inputmode="numeric" data-ob="heightIn" value="${esc(ob.heightIn)}"></div>
+       </div><div class="err" id="err-heightCm"></div>`;
+  return `<section class="hero">
+      <div class="eyebrow">Basic: one screen</div>
+      <h1 style="margin-top:6px">Your details</h1>
+      <p class="muted" style="margin:10px 0 0">Answer these and your daily targets are worked out for you. Answers save as you type.</p>
+    </section>
+    <form id="onboardForm" novalidate>
+      <div class="card"><h3>About you</h3>
+        <div class="grid2">
+          ${obInput(ob, 'age', 'Age', 'number', 'e.g. 32', 'min="18" max="100" inputmode="numeric"')}
+          ${obRadioMap(ob, 'sex', 'Sex', [['Male', 'Male'], ['Female', 'Female']])}
+        </div>
+        <div class="field"><label>Height unit</label><div class="chips">
+          <label class="chip"><input type="radio" name="ob-heightUnit" value="cm" data-ob="heightUnit" ${unit === 'cm' ? 'checked' : ''}>cm</label>
+          <label class="chip"><input type="radio" name="ob-heightUnit" value="ftin" data-ob="heightUnit" ${unit === 'ftin' ? 'checked' : ''}>ft / in</label></div></div>
+        ${heightBlock}
+        <div class="field"><label for="ob-weight">Current weight</label>
+          <div class="row" style="flex-wrap:nowrap"><input id="ob-weight" type="number" step="0.1" min="0" inputmode="decimal" data-ob="weight" value="${esc(ob.weight)}" style="flex:1">
+          <select data-ob="weightUnit" style="width:90px"><option value="kg" ${ob.weightUnit === 'kg' ? 'selected' : ''}>kg</option><option value="lb" ${ob.weightUnit === 'lb' ? 'selected' : ''}>lb</option></select></div>
+          <div class="err" id="err-weight"></div></div>
+      </div>
+      <div class="card"><h3>Goal and day</h3>
+        ${obRadioMap(ob, 'goalKind', 'Goal', BASIC_GOALS)}
+        ${obRadioMap(ob, 'jobMult', 'Job activity', BASIC_JOBS)}
+        ${obInput(ob, 'steps', 'Average steps a day', 'number', 'e.g. 6000', 'min="0" max="60000" inputmode="numeric"')}
+      </div>
+      <div class="card"><h3>Training</h3>
+        ${obInput(ob, 'trainingSessions', 'Training sessions a week', 'number', 'e.g. 3', 'min="0" max="14" inputmode="numeric"')}
+        ${obRadioMap(ob, 'trainingIntensity', 'How hard are they?', BASIC_INTENSITY)}
+      </div>
+      <div class="card"><h3>Weekly weigh-in</h3>
+        <div class="grid2">
+          ${obSelect(ob, 'weighInDay', 'Weigh-in day', DAYS)}
+          <div class="field"><label for="ob-weighInTime">Weigh-in time</label>
+            <select id="ob-weighInTime" data-ob="weighInTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${(ob.weighInTime || '07:00') === t ? 'selected' : ''}>${fmtTime(t)}</option>`).join('')}</select>
+            <p class="mini" style="margin:6px 0 0">Same day, same time each week, after the toilet and before eating or drinking.</p></div>
+        </div>
+      </div>
+      <div class="card"><h3>Agreements</h3>
+        ${obAgree(ob, 'agreeNotCoach', 'I understand this is general guidance, not medical advice.')}
+        ${obAgree(ob, 'agreeTerms', 'I agree to the terms. Basic is $2.50 a week, billed as $30 every 12 weeks.')}
+      </div>
+      <p class="ob-msg" id="obMsg" role="alert"></p>
+      <div class="ob-nav"><span></span><button type="button" data-act="basicSubmit">See my daily targets</button></div>
+    </form>`;
+}
+function renderBasicTargets(c) {
+  const t = c.targets;
+  const rows = [
+    ['Calories', t.calories, 'kcal', 'Your daily energy target. Eating around this, with your steps and training, moves your weight toward your goal.'],
+    ['Protein', t.protein, 'g', 'Protein helps you build and keep muscle while you diet. Aim to hit it most days.'],
+    ['Carbs', t.carbs, 'g', 'Carbs fuel your training and make the rest of the day easier to get through.'],
+    ['Fat', t.fat, 'g', 'Fat keeps your hormones and appetite steady. Keep close to this figure.'],
+    ['Fibre', t.fibre, 'g', 'Fibre keeps you full and your digestion regular. Vegetables, fruit, oats and beans all help.'],
+    ['Steps', fmtSteps(t.steps), 'a day', 'Daily steps add to what you burn. Build up to this every day.']
+  ];
+  return `<section class="hero"><div class="eyebrow">Your daily targets</div>
+      <h1 style="margin-top:6px">Your daily targets</h1>
+      <p class="muted" style="margin:10px 0 0">Worked out from your answers with the same maths as our calculator. Update them from Progress after your weigh-ins.</p></section>
+    <div class="card">${rows.map(([name, val, unit, text]) => `<div class="target-row">
+      <div><b>${esc(name)}</b><div class="mini">${esc(text)}</div></div>
+      <div class="target-val">${esc(val)}<small> ${esc(unit)}</small></div></div>`).join('')}</div>
+    <button data-act="basicStart" style="width:100%">Start tracking</button>`;
+}
+
 function keyOf(x) {
   return String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean)
     .map(w => (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) ? w.slice(0, -1) : w).join(' ');
@@ -1167,7 +1364,7 @@ function stepAbout(ob) {
        </div><div class="err" id="err-heightCm"></div>`;
   return `<div class="card"><h3>About you</h3>
     <div class="grid2">
-      ${obInput(ob, 'age', 'Age', 'number', 'e.g. 32', 'min="10" max="100" inputmode="numeric"')}
+      ${obInput(ob, 'age', 'Age', 'number', 'e.g. 32', 'min="18" max="100" inputmode="numeric"')}
       ${obSelect(ob, 'sex', 'Sex', ['Prefer not to say', 'Female', 'Male', 'Other'])}
     </div>
     <div class="field"><label>Height unit</label><div class="chips">${unitChip('cm', 'cm')}${unitChip('ftin', 'ft / in')}</div></div>
@@ -1285,6 +1482,7 @@ function renderOnboardingPage(c) {
     </section>
     <form id="onboardForm" novalidate>
       ${OB_STEP_HTML[step](ob)}
+      <p class="ob-msg" id="obMsg" role="alert"></p>
       <div class="ob-nav">
         ${step > 1 ? '<button type="button" class="btn-ghost" data-act="obBack">Back</button>' : '<span></span>'}
         <button type="button" data-act="${last ? 'obSubmit' : 'obNext'}">${last ? 'Send my answers to Stefan' : 'Next'}</button>
@@ -1301,7 +1499,7 @@ function clearObErr(key) {
 function obErrors(ob, step) {
   const e = {}, n = v => parseFloat(v);
   if (step === 1) {
-    if (!(n(ob.age) >= 10 && n(ob.age) <= 100)) e.age = 'Enter your age (10 to 100).';
+    if (!(n(ob.age) >= 18 && n(ob.age) <= 100)) e.age = n(ob.age) > 0 && n(ob.age) < 18 ? 'Coaching is for adults 18 and over.' : 'Enter your age (18 to 100).';
     if (ob.heightUnit === 'ftin') {
       if (!(n(ob.heightFt) >= 3 && n(ob.heightFt) <= 8 && n(ob.heightIn) >= 0 && n(ob.heightIn) <= 11)) e.heightCm = 'Enter your height: feet (3 to 8) and inches (0 to 11).';
     } else if (!(n(ob.heightCm) >= 100 && n(ob.heightCm) <= 250)) e.heightCm = 'Enter your height in cm (100 to 250).';
@@ -1353,95 +1551,193 @@ function setObErrors(errs) {
   if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
+/* ==========================================================================
+   Client pages: status, Today (meals, steps, sets and reps, weigh-in), Progress
+   ========================================================================== */
+const STEPS_COLOUR = '#2FA36B';
+function fmtKg(kg) { return ui.unit === 'kg' ? (Math.round(kg * 10) / 10) + ' kg' : (Math.round(kgToLb(kg) * 10) / 10) + ' lb'; }
+function fmtSteps(n) { return Number(n).toLocaleString('en-AU'); }
+// Plan sessions from the coach's published training plan: "Mon: Full body A" then "- Squat 3x8" lines.
+function planSessions(c) {
+  const out = [];
+  let cur = null;
+  (c.plan.trainPublished || '').split('\n').forEach(raw => {
+    const h = raw.match(/^\s*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*\s*:\s*(.*)$/i);
+    if (h) {
+      cur = { day: DAYS.findIndex(d => d.toLowerCase() === h[1].slice(0, 3).toLowerCase()) + 1, title: h[2].trim() || h[1], exercises: [] };
+      out.push(cur);
+      return;
+    }
+    const m = raw.match(/^\s*-\s+(.*)$/);
+    if (m && cur) {
+      const line = m[1];
+      const sr = line.match(/(\d+)\s*[x×]\s*(\d+)/);
+      cur.exercises.push({
+        name: exerciseName(line) || line.trim(), planned: line.trim(),
+        sets: sr ? parseInt(sr[1], 10) : 1, reps: sr ? parseInt(sr[2], 10) : null,
+        unit: /\bsec/i.test(line) ? 'sec' : ''
+      });
+    }
+  });
+  return out;
+}
+// Keeps the workout form state for the day being viewed.
+function woState(day, sessions) {
+  let wo = ui.wo;
+  if (!wo || wo.day !== day) wo = ui.wo = { day, mode: sessions.length ? 'plan' : 'other', ex: null, notes: '', what: '', minutes: '' };
+  if (wo.mode === 'plan' && sessions.length && !wo.ex) {
+    wo.ex = sessions[0].exercises.map(e => ({
+      name: e.name, planned: e.planned, unit: e.unit, skipped: false,
+      sets: Array.from({ length: e.sets }, () => ({ w: '', r: e.reps != null ? String(e.reps) : '' }))
+    }));
+  }
+  if (wo.mode === 'plan' && !sessions.length) wo.mode = 'other';
+  return wo;
+}
+function sessionSummary(w) {
+  if (!w.session) return '';
+  return w.session.exercises.map(e => {
+    if (e.skipped) return `<div class="mini">${esc(e.name)}: skipped</div>`;
+    const sets = e.sets.map(st => {
+      const kg = st.kg != null ? fmtKg(st.kg) + ' x ' : '';
+      const reps = st.reps != null ? st.reps + (e.unit === 'sec' ? ' sec' : '') : '-';
+      return kg + reps;
+    });
+    return `<div class="mini">${esc(e.name)}: ${esc(sets.join(', ') || 'no sets')}</div>`;
+  }).join('');
+}
+function stepsCard(c, day) {
+  const v = c.steps[day];
+  const target = c.targets && c.targets.steps;
+  const hit = target && v >= target;
+  const pct = target && v ? Math.min(100, Math.round(v / target * 100)) : 0;
+  const label = !v ? (target ? `Not logged yet. Target ${fmtSteps(target)} steps` : 'Not logged yet')
+    : target ? `${fmtSteps(v)} of ${fmtSteps(target)} steps` : `${fmtSteps(v)} steps`;
+  return `<div class="card"><h3>Steps</h3>
+    <div class="metric"><div class="top"><span><b>${pday(day)}</b></span><span style="color:${hit ? '#1b7a46' : 'var(--ink)'}">${label}</span></div>
+      ${target ? `<div class="bar"><span style="width:${pct}%;background:${hit ? '#1b7a46' : STEPS_COLOUR}"></span></div>` : '<p class="mini" style="margin:0">Your steps target is set by your coach.</p>'}</div>
+    <div class="row" style="flex-wrap:nowrap"><input id="st-val" type="number" inputmode="numeric" min="0" max="60000" value="${v || ''}" placeholder="Steps" aria-label="Steps for the day" style="flex:1"><button data-act="saveSteps">Save steps</button></div>
+  </div>`;
+}
+function pday(day) { return day === todayS() ? 'Today' : fmtDate(day); }
+function workoutCard(c, day) {
+  const sessions = planSessions(c).filter(s => s.day === dowNum(day));
+  const wo = woState(day, sessions);
+  const logged = (c.workouts || []).filter(w => w.date === day);
+  const loggedHtml = logged.length ? logged.map(w => `<div class="meal"><div style="flex:1 1 220px">
+      <b>${esc(w.what)}</b> <span class="mini">${w.session ? 'Sets and reps' : (w.minutes ? w.minutes + ' min' : '')}</span>
+      ${w.notes ? `<div class="mini">${esc(w.notes)}</div>` : ''}${sessionSummary(w)}</div>
+      <button class="btn-danger btn-sm" data-act="deleteWorkout" data-id="${esc(w.id)}">Delete</button></div>`).join('')
+    : '<p class="muted">Nothing logged for this day.</p>';
+  const tabs = `<div class="tabs" style="margin-bottom:10px">
+    ${sessions.length ? `<button class="tab ${wo.mode === 'plan' ? 'on' : ''}" data-act="woMode" data-m="plan">${esc(sessions[0].title)}</button>` : ''}
+    <button class="tab ${wo.mode === 'other' ? 'on' : ''}" data-act="woMode" data-m="other">Other activity</button></div>`;
+  let form = '';
+  if (wo.mode === 'plan') {
+    form = (wo.ex || []).map((e, i) => `<div style="border-top:1px solid var(--line);padding:12px 0">
+        <div class="row"><b>${esc(e.name)}</b>
+          <label class="check" style="margin:0"><input type="checkbox" data-woskip="${i}" ${e.skipped ? 'checked' : ''}>Skipped</label></div>
+        <div class="mini">Planned: ${esc(e.planned)}</div>
+        ${e.skipped ? '' : `<div class="wo-sets">
+          <div class="wo-set wo-head mini"><span>Set</span><span>Weight (${ui.unit})</span><span>${e.unit === 'sec' ? 'Seconds' : 'Reps'}</span><span></span></div>
+          ${e.sets.map((st, j) => `<div class="wo-set"><span class="mini">${j + 1}</span>
+            <input type="number" inputmode="decimal" step="0.5" min="0" data-wo="w" data-i="${i}" data-j="${j}" value="${esc(st.w)}" placeholder="${ui.unit}" aria-label="Weight in ${ui.unit}, set ${j + 1}">
+            <input type="number" inputmode="numeric" min="0" data-wo="r" data-i="${i}" data-j="${j}" value="${esc(st.r)}" aria-label="${e.unit === 'sec' ? 'Seconds' : 'Reps'}, set ${j + 1}">
+            <button class="btn-ghost btn-sm" data-act="woSetDel" data-i="${i}" data-j="${j}">Remove</button></div>`).join('')}
+          <button class="btn-ghost btn-sm" data-act="woSetAdd" data-i="${i}" style="margin-top:8px">Add set</button></div>`}
+      </div>`).join('') + `<div class="field"><label for="wo-notes">Notes (optional)</label>
+        <textarea id="wo-notes" data-wo="notes" style="min-height:70px">${esc(wo.notes)}</textarea></div>`;
+  } else {
+    form = `<div class="stack">
+      <div class="field" style="margin:0"><label for="wo-what">What</label><input id="wo-what" data-wo="what" value="${esc(wo.what)}" placeholder="e.g. Football, a walk with the dog"></div>
+      <div class="grid2"><div class="field" style="margin:0"><label for="wo-min">Minutes</label><input id="wo-min" type="number" min="0" inputmode="numeric" data-wo="minutes" value="${esc(wo.minutes)}"></div>
+      <div class="field" style="margin:0"><label for="wo-notes">Notes</label><input id="wo-notes" data-wo="notes" value="${esc(wo.notes)}"></div></div>
+    </div>`;
+  }
+  return `<div class="card"><h3>Workout</h3>
+    <p class="mini" style="margin-top:0">${sessions.length ? 'Log the sets you actually did. Stefan reviews them.' : 'No session is planned for this day. Log what you did.'}</p>
+    ${loggedHtml}
+    <div style="margin-top:12px">${tabs}${form}</div>
+    <button data-act="saveWorkout" style="margin-top:8px">Save workout</button>
+  </div>`;
+}
+
 function statusLine(c) {
   const s = c.status;
-  if (s === 'onboarding') return 'Finish your onboarding so Stefan can build your plan.';
+  if (s === 'onboarding') return c.tier === 'basic' ? 'Finish your setup to get your daily targets.' : 'Finish your onboarding so Stefan can build your plan.';
   if (s === 'awaiting') {
     return hasPlanMeals(c.plan.mealPublished)
       ? planReadyCopy(c)
       : 'Stefan is building your plan. It will be ready within 3 business days. You can start logging meals now.';
   }
+  if (c.tier === 'basic' && s === 'active') return `Basic. $2.50 a week, billed every 12 weeks. Next billing: ${fmtDate(c.nextBilling)}.`;
   if (s === 'active') {
-    if (c.tier === 'essential') return 'Your plan is active. Weigh-in day: ' + (DAYS_FULL[DAYS.indexOf(c.ob.weighInDay)] || c.ob.weighInDay) + '.';
     return `Week ${weekOf(c)} of ${WEEKS}. Ends ${fmtDate(endDateOf(c))}. Weigh-in day: ${DAYS_FULL[DAYS.indexOf(c.ob.weighInDay)] || c.ob.weighInDay}.`;
   }
   if (s === 'paused') return `Paused since ${fmtDate(c.pauseStart)}. Pause days used: ${c.pauseUsed + diffDays(c.pauseStart || todayS(), todayS())} of ${PAUSE_MAX}. Stefan will resume you when you are ready.`;
-  if (s === 'finished') return 'Your plan is finished. Renew with 20% off and keep your place, or keep logging for AUD $15 per 12 weeks.';
-  if (s === 'selflog') return 'Self-logging. $15 per 12 weeks.';
+  if (s === 'finished') return 'Your 12 weeks are finished. Renew with 20% off and keep your place, or drop to Basic for $30 every 12 weeks.';
   return '';
+}
+function planReadyCopy(c) {
+  if (c.tier === 'beast') return 'Your plan is ready to read. Message Stefan on WhatsApp to book your call and pick a start date.';
+  if (c.tier === 'core') return 'Your plan is ready to read. Bring it to your weekly check-in to book your call and pick a start date.';
+  return 'Your plan is ready to read. Stefan will email you to book your call and pick a start date.';
 }
 function clientStatusCard(c) {
   let extra = '';
   if (c.status === 'finished') {
     extra = `<div class="row" style="margin-top:10px;justify-content:flex-start">
-      ${c.tier !== 'essential' ? `<button data-act="renew">Renew with 20% off: ${money(TIERS[c.tier].price * 0.8)}</button>` : ''}
-      <button class="btn-ghost" data-act="keepLogging">Keep logging for $15 per 12 weeks</button></div>`;
+      ${COACHED.includes(c.tier) ? `<button data-act="renew">Renew with 20% off: ${money(TIERS[c.tier].price * 0.8)}</button>` : ''}
+      <button class="btn-ghost" data-act="dropBasic">Drop to Basic: $30 per 12 weeks</button></div>`;
   }
+  const whatsapp = c.tier === 'beast' && c.status !== 'finished'
+    ? '<div style="margin-top:12px"><a class="btn btn-amber btn-sm" href="https://wa.me/" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>' : '';
   return `<section class="hero">
     <div class="row"><div><div class="muted">Hi ${esc(c.name.split(' ')[0])}</div><h1>${esc(TIERS[c.tier].name)}</h1></div>
     <div>${statusPill(c.status)}</div></div>
-    <p class="status-line" style="margin:12px 0 0">${esc(statusLine(c))}</p>${extra}
-    ${c.tier === 'beast' && c.status !== 'finished' && c.status !== 'selflog'
-      ? '<div style="margin-top:12px"><a class="btn btn-amber btn-sm" href="https://wa.me/" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>' : ''}
+    <p class="status-line" style="margin:12px 0 0">${esc(statusLine(c))}</p>${extra}${whatsapp}
   </section>`;
 }
 function renderClientPage(c) {
-  const tabs = [['today','Today'],['plan','My plan'],['progress','Progress']];
+  const basic = c.tier === 'basic';
+  const tabs = basic ? [['today', 'Today'], ['progress', 'Progress']] : [['today', 'Today'], ['plan', 'My plan'], ['progress', 'Progress']];
+  if (basic && ui.clientTab === 'plan') ui.clientTab = 'today';
   const body = ui.clientTab === 'plan' ? renderClientPlan(c) : ui.clientTab === 'progress' ? renderProgress(c, false) : renderToday(c);
   return clientStatusCard(c) + `<nav class="tabs">${tabs.map(t => `<button class="tab ${ui.clientTab === t[0] ? 'on' : ''}" data-act="clientTab" data-tab="${t[0]}">${t[1]}</button>`).join('')}</nav>` + body;
 }
 function renderToday(c) {
+  const basic = c.tier === 'basic';
   const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
   const isToday = day === todayS();
   const meals = c.logs[day] || [];
   const tot = sumNut(meals);
   const tg = c.targets;
-  const unit = ui.unit;
   const bars = NUT.map(k => barHtml(k, Math.round(tot[k]), tg ? tg[k] : null)).join('');
-  const mode = ui.addMode;
-  const modeBtns = [['describe','Describe it'],['plan','From my plan'],['builder','Meal Builder']]
+  const mode = basic ? 'describe' : ui.addMode;
+  const modeBtns = basic ? '' : [['describe', 'Describe it'], ['plan', 'From my plan'], ['builder', 'Meal Builder']]
     .map(m => `<button class="tab ${mode === m[0] ? 'on' : ''}" data-act="addMode" data-m="${m[0]}">${m[1]}</button>`).join('');
-
-  let addPanel = '';
-  if (mode === 'describe') addPanel = describePanel(c);
-  else if (mode === 'plan') addPanel = planPanel(c, day);
-  else addPanel = builderPanel(c);
-
+  const addPanel = mode === 'describe' ? describePanel(c) : mode === 'plan' ? planPanel(c, day) : builderPanel(c);
   const mealsHtml = meals.length
     ? meals.map(m => ui.editId === m.id ? mealEditHtml(m, 'e-') : mealRowHtml(m)).join('')
     : '<p class="muted">No meals logged for this day yet.</p>';
-
-  const wos = (c.workouts || []).filter(w => w.date === day);
-  const woHtml = wos.length ? wos.map(w => `<div class="meal"><div><b>${esc(w.what)}</b><div class="mini">${w.minutes} min${w.notes ? ' · ' + esc(w.notes) : ''}</div></div>
-      <button class="btn-danger btn-sm" data-act="deleteWorkout" data-id="${esc(w.id)}">Delete</button></div>`).join('') : '<p class="muted">No workout logged for this day.</p>';
-
-
   const dayNav = `<div class="row" style="margin-bottom:12px">
     <button class="btn-ghost btn-sm" data-act="dayPrev">‹ Previous</button>
     <div style="text-align:center"><b>${isToday ? 'Today' : pd(day).toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'short' })}</b>
       <div class="mini">${fmtDate(day)}</div></div>
     <button class="btn-ghost btn-sm" data-act="dayNext" ${isToday ? 'disabled' : ''}>Next ›</button></div>`;
-
   return `${dayNav}
     <div class="grid2">
       <div>
-        <div class="card"><h3>Totals</h3>${tg ? '' : '<p class="muted">Your targets will appear here once Stefan has set them. Totals only for now.</p>'}${bars}</div>
+        <div class="card"><h3>Totals</h3>${tg ? '' : '<p class="muted">Your targets will appear here once they are set. Totals only for now.</p>'}${bars}</div>
         <div class="card"><h3>Meals</h3>${mealsHtml}</div>
       </div>
       <div>
         <div class="card"><h3>Add a meal</h3>
-          <div class="tabs">${modeBtns}</div>
+          ${basic ? '' : `<div class="tabs">${modeBtns}</div>`}
           ${addPanel}
         </div>
-        <div class="card"><h3>Workout</h3>
-          ${woHtml}
-          <div class="stack" style="margin-top:12px">
-            <div class="field" style="margin:0"><label for="wo-what">What</label><input id="wo-what" placeholder="e.g. Full body A"></div>
-            <div class="grid2"><div class="field" style="margin:0"><label for="wo-min">Minutes</label><input id="wo-min" type="number" min="0" inputmode="numeric"></div>
-            <div class="field" style="margin:0"><label for="wo-notes">Notes</label><input id="wo-notes"></div></div>
-            <button data-act="saveWorkout">Add workout</button>
-          </div>
-        </div>
+        ${basic ? '' : workoutCard(c, day)}
+        ${stepsCard(c, day)}
         ${weighInCard(c)}
       </div>
     </div>`;
@@ -1541,7 +1837,6 @@ function renderClientPlan(c) {
     <div class="card"><h3>Training plan</h3>${training}</div>`;
 }
 
-/* Progress: shared by client and coach */
 function renderProgress(c, coach) {
   const wi = weighPoints(c);
   const unit = ui.unit;
@@ -1552,47 +1847,78 @@ function renderProgress(c, coach) {
     const prev = wi.length > 1 ? wi[wi.length - 2].kg : null;
     const change = last - first;
     const pct = first ? (change / first * 100) : 0;
-    const dUnit = unit === 'kg' ? 'kg' : 'lb';
     const conv = v => unit === 'kg' ? v : kgToLb(v);
+    const big = "font-family:'Bebas Neue',Impact,sans-serif;font-size:32px";
     stats = `<div class="grid3">
-      <div class="note-box"><div class="mini">Latest weight</div><b style="font-family:'Bebas Neue',Impact,sans-serif;font-size:32px">${weightText(last, unit)}</b></div>
-      <div class="note-box"><div class="mini">Change since start</div><b class="${change <= 0 ? 'c-green' : 'c-red'}" style="font-family:'Bebas Neue',Impact,sans-serif;font-size:32px">${(conv(change)).toFixed(1)} ${dUnit} (${pct.toFixed(1)}%)</b></div>
-      <div class="note-box"><div class="mini">Change since last weigh-in</div><b style="font-family:'Bebas Neue',Impact,sans-serif;font-size:32px">${prev == null ? 'n/a' : conv(last - prev).toFixed(1) + ' ' + dUnit}</b></div>
+      <div class="note-box"><div class="mini">Latest weight</div><b style="${big}">${weightText(last, unit)}</b></div>
+      <div class="note-box"><div class="mini">Change since start</div><b class="${change <= 0 ? 'c-green' : 'c-red'}" style="${big}">${conv(change).toFixed(1)} ${unit} (${pct.toFixed(1)}%)</b></div>
+      <div class="note-box"><div class="mini">Change since last weigh-in</div><b style="${big}">${prev == null ? 'n/a' : conv(last - prev).toFixed(1) + ' ' + unit}</b></div>
     </div>`;
   }
   const logged = [];
-  for (let i = 0; i < 7; i++) { const d = addDays(todayS(), -i); if ((c.logs[d] || []).length) logged.push(sumNut(c.logs[d])); }
-  const macroCard = logged.length ? `<div class="card"><h3>Average per day, last 7 days</h3>
-    <p class="mini" style="margin-top:0">Based on ${logged.length} logged day${logged.length === 1 ? '' : 's'}.</p>
-    ${NUT.map(k => barHtml(k, Math.round(logged.reduce((x, t) => x + t[k], 0) / logged.length), c.targets ? c.targets[k] : null)).join('')}</div>` : '';
-  const weekAgo = addDays(todayS(), -6);
-  const wos = (c.workouts || []).filter(w => w.date >= weekAgo).sort((a, b) => a.date < b.date ? 1 : -1);
-  const woList = wos.length ? wos.map(w => `<div class="meal"><div><b>${esc(w.what)}</b><div class="mini">${fmtDate(w.date)} · ${w.minutes} min${w.notes ? ' · ' + esc(w.notes) : ''}</div></div></div>`).join('')
-    : '<p class="muted">No workouts in the last 7 days.</p>';
+  for (let i = 0; i < 7; i++) { const d = addDays(todayS(), -i); if (c.steps[d]) logged.push(c.steps[d]); }
+  const stepsAvg = logged.length ? Math.round(logged.reduce((x, y) => x + y, 0) / logged.length) : null;
+  const stepsCardHtml = `<div class="card"><h3>Steps</h3>
+    <div class="metric"><div class="top"><span>Average per day, last 7 days</span><span><b>${stepsAvg == null ? 'Nothing logged yet' : fmtSteps(stepsAvg) + ' steps'}</b></span></div>
+    ${c.targets && c.targets.steps && stepsAvg != null ? `<div class="bar"><span style="width:${Math.min(100, Math.round(stepsAvg / c.targets.steps * 100))}%;background:${STEPS_COLOUR}"></span></div><p class="mini" style="margin:6px 0 0">Target ${fmtSteps(c.targets.steps)} steps a day, based on ${logged.length} logged day${logged.length === 1 ? '' : 's'}.</p>` : ''}</div></div>`;
+  const logDays = [];
+  for (let i = 0; i < 7; i++) { const d = addDays(todayS(), -i); if ((c.logs[d] || []).length) logDays.push(sumNut(c.logs[d])); }
+  const macroCard = logDays.length ? `<div class="card"><h3>Average per day, last 7 days</h3>
+    <p class="mini" style="margin-top:0">Based on ${logDays.length} logged day${logDays.length === 1 ? '' : 's'}.</p>
+    ${NUT.map(k => barHtml(k, Math.round(logDays.reduce((x, t) => x + t[k], 0) / logDays.length), c.targets ? c.targets[k] : null)).join('')}</div>` : '';
+  const updateBtn = !coach && c.tier === 'basic'
+    ? '<button class="btn-ghost btn-sm" data-act="updateTargets">Update my targets</button>' : '';
+  let workoutsCard = '';
+  if (c.tier !== 'basic') {
+    const weekAgo = addDays(todayS(), -6);
+    const wos = (c.workouts || []).filter(w => w.date >= weekAgo).sort((a, b) => a.date < b.date ? 1 : -1);
+    const woList = wos.length ? wos.map(w => `<div class="meal"><div style="flex:1 1 220px"><b>${esc(w.what)}</b><div class="mini">${fmtDate(w.date)}${w.minutes ? ' · ' + w.minutes + ' min' : ''}${w.notes ? ' · ' + esc(w.notes) : ''}</div>${sessionSummary(w)}</div></div>`).join('')
+      : '<p class="muted">No workouts in the last 7 days.</p>';
+    workoutsCard = `<div class="card"><h3>Workouts in the last 7 days</h3>${woList}</div>`;
+  }
   return `<div class="card"><div class="row"><h3 style="margin:0">Weight</h3>${unitBtns}</div>
-      <div style="margin-top:12px">${stats}</div>${weighChart(wi, unit)}</div>
+      <div style="margin-top:12px">${stats}</div>${weighChart(wi, unit)}
+      <div style="margin-top:10px">${updateBtn}</div></div>
+    ${stepsCardHtml}
     ${macroCard}
-    <div class="card"><h3>Workouts in the last 7 days</h3>${woList}</div>`;
+    ${workoutsCard}`;
 }
 
+
 /* ==========================================================================
-   Coach: client list
+   Coach: client list (four capacities; Basic is unlimited and shows billing only)
    ========================================================================== */
 function renderCoachList() {
-  const cards = CAP_TIERS.map(t => {
+  const capCard = t => {
+    const T = TIERS[t];
+    if (T.unlimited) {
+      return `<div class="card">
+        <div class="row"><h3 style="margin:0">${T.name}</h3><span class="muted">${T.short}</span></div>
+        <div class="cap-nums"><div><b>${activeCount(t)}</b><span>active</span></div><div><b class="c-green">Unlimited</b><span>spots</span></div></div>
+        <p class="mini" style="margin:0">Basic clients run themselves, so there is no limit to set.</p>
+      </div>`;
+    }
     const left = spotsLeft(t);
     return `<div class="card">
-      <div class="row"><h3 style="margin:0">${TIERS[t].name}</h3><span class="muted">${TIERS[t].short}</span></div>
+      <div class="row"><h3 style="margin:0">${T.name}</h3><span class="muted">${T.short}</span></div>
       <div class="cap-nums"><div><b>${activeCount(t)}</b><span>active or paused</span></div>
         <div><b class="${left > 0 ? 'c-green' : 'c-red'}">${Math.max(0, left)}</b><span>spots left</span></div></div>
       <label for="cap-${t}">Capacity</label>
       <input id="cap-${t}" type="number" min="0" max="500" inputmode="numeric" value="${db.capacity[t]}" data-ch="cap" data-tier="${t}" style="max-width:160px">
     </div>`;
-  }).join('');
+  };
+  const cards = ['essential', 'core', 'beast', 'basic'].map(capCard).join('');
   const wl = db.waitlist.length
     ? db.waitlist.map(w => `<div class="meal"><div><b>${esc(w.email)}</b><div class="mini">${TIERS[w.tier].name} · ${fmtDate(w.at.slice(0, 10))}</div></div></div>`).join('')
     : '<p class="muted">No one on the waitlist yet.</p>';
-  const rows = db.clients.slice().sort((a, b) => a.name.localeCompare(b.name)).map(c => `<tr>
+  const rows = db.clients.slice().sort((a, b) => a.name.localeCompare(b.name)).map(c => c.tier === 'basic'
+    ? `<tr>
+        <td><button class="btn-link" data-act="openClient" data-id="${esc(c.id)}">${esc(c.name)}</button><div class="mini">${esc(c.email)}</div></td>
+        <td>Basic</td>
+        <td>${statusPill(c.status)}</td>
+        <td colspan="3" class="mini">Next billing: ${esc(c.nextBilling ? fmtDate(c.nextBilling) : 'not set')}</td>
+      </tr>`
+    : `<tr>
       <td><button class="btn-link" data-act="openClient" data-id="${esc(c.id)}">${esc(c.name)}</button><div class="mini">${esc(c.email)}</div></td>
       <td>${TIERS[c.tier].name}</td>
       <td>${statusPill(c.status)}</td>
@@ -1605,14 +1931,31 @@ function renderCoachList() {
       <div class="card" style="grid-column:1/-1"><h3>Waitlist</h3>${wl}</div>
     </div>
     <div class="card"><h3>All clients</h3><div class="table-wrap"><table>
-      <thead><tr><th>Client</th><th>Tier</th><th>Status</th><th>Week</th><th>Last logged</th><th>Needs you</th></tr></thead>
+      <thead><tr><th>Client</th><th>Plan</th><th>Status</th><th>Week</th><th>Last logged</th><th>Needs you</th></tr></thead>
       <tbody>${rows || '<tr><td colspan="6">No clients yet.</td></tr>'}</tbody></table></div></div>`;
 }
 
 /* ==========================================================================
-   Coach: client page
+   Coach: client page. Basic clients get a billing-only page: no logs, plan or notes.
    ========================================================================== */
+function renderBasicCoachView(c) {
+  return `<div class="row" style="margin-bottom:10px"><button class="btn-ghost btn-sm" data-act="backClients">‹ All clients</button></div>
+    <section class="hero"><div class="row"><div>
+      <h1>${esc(c.name)}</h1>
+      <div class="muted">${esc(c.email)} · Basic</div>
+    </div><div>${statusPill(c.status)}</div></div></section>
+    <div class="card"><h3>Plan</h3>
+      <dl class="dl">
+        <dt>Plan</dt><dd>Basic: $2.50 a week, $30 billed every 12 weeks</dd>
+        <dt>Status</dt><dd>${esc(STATUS[c.status][0])}</dd>
+        <dt>Next billing</dt><dd>${esc(c.nextBilling ? fmtDate(c.nextBilling) : 'Not set')}</dd>
+        <dt>Started</dt><dd>${esc(c.startDate ? fmtDate(c.startDate) : 'Not started')}</dd>
+      </dl>
+      <p class="mini" style="margin-top:12px">Basic clients log privately. You see their plan, status and billing only. Their meals, steps, workouts and weigh-ins are not shown here.</p>
+    </div>`;
+}
 function renderCoachClient(c) {
+  if (c.tier === 'basic') return renderBasicCoachView(c);
   const tabs = [['overview','Overview'],['onboarding','Onboarding'],['plan','Targets and plan'],['logs','Logs'],['progress','Progress'],['notes','Notes']];
   let body = '';
   if (ui.coachTab === 'overview') body = overviewHtml(c);
@@ -1634,7 +1977,7 @@ function overviewHtml(c) {
   const paid = c.paid ? `${fmtDate(c.paid.date)}, ${money(c.paid.amount)}` : 'Not recorded';
   const flag = c.healthFlag ? (c.ob.healthClearance ? 'Flagged. Client has confirmed clearance.' : 'Flagged. Clearance not confirmed.') : 'No flags';
   const info = `<dl class="dl">
-    <dt>Tier</dt><dd>${TIERS[c.tier].name}</dd>
+    <dt>Plan</dt><dd>${TIERS[c.tier].name}</dd>
     <dt>Paid</dt><dd>${esc(paid)}</dd>
     <dt>Start date</dt><dd>${esc(fmtDate(c.startDate))}</dd>
     <dt>Week</dt><dd>${esc(weekLabel(c))}</dd>
@@ -1643,10 +1986,12 @@ function overviewHtml(c) {
     <dt>Health</dt><dd>${esc(flag)}${c.healthFlag && c.ob.healthNote ? ' (' + esc(c.ob.healthNote) + ')' : ''}</dd>
   </dl>`;
   let actions = '';
-  const tierSel = `<div class="field"><label for="newTier">Change tier</label><div class="row" style="flex-wrap:nowrap">
+  const tierSel = `<div class="field"><label for="newTier">Change plan</label><div class="row" style="flex-wrap:nowrap">
     <select id="newTier" style="flex:1">${Object.keys(TIERS).map(t => `<option value="${t}" ${t === c.tier ? 'selected' : ''}>${TIERS[t].name}</option>`).join('')}</select>
     <button class="btn-ghost" data-act="changeTier">Apply</button></div></div>`;
   const del = `<button class="btn-danger" data-act="deleteClient" data-id="${esc(c.id)}">Delete client and data</button>`;
+  const wDay = `<select id="cWDay" data-ch="weighDay">${DAYS.map((d, i) => `<option value="${d}" ${(c.ob.weighInDay || 'Mon') === d ? 'selected' : ''}>${DAYS_FULL[i]}</option>`).join('')}</select>`;
+  const wTime = `<select id="cWTime" data-ch="weighTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${weighTime(c) === t ? 'selected' : ''}>${fmtTime(t)}</option>`).join('')}</select>`;
   if (c.status === 'onboarding') {
     actions = '<p class="muted">Waiting for the client to finish onboarding.</p>';
   } else if (c.status === 'awaiting') {
@@ -1664,12 +2009,8 @@ function overviewHtml(c) {
   } else if (c.status === 'paused') {
     actions = `<div class="row" style="justify-content:flex-start"><button data-act="resume">Resume</button><button class="btn-ghost" data-act="finish">Finish</button></div>`;
   } else if (c.status === 'finished') {
-    actions = '<p class="mini">Client can renew or keep logging from their Today screen.</p>';
-  } else {
-    actions = '<p class="mini">Self-logging. No coaching plan is active.</p>';
+    actions = '<p class="mini">The client can renew, or drop to Basic, from their Today screen.</p>';
   }
-  const wDay = `<select id="cWDay" data-ch="weighDay">${DAYS.map((d, i) => `<option value="${d}" ${(c.ob.weighInDay || 'Mon') === d ? 'selected' : ''}>${DAYS_FULL[i]}</option>`).join('')}</select>`;
-  const wTime = `<select id="cWTime" data-ch="weighTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${weighTime(c) === t ? 'selected' : ''}>${fmtTime(t)}</option>`).join('')}</select>`;
   return `<div class="grid2">
     <div class="card"><h3>Status</h3>${info}</div>
     <div class="card"><h3>Weigh-in</h3>
@@ -1677,9 +2018,10 @@ function overviewHtml(c) {
       <div class="field"><label for="cWTime">Weigh-in time</label>${wTime}</div>
       <p class="mini">Saved as you change them. The client can only weigh in on this day. Same day, same time each week, after the toilet and before eating or drinking.</p>
     </div>
-    <div class="card"><h3>Actions</h3>${actions}<hr style="border:0;border-top:1px solid var(--line);margin:16px 0">${tierSel}${del}</div>
+    <div class="card" style="grid-column:1/-1"><h3>Actions</h3>${actions}<hr style="border:0;border-top:1px solid var(--line);margin:16px 0">${tierSel}${del}</div>
   </div>`;
 }
+
 function onboardingAnswersHtml(c) {
   const ob = c.ob;
   const rows = [
@@ -1739,6 +2081,8 @@ function planEditorHtml(c) {
   const targetsCard = `<div class="card"><h3>Daily targets</h3>
     <div class="grid5">${NUT.map(k => `<div class="field" style="margin:0"><label for="t-${k}">${NUT_LABEL[k]}${k === 'calories' ? ' (kcal)' : ' (g)'}</label>
       <input id="t-${k}" type="number" min="0" inputmode="numeric" value="${c.targets ? c.targets[k] : ''}" data-ch="target" data-k="${k}"></div>`).join('')}</div>
+    <div class="field" style="max-width:260px;margin-top:12px"><label for="t-steps">Steps a day</label>
+      <input id="t-steps" type="number" min="0" inputmode="numeric" value="${c.targets && c.targets.steps != null ? c.targets.steps : ''}" data-ch="target" data-k="steps"></div>
     <p class="mini">Targets show to the client straight away.</p></div>`;
   const dayBtns = DAYS.map((x, i) => {
     const n = i + 1;
@@ -1793,34 +2137,85 @@ function planEditorHtml(c) {
         <p class="mini" style="margin:8px 0 0">Publishes the meal plan and training plan to the client.</p></div>
     </div>`;
 }
+/* ==========================================================================
+   Coach: logs. Sessions with sets and reps, and highlights when weight or reps went up.
+   ========================================================================== */
+// Best set for an exercise: the heaviest set (most reps at that weight), or the most reps if no weight.
+function bestSet(e) {
+  if (!e || e.skipped || !e.sets || !e.sets.length) return null;
+  const weighted = e.sets.filter(s => s.kg != null);
+  if (!weighted.length) {
+    const reps = Math.max(...e.sets.map(s => s.reps || 0));
+    return reps > 0 ? { kg: null, reps } : null;
+  }
+  const kg = Math.max(...weighted.map(s => s.kg));
+  const reps = Math.max(...weighted.filter(s => s.kg === kg).map(s => s.reps || 0));
+  return { kg, reps };
+}
+// The last time this exercise was logged before the given date.
+function previousBest(c, name, date) {
+  const prior = (c.workouts || []).filter(w => w.session && w.date < date).sort((a, b) => a.date < b.date ? 1 : -1);
+  for (const w of prior) {
+    const e = w.session.exercises.find(x => x.name === name && !x.skipped);
+    const b = bestSet(e);
+    if (b) return b;
+  }
+  return null;
+}
+// Returns "+2.5 kg" or "+1 rep" when the exercise went up since it was last logged, otherwise null.
+function progressNote(c, w, e) {
+  const cur = bestSet(e);
+  if (!cur) return null;
+  const prev = previousBest(c, e.name, w.date);
+  if (!prev) return null;
+  if (cur.kg != null && prev.kg != null) {
+    if (cur.kg > prev.kg) return '+' + (Math.round((cur.kg - prev.kg) * 10) / 10) + ' kg';
+    if (cur.kg === prev.kg && cur.reps > prev.reps) return '+' + (cur.reps - prev.reps) + ' reps';
+    return null;
+  }
+  if (cur.kg == null && prev.kg == null && cur.reps > prev.reps) return '+' + (cur.reps - prev.reps) + ' reps';
+  return null;
+}
+function coachSessionHtml(c, w) {
+  const rows = w.session.exercises.map(e => {
+    if (e.skipped) return `<div class="log-ex"><b>${esc(e.name)}</b> <span class="mini">skipped</span></div>`;
+    const sets = e.sets.map(s => {
+      const kg = s.kg != null ? (ui.unit === 'kg' ? (Math.round(s.kg * 10) / 10) + ' kg' : (Math.round(kgToLb(s.kg) * 10) / 10) + ' lb') + ' x ' : '';
+      return kg + (s.reps != null ? s.reps + (e.unit === 'sec' ? ' sec' : '') : '-');
+    });
+    const note = progressNote(c, w, e);
+    return `<div class="log-ex"><b>${esc(e.name)}</b> ${note ? `<span class="up-badge">Up ${esc(note)}</span>` : ''}
+      <div class="mini">${esc(sets.join(', ') || 'no sets')}</div></div>`;
+  }).join('');
+  return `<div style="margin:6px 0 10px"><div><b>${esc(w.what)}</b></div>${rows}${w.notes ? `<div class="mini">${esc(w.notes)}</div>` : ''}</div>`;
+}
 function logsHtml(c) {
   const t = c.targets;
   const days = [];
   for (let i = 0; i < 21; i++) days.push(addDays(todayS(), -i));
-  return `<div class="card"><h3>Last 21 days</h3><p class="mini" style="margin-top:0">Newest first. Tap a day to open it.</p>
+  return `<div class="card"><h3>Last 21 days</h3><p class="mini" style="margin-top:0">Newest first. Tap a day to open it. <span class="up-badge">Up</span> marks a lift that went up since it was last logged.</p>
     ${days.map((date, idx) => {
       const meals = c.logs[date] || [];
       const tot = sumNut(meals);
-      const wo = (c.workouts || []).filter(w => w.date === date);
+      const wos = (c.workouts || []).filter(w => w.date === date);
       const wi = c.weighIns.find(w => w.date === date);
+      const steps = c.steps[date];
       const calOver = t && tot.calories > t.calories, proOver = t && tot.protein > t.protein;
       const summary = `<summary><span>${fmtDate(date)}</span>
         <span class="mini" style="font-weight:400;margin-left:8px">${meals.length ? `<span style="color:${macroInk('calories', tot.calories, t && t.calories)}">${tot.calories} kcal${calOver ? ' (over)' : ''}</span> · <span style="color:${macroInk('protein', tot.protein, t && t.protein)}">P ${tot.protein}g${proOver ? ' (over)' : ''}</span> · ${meals.length} meal${meals.length === 1 ? '' : 's'}` : 'No meals logged'}
-        · ${wo.length ? 'Workout' : 'No workout'} · ${wi ? weightText(wi.kg, 'kg') : 'No weigh-in'}</span></summary>`;
+        · ${steps ? fmtSteps(steps) + ' steps' : 'No steps'} · ${wos.length ? wos.length + ' workout' + (wos.length === 1 ? '' : 's') : 'No workout'} · ${wi ? weightText(wi.kg, 'kg') : 'No weigh-in'}</span></summary>`;
       const body = meals.length ? meals.map(m => `<div class="meal" style="padding:8px 0">
           <div style="flex:1 1 200px"><span class="mini">${esc(m.time || '')}</span> <b>${esc(m.name)}</b> <span class="mini">${esc(sourceLabel(m))}</span>
           <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div>
           ${m.edited && m.ai ? `<div class="edited">Changed by client. Beast AI said ${m.ai.calories} kcal, P ${m.ai.protein}g.</div>` : ''}</div></div>`).join('')
         : '<p class="mini">No meals logged.</p>';
-      const woTxt = wo.length ? '<div class="mini">Workout: ' + wo.map(w => esc(w.what) + ' (' + w.minutes + ' min)').join(', ') + '</div>' : '';
+      const woTxt = wos.map(w => w.session ? coachSessionHtml(c, w)
+        : `<div class="mini">Other activity: ${esc(w.what)}${w.minutes ? ' (' + w.minutes + ' min)' : ''}${w.notes ? ' · ' + esc(w.notes) : ''}</div>`).join('');
       return `<details ${idx === 0 ? 'open' : ''}>${summary}<div style="padding:4px 0 6px">${body}${woTxt}</div></details>`;
     }).join('')}
   </div>`;
 }
 
-/* ==========================================================================
-   Actions
-   ========================================================================== */
 const ACT = {};
 const CH = {};
 const INP = {};
@@ -1998,19 +2393,70 @@ ACT.deleteMeal = el => {
   c.logs[day] = (c.logs[day] || []).filter(x => x.id !== el.dataset.id);
   persist(); render(); toast('Meal deleted.');
 };
+/* ---- Set and rep logging (coaching clients) and steps (everyone) ---- */
+function numOrNull(v) { const x = parseFloat(v); return isFinite(x) ? x : null; }
+function intOrNull(v) { const x = parseInt(v, 10); return isFinite(x) ? x : null; }
+function woInput(el) {
+  const wo = ui.wo;
+  if (!wo) return;
+  const k = el.dataset.wo;
+  if (k === 'what' || k === 'minutes' || k === 'notes') wo[k] = el.value;
+  else {
+    const st = wo.ex[Number(el.dataset.i)].sets[Number(el.dataset.j)];
+    st[k === 'w' ? 'w' : 'r'] = el.value;
+  }
+  saveUi();
+}
+ACT.woMode = el => {
+  const m = el.dataset.m;
+  ui.wo = Object.assign({}, ui.wo, { mode: m, ex: m === 'plan' ? null : (ui.wo && ui.wo.ex) });
+  saveUi(); render();
+};
+ACT.woSetAdd = el => {
+  const e = ui.wo.ex[Number(el.dataset.i)];
+  e.sets.push({ w: '', r: e.sets.length ? e.sets[e.sets.length - 1].r : '' });
+  saveUi(); render();
+};
+ACT.woSetDel = el => {
+  ui.wo.ex[Number(el.dataset.i)].sets.splice(Number(el.dataset.j), 1);
+  saveUi(); render();
+};
 ACT.saveWorkout = () => {
   const c = clientById(ui.clientId);
-  const what = (document.getElementById('wo-what').value || '').trim();
-  const mins = clampNum(document.getElementById('wo-min').value, 600);
-  if (!what) { toast('Add what you did.'); return; }
   const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
-  c.workouts.push({ id: uid(), date: day, what: what.slice(0, 120), minutes: mins, notes: (document.getElementById('wo-notes').value || '').trim().slice(0, 300) });
-  persist(); render(); toast('Workout saved.');
+  const wo = ui.wo || {};
+  if (wo.mode === 'plan' && wo.ex) {
+    const exercises = wo.ex.map(e => ({
+      name: e.name, unit: e.unit || '', skipped: !!e.skipped,
+      sets: e.skipped ? [] : e.sets.map(st => {
+        const w = numOrNull(st.w);
+        const kg = w == null ? null : Math.round((ui.unit === 'kg' ? w : lbToKg(w)) * 10) / 10;
+        return { kg, reps: intOrNull(st.r) };
+      }).filter(s => s.kg != null || s.reps != null)
+    }));
+    if (!exercises.some(e => e.skipped || e.sets.length)) { toast('Log a set for at least one exercise, or mark it skipped.'); return; }
+    const session = planSessions(c).find(s => s.day === dowNum(day));
+    c.workouts.push({ id: uid(), date: day, what: session ? session.title : 'Workout', minutes: null,
+      notes: (wo.notes || '').trim().slice(0, 300), session: { exercises } });
+  } else {
+    const what = (wo.what || '').trim();
+    if (!what) { toast('Say what you did.'); return; }
+    c.workouts.push({ id: uid(), date: day, what: what.slice(0, 120), minutes: clampNum(wo.minutes, 600), notes: (wo.notes || '').trim().slice(0, 300) });
+  }
+  ui.wo = null; persist(); saveUi(); render(); toast('Workout saved.');
 };
 ACT.deleteWorkout = el => {
   const c = clientById(ui.clientId);
   c.workouts = c.workouts.filter(w => w.id !== el.dataset.id);
   persist(); render();
+};
+ACT.saveSteps = () => {
+  const c = clientById(ui.clientId);
+  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const v = document.getElementById('st-val').value;
+  if (v === '') delete c.steps[day];
+  else c.steps[day] = clampNum(v, 60000);
+  persist(); render(); toast('Steps saved.');
 };
 ACT.saveWeigh = () => {
   const c = clientById(ui.clientId);
@@ -2025,17 +2471,30 @@ ACT.saveWeigh = () => {
   persist(); render(); toast('Weigh-in saved.');
 };
 
-/* --- Client status actions --- */
+/* --- Client plan actions: renew, drop to Basic, Basic targets --- */
 ACT.renew = () => {
   const c = clientById(ui.clientId);
   c.status = 'awaiting'; c.startDate = null; c.pauseUsed = 0; c.pauseStart = null;
   c.paid = { date: todayS(), amount: Math.round(TIERS[c.tier].price * 0.8 * 100) / 100, renewal: true };
   persist(); render(); toast('Renewal saved. Stefan will confirm your start date.');
 };
-ACT.keepLogging = () => {
+ACT.dropBasic = () => {
   const c = clientById(ui.clientId);
-  c.status = 'selflog'; persist(); render(); toast('You are now self-logging.');
+  const today = todayS();
+  c.tier = 'basic'; c.status = 'active'; c.startDate = today; c.nextBilling = addDays(today, 84);
+  c.paid = { date: today, amount: 30 }; c.pauseUsed = 0; c.pauseStart = null;
+  persist(); render(); toast('You are on Basic: $30 every 12 weeks. Your targets are kept.');
 };
+ACT.updateTargets = () => {
+  const c = clientById(ui.clientId);
+  const latest = sortedWeighIns(c).slice(-1)[0];
+  const inp = basicInputs(c.ob, latest ? latest.kg : c.ob.weightKg);
+  const t = BasicTargets.calcTargets(inp);
+  c.targets = { calories: t.calories, protein: t.protein, carbs: t.carbs, fat: t.fat, fibre: t.fibre, steps: BasicTargets.stepsTarget(inp.steps) };
+  persist(); render();
+  toast(latest ? 'Targets updated from your latest weigh-in.' : 'Targets updated from your starting weight.');
+};
+
 
 /* --- New client flow --- */
 ACT.buy = el => { ui.newTier = el.dataset.t; ui.newStep = 'checkout'; saveUi(); render(); };
@@ -2061,20 +2520,21 @@ ACT.pay = el => {
   nameEl.classList.toggle('invalid', !name);
   emailEl.classList.toggle('invalid', !emailOk);
   if (!name || !emailOk) return;
-  if (CAP_TIERS.includes(t) && spotsLeft(t) <= 0) { toast('That tier just filled up. Join the waitlist instead.'); ui.newStep = 'plans'; saveUi(); render(); return; }
+  if (CAP_TIERS.includes(t) && spotsLeft(t) <= 0) { toast('That plan just filled up. Join the waitlist instead.'); ui.newStep = 'plans'; saveUi(); render(); return; }
   const c = mkClient({ name, email, tier: t, status: 'onboarding', paid: { date: todayS(), amount: TIERS[t].price } });
   c.ob = blankOb();
   db.clients.push(c);
-  c.obStep = 1; persist();
+  persist();
   ui.view = 'client'; ui.clientId = c.id; ui.clientTab = 'today'; ui.newStep = 'plans';
   saveUi(); render(); window.scrollTo(0, 0);
 };
 
-/* --- Onboarding submit --- */
+/* --- Onboarding: steps for coaching, one screen for Basic --- */
+function setObMsg(text) { const el = document.getElementById('obMsg'); if (el) el.textContent = text; }
 ACT.obNext = () => {
   const c = clientById(ui.clientId), step = obStepOf(c);
   const errs = obErrors(c.ob, step);
-  if (Object.keys(errs).length) { setObErrors(errs); toast('Please answer the questions marked in red.'); return; }
+  if (Object.keys(errs).length) { setObErrors(errs); setObMsg('Please answer the questions marked in red.'); return; }
   c.obStep = Math.min(6, step + 1); persist(); render(); window.scrollTo(0, 0);
 };
 ACT.obBack = () => {
@@ -2086,13 +2546,12 @@ ACT.obSubmit = () => {
   for (let step = 1; step <= 6; step++) {
     const errs = obErrors(ob, step);
     if (Object.keys(errs).length) {
-      c.obStep = step; persist(); render(); setObErrors(errs); window.scrollTo(0, 0);
-      toast('Please answer the questions marked in red.');
+      c.obStep = step; persist(); render(); setObErrors(errs); setObMsg('Please answer the questions marked in red.');
       return;
     }
   }
-  ob.heightCm = ob.heightUnit === 'ftin' ? Math.round(parseFloat(ob.heightFt) * 30.48 + parseFloat(ob.heightIn) * 2.54) : parseFloat(ob.heightCm);
-  ob.weightKg = Math.round((ob.weightUnit === 'kg' ? parseFloat(ob.weight) : lbToKg(parseFloat(ob.weight))) * 10) / 10;
+  ob.heightCm = ob.heightUnit === 'ftin' ? (parseFloat(ob.heightFt) * 12 + parseFloat(ob.heightIn)) * 2.54 : parseFloat(ob.heightCm);
+  ob.weightKg = ob.weightUnit === 'kg' ? parseFloat(ob.weight) : lbToKg(parseFloat(ob.weight));
   ob.submittedAt = new Date().toISOString();
   c.healthFlag = Object.values(ob.health).includes('yes');
   c.status = 'awaiting';
@@ -2100,6 +2559,26 @@ ACT.obSubmit = () => {
   persist(); render(); window.scrollTo(0, 0);
   toast('Thanks. Stefan is building your plan.');
 };
+ACT.basicSubmit = () => {
+  const c = clientById(ui.clientId), ob = c.ob;
+  const errs = basicErrors(ob);
+  if (Object.keys(errs).length) { setObErrors(errs); setObMsg('Please answer the questions marked in red.'); return; }
+  ob.heightCm = ob.heightUnit === 'ftin' ? (parseFloat(ob.heightFt) * 12 + parseFloat(ob.heightIn)) * 2.54 : parseFloat(ob.heightCm);
+  ob.weightKg = ob.weightUnit === 'kg' ? parseFloat(ob.weight) : lbToKg(parseFloat(ob.weight));
+  ob.submittedAt = new Date().toISOString();
+  const t = BasicTargets.calcTargets(basicInputs(ob, ob.weightKg));
+  c.targets = { calories: t.calories, protein: t.protein, carbs: t.carbs, fat: t.fat, fibre: t.fibre, steps: BasicTargets.stepsTarget(parseFloat(ob.steps)) };
+  c.basicStage = 'targets';
+  persist(); render(); window.scrollTo(0, 0);
+};
+ACT.basicStart = () => {
+  const c = clientById(ui.clientId);
+  const today = todayS();
+  c.status = 'active'; c.startDate = today; c.nextBilling = addDays(today, 84); c.basicStage = null;
+  persist(); render(); window.scrollTo(0, 0);
+  toast('Tracking started. Log your meals and steps on Today.');
+};
+
 /* --- Coach: clients and capacity --- */
 CH.weighDay = el => { const c = clientById(ui.coachClientId); c.ob.weighInDay = el.value; persist(); render(); toast('Weigh-in day saved.'); };
 CH.weighTime = el => { const c = clientById(ui.coachClientId); c.ob.weighInTime = el.value; persist(); render(); toast('Weigh-in time saved.'); };
@@ -2148,18 +2627,19 @@ ACT.changeTier = () => {
   const t = document.getElementById('newTier').value;
   if (t === c.tier) return;
   const holdsSpot = c.status === 'active' || c.status === 'paused';
-  if (holdsSpot) {
-    const freeAfterMove = db.capacity[t] - activeCount(t);
-    if (freeAfterMove <= 0 && c.tier !== t) { toast('No spot is free in ' + TIERS[t].name + '.'); return; }
+  if (holdsSpot && t !== 'basic' && c.tier !== t && spotsLeft(t) <= 0) { toast('No spot is free in ' + TIERS[t].name + '.'); return; }
+  c.tier = t;
+  if (t === 'basic') {
+    c.status = 'active'; c.startDate = c.startDate || todayS();
+    c.nextBilling = c.nextBilling || addDays(todayS(), 84); c.pauseStart = null;
   }
-  c.tier = t; persist(); render(); toast('Tier changed to ' + TIERS[t].name + '.');
+  persist(); render(); toast('Plan changed to ' + TIERS[t].name + '.');
 };
-
 /* --- Coach: targets and plan --- */
 CH.target = el => {
   const c = clientById(ui.coachClientId);
   if (!c.targets) c.targets = { calories:0, protein:0, carbs:0, fat:0, fibre:0 };
-  c.targets[el.dataset.k] = clampNum(el.value, el.dataset.k === 'calories' ? 10000 : 1000);
+  c.targets[el.dataset.k] = clampNum(el.value, el.dataset.k === 'calories' ? 10000 : el.dataset.k === 'steps' ? 40000 : 1000);
   persist(); render();
 };
 ACT.pDay = el => { ui.coachPlanDay = Number(el.dataset.d); saveUi(); render(); };
@@ -2269,6 +2749,9 @@ document.addEventListener('click', e => {
 const OB_SEL = '#onboardForm [data-ob], #onboardForm [data-obgrp], #onboardForm [data-health]';
 document.addEventListener('change', e => {
   const el = e.target;
+  if (el.dataset && el.dataset.woskip !== undefined) {
+    ui.wo.ex[Number(el.dataset.woskip)].skipped = el.checked; saveUi(); render(); return;
+  }
   if (el.dataset && el.dataset.ch === 'viewAs') {
     const v = el.value;
     if (v === 'coach') { ui.view = 'coach'; ui.coachClientId = null; }
@@ -2283,6 +2766,7 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('input', e => {
   const el = e.target;
+  if (el.dataset && el.dataset.wo) { woInput(el); return; }
   if (el.dataset && el.dataset.ui) { ui[el.dataset.ui] = el.value; saveUi(); return; }
   if (el.dataset && el.dataset.inp && INP[el.dataset.inp]) { INP[el.dataset.inp](el, e); return; }
   if (el.matches && el.matches(OB_SEL)) handleObInput(el);

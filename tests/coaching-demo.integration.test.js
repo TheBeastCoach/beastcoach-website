@@ -73,9 +73,11 @@ async function routeToHandler(route) {
 function startServer() {
   return new Promise(resolve => {
     const srv = http.createServer((req, res) => {
-      if (req.url.split('?')[0] === '/coaching-demo.html') {
-        res.setHeader('content-type', 'text/html');
-        res.end(fs.readFileSync(path.join(ROOT, 'coaching-demo.html')));
+      const file = req.url.split('?')[0];
+      const types = { '/coaching-demo.html': 'text/html', '/basic-targets.js': 'application/javascript' };
+      if (types[file]) {
+        res.setHeader('content-type', types[file]);
+        res.end(fs.readFileSync(path.join(ROOT, file.slice(1))));
       } else { res.statusCode = 404; res.end(); }
     });
     srv.listen(0, '127.0.0.1', () => resolve(srv));
