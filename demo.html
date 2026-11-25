@@ -398,7 +398,8 @@
         body: JSON.stringify({ meal })
       });
       const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || 'Analysis failed');
+      // A limit (429) or a busy counter (503) comes back with a message meant for the visitor.
+      if (!res.ok || data.error) throw new Error(data.message || data.error || 'Analysis failed');
 
       pendingMeal = data;
       document.getElementById('confirm-name').textContent = data.name || meal;

@@ -956,21 +956,24 @@ async function loadRatingFor(recipeId) {
   summaryEl.textContent = "Loading…";
   if (!sb) { summaryEl.textContent = "Ratings unavailable"; return; }
   try {
-    const { data, error } = await sb.from("recipe_ratings").select("rating,email").eq("recipe_id", recipeId);
+    // Only the summary comes back: the average, the count and the caller's own rating. Never anyone's email.
+    const { data, error } = await sb.rpc("recipe_rating_summary", { p_recipe_id: String(recipeId) });
     if (error) {
       console.error("Rating load failed:", error);
       summaryEl.textContent = "Ratings coming soon";
       return;
     }
-    const ratings = (data || []).map(r => r.rating);
-    const avg = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
-    const mine = currentUser && currentUser.email ? data.find(r => r.email === currentUser.email.toLowerCase().trim()) : null;
+    const row = Array.isArray(data) ? data[0] : data;
+    const count = row ? Number(row.rating_count) || 0 : 0;
+    const avg = row && row.avg_rating != null ? Number(row.avg_rating) : 0;
+    const mine = currentUser && row && row.my_rating != null ? Number(row.my_rating) : null;
+    const countText = count ? `${avg.toFixed(1)} / 5 · ${count} rating${count === 1 ? "" : "s"}` : "";
     if (currentUser) {
-      renderStars(starsEl, mine ? mine.rating : 0, false, (val) => submitRating(recipeId, val));
-      summaryEl.textContent = ratings.length ? `${avg.toFixed(1)} / 5 · ${ratings.length} rating${ratings.length === 1 ? "" : "s"}` : "No ratings yet, be the first";
+      renderStars(starsEl, mine || 0, false, (val) => submitRating(recipeId, val));
+      summaryEl.textContent = count ? countText : "No ratings yet, be the first";
     } else {
       renderStars(starsEl, avg, true, null);
-      summaryEl.textContent = ratings.length ? `${avg.toFixed(1)} / 5 · ${ratings.length} rating${ratings.length === 1 ? "" : "s"}` : "No ratings yet";
+      summaryEl.textContent = count ? countText : "No ratings yet";
     }
   } catch (err) {
     console.error("Rating load failed:", err);
