@@ -401,25 +401,30 @@ function resolveTimeZone(text) {
   const first = key.split(',')[0].trim();
   return TZ_BY_NAME[key] || TZ_BY_NAME[first] || TZ_BY_NAME[first.replace(/ /g, '_')] || null;
 }
-function zoneFor(row) { return (row && row.time_zone && resolveTimeZone(row.time_zone)) || MELB; }
+// The client's own zone (coaching_clients.time_zone) if it is a valid IANA name, otherwise Melbourne.
+function validZone(z) {
+  if (!z) return null;
+  try { new Intl.DateTimeFormat('en-AU', { timeZone: z }); return z; } catch (e) { return null; }
+}
+function zoneFor(row) { return validZone(row && row.time_zone) || MELB; }
 
 /* ==========================================================================
-   Dates. "Today" for logging is Melbourne's day, the same day the database uses.
+   Dates. "Today", the 3-day window, the activation day and weigh-in days use the client's own zone.
    ========================================================================== */
 const pad = n => String(n).padStart(2, '0');
 function ymdIn(date, zone) { return new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date); }
-function melbToday() { return ymdIn(new Date(), MELB); }
+function clientToday(row) { return ymdIn(new Date(), zoneFor(row)); }
 function pd(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
 function addDays(s, n) { const d = pd(s); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
 function diffDays(a, b) { return Math.round((pd(b) - pd(a)) / 86400000); }
 function dowNum(s) { return (pd(s).getDay() + 6) % 7 + 1; }
 function fmtDate(s) { return s ? pd(s).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : 'Not set'; }
-function pday(day) { return day === melbToday() ? 'Today' : fmtDate(day); }
-function activatedDay(row) { return row && row.activated_at ? ymdIn(new Date(row.activated_at), MELB) : null; }
+function pday(row, day) { return day === clientToday(row) ? 'Today' : fmtDate(day); }
+function activatedDay(row) { return row && row.activated_at ? ymdIn(new Date(row.activated_at), zoneFor(row)) : null; }
 // Logging is open from activation, for today and up to 3 days back, and only while the plan is active.
 function canLog(row, day) {
   if (!row || row.status !== 'active') return false;
-  const start = activatedDay(row), today = melbToday();
+  const start = activatedDay(row), today = clientToday(row);
   if (!start) return false;
   return day >= start && day <= today && day >= addDays(today, -LOG_BACK_DAYS);
 }
@@ -444,7 +449,7 @@ const S = {
   session: null, user: null, rows: [], cur: null,
   plans: {}, weighIns: [], steps: [], checkin: null,
   day: null, tab: 'today', addMode: null, wo: null, woMode: 'plan',
-  describe: null, build: null, sheet: null, confirmDelete: false, consentChosen: null
+  describe: null, build: null, sheet: null, confirmDelete: false, marketing: null, marketingError: false
 };
 
 function friendly(err) {
@@ -464,6 +469,12 @@ function toast(msg) {
   window.__toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
 }
 
+/* The signed-in client's own marketing setting, true or false (get_my_marketing_consent in the database). */
+async function loadMarketing() {
+  const { data, error } = await sb.rpc('get_my_marketing_consent');
+  S.marketingError = !!error;
+  S.marketing = error ? null : data === true;
+}
 async function loadAll() {
   const { data: rowsData, error } = await sb.from('coaching_clients').select(CLIENT_COLUMNS).order('created_at', { ascending: false });
   if (error) throw error;
@@ -540,7 +551,7 @@ function noPlanHtml() {
 }
 function statusHeader() {
   const r = S.cur;
-  const week = r.activated_at ? Math.min(12, Math.floor(diffDays(activatedDay(r), melbToday()) / 7) + 1) : null;
+  const week = r.activated_at ? Math.min(12, Math.floor(diffDays(activatedDay(r), clientToday(r)) / 7) + 1) : null;
   return `<section class="hero"><div class="row"><div><div class="muted">${esc(PLAN_NAMES[r.tier] || 'Coaching')} plan</div>
       <h1>${esc(r.name || 'My Coach')}</h1></div><span class="pill">${esc(STATUS_LABEL[r.status] || r.status)}</span></div>
       ${week ? `<p class="muted" style="margin:10px 0 0">Week ${week} of 12. Weigh-in day: ${esc(DAYS_FULL[DAYS.indexOf((r.onboarding || {}).weighInDay) >= 0 ? DAYS.indexOf(r.onboarding.weighInDay) : 0])}.</p>` : ''}
@@ -686,7 +697,7 @@ function sixStepHtml() {
           <div class="err" id="err-health"></div>
           ${['heart', 'chest', 'other'].some(k => h[k] === 'yes') ? `<div class="hl-amber" style="margin-top:10px"><label class="check"><input type="checkbox" data-f="healthClearance" ${d.healthClearance ? 'checked' : ''}><span>I have checked with my doctor that I can start exercise and diet changes.</span></label><div class="err" id="err-healthClearance"></div></div>` : ''}</div>
         <div class="card"><h3>Agreements</h3>
-          ${agree(d, 'agreeTerms', `I have read the <a href="/coaching-terms" target="_blank" rel="noopener">terms</a>. Full refund any time before your plan starts. No refunds once your plan is delivered.`)}
+          ${agree(d, 'agreeTerms', `I have read the <a href="/coaching-terms" target="_blank" rel="noopener">terms</a>. Full refund any time before your plan starts. Once your plan is delivered, no refund is given except where the Australian Consumer Law gives you a right to one.`)}
           ${agree(d, 'agreeNotCoach', `I understand Stefan is a coach, not a dietitian or doctor, and this is general guidance, not medical advice. <a href="/coaching-health" target="_blank" rel="noopener">Read the health notice</a>.`)}
           ${agree(d, 'agreeConsent', `I agree Stefan can see the meals, workouts and weights I log. <a href="/coaching-privacy" target="_blank" rel="noopener">Read the privacy notice</a>.`)}</div>`;
     }
@@ -812,7 +823,7 @@ function showErrors(errs) {
 function answersFrom(d, tier) {
   const heightCm = d.heightUnit === 'ftin' ? (parseFloat(d.heightFt) * 12 + parseFloat(d.heightIn)) * 2.54 : parseFloat(d.heightCm);
   const weightKg = d.weightUnit === 'kg' ? parseFloat(d.weight) : parseFloat(d.weight) / 2.20462;
-  const base = { timezone: String(d.timezone || '').trim(), age: parseFloat(d.age), sex: d.sex, heightCm: Math.round(heightCm * 10) / 10,
+  const base = { timezone: String(d.timezone || '').trim(), timeZoneIana: resolveTimeZone(d.timezone) || MELB, age: parseFloat(d.age), sex: d.sex, heightCm: Math.round(heightCm * 10) / 10,
     weightKg: Math.round(weightKg * 10) / 10, stepsEveryday: parseFloat(d.stepsEveryday), stepsRealistic: parseFloat(d.stepsRealistic),
     weighInDay: d.weighInDay || 'Mon', weighInTime: d.weighInTime || '07:00', agreeTerms: !!d.agreeTerms, agreeNotCoach: !!d.agreeNotCoach };
   if (tier === 'basic') {
@@ -840,7 +851,7 @@ async function submitOnboarding(answers) {
 function todayHtml() {
   const r = S.cur, basic = r.tier === 'basic', day = S.day;
   const editable = canLog(r, day);
-  const isToday = day === melbToday();
+  const isToday = day === clientToday(r);
   const meals = S.meals || [];
   const tot = { calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 };
   meals.forEach(m => NUT.forEach(k => { tot[k] += Number(m[k]) || 0; }));
@@ -853,7 +864,7 @@ function todayHtml() {
   }).join('');
   const nav = `<div class="row" style="margin-bottom:12px">
     <button class="btn-ghost btn-sm" data-act="dayPrev" ${canGoBack(r, day) ? '' : 'disabled'}>‹ Previous</button>
-    <div style="text-align:center"><b>${pday(day)}</b><div class="mini">${fmtDate(day)}</div></div>
+    <div style="text-align:center"><b>${pday(r, day)}</b><div class="mini">${fmtDate(day)}</div></div>
     <button class="btn-ghost btn-sm" data-act="dayNext" ${isToday ? 'disabled' : ''}>Next ›</button></div>`;
   return checkinCard() + nav
     + (!editable ? `<div class="ro-note">${esc(readOnlyDayText(day))}</div>` : '')
@@ -865,7 +876,7 @@ function todayHtml() {
     ${weighCard(editable, day)}`;
 }
 function readOnlyDayText(day) {
-  return day < melbToday() && day < addDays(melbToday(), -LOG_BACK_DAYS)
+  return day < clientToday(S.cur) && day < addDays(clientToday(S.cur), -LOG_BACK_DAYS)
     ? 'That day is more than 3 days back, so it is read-only.'
     : 'This day is not open for logging yet, or your plan is not active.';
 }
@@ -1038,10 +1049,11 @@ function weighChart(w) {
 }
 function settingsHtml() {
   const r = S.cur;
-  return `<div class="card"><h3>News and offers</h3>
-      <p class="muted">Tell us whether you want news and offers from Beast Coach by email. You can change this any time, and each email has an unsubscribe link.</p>
-      <div class="row" style="justify-content:flex-start"><button data-act="consent" data-on="yes">Yes, send me news and offers</button><button class="btn-ghost" data-act="consent" data-on="no">No, do not send me news</button></div>
-      <p class="mini" style="margin-top:8px">${S.consentChosen ? (S.consentChosen === 'yes' ? 'Saved: news and offers on.' : 'Saved: news and offers off.') : ''}</p></div>
+  const on = S.marketing === true;
+  return `<div class="card"><h3>Marketing emails: ${S.marketing === null ? 'Unknown' : (on ? 'On' : 'Off')}</h3>
+      <p class="muted">News and offers from Beast Coach by email. You can change this any time, and each email has an unsubscribe link.</p>
+      ${S.marketingError ? '<p class="mini" style="margin:0 0 8px;color:#B42318">Could not load your setting. Please try again.</p>' : ''}
+      <div class="row" style="justify-content:flex-start"><button data-act="toggleMarketing" ${S.marketing === null ? 'disabled' : ''}>${on ? 'Turn marketing emails off' : 'Turn marketing emails on'}</button></div></div>
     <div class="card"><h3>Delete my coaching data</h3>
       <p class="muted">This deletes your plan, meals, workouts, steps, weigh-ins and check-ins from Beast Coach. Your purchase record is kept for tax, and your email choice is respected.</p>
       ${S.confirmDelete
@@ -1153,9 +1165,9 @@ async function reloadToday() { await loadAll(); await loadDay(); render(); }
 
 const actions = {
   tab(el) { S.tab = el.dataset.tab; render(); },
-  startTracking() { S.basicTargets = null; S.day = melbToday(); loadDay().then(render); toast('Tracking started. Log your meals and steps on Today.'); },
+  startTracking() { S.basicTargets = null; S.day = clientToday(S.cur); loadDay().then(render); toast('Tracking started. Log your meals and steps on Today.'); },
   dayPrev() { if (canGoBack(S.cur, S.day)) { S.day = addDays(S.day, -1); S.wo = null; loadDay().then(render); } },
-  dayNext() { if (S.day < melbToday()) { S.day = addDays(S.day, 1); S.wo = null; loadDay().then(render); } },
+  dayNext() { if (S.day < clientToday(S.cur)) { S.day = addDays(S.day, 1); S.wo = null; loadDay().then(render); } },
   addMode(el) { S.addMode = el.dataset.m; S.describe = null; S.build = null; render(); },
   woMode(el) { S.woMode = el.dataset.m; S.wo = null; render(); },
   async logPlan(el) {
@@ -1266,10 +1278,12 @@ const actions = {
   },
   howTo(el) { openExercise(el.dataset.name); },
   closeSheet() { document.getElementById('sheetRoot').innerHTML = ''; },
-  consent(el) {
-    sb.rpc('set_marketing_consent', { p_on: el.dataset.on === 'yes' }).then(({ data, error }) => {
+  toggleMarketing() {
+    if (S.marketing === null) return;
+    const next = !S.marketing;
+    sb.rpc('set_marketing_consent', { p_on: next }).then(({ data, error }) => {
       if (error || !data || !data.ok) { toast(friendly(error) || 'Could not save. Please try again.'); return; }
-      S.consentChosen = el.dataset.on; render(); toast('Saved.');
+      S.marketing = next; render(); toast(next ? 'Marketing emails on.' : 'Marketing emails off.');
     });
   },
   askDelete() { S.confirmDelete = true; render(); },
@@ -1366,7 +1380,8 @@ async function boot() {
     document.getElementById('app').innerHTML = `<div class="card"><p>${esc(friendly(err))}</p></div>`;
     return;
   }
-  S.day = melbToday();
+  await loadMarketing();
+  S.day = clientToday(S.cur);
   await loadDay();
   render();
 }

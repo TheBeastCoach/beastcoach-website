@@ -102,7 +102,7 @@ function newBackend(opts) {
   const row = Object.assign({
     id: 1, user_id: 'user-1', email: 'client@example.com', name: 'Client Example', tier: 'core', status: 'active',
     start_date: activated, activated_at: activated + 'T09:00:00+11:00', end_date: addDaysStr(activated, 84),
-    time_zone: 'Melbourne', whatsapp: '+61 400 000 001', created_at: activated + 'T08:00:00Z',
+    time_zone: 'Australia/Melbourne', whatsapp: '+61 400 000 001', created_at: activated + 'T08:00:00Z',
     onboarding: { weighInDay: weekday, weighInTime: '07:00', goal: 'Get stronger' },
     targets: { calories: 2000, protein: 150, carbs: 200, fat: 70, fibre: 28, steps: 8000 }
   }, o.row || {});
@@ -112,16 +112,22 @@ function newBackend(opts) {
     plans: [{ client_id: 1, version: 1, is_current: true, plan }],
     meals: [], workouts: [], steps: [], weighIns: [],
     checkins: o.checkins === undefined ? [{ id: 'c1', client_id: 1, type: 'Check-in', scheduled_at: new Date(Date.now() + 2 * 86400000).toISOString(), status: 'scheduled' }] : o.checkins,
-    consent: [], deleted: false, requests: [], ai: [], rpc: [], ...o.extra
+    consent: [], marketing: false, deleted: false, requests: [], ai: [], rpc: [], ...o.extra
   };
   if (o.meals) db.meals = o.meals;
   return db;
 }
 // The window the database applies: from activation, up to 3 days back, today at most, active only.
+// "Today" and the activation day are in the client's own zone (coaching_clients.time_zone), else Melbourne.
+function zoneOf(c) {
+  try { new Intl.DateTimeFormat('en-AU', { timeZone: c.time_zone }); return c.time_zone; } catch (e) { return MELB; }
+}
+function ymdIn(d, zone) { return new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d); }
 function canLog(db, c, day) {
   if (c.status !== 'active' || !c.activated_at) return false;
-  const start = ymd(new Date(c.activated_at));
-  return day >= start && day <= db.today && day >= addDaysStr(db.today, -3);
+  const zone = zoneOf(c);
+  const start = ymdIn(new Date(c.activated_at), zone), today = ymdIn(new Date(), zone);
+  return day >= start && day <= today && day >= addDaysStr(today, -3);
 }
 function matches(rowObj, filters) {
   return filters.every(f => {
@@ -207,7 +213,8 @@ function handleRpc(db, name, args) {
     c.status = 'awaiting_activation';
     return { status: 200, body: { ok: true, status: 'awaiting_activation' } };
   }
-  if (name === 'set_marketing_consent') { db.consent.push(args.p_on); return { status: 200, body: { ok: true, customer_records: 1 } }; }
+  if (name === 'set_marketing_consent') { db.consent.push(args.p_on); db.marketing = args.p_on; return { status: 200, body: { ok: true, customer_records: 1 } }; }
+  if (name === 'get_my_marketing_consent') { return { status: 200, body: db.marketing === true } ; }
   if (name === 'delete_my_coaching_data') { db.deleted = true; db.clients.splice(0, db.clients.length); db.meals.length = 0; db.workouts.length = 0; db.steps.length = 0; db.weighIns.length = 0; db.checkins.length = 0; db.plans.length = 0; return { status: 200, body: { deleted: true, client_rows_removed: 1, customer_record_kept: true } }; }
   return { status: 404, body: { code: 'PGRST202', message: 'no function ' + name } };
 }
@@ -296,7 +303,7 @@ test('active Core client: the check-in card, the Today screen and the WhatsApp b
 });
 
 test('the check-in card shows the Melbourne time as well when the client is in another zone', SKIP, async () => {
-  const backend = newBackend({ row: { time_zone: 'London' }, checkins: [{ id: 'c9', client_id: 1, type: 'Video call', scheduled_at: new Date(Date.now() + 2 * 86400000).toISOString(), status: 'scheduled' }] });
+  const backend = newBackend({ row: { time_zone: 'Europe/London' }, checkins: [{ id: 'c9', client_id: 1, type: 'Video call', scheduled_at: new Date(Date.now() + 2 * 86400000).toISOString(), status: 'scheduled' }] });
   const { ctx, page } = await open(backend);
   await waitForApp(page);
   assert.match(await txt(page, '#checkinCard .eyebrow'), /Video call/);
@@ -430,7 +437,7 @@ test('past days: Previous stops at 3 days back, and an older day is read-only', 
   await waitForApp(page);
   for (let i = 0; i < 3; i++) {
     await page.click('button[data-act="dayPrev"]');
-    await page.waitForFunction(n => document.querySelectorAll('.row b').length >= 0 && S.day === addDays(melbToday(), -n), i + 1);
+    await page.waitForFunction(n => document.querySelectorAll('.row b').length >= 0 && S.day === addDays(clientToday(S.cur), -n), i + 1);
   }
   await page.waitForFunction(() => document.querySelector('button[data-act="dayPrev"]').disabled);
   assert.equal(await page.locator('button[data-act="dayPrev"]').isDisabled(), true, 'Previous is off at 3 days back');
@@ -444,7 +451,7 @@ test('logging refused by the database shows a friendly message, not the raw data
   // Ask the page to save a step count for a day outside the window, as a stale page could.
   // As the page does when a button is pressed: the action runs, and any error becomes the toast.
   await page.evaluate(async () => {
-    S.day = addDays(melbToday(), -6);
+    S.day = addDays(clientToday(S.cur), -6);
     document.getElementById('app').insertAdjacentHTML('beforeend', '<input id="st-val" value="5000">');
     try { await actions.saveSteps(); } catch (err) { toast(friendly(err)); }
   });
@@ -482,16 +489,46 @@ test('a returning client: an earlier 12-week plan shows as its own block in Prog
   await ctx.close();
 });
 
+test('a London client: today, the 3-day window and the first day open in London time, not Melbourne', SKIP, async () => {
+  const backend = newBackend({ row: { time_zone: 'Europe/London' } });
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  const check = await page.evaluate(() => ({
+    today: clientToday(S.cur), zone: zoneFor(S.cur),
+    logToday: canLog(S.cur, clientToday(S.cur)),
+    logThreeBack: canLog(S.cur, addDays(clientToday(S.cur), -3)),
+    logFourBack: canLog(S.cur, addDays(clientToday(S.cur), -4))
+  }));
+  assert.equal(check.zone, 'Europe/London');
+  assert.equal(check.today, await page.evaluate(() => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())));
+  assert.equal(check.logToday, true, 'today in London can be logged');
+  assert.equal(check.logThreeBack, true, '3 days back in London can be logged');
+  assert.equal(check.logFourBack, false, '4 days back in London is refused');
+  await ctx.close();
+});
+
+test('an invalid stored zone falls back to Australia/Melbourne', SKIP, async () => {
+  const backend = newBackend({ row: { time_zone: 'Mars/Olympus' } });
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  assert.equal(await page.evaluate(() => zoneFor(S.cur)), 'Australia/Melbourne');
+  await ctx.close();
+});
+
 test('settings: marketing emails on and off, through the consent function', SKIP, async () => {
   const backend = newBackend();
   const { ctx, page } = await open(backend);
   await waitForApp(page);
   await page.click('button[data-act="tab"][data-tab="settings"]');
-  await page.click('button[data-act="consent"][data-on="no"]');
-  await page.waitForFunction(() => document.body.textContent.includes('Saved: news and offers off'));
-  await page.click('button[data-act="consent"][data-on="yes"]');
-  await page.waitForFunction(() => document.body.textContent.includes('Saved: news and offers on'));
-  assert.deepEqual(backend.rpc.filter(r => r.name === 'set_marketing_consent').map(r => r.args.p_on), [false, true]);
+  // One toggle. The setting starts Off (the database says false), so the first press turns it On.
+  await page.waitForFunction(() => document.getElementById('app').textContent.includes('Marketing emails: Off'));
+  assert.equal(await page.locator('button[data-act="toggleMarketing"]').count(), 1, 'one toggle button');
+  await page.click('button[data-act="toggleMarketing"]');
+  await page.waitForFunction(() => document.getElementById('app').textContent.includes('Marketing emails: On'));
+  await page.click('button[data-act="toggleMarketing"]');
+  await page.waitForFunction(() => document.getElementById('app').textContent.includes('Marketing emails: Off'));
+  assert.deepEqual(backend.rpc.filter(r => r.name === 'set_marketing_consent').map(r => r.args.p_on), [true, false]);
+  assert.ok(backend.rpc.some(r => r.name === 'get_my_marketing_consent'), 'the setting is read with get_my_marketing_consent');
   await ctx.close();
 });
 

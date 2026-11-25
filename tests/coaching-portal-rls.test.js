@@ -464,15 +464,16 @@ test('the customer list and the coach notes never reach a client, even by guessi
 
 // The verification script you run in the Supabase SQL Editor (supabase/coaching-portal-verify.sql).
 // It must pass here too, and it must leave nothing behind.
-test('supabase/coaching-portal-verify.sql: every check passes, and nothing is left behind (after 4a and 4b)', async () => {
+test('supabase/coaching-portal-verify.sql: every check passes, and nothing is left behind (after 4a, 4b and 4b2)', async () => {
   const db = await newDb();
   await db.exec(read('supabase/coaching-portal-4b.sql'));
+  await db.exec(read('supabase/coaching-portal-4b2.sql'));
   const results = await db.exec(read('supabase/coaching-portal-verify.sql'));
   const table = results.find(r => r.rows && r.rows.length && r.rows[0].check_name);
   assert.ok(table, 'the script ends with a results table');
   const failed = table.rows.filter(r => r.result !== 'PASS');
   assert.deepEqual(failed.map(r => r.check_name + ': ' + r.detail), [], 'no FAIL rows');
-  assert.ok(table.rows.length >= 25, 'the checks ran: ' + table.rows.length);
+  assert.ok(table.rows.length >= 33, 'the checks ran: ' + table.rows.length);
   const left = await scalar(db, `select count(*)::int as n from auth.users where email like 'verify-%'`);
   assert.equal(left.n, 0, 'the stub users are gone after the rollback');
   await db.close();

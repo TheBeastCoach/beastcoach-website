@@ -181,8 +181,16 @@ What 4b adds, on top of 4a:
 
 1. `supabase/coaching.sql`, only if it has never been run.
 2. `supabase/coaching-portal.sql` (4a). Already run on the live project.
-3. `supabase/coaching-portal-4b.sql` (4b). Safe to run twice. Run it once now.
-4. `supabase/coaching-portal-verify.sql`. Read the results panel: every row should say PASS. It now expects the older-plan and counter checks as well, and it still rolls back, so it leaves nothing behind.
+3. `supabase/coaching-portal-4b.sql` (4b). Safe to run twice.
+4. `supabase/coaching-portal-4b2.sql` (4b2). Safe to run twice. Client time zones, and the marketing email setting. Run after 4b.
+5. `supabase/coaching-portal-verify.sql`. Read the results panel: every row should say PASS. It still rolls back, so it leaves nothing behind.
+
+### Step 4b2: client time zones and marketing emails
+
+- **Time zones.** "Today", the 3-day logging window, the activation day and the weigh-in day use the client's own zone (`coaching_clients.time_zone`). A missing or unknown zone falls back to Australia/Melbourne. Onboarding saves a valid IANA zone: a city such as London is mapped to Europe/London (`resolve_time_zone()`), and a full zone name is kept as it is. Database: `supabase/coaching-portal-4b2.sql` (`valid_time_zone()`, `resolve_time_zone()`, `client_zone()`, `client_today()`, `can_log_on()`, `submit_onboarding()`). Page: `my-coach.html` (`zoneFor()`, `clientToday()`, `canLog()`).
+- **Marketing emails.** `get_my_marketing_consent()` (security definer) returns only the signed-in client's own setting, true or false. Settings shows "Marketing emails: On" or "Off" with one toggle button. Anon cannot call it.
+- **Checks.** The verify script adds a London client: the client zone is Europe/London, a London client logs on their own date, can log 3 days back and is refused 4 days back. It also checks the fallback zone, city mapping, that a client sees only their own marketing setting, and that anon is refused.
+- **Limit of the London check.** Right now London and Melbourne may be on the same calendar date, so the London boundary is only proven in full when the two dates differ (roughly from midnight to 11am Melbourne time). The zone-to-date mapping itself is covered by the fallback and city checks.
 
 ### Environment for `/api/coach-ai` (Vercel)
 
@@ -208,9 +216,13 @@ What 4b adds, on top of 4a:
 
 - `tests/coaching-portal-client.test.js`: the client portal on a stubbed Supabase, which applies the same window and weigh-in rules as the database. It covers both onboarding flows (the six steps and the Basic screen), the status screens, the check-in card, The Beast only WhatsApp, From my plan, Describe it, Meal Builder, workouts (plan and Other activity), steps, the weigh-in day, past-day logging, refused days with a friendly message, read-only plans, earlier plans in Progress, the consent buttons, delete my data, How to do it, and no coach-only notes.
 - `tests/coach-ai.test.js`: no token, a bad token, no active plan, the client limit, the shared cap, the order of the checks, the day mode refused for clients, an unreachable counter, missing keys.
-- `tests/coaching-portal-rls.test.js`: the 4b database rules (older plans, the returning-client claim, the counter per client and shared, anon refused), and the extended verify script, all PASS, nothing left behind.
+- `tests/coaching-portal-rls.test.js`: the 4b database rules (older plans, the returning-client claim, the counter per client and shared, anon refused), and the extended verify script (after 4b and 4b2), all PASS, nothing left behind.
 
 What the tests cannot prove: the page is tested on a stub of Supabase and of Beast AI, and the database on PGlite. Before launch, sign in on a Supabase preview project with a real client account and check one day of logging end to end, and one call to Describe it.
+
+## Agreement pages
+
+Agreement pages: reviewed by Stefan's attorney. Australian Consumer Law refund wording and Australian Privacy Principles to be confirmed before launch.
 
 ## Open for 4c
 

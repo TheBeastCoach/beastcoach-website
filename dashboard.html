@@ -114,6 +114,12 @@
   @media (max-width: 480px) { .tile-grid { grid-template-columns: 1fr; } }
   .tile { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px; cursor: pointer; text-decoration: none; display: block; }
   .tile:hover { border-color: var(--green); }
+  /* My Coach: the one tile for paying clients. Same green as the donate button; contrast checked (WCAG AA). */
+  .tile.coach-tile { background: var(--green); border-color: var(--green); color: #FFFFFF; }
+  .tile.coach-tile:hover { background: var(--green-dark); border-color: var(--green-dark); }
+  .tile.coach-tile h3 { color: #FFFFFF; }
+  .tile.coach-tile p { color: #E8F5EE; }
+  .tile .coach-label { display: block; font-size: 12px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: #CDEBDB; margin-bottom: 6px; }
   .tile h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 6px; color: var(--text); }
   .tile p { color: var(--muted); font-size: 13px; }
 
@@ -381,8 +387,8 @@
       <button class="signout" id="signout-btn">Sign out</button>
     </div>
     <div class="tile-grid">
+      <a class="tile coach-tile" id="myCoachTile" href="/my-coach" style="display:none"><span class="coach-label">Your coaching</span><h3>My Coach</h3><p>Your coaching plan, status and portal.</p></a>
       <a class="tile" href="/beast-challenge" style="border-color:var(--green)"><h3>Beast Challenge</h3><p>New &middot; Free 30 days: log your steps and walk a real city-to-city journey.</p></a>
-      <a class="tile" id="myCoachTile" href="/my-coach" style="display:none"><h3>My Coach</h3><p>Your coaching plan, status and portal.</p></a>
       <a class="tile" id="disciplineTile" href="/discipline-path"><h3>8-Step Discipline Program</h3><p>View the program and get started.</p></a>
       <a class="tile" href="/challenge"><h3>30-Day Challenge</h3><p>Log today's entry and see your progress.</p></a>
       <a class="tile" data-nav="calculator"><h3>BMI &amp; Macro Calculator</h3><p>Your calories, macros, and BMI.</p></a>

@@ -74,7 +74,8 @@ insert into verify_ids (name, id, email) values
   ('C', gen_random_uuid(), 'verify-coach@verify.invalid'),
   ('U', gen_random_uuid(), 'verify-unconfirmed@verify.invalid'),
   ('N', gen_random_uuid(), 'VERIFY-New.Client@Verify.invalid'),
-  ('X', gen_random_uuid(), 'verify-stranger@verify.invalid');
+  ('X', gen_random_uuid(), 'verify-stranger@verify.invalid'),
+  ('L', gen_random_uuid(), 'verify-london@verify.invalid');   -- a confirmed client in London (time zone checks)
 
 do $$
 declare
@@ -117,6 +118,11 @@ begin
   insert into public.coaching_customers (email, name, tier, amount_cents, marketing_consent) values
     ('verify-a@verify.invalid', 'Verify A', 'core', 29900, true),
     ('verify-b@verify.invalid', 'Verify B', 'essential', 11000, false);
+
+  -- Client L: London. Active for 10 days, so today in London and the 3 days before it are open to log.
+  insert into public.coaching_clients (user_id, email, name, tier, status, activated_at, start_date, time_zone, onboarding)
+  select i.id, i.email, 'Verify London', 'core', 'active', now() - interval '10 days', public.melbourne_today() - 10, 'Europe/London', '{}'::jsonb
+    from verify_ids i where i.name = 'L';
 exception when others then
   perform pg_temp.verify_record('setup: stub data', false, sqlerrm);
 end $$;
@@ -535,6 +541,89 @@ begin
 exception when others then
   perform pg_temp.verify_reset();
   perform pg_temp.verify_record('spot counts: Basic is never a capacity tier', false, 'error: ' || sqlerrm);
+end $$;
+
+-- 7b. Time zones: a London client logs on their own date; the window is in their zone. ------------
+do $$
+declare l_id bigint; l_zone text; ok_today boolean := false; ok_three boolean := false;
+  refused_four boolean := false; l_today date; mel_today date;
+begin
+  select id into l_id from public.coaching_clients where email = 'verify-london@verify.invalid';
+  l_zone := public.client_zone(l_id);
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('London: the client zone is Europe/London', l_zone = 'Europe/London', 'zone: ' || coalesce(l_zone, 'null'));
+
+  -- The London date is worked out here, as the database owner, from the zone itself.
+  l_today := (now() at time zone 'Europe/London')::date;
+  mel_today := (now() at time zone 'Australia/Melbourne')::date;
+  perform pg_temp.verify_as('authenticated', 'L');
+  begin
+    insert into public.coaching_meal_logs (client_id, log_date, name, calories, source, meal_time)
+      values (l_id, l_today, 'Verify London dinner', 650, 'typed', 'Dinner');
+    ok_today := true;
+  exception when others then ok_today := false; end;
+  begin
+    insert into public.coaching_meal_logs (client_id, log_date, name, calories, source)
+      values (l_id, l_today - 3, 'Verify London lunch', 500, 'typed');
+    ok_three := true;
+  exception when others then ok_three := false; end;
+  begin
+    insert into public.coaching_meal_logs (client_id, log_date, name, calories, source)
+      values (l_id, l_today - 4, 'Verify London too early', 500, 'typed');
+  exception when others then refused_four := true; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('London: logs the evening meal on their own date', ok_today,
+    'London date ' || l_today || ' (Melbourne date ' || mel_today || ')');
+  perform pg_temp.verify_record('London: can log 3 days back in their own time', ok_three, '');
+  perform pg_temp.verify_record('London: refused 4 days back in their own time', refused_four, '');
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('London: time zone logging checks', false, 'error: ' || sqlerrm);
+end $$;
+
+-- 7c. Time zone fallback: a missing or unknown zone is Australia/Melbourne; city names map to IANA. ----
+do $$
+declare l_id bigint; fb text; city_ok boolean; bad_ok boolean; typed_ok boolean;
+begin
+  select id into l_id from public.coaching_clients where email = 'verify-london@verify.invalid';
+  update public.coaching_clients set time_zone = 'Mars/Olympus' where id = l_id;
+  fb := public.client_zone(l_id);
+  update public.coaching_clients set time_zone = 'Europe/London' where id = l_id;
+  city_ok := public.resolve_time_zone('London') = 'Europe/London' and public.resolve_time_zone('london, uk') = 'Europe/London';
+  bad_ok := public.resolve_time_zone('Mars/Olympus') = 'Australia/Melbourne' and public.resolve_time_zone('') = 'Australia/Melbourne';
+  typed_ok := public.resolve_time_zone('america/new_york') = 'America/New_York';
+  perform pg_temp.verify_record('time zone: an unknown stored zone falls back to Australia/Melbourne', fb = 'Australia/Melbourne', 'zone: ' || fb);
+  perform pg_temp.verify_record('time zone: a city maps to its IANA zone (London to Europe/London)', city_ok, '');
+  perform pg_temp.verify_record('time zone: unknown or empty input falls back to Australia/Melbourne', bad_ok and typed_ok, '');
+exception when others then
+  perform pg_temp.verify_record('time zone: fallback checks', false, 'error: ' || sqlerrm);
+end $$;
+
+-- 7d. Marketing setting: each client sees only their own; anon cannot call it. -----------------------
+do $$
+declare a_val boolean; b_val boolean; l_val boolean; anon_blocked boolean := false;
+begin
+  perform pg_temp.verify_as('authenticated', 'A');
+  a_val := public.get_my_marketing_consent();
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_as('authenticated', 'B');
+  b_val := public.get_my_marketing_consent();
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_as('authenticated', 'L');
+  l_val := public.get_my_marketing_consent();
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('marketing: returns only the signed-in client''s own setting',
+    a_val = true and b_val = false and l_val = false,
+    'A: ' || coalesce(a_val::text, 'null') || ', B: ' || coalesce(b_val::text, 'null') || ', London (no customer record): ' || coalesce(l_val::text, 'null'));
+  perform pg_temp.verify_as('anon', 'anon');
+  begin
+    perform public.get_my_marketing_consent();
+  exception when others then anon_blocked := true; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('marketing: anon cannot call get_my_marketing_consent', anon_blocked, '');
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('marketing: consent checks', false, 'error: ' || sqlerrm);
 end $$;
 
 -- 8. Delete: B removes their own data; B's customer row stays; A's data is untouched. Runs last. ---

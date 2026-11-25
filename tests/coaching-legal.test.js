@@ -1,4 +1,4 @@
-// Checks the three draft agreement pages linked from the coaching onboarding:
+// Checks the three agreement pages linked from the coaching onboarding:
 // /coaching-terms, /coaching-health and /coaching-privacy. Plain file checks, no browser needed.
 // Run with: node --test tests/coaching-legal.test.js
 const test = require('node:test');
@@ -12,15 +12,22 @@ const text = html => html.replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]
 const PAGES = ['coaching-terms.html', 'coaching-health.html', 'coaching-privacy.html'];
 
 for (const f of PAGES) {
-  test(`${f}: noindex, the draft banner at the top, and no em dashes`, () => {
+  test(`${f}: indexable, no draft wording, and no em dashes`, () => {
     const html = read(f);
-    assert.match(html, /<meta name="robots" content="noindex/, 'noindex');
-    assert.match(html, /DRAFT: not yet reviewed\. Do not rely on this yet\./, 'draft banner text');
-    assert.ok(html.indexOf('DRAFT: not yet reviewed') < html.indexOf('<h1>'), 'the banner sits above the heading');
-    assert.doesNotMatch(html, /—|–/, 'no em or en dashes');
+    assert.doesNotMatch(html, /<meta name="robots" content="noindex/, 'no noindex tag');
+    assert.doesNotMatch(html, /draft|DRAFT|not yet reviewed/i, 'no draft wording');
+    assert.doesNotMatch(html, /\u2014|\u2013/, 'no em or en dashes');
     assert.match(html, /href="\/coaching"/, 'link back to the sales page');
   });
 }
+
+test('coaching-terms.html: refunds keep the policy and say nothing takes away Consumer Law rights', () => {
+  const t = text(read('coaching-terms.html'));
+  assert.match(t, /You get a full refund if you ask before your plan starts\./);
+  assert.match(t, /Once your plan has been delivered, we do not give refunds for it, except where the Australian Consumer Law gives you a right to one\./);
+  assert.match(t, /Nothing in these terms limits your rights under the Australian Consumer Law\./);
+  assert.doesNotMatch(t, /There are no refunds/i, 'the absolute wording is gone');
+});
 
 test('coaching-terms.html: plans, prices, billing, refunds, pausing, WhatsApp hours, renewal and Basic after 12 weeks', () => {
   const t = text(read('coaching-terms.html'));
@@ -29,7 +36,7 @@ test('coaching-terms.html: plans, prices, billing, refunds, pausing, WhatsApp ho
   assert.match(t, /\$299 for 12 weeks, paid up front/);
   assert.match(t, /\$699 for 12 weeks, paid up front/);
   assert.match(t, /full refund if you ask before your plan starts/);
-  assert.match(t, /no refunds once your plan has been delivered/);
+  assert.match(t, /we do not give refunds for it, except where the Australian Consumer Law gives you a right to one/);
   assert.match(t, /Core and The Beast can be paused for up to 2 weeks/);
   assert.match(t, /reply within 2 hours during Australian business hours, Melbourne time/);
   assert.match(t, /renew at 20% off/);
