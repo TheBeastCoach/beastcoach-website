@@ -103,12 +103,13 @@ for (const p of PEOPLE) {
   });
 }
 
-test('steps target: average plus 2,000, between 7,000 and 10,000', () => {
-  assert.equal(BasicTargets.stepsTarget(4000), 7000);
-  assert.equal(BasicTargets.stepsTarget(5000), 7000);
-  assert.equal(BasicTargets.stepsTarget(6500), 8500);
-  assert.equal(BasicTargets.stepsTarget(8000), 10000);
-  assert.equal(BasicTargets.stepsTarget(12000), 10000);
+test('steps target is the realistic target the client gave, kept between 3,000 and 20,000', () => {
+  assert.equal(BasicTargets.stepsTarget(1000), 3000, 'below the floor goes up to 3,000');
+  assert.equal(BasicTargets.stepsTarget(3000), 3000);
+  assert.equal(BasicTargets.stepsTarget(8000), 8000, 'no +2,000 rule any more');
+  assert.equal(BasicTargets.stepsTarget(9000), 9000);
+  assert.equal(BasicTargets.stepsTarget(20000), 20000);
+  assert.equal(BasicTargets.stepsTarget(25000), 20000, 'above the ceiling goes down to 20,000');
 });
 
 test('the calculator has no maintain goal, so maintain is the calculator maintenance (adjustment 0)', () => {

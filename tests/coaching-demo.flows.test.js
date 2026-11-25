@@ -68,6 +68,7 @@ test('Basic signup: one-screen onboarding, the daily targets screen, then Start 
   assert.match(await page.textContent('#app'), /\$2\.50 a week, \$30 billed every 12 weeks/);
   await page.fill('#nc-name', 'Basic Tester');
   await page.fill('#nc-email', 'basic.tester@example.com');
+  await page.selectOption('#nc-country', 'Australia');
   assert.match(await page.textContent('button[data-act="pay"]'), /Pay \$30 every 12 weeks/);
   await page.click('button[data-act="pay"]');
   await page.waitForSelector('text=Your details');
@@ -76,6 +77,7 @@ test('Basic signup: one-screen onboarding, the daily targets screen, then Start 
   await page.click('button[data-act="basicSubmit"]');
   assert.equal(await page.textContent('#obMsg'), 'Please answer the questions marked in red.');
   assert.match(await page.textContent('#err-age'), /Enter your age/);
+  assert.match(await page.textContent('#err-timezone'), /Enter your time zone or city/, 'time zone is required, with no default');
   // Under 18 gets the age rule
   await page.fill('#ob-age', '16');
   await page.click('button[data-act="basicSubmit"]');
@@ -86,9 +88,11 @@ test('Basic signup: one-screen onboarding, the daily targets screen, then Start 
   await page.check('input[name="ob-sex"][value="Male"]');
   await page.fill('#ob-heightCm', '182');
   await page.fill('#ob-weight', '84');
+  await page.fill('#ob-timezone', 'Melbourne');
   await page.check('input[name="ob-goalKind"][value="fatloss"]');
   await page.check('input[name="ob-jobMult"][value="1.15"]');
-  await page.fill('#ob-steps', '5000');
+  await page.fill('#ob-stepsEveryday', '5000');
+  await page.fill('#ob-stepsRealistic', '9000');
   await page.fill('#ob-trainingSessions', '3');
   await page.check('input[name="ob-trainingIntensity"][value="350"]');
   await page.check('input[data-ob="agreeNotCoach"]');
@@ -104,7 +108,7 @@ test('Basic signup: one-screen onboarding, the daily targets screen, then Start 
   assert.equal(num(shown[2]), want.carbs, 'carbs');
   assert.equal(num(shown[3]), want.fat, 'fat');
   assert.equal(num(shown[4]), want.fibre, 'fibre');
-  assert.equal(num(shown[5]), 7000, 'steps: 5,000 plus 2,000, at least 7,000');
+  assert.equal(num(shown[5]), 9000, 'steps target is the realistic target given, 9,000');
   await page.screenshot({ path: SHOTS + '/basic-targets-phone.png', fullPage: true });
   await page.click('button[data-act="basicStart"]');
   await page.waitForSelector('text=Tracking started');
@@ -234,6 +238,7 @@ test('Coaching onboarding: under 18 gets the age message above Next, and the pag
   await page.click('button[data-act="buy"][data-t="core"]');
   await page.fill('#nc-name', 'Young Person');
   await page.fill('#nc-email', 'young.person@example.com');
+  await page.selectOption('#nc-country', 'Australia');
   await page.click('button[data-act="pay"]');
   await page.waitForSelector('text=Step 1 of 6');
   await page.fill('#ob-age', '16');

@@ -173,6 +173,24 @@ summary::-webkit-details-marker{display:none}
 .log-ex{padding:4px 0}
 .up-badge{display:inline-block;background:#d8f3e3;color:#1b5e3a;border:1px solid var(--mint);border-radius:999px;padding:1px 9px;font-size:12px;font-weight:800;margin-left:4px}
 .plans{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+/* add a meal: an action card with a segmented control and one primary button */
+.add-card{border:2px solid var(--mint)}
+.add-card .lede{font-size:15px;color:var(--ink);margin:0 0 12px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:#EEF5F0;border-radius:14px;padding:4px;margin-bottom:14px}
+.seg button{background:transparent;color:var(--ink);font-size:14px;font-weight:700;padding:9px 6px;min-height:42px;border-radius:11px;white-space:normal;line-height:1.15}
+.seg button:hover{background:#fff}
+.seg button.on{background:var(--ink);color:#fff}
+.seg.one{grid-template-columns:1fr}
+.late{display:inline-block;background:#eef1f4;color:#3b4a57;border-radius:6px;padding:1px 7px;font-size:12px;font-weight:700;margin-left:6px}
+.ro-note{background:#EEF1F4;border-radius:14px;padding:12px 14px;font-size:15px;margin-bottom:12px}
+.filters{display:grid;gap:10px;grid-template-columns:1fr;margin:8px 0 14px}
+@media(min-width:900px){.filters{grid-template-columns:2fr 1fr 1fr 1fr}}
+.filters label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.cust-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.cust-note{background:#EEF5F0;border-radius:14px;padding:12px 14px;font-size:14px;margin:10px 0}
+.ok-yes{color:#1b7a46;font-weight:800}.ok-no{color:var(--muted)}
+.tz-flag{font-size:13px;color:var(--amber-text);background:#fff6e0;border-radius:8px;padding:4px 9px;display:inline-block;margin-top:5px}
+.hint{font-size:13px;color:var(--muted);margin:4px 0 0}
 </style>
 </head>
 <body>
@@ -180,6 +198,7 @@ summary::-webkit-details-marker{display:none}
 <main class="wrap" id="app"></main>
 <div id="sheetRoot"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<datalist id="tzList"></datalist>
 
 <script src="/basic-targets.js"></script>
 <script>
@@ -188,8 +207,9 @@ summary::-webkit-details-marker{display:none}
 /* ==========================================================================
    Constants
    ========================================================================== */
-const DB_KEY = 'bc_demo_v2';
-const UI_KEY = 'bc_demo_ui';
+// Bumped with the customer records, so older saved demo data is replaced by the new seeds.
+const DB_KEY = 'bc_demo_v3';
+const UI_KEY = 'bc_demo_ui2';
 const DEMO_KEY_NAME = 'bc_demo_key';
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const DAYS_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -207,6 +227,46 @@ const TIERS = {
   beast: { name:'The Beast', price:699, big:'$699', bigNote:'for 12 weeks', short:'$699 for 12 weeks', recur:true,
     desc:'12 weeks of close, hands-on coaching in our smallest group. Our most supported option.' }
 };
+
+/* Time zones. The client types a city or a zone. A known one sets their "today" and weigh-in day.
+   Anything else falls back to Australia/Melbourne and is flagged in the coach view. */
+const DEFAULT_TZ = 'Australia/Melbourne';
+const TZ_CITIES = [
+  ['Melbourne','Australia/Melbourne'], ['Sydney','Australia/Sydney'], ['Brisbane','Australia/Brisbane'],
+  ['Adelaide','Australia/Adelaide'], ['Perth','Australia/Perth'], ['Hobart','Australia/Hobart'], ['Darwin','Australia/Darwin'],
+  ['Auckland','Pacific/Auckland'], ['London','Europe/London'], ['Dublin','Europe/Dublin'], ['Paris','Europe/Paris'],
+  ['Berlin','Europe/Berlin'], ['Johannesburg','Africa/Johannesburg'], ['Dubai','Asia/Dubai'], ['Singapore','Asia/Singapore'],
+  ['Hong Kong','Asia/Hong_Kong'], ['Tokyo','Asia/Tokyo'], ['Mumbai','Asia/Kolkata'], ['New York','America/New_York'],
+  ['Chicago','America/Chicago'], ['Denver','America/Denver'], ['Los Angeles','America/Los_Angeles'],
+  ['Toronto','America/Toronto'], ['Vancouver','America/Vancouver']
+];
+// Known names -> zone: city names, full zone names (Europe/London) and their last part (London).
+const TZ_BY_NAME = {};
+TZ_CITIES.forEach(([city, zone]) => {
+  TZ_BY_NAME[city.toLowerCase()] = zone;
+  TZ_BY_NAME[zone.toLowerCase()] = zone;
+  TZ_BY_NAME[zone.split('/')[1].replace(/_/g, ' ').toLowerCase()] = zone;
+});
+if (typeof Intl.supportedValuesOf === 'function') {
+  Intl.supportedValuesOf('timeZone').forEach(z => { TZ_BY_NAME[z.toLowerCase()] = TZ_BY_NAME[z.toLowerCase()] || z; });
+}
+// Returns the zone for what the client typed, or null if it is not a known zone or city.
+function resolveTimeZone(text) {
+  const key = String(text || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  if (!key) return null;
+  const first = key.split(',')[0].trim();                      // "Melbourne, Australia" -> "melbourne"
+  return TZ_BY_NAME[key] || TZ_BY_NAME[first] || TZ_BY_NAME[first.replace(/ /g, '_')] || null;
+}
+// The zone used for this client's "today" and weigh-in day.
+function zoneFor(c) { return (c && c.ob && resolveTimeZone(c.ob.timezone)) || DEFAULT_TZ; }
+// Set by render() to the zone of whoever is on screen, so todayS() is their today.
+let activeZone = DEFAULT_TZ;
+
+/* Customers: one record per person who buys anything. Kept after their client data is deleted.
+   In production this becomes a Supabase table (one row per customer, joined with the existing
+   Discipline Path purchases), readable only by the coach role. Here it lives in browser storage. */
+const CUSTOMER_STATUS = { active:'Active', finished:'Finished', basic:'Basic', cancelled:'Cancelled' };
+const COUNTRIES = ['Australia', 'New Zealand', 'United Kingdom', 'United States', 'Canada', 'Ireland', 'South Africa', 'Singapore', 'Other'];
 const STATUS = {
   onboarding:['Onboarding','p-onboarding'], awaiting:['Awaiting activation','p-awaiting'],
   active:['Active','p-active'], paused:['Paused','p-paused'], finished:['Finished','p-finished']
@@ -485,9 +545,10 @@ const Store = {
       const raw = localStorage.getItem(DB_KEY);
       if (raw) {
         const d = JSON.parse(raw);
-        if (d && d.version === 1 && Array.isArray(d.clients)) {
+        if (d && d.version === 2 && Array.isArray(d.clients)) {
           d.capacity = Object.assign({ essential: 100, core: 25, beast: 4 }, d.capacity);
           d.exercises = d.exercises || {};
+          d.customers = d.customers || [];
           return d;
         }
       }
@@ -504,14 +565,25 @@ const Store = {
   saveUi(u) { try { localStorage.setItem(UI_KEY, JSON.stringify(u)); } catch (e) {} }
 };
 let db = null;
-function persist() { Store.save(db); }
+function persist() { syncCustomerStatuses(); Store.save(db); }
 
 /* ==========================================================================
    Dates and numbers
    ========================================================================== */
 const pad = n => String(n).padStart(2, '0');
 function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-function todayS() { return ymd(new Date()); }
+// "Today" in the zone of the client on screen (Melbourne for the coach view).
+function ymdIn(date, zone) { return new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date); }
+function todayS() { return ymdIn(new Date(), activeZone); }
+// Clients can log for today and the 3 days before it. Older days are read-only.
+const LOG_BACK_DAYS = 3;
+const READ_ONLY_MSG = 'That day is more than 3 days back, so it is read-only.';
+function logDay() { return ui.clientDay > todayS() ? todayS() : ui.clientDay; }
+function canLogDay(day) { return day <= todayS() && day >= addDays(todayS(), -LOG_BACK_DAYS); }
+// Progress and the 7-day averages only count days from activation (c.startDate).
+function countable(c, d) { return !!c.startDate && d >= c.startDate; }
+// Save handlers call this first: a read-only day shows a message and nothing is saved.
+function guardDay(day) { if (canLogDay(day)) return true; toast(READ_ONLY_MSG); return false; }
 function pd(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
 function addDays(s, n) { const d = pd(s); d.setDate(d.getDate() + n); return ymd(d); }
 function diffDays(a, b) { return Math.round((pd(b) - pd(a)) / 86400000); }
@@ -593,9 +665,9 @@ function emptyPublished() {
 function blankOb(extra) {
   return Object.assign({
     age:'', sex:'', heightUnit:'cm', heightCm:'', heightFt:'', heightIn:'', weight:'', weightUnit:'kg', weightKg:null, whatsapp:'',
-    timezone: (Intl.DateTimeFormat().resolvedOptions().timeZone || 'Australia/Melbourne'),
+    timezone:'',                       // typed by the client, no default; required
     goal:'', timeframe:'', goalWhy:'', goalKind:'', jobMult:'', trainingSessions:'', trainingIntensity:'',
-    job:'', activity:'', steps:'',
+    job:'', activity:'', stepsEveryday:'', stepsRealistic:'',
     likedFoods:[], likedOther:'', avoid:'', allergies:'', diet:'',
     mealsPerDay:'', cookTime:'', whoCooks:'', eatsOut:'', alcohol:'', typicalDay:'',
     trainingDays:[], timeOfDay:'', sessionLength:'', place:'', equipment:[], experience:'',
@@ -608,7 +680,7 @@ function mkClient(o) {
   return Object.assign({
     id: uid(), name:'', email:'', tier:'essential', status:'onboarding', paid:null, createdAt: new Date().toISOString(),
     startDate:null, pauseUsed:0, pauseStart:null, healthFlag:false, ob: blankOb(), obStep: 1,
-    steps:{}, nextBilling:null, basicStage:null,
+    steps:{}, stepsLate:{}, nextBilling:null, basicStage:null,     // stepsLate: days logged after the day itself
     weighIns:[], workouts:[], targets:null,
     plan:{ mealDraft: emptyDraft(), mealPublished: null, trainDraft:'', trainPublished: null, publishedAt: null },
     logs:{}, notes:''
@@ -693,9 +765,9 @@ function seedDb() {
     paid:{ date: addDays(t, -10), amount: 299 }, createdAt: addDays(t, -10) + 'T09:00:00.000Z',
     startDate: addDays(t, -9), healthFlag:false,
     ob: blankOb({
-      age:'34', sex:'Male', heightUnit:'cm', heightCm:'182', weight:'84', weightUnit:'kg', weightKg:84, whatsapp:'+61 400 000 001',
+      age:'34', sex:'Male', heightUnit:'cm', heightCm:'182', weight:'84', weightUnit:'kg', weightKg:84, whatsapp:'+61 400 000 001', timezone:'Melbourne',
       goal:'Lose 6 kg and get back to lifting 3 days a week', timeframe:'3 months', goalWhy:'Trip in March and my knee is sick of the extra weight',
-      job:'Software tester, mostly at a desk', activity:'Mostly sitting', steps:'5000',
+      job:'Software tester, mostly at a desk', activity:'Mostly sitting', stepsEveryday:'5000', stepsRealistic:'8000',
       likedFoods:['Chicken','Rice','Broccoli','Salmon','Potato','Eggs','Greek yoghurt','Oats','Banana','Berries','Beef','Nuts'],
       likedOther:'Spicy noodles', avoid:'Mushrooms', allergies:'', diet:'No restrictions', mealsPerDay:'4 or more',
       cookTime:'15 min', whoCooks:'Me', eatsOut:'1', alcohol:'2', typicalDay:'Cereal for breakfast, a sandwich at lunch, takeaway on some nights.',
@@ -721,9 +793,9 @@ function seedDb() {
     paid:{ date: addDays(t, -2), amount: 110 }, createdAt: addDays(t, -2) + 'T10:00:00.000Z',
     startDate: null, healthFlag:true,
     ob: blankOb({
-      age:'29', sex:'Female', heightUnit:'cm', heightCm:'166', weight:'71', weightUnit:'kg', weightKg:71, whatsapp:'+61 400 000 002',
+      age:'29', sex:'Female', heightUnit:'cm', heightCm:'166', weight:'71', weightUnit:'kg', weightKg:71, whatsapp:'+61 400 000 002', timezone:'Melbourne',
       goal:'More energy and a steady routine', timeframe:'3 months', goalWhy:'Shift work has wrecked my sleep and my eating',
-      job:'Nurse, rotating shifts', activity:'On my feet', steps:'9000',
+      job:'Nurse, rotating shifts', activity:'On my feet', stepsEveryday:'7000', stepsRealistic:'9000',
       likedFoods:['Tofu','Tempeh','Eggs','Spinach','Banana','Oats','Greek yoghurt'], likedOther:'', avoid:'Fish',
       allergies:'Peanuts', diet:'Vegetarian', mealsPerDay:'3 plus snacks', cookTime:'15 min', whoCooks:'Me',
       eatsOut:'0', alcohol:'0', typicalDay:'Toast and tea, skip lunch on long shifts, pasta at night.',
@@ -733,9 +805,9 @@ function seedDb() {
       agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -1) + 'T18:30:00.000Z'
     }),
     weighIns: [],
-    steps: seedSteps(t, 9000),
+    steps: {},                                  // nothing before activation
     logs: { [t]: [ { id: uid(), time:'08:10', name:'Overnight oats', calories:350, protein:22, carbs:48, fat:9, fibre:8,
-      source:'typed', ai:null, edited:false, text:'' } ] },
+      source:'typed', ai:null, edited:false, text:'', waiting: true } ] },   // logged while waiting: baseline group
     notes: ''
   });
 
@@ -745,9 +817,9 @@ function seedDb() {
     paid:{ date: addDays(t, -35), amount: 699 }, createdAt: addDays(t, -35) + 'T08:00:00.000Z',
     startDate: addDays(t, -29), healthFlag:false,
     ob: blankOb({
-      age:'31', sex:'Male', heightUnit:'cm', heightCm:'178', weight:'101.5', weightUnit:'kg', weightKg:101.5, whatsapp:'+61 400 000 003',
+      age:'31', sex:'Male', heightUnit:'cm', heightCm:'178', weight:'101.5', weightUnit:'kg', weightKg:101.5, whatsapp:'+61 400 000 003', timezone:'Melbourne',
       goal:'Drop to 90 kg and build a stronger base', timeframe:'6 months', goalWhy:'Want to keep up with my kids and stop feeling flat',
-      job:'Warehouse supervisor, on my feet', activity:'On my feet', steps:'8000',
+      job:'Warehouse supervisor, on my feet', activity:'On my feet', stepsEveryday:'8000', stepsRealistic:'9000',
       likedFoods:['Beef','Rice','Potato','Eggs','Tuna','Chicken','Banana','Apple','Popcorn','Protein powder','Protein bars','Cheese'],
       likedOther:'', avoid:'Seafood other than tuna', allergies:'', diet:'No restrictions', mealsPerDay:'3 plus snacks',
       cookTime:'30 min', whoCooks:'Shared', eatsOut:'2', alcohol:'4', typicalDay:'Porridge, a large lunch from the cafe, dinner at 8pm.',
@@ -778,12 +850,12 @@ function seedDb() {
     startDate: alexStart, nextBilling: addDays(alexStart, 84),
     ob: blankOb({
       age:'29', sex:'Male', heightUnit:'cm', heightCm:'180', weight:'92', weightUnit:'kg', weightKg:92, whatsapp:'',
-      goalKind:'fatloss', jobMult:'1.15', steps:'6000', trainingSessions:'3', trainingIntensity:'350',
-      weighInDay:'Sat', weighInTime:'08:00', agreeNotCoach:true, agreeTerms:true, submittedAt: alexStart + 'T09:00:00.000Z'
+      goalKind:'fatloss', jobMult:'1.15', stepsEveryday:'6000', stepsRealistic:'8000', trainingSessions:'3', trainingIntensity:'350',
+      timezone:'Melbourne', weighInDay:'Sat', weighInTime:'08:00', agreeNotCoach:true, agreeTerms:true, submittedAt: alexStart + 'T09:00:00.000Z'
     }),
     weighIns: weighsOn(alexStart, 'Sat', [91.2]),
     steps: seedSteps(t, 5600),
-    targets: Object.assign({}, alexT, { steps: BasicTargets.stepsTarget(6000) }),
+    targets: Object.assign({}, alexT, { steps: BasicTargets.stepsTarget(8000) }),
     logs: {
       [t]: [
         { id: uid(), time:'07:45', name:'Greek yoghurt with berries', calories:320, protein:24, carbs:34, fat:8, fibre:5, source:'ai',
@@ -794,11 +866,37 @@ function seedDb() {
     }
   });
 
+  /* Customers. Every person who has bought, including the four clients above and three past customers.
+     marketingDate is the day they answered the news question at checkout (seeded as No unless stated). */
+  const customer = o => Object.assign({ id: uid(), country: 'Australia', purchases: [], status: 'active',
+    marketingConsent: false, marketingDate: null, unsubscribed: false, unsubscribedDate: null,
+    dataDeleted: false, dataDeletedDate: null, clientId: null }, o);
+  const customers = [
+    customer({ name:'Sam Taylor', email:'sam@example.com', clientId:'c_sam', status:'active',
+      purchases:[{ product:'Core', date: addDays(t, -10), price: 299 }], marketingConsent: true, marketingDate: addDays(t, -10) }),
+    customer({ name:'Mia Chen', email:'mia@example.com', clientId:'c_mia', status:'active',
+      purchases:[{ product:'Essential', date: addDays(t, -2), price: 110 }], marketingDate: addDays(t, -2) }),
+    customer({ name:'Jordan Reid', email:'jordan@example.com', clientId:'c_jordan', status:'active',
+      purchases:[{ product:'The Beast', date: addDays(t, -35), price: 699 }], marketingDate: addDays(t, -35) }),
+    customer({ name:'Alex Lee', email:'alex@example.com', clientId:'c_alex', status:'basic',
+      purchases:[{ product:'Basic', date: alexStart, price: 30 }], marketingDate: alexStart }),
+    // Past customers
+    customer({ name:'Dana Price', email:'dana.price@example.com', country:'New Zealand', status:'finished',
+      purchases:[{ product:'Core', date: addDays(t, -150), price: 299 }], marketingConsent: true, marketingDate: addDays(t, -150) }),
+    customer({ name:'Ben Ortiz', email:'ben.ortiz@example.com', country:'United Kingdom', status:'finished',
+      purchases:[{ product:'Essential', date: addDays(t, -120), price: 110 }], marketingConsent: false, marketingDate: addDays(t, -120),
+      dataDeleted: true, dataDeletedDate: addDays(t, -30) }),
+    customer({ name:'Kim Walsh', email:'kim.walsh@example.com', country:'Australia', status:'basic',
+      purchases:[{ product:'Basic', date: addDays(t, -200), price: 30 }], marketingConsent: true, marketingDate: addDays(t, -200),
+      unsubscribed: true, unsubscribedDate: addDays(t, -12) })
+  ];
+
   return {
-    version: 1,
+    version: 2,
     capacity: { essential: 100, core: 25, beast: 4 },
     waitlist: [],
     clients: [ sam, mia, jordan, alex ],
+    customers,
     exercises: {}
   };
 }
@@ -810,9 +908,9 @@ let ui = null;
 function initUi() { ui = Object.assign({
   view:'coach', coachClientId:null, coachTab:'overview', clientId:null, clientTab:'today',
   clientDay: todayS(), clientPlanDay: dowNum(todayS()), coachPlanDay: dowNum(todayS()),
-  addMode:'describe', unit:'kg', newStep:'plans', newTier:null,
+  addMode:null, unit:'kg', newStep:'plans', newTier:null, coachPage:'clients',   // addMode null: plan for coached clients, describe for Basic
   describe:'', aiResult:null, bText:'', bMeal:'Lunch', bEffort:'15 minutes', buildResults:null,
-  editId:null, logOpen:{}, planInputsOpen:true
+  editId:null, logOpen:{}, planInputsOpen:true, custFilter:{ product:'', status:'', ok:'', q:'' }
 }, Store.loadUi()); }
 function saveUi() { Store.saveUi(ui); }
 
@@ -1039,6 +1137,10 @@ function readNut(prefix) {
 }
 function nowHHMM() { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
 function addMealTo(c, date, m) {
+  // Logged while waiting for activation: shown in the baseline group, not in the day list.
+  if (c.status === 'awaiting' || c.status === 'onboarding') m.waiting = true;
+  // Logged for an earlier day: the coach sees "added later" on that day.
+  if (date < todayS()) m.addedLate = true;
   c.logs[date] = c.logs[date] || [];
   c.logs[date].push(m);
   persist();
@@ -1060,11 +1162,15 @@ function toast(msg) {
    Rendering entry point
    ========================================================================== */
 function render() {
+  // "Today" follows the zone of the client on screen. The coach's own pages use Melbourne.
+  const shown = ui.view === 'client' ? clientById(ui.clientId)
+    : (ui.view === 'coach' && ui.coachClientId ? clientById(ui.coachClientId) : null);
+  activeZone = zoneFor(shown);
   renderBar();
   const app = document.getElementById('app');
   if (ui.view === 'coach') {
     const c = ui.coachClientId ? clientById(ui.coachClientId) : null;
-    app.innerHTML = c ? renderCoachClient(c) : renderCoachList();
+    app.innerHTML = c ? renderCoachClient(c) : (ui.coachPage === 'customers' ? renderCustomers() : renderCoachList());
   } else if (ui.view === 'client') {
     const c = clientById(ui.clientId);
     if (!c) { ui.view = 'coach'; saveUi(); return render(); }
@@ -1135,6 +1241,8 @@ function renderCheckout() {
     <div class="card" style="max-width:560px">
       <div class="field"><label for="nc-name">Full name</label><input id="nc-name" autocomplete="name"><div class="err" id="err-nc-name"></div></div>
       <div class="field"><label for="nc-email">Email</label><input id="nc-email" type="email" autocomplete="email"><div class="err" id="err-nc-email"></div></div>
+      <div class="field"><label for="nc-country">Country</label><select id="nc-country"><option value="">Choose one</option>${COUNTRIES.map(x => `<option>${esc(x)}</option>`).join('')}</select><div class="err" id="err-nc-country"></div></div>
+      <label class="check" style="margin-bottom:14px"><input type="checkbox" id="nc-news"><span>Send me news and offers from Beast Coach. Unsubscribe any time. <span class="mini">(Optional)</span></span></label>
       <div class="note-box" style="margin-bottom:12px">No payment is taken in the demo.</div>
       <p class="fine" style="margin-bottom:14px">Full refund any time before your plan starts. No refunds once your plan is delivered.</p>
       <div class="row" style="justify-content:flex-start">
@@ -1158,7 +1266,7 @@ function obRadioMap(ob, k, label, pairs) {
 function basicInputs(ob, weightKg) {
   return {
     sex: ob.sex === 'Female' ? 'female' : 'male', age: parseFloat(ob.age), heightCm: parseFloat(ob.heightCm), weightKg,
-    activity: parseFloat(ob.jobMult), steps: parseFloat(ob.steps), trainingSessions: parseFloat(ob.trainingSessions),
+    activity: parseFloat(ob.jobMult), steps: parseFloat(ob.stepsEveryday), trainingSessions: parseFloat(ob.trainingSessions),
     trainingIntensity: parseFloat(ob.trainingIntensity), goal: ob.goalKind
   };
 }
@@ -1172,12 +1280,42 @@ function basicErrors(ob) {
   if (!(n(ob.weight) > 0)) e.weight = 'Enter your current weight.';
   if (!BASIC_GOALS.some(([v]) => v === ob.goalKind)) e.goalKind = OB_CHOOSE;
   if (!BASIC_JOBS.some(([v]) => v === ob.jobMult)) e.jobMult = OB_CHOOSE;
-  if (!(n(ob.steps) >= 0 && n(ob.steps) <= 60000) || ob.steps === '') e.steps = 'Enter your average steps a day (0 to 60,000).';
+  Object.assign(e, stepsErrors(ob), tzErrors(ob));
   if (!(n(ob.trainingSessions) >= 0 && n(ob.trainingSessions) <= 14) || ob.trainingSessions === '') e.trainingSessions = 'Enter how many sessions a week (0 if none).';
   if (!BASIC_INTENSITY.some(([v]) => v === ob.trainingIntensity)) e.trainingIntensity = OB_CHOOSE;
   if (!ob.agreeNotCoach) e.agreeNotCoach = 'Please confirm you understand this is general guidance.';
   if (!ob.agreeTerms) e.agreeTerms = 'Please agree to the terms and billing.';
   return e;
+}
+/* The two steps questions, used by Basic and by step 2 of the six-step onboarding.
+   Everyday steps: how many a normal day has, without planned walks. Calories use this (the conservative choice).
+   Realistic target: the steps target the client thinks is realistic, including planned walks. */
+const STEPS_EVERYDAY_Q = 'About how many steps do you do on a normal day, NOT counting any walks you do on purpose? (work, errands, around the house)';
+const STEPS_REALISTIC_Q = 'What daily steps target feels realistic for you, including walks you do on purpose?';
+function stepsErrors(ob) {
+  const e = {}, every = parseFloat(ob.stepsEveryday), real = parseFloat(ob.stepsRealistic);
+  if (!(every >= 0 && every <= 60000)) e.stepsEveryday = 'Enter a number from 0 to 60,000. An estimate is fine.';
+  if (!(real >= 3000 && real <= 20000)) e.stepsRealistic = 'Enter a target from 3,000 to 20,000.';
+  return e;
+}
+// Time zone: required. Anything typed is kept; an unknown one falls back to Melbourne and is flagged for the coach.
+function tzErrors(ob) { return String(ob.timezone || '').trim() ? {} : { timezone: 'Enter your time zone or city.' }; }
+// Shared field for the time zone question (used in step 1 and on Basic).
+function tzField(ob) {
+  return `<div class="field"><label for="ob-timezone">Your time zone or city (e.g. Melbourne, London, New York)</label>
+    <input id="ob-timezone" type="text" data-ob="timezone" list="tzList" autocomplete="off" aria-required="true" value="${esc(ob.timezone)}" placeholder="Start typing, e.g. Melbourne">
+    <p class="hint">Pick from the list, or type your own. It sets your daily totals and your weigh-in day.</p>
+    <div class="err" id="err-timezone"></div></div>`;
+}
+// Shared field pair for the steps questions.
+function stepsFields(ob) {
+  return `<div class="field"><label for="ob-stepsEveryday">${esc(STEPS_EVERYDAY_Q)}</label>
+      <p class="hint" style="margin:0 0 6px">Just an estimate is fine.</p>
+      <input id="ob-stepsEveryday" type="number" inputmode="numeric" min="0" max="60000" data-ob="stepsEveryday" value="${esc(ob.stepsEveryday)}" placeholder="e.g. 4000">
+      <div class="err" id="err-stepsEveryday"></div></div>
+    <div class="field"><label for="ob-stepsRealistic">${esc(STEPS_REALISTIC_Q)}</label>
+      <input id="ob-stepsRealistic" type="number" inputmode="numeric" min="3000" max="20000" data-ob="stepsRealistic" value="${esc(ob.stepsRealistic)}" placeholder="e.g. 8000">
+      <div class="err" id="err-stepsRealistic"></div></div>`;
 }
 function renderBasicPage(c) {
   if (c.basicStage === 'targets') return renderBasicTargets(c);
@@ -1208,11 +1346,12 @@ function renderBasicPage(c) {
           <div class="row" style="flex-wrap:nowrap"><input id="ob-weight" type="number" step="0.1" min="0" inputmode="decimal" data-ob="weight" value="${esc(ob.weight)}" style="flex:1">
           <select data-ob="weightUnit" style="width:90px"><option value="kg" ${ob.weightUnit === 'kg' ? 'selected' : ''}>kg</option><option value="lb" ${ob.weightUnit === 'lb' ? 'selected' : ''}>lb</option></select></div>
           <div class="err" id="err-weight"></div></div>
+        ${tzField(ob)}
       </div>
       <div class="card"><h3>Goal and day</h3>
         ${obRadioMap(ob, 'goalKind', 'Goal', BASIC_GOALS)}
         ${obRadioMap(ob, 'jobMult', 'Job activity', BASIC_JOBS)}
-        ${obInput(ob, 'steps', 'Average steps a day', 'number', 'e.g. 6000', 'min="0" max="60000" inputmode="numeric"')}
+        ${stepsFields(ob)}
       </div>
       <div class="card"><h3>Training</h3>
         ${obInput(ob, 'trainingSessions', 'Training sessions a week', 'number', 'e.g. 3', 'min="0" max="14" inputmode="numeric"')}
@@ -1227,8 +1366,8 @@ function renderBasicPage(c) {
         </div>
       </div>
       <div class="card"><h3>Agreements</h3>
-        ${obAgree(ob, 'agreeNotCoach', 'I understand this is general guidance, not medical advice.')}
-        ${obAgree(ob, 'agreeTerms', 'I agree to the terms. Basic is $2.50 a week, billed as $30 every 12 weeks.')}
+        ${obAgree(ob, 'agreeNotCoach', `I understand this is general guidance, not medical advice. ${docLink('/coaching-health', 'Read the health notice')}.`)}
+        ${obAgree(ob, 'agreeTerms', `I agree to the ${docLink('/coaching-terms', 'terms')}. Basic is $2.50 a week, billed as $30 every 12 weeks.`)}
       </div>
       <p class="ob-msg" id="obMsg" role="alert"></p>
       <div class="ob-nav"><span></span><button type="button" data-act="basicSubmit">See my daily targets</button></div>
@@ -1351,6 +1490,8 @@ function obSelect(ob, k, label, opts) {
 function obGroup(ob, k, opts) {
   return `<div class="chips">${opts.map(o => `<label class="chip"><input type="checkbox" data-obgrp="${k}" value="${esc(o)}" ${ob[k].includes(o) ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`;
 }
+// A link to one agreement document. It opens in a new tab, so the form is not lost.
+function docLink(href, label) { return `<a href="${href}" target="_blank" rel="noopener">${label}</a>`; }
 function obAgree(ob, k, text) {
   return `<div><label class="check"><input type="checkbox" data-ob="${k}" ${ob[k] ? 'checked' : ''}><span>${text}</span></label><div class="err" id="err-${k}"></div></div>`;
 }
@@ -1375,8 +1516,8 @@ function stepAbout(ob) {
       <div class="err" id="err-weight"></div></div>
     <div class="grid2">
       ${obInput(ob, 'whatsapp', 'WhatsApp number', 'tel', '+61 4xx xxx xxx')}
-      ${obInput(ob, 'timezone', 'Time zone', 'text', 'Australia/Melbourne')}
-    </div></div>`;
+    </div>
+    ${tzField(ob)}</div>`;
 }
 function stepGoal(ob) {
   return `<div class="card"><h3>Your goal</h3>
@@ -1388,26 +1529,29 @@ function stepGoal(ob) {
     <div class="grid2">
       ${obInput(ob, 'job', 'Job', 'text', 'e.g. Teacher, on my feet all day')}
       ${obSelect(ob, 'activity', 'How active is your job?', ACTIVITY)}
-      ${obInput(ob, 'steps', 'Steps on a usual day', 'number', 'e.g. 6000', 'min="0" inputmode="numeric"')}
-    </div></div>`;
+    </div>
+    ${stepsFields(ob)}</div>`;
 }
 function stepLikes(ob) {
   const groups = Object.keys(FOOD_GROUPS).map(g => `<div style="margin-bottom:14px"><label>${g}</label>${obGroup(ob, 'likedFoods', FOOD_GROUPS[g])}</div>`).join('');
   return `<div class="card"><h3>Food you like</h3>
     <p class="muted">Tick everything you like. At least 3 in total, including anything you type below.</p>
     ${groups}
-    <div class="field"><label for="ob-likedOther">Anything else you love?</label><input id="ob-likedOther" data-ob="likedOther" value="${esc(ob.likedOther)}"></div>
+    <div class="field"><label for="ob-likedOther">Other foods you like</label><input id="ob-likedOther" data-ob="likedOther" value="${esc(ob.likedOther)}">
+      <p class="hint">Separate each food with a comma, e.g. halloumi, chickpeas, lentils</p></div>
     <div class="err" id="err-likedFoods"></div></div>`;
 }
 function stepEat(ob) {
   return `<div class="card"><h3>Food to avoid</h3>
     <div class="grid2">
-      <div class="field"><label for="ob-avoid">Foods you will not eat</label><textarea id="ob-avoid" data-ob="avoid">${esc(ob.avoid)}</textarea></div>
-      <div class="field"><label for="ob-allergies">Allergies or intolerances</label><textarea id="ob-allergies" data-ob="allergies">${esc(ob.allergies)}</textarea></div>
+      <div class="field"><label for="ob-avoid">Foods you will not eat</label><textarea id="ob-avoid" data-ob="avoid">${esc(ob.avoid)}</textarea>
+        <p class="hint">Separate each food with a comma, e.g. halloumi, chickpeas, lentils</p></div>
+      <div class="field"><label for="ob-allergies">Allergies or intolerances</label><textarea id="ob-allergies" data-ob="allergies">${esc(ob.allergies)}</textarea>
+        <p class="hint">Separate each food with a comma, e.g. halloumi, chickpeas, lentils</p></div>
     </div></div>
   <div class="card"><h3>How you eat</h3>
     ${obRadios(ob, 'diet', 'Dietary style', DIETS, 'Choose No restrictions if none applies.')}
-    ${obRadios(ob, 'mealsPerDay', 'Meals per day', MEALS_PER_DAY)}
+    ${obRadios(ob, 'mealsPerDay', 'How many meals are you currently eating per day?', MEALS_PER_DAY)}
     ${obRadios(ob, 'cookTime', 'Cooking time per meal', COOK_TIMES)}
     ${obRadios(ob, 'whoCooks', 'Who cooks?', WHO_COOKS)}
     <div class="grid2">
@@ -1463,9 +1607,9 @@ function stepFinish(ob) {
       <div class="err" id="err-healthClearance"></div>
     </div></div>
   <div class="card"><h3>Agreements</h3>
-    ${obAgree(ob, 'agreeTerms', 'I have read the terms. Full refund any time before your plan starts. No refunds once your plan is delivered.')}
-    ${obAgree(ob, 'agreeNotCoach', 'I understand Stefan is a coach, not a dietitian or doctor, and this is general guidance, not medical advice.')}
-    ${obAgree(ob, 'agreeConsent', 'I agree Stefan can see the meals, workouts and weights I log.')}
+    ${obAgree(ob, 'agreeTerms', `I have read the ${docLink('/coaching-terms', 'terms')}. Full refund any time before your plan starts. No refunds once your plan is delivered.`)}
+    ${obAgree(ob, 'agreeNotCoach', `I understand Stefan is a coach, not a dietitian or doctor, and this is general guidance, not medical advice. ${docLink('/coaching-health', 'Read the health notice')}.`)}
+    ${obAgree(ob, 'agreeConsent', `I agree Stefan can see the meals, workouts and weights I log. ${docLink('/coaching-privacy', 'Read the privacy notice')}.`)}
   </div>`;
 }
 const OB_STEP_HTML = [null, stepAbout, stepGoal, stepLikes, stepEat, stepTrain, stepFinish];
@@ -1505,10 +1649,12 @@ function obErrors(ob, step) {
     } else if (!(n(ob.heightCm) >= 100 && n(ob.heightCm) <= 250)) e.heightCm = 'Enter your height in cm (100 to 250).';
     if (!(n(ob.weight) > 0)) e.weight = 'Enter your current weight.';
     if (ob.whatsapp.replace(/\D/g, '').length < 6) e.whatsapp = 'Enter a WhatsApp number so Stefan can reach you.';
+    Object.assign(e, tzErrors(ob));
   }
   if (step === 2) {
     if (!ob.goal.trim()) e.goal = 'Tell us what you want to achieve.';
     if (!TIMEFRAMES.includes(ob.timeframe)) e.timeframe = OB_CHOOSE;
+    Object.assign(e, stepsErrors(ob));
   }
   if (step === 3) {
     const liked = ob.likedFoods.length + ob.likedOther.split(',').map(x => x.trim()).filter(Boolean).length;
@@ -1606,8 +1752,9 @@ function sessionSummary(w) {
     return `<div class="mini">${esc(e.name)}: ${esc(sets.join(', ') || 'no sets')}</div>`;
   }).join('');
 }
-function stepsCard(c, day) {
+function stepsCard(c, day, opts) {
   const v = c.steps[day];
+  const ro = opts && opts.readonly;
   const target = c.targets && c.targets.steps;
   const hit = target && v >= target;
   const pct = target && v ? Math.min(100, Math.round(v / target * 100)) : 0;
@@ -1616,18 +1763,19 @@ function stepsCard(c, day) {
   return `<div class="card"><h3>Steps</h3>
     <div class="metric"><div class="top"><span><b>${pday(day)}</b></span><span style="color:${hit ? '#1b7a46' : 'var(--ink)'}">${label}</span></div>
       ${target ? `<div class="bar"><span style="width:${pct}%;background:${hit ? '#1b7a46' : STEPS_COLOUR}"></span></div>` : '<p class="mini" style="margin:0">Your steps target is set by your coach.</p>'}</div>
-    <div class="row" style="flex-wrap:nowrap"><input id="st-val" type="number" inputmode="numeric" min="0" max="60000" value="${v || ''}" placeholder="Steps" aria-label="Steps for the day" style="flex:1"><button data-act="saveSteps">Save steps</button></div>
+    ${ro ? '' : `<div class="row" style="flex-wrap:nowrap"><input id="st-val" type="number" inputmode="numeric" min="0" max="60000" value="${v || ''}" placeholder="Steps" aria-label="Steps for the day" style="flex:1"><button data-act="saveSteps">Save steps</button></div>`}
   </div>`;
 }
 function pday(day) { return day === todayS() ? 'Today' : fmtDate(day); }
-function workoutCard(c, day) {
+function workoutCard(c, day, opts) {
+  const ro = opts && opts.readonly;
   const sessions = planSessions(c).filter(s => s.day === dowNum(day));
   const wo = woState(day, sessions);
   const logged = (c.workouts || []).filter(w => w.date === day);
   const loggedHtml = logged.length ? logged.map(w => `<div class="meal"><div style="flex:1 1 220px">
       <b>${esc(w.what)}</b> <span class="mini">${w.session ? 'Sets and reps' : (w.minutes ? w.minutes + ' min' : '')}</span>
       ${w.notes ? `<div class="mini">${esc(w.notes)}</div>` : ''}${sessionSummary(w)}</div>
-      <button class="btn-danger btn-sm" data-act="deleteWorkout" data-id="${esc(w.id)}">Delete</button></div>`).join('')
+      ${ro ? '' : `<button class="btn-danger btn-sm" data-act="deleteWorkout" data-id="${esc(w.id)}">Delete</button>`}</div>`).join('')
     : '<p class="muted">Nothing logged for this day.</p>';
   const tabs = `<div class="tabs" style="margin-bottom:10px">
     ${sessions.length ? `<button class="tab ${wo.mode === 'plan' ? 'on' : ''}" data-act="woMode" data-m="plan">${esc(sessions[0].title)}</button>` : ''}
@@ -1654,6 +1802,7 @@ function workoutCard(c, day) {
       <div class="field" style="margin:0"><label for="wo-notes">Notes</label><input id="wo-notes" data-wo="notes" value="${esc(wo.notes)}"></div></div>
     </div>`;
   }
+  if (ro) return `<div class="card"><h3>Workout</h3>${loggedHtml}</div>`;
   return `<div class="card"><h3>Workout</h3>
     <p class="mini" style="margin-top:0">${sessions.length ? 'Log the sets you actually did. Stefan reviews them.' : 'No session is planned for this day. Log what you did.'}</p>
     ${loggedHtml}
@@ -1707,37 +1856,43 @@ function renderClientPage(c) {
 }
 function renderToday(c) {
   const basic = c.tier === 'basic';
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const day = logDay();
   const isToday = day === todayS();
+  const ro = !canLogDay(day);            // older than 3 days: read-only
   const meals = c.logs[day] || [];
   const tot = sumNut(meals);
   const tg = c.targets;
   const bars = NUT.map(k => barHtml(k, Math.round(tot[k]), tg ? tg[k] : null)).join('');
-  const mode = basic ? 'describe' : ui.addMode;
-  const modeBtns = basic ? '' : [['describe', 'Describe it'], ['plan', 'From my plan'], ['builder', 'Meal Builder']]
-    .map(m => `<button class="tab ${mode === m[0] ? 'on' : ''}" data-act="addMode" data-m="${m[0]}">${m[1]}</button>`).join('');
+  // Coached clients: From my plan (default), Describe it, Meal Builder. Basic has no plan: Describe it only.
+  const mode = basic ? 'describe' : (ui.addMode || 'plan');
+  const modes = basic ? [['describe', 'Describe it']]
+    : [['plan', 'From my plan'], ['describe', 'Describe it'], ['builder', 'Meal Builder']];
+  const seg = `<div class="seg ${modes.length === 1 ? 'one' : ''}" role="group" aria-label="How to add the meal">
+    ${modes.map(([m, l]) => `<button type="button" class="${mode === m ? 'on' : ''}" aria-pressed="${mode === m}" data-act="addMode" data-m="${m}">${l}</button>`).join('')}</div>`;
   const addPanel = mode === 'describe' ? describePanel(c) : mode === 'plan' ? planPanel(c, day) : builderPanel(c);
+  const lede = basic ? 'Log what you ate: describe it and Beast AI calculates it.'
+    : 'Log what you ate: pick it from your plan, or describe it and Beast AI calculates it.';
+  const addCard = `<div class="card add-card" id="addMealCard"><h3>Add a meal</h3>
+      <p class="lede">${lede}</p>${seg}${addPanel}</div>`;
   const mealsHtml = meals.length
-    ? meals.map(m => ui.editId === m.id ? mealEditHtml(m, 'e-') : mealRowHtml(m)).join('')
+    ? meals.map(m => !ro && ui.editId === m.id ? mealEditHtml(m, 'e-') : mealRowHtml(m, { readonly: ro })).join('')
     : '<p class="muted">No meals logged for this day yet.</p>';
   const dayNav = `<div class="row" style="margin-bottom:12px">
-    <button class="btn-ghost btn-sm" data-act="dayPrev">‹ Previous</button>
+    <button class="btn-ghost btn-sm" data-act="dayPrev" ${canLogDay(addDays(day, -1)) ? '' : 'disabled'}>‹ Previous</button>
     <div style="text-align:center"><b>${isToday ? 'Today' : pd(day).toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'short' })}</b>
       <div class="mini">${fmtDate(day)}</div></div>
     <button class="btn-ghost btn-sm" data-act="dayNext" ${isToday ? 'disabled' : ''}>Next ›</button></div>`;
   return `${dayNav}
+    ${ro ? `<div class="ro-note">${READ_ONLY_MSG} You can still see what was logged.</div>` : ''}
     <div class="grid2">
       <div>
         <div class="card"><h3>Totals</h3>${tg ? '' : '<p class="muted">Your targets will appear here once they are set. Totals only for now.</p>'}${bars}</div>
         <div class="card"><h3>Meals</h3>${mealsHtml}</div>
       </div>
       <div>
-        <div class="card"><h3>Add a meal</h3>
-          ${basic ? '' : `<div class="tabs">${modeBtns}</div>`}
-          ${addPanel}
-        </div>
-        ${basic ? '' : workoutCard(c, day)}
-        ${stepsCard(c, day)}
+        ${ro ? '' : addCard}
+        ${basic ? '' : workoutCard(c, day, { readonly: ro })}
+        ${stepsCard(c, day, { readonly: ro })}
         ${weighInCard(c)}
       </div>
     </div>`;
@@ -1758,7 +1913,7 @@ function describePanel(c) {
     </div>` : '';
   return `<div class="field"><label for="describe">What did you eat? (up to 600 characters)</label>
       <textarea id="describe" data-ui="describe" maxlength="600" placeholder="e.g. Two slices of toast with peanut butter and a banana">${esc(ui.describe)}</textarea></div>
-    ${r ? '' : '<button data-act="aiDescribe">Estimate with Beast AI</button>'}
+    ${r ? '' : '<button data-act="aiDescribe">Calculate now</button>'}
     ${aiPart}
     <details ${aiEnabled() ? '' : 'open'} style="margin-top:12px"><summary>Enter the numbers yourself</summary>
       ${manualForm('m-')}
@@ -1783,7 +1938,7 @@ function planPanel(c, day) {
 }
 function builderPanel(c) {
   const t = c.targets;
-  const eaten = totalsFor(c, ui.clientDay > todayS() ? todayS() : ui.clientDay);
+  const eaten = totalsFor(c, logDay());
   let aim = '';
   if (t) {
     const calLeft = Math.min(900, Math.max(0, t.calories - eaten.calories));
@@ -1856,13 +2011,16 @@ function renderProgress(c, coach) {
     </div>`;
   }
   const logged = [];
-  for (let i = 0; i < 7; i++) { const d = addDays(todayS(), -i); if (c.steps[d]) logged.push(c.steps[d]); }
+  for (let i = 0; i < 7; i++) { const d = addDays(todayS(), -i); if (countable(c, d) && c.steps[d]) logged.push(c.steps[d]); }
   const stepsAvg = logged.length ? Math.round(logged.reduce((x, y) => x + y, 0) / logged.length) : null;
   const stepsCardHtml = `<div class="card"><h3>Steps</h3>
     <div class="metric"><div class="top"><span>Average per day, last 7 days</span><span><b>${stepsAvg == null ? 'Nothing logged yet' : fmtSteps(stepsAvg) + ' steps'}</b></span></div>
     ${c.targets && c.targets.steps && stepsAvg != null ? `<div class="bar"><span style="width:${Math.min(100, Math.round(stepsAvg / c.targets.steps * 100))}%;background:${STEPS_COLOUR}"></span></div><p class="mini" style="margin:6px 0 0">Target ${fmtSteps(c.targets.steps)} steps a day, based on ${logged.length} logged day${logged.length === 1 ? '' : 's'}.</p>` : ''}</div></div>`;
   const logDays = [];
-  for (let i = 0; i < 7; i++) { const d = addDays(todayS(), -i); if ((c.logs[d] || []).length) logDays.push(sumNut(c.logs[d])); }
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(todayS(), -i);
+    if (countable(c, d) && (c.logs[d] || []).some(m => !m.waiting)) logDays.push(sumNut((c.logs[d] || []).filter(m => !m.waiting)));
+  }
   const macroCard = logDays.length ? `<div class="card"><h3>Average per day, last 7 days</h3>
     <p class="mini" style="margin-top:0">Based on ${logDays.length} logged day${logDays.length === 1 ? '' : 's'}.</p>
     ${NUT.map(k => barHtml(k, Math.round(logDays.reduce((x, t) => x + t[k], 0) / logDays.length), c.targets ? c.targets[k] : null)).join('')}</div>` : '';
@@ -1871,7 +2029,7 @@ function renderProgress(c, coach) {
   let workoutsCard = '';
   if (c.tier !== 'basic') {
     const weekAgo = addDays(todayS(), -6);
-    const wos = (c.workouts || []).filter(w => w.date >= weekAgo).sort((a, b) => a.date < b.date ? 1 : -1);
+    const wos = (c.workouts || []).filter(w => w.date >= weekAgo && countable(c, w.date)).sort((a, b) => a.date < b.date ? 1 : -1);
     const woList = wos.length ? wos.map(w => `<div class="meal"><div style="flex:1 1 220px"><b>${esc(w.what)}</b><div class="mini">${fmtDate(w.date)}${w.minutes ? ' · ' + w.minutes + ' min' : ''}${w.notes ? ' · ' + esc(w.notes) : ''}</div>${sessionSummary(w)}</div></div>`).join('')
       : '<p class="muted">No workouts in the last 7 days.</p>';
     workoutsCard = `<div class="card"><h3>Workouts in the last 7 days</h3>${woList}</div>`;
@@ -1888,6 +2046,158 @@ function renderProgress(c, coach) {
 /* ==========================================================================
    Coach: client list (four capacities; Basic is unlimited and shows billing only)
    ========================================================================== */
+/* ==========================================================================
+   Customers: one record per person who buys. Kept after their client data is deleted.
+   Demo only: browser storage. In production this becomes a Supabase table (one row per
+   customer, joined with the existing Discipline Path purchases), readable only by the coach role.
+   ========================================================================== */
+const isEmailOk = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+function customerByEmail(email) { const e = String(email).trim().toLowerCase(); return db.customers.find(x => x.email.toLowerCase() === e) || null; }
+function custOk(x) { return !!x.marketingConsent && !x.unsubscribed; }             // OK to email: said yes and not unsubscribed
+function custLastPurchase(x) { return x.purchases.map(p => p.date).sort().slice(-1)[0] || ''; }
+function custProducts(x) { return [...new Set(x.purchases.map(p => p.product))]; }
+function matchCustomer(x, f) {
+  f = f || {};
+  if (f.product && !custProducts(x).includes(f.product)) return false;
+  if (f.status && x.status !== f.status) return false;
+  if (f.ok === 'yes' && !custOk(x)) return false;
+  if (f.ok === 'no' && custOk(x)) return false;
+  const q = String(f.q || '').trim().toLowerCase();
+  if (q && !(x.name + ' ' + x.email).toLowerCase().includes(q)) return false;
+  return true;
+}
+// Keeps each customer's status in step with their client. Basic is Basic; a finished client is Finished.
+function syncCustomerStatuses() {
+  db.customers.forEach(x => {
+    if (!x.clientId) return;
+    const c = clientById(x.clientId);
+    if (!c) return;
+    x.status = c.tier === 'basic' ? 'basic' : c.status === 'finished' ? 'finished' : 'active';
+  });
+}
+// Records a purchase against a customer, creating the customer if needed. The news answer is stored with its date.
+function recordPurchase(c, { name, email, country, product, price, news }) {
+  let x = customerByEmail(email);
+  if (!x) {
+    x = { id: uid(), name, email, country, purchases: [], status: 'active', marketingConsent: false, marketingDate: null,
+      unsubscribed: false, unsubscribedDate: null, dataDeleted: false, dataDeletedDate: null, clientId: null };
+    db.customers.push(x);
+  }
+  x.name = name; x.country = country; x.clientId = c.id; x.dataDeleted = false; x.dataDeletedDate = null;
+  x.purchases.push({ product, date: todayS(), price });
+  x.marketingConsent = !!news; x.marketingDate = todayS();
+  if (news) { x.unsubscribed = false; x.unsubscribedDate = null; }   // a fresh, ticked yes is a new opt-in
+  return x;
+}
+function custSummary(f) {
+  const rows = db.customers.filter(x => matchCustomer(x, f));
+  const ok = rows.filter(custOk);
+  return { shown: rows.length, ok: ok.length, notConsented: rows.filter(x => !x.marketingConsent).length,
+           unsubscribed: rows.filter(x => x.marketingConsent && x.unsubscribed).length, rows };
+}
+function custNoteHtml(f) {
+  const s = custSummary(f);
+  const left = s.shown - s.ok;
+  return `Only customers who said yes to news and have not unsubscribed are included in the copy and the CSV.
+    ${left ? `${left} shown ${left === 1 ? 'is' : 'are'} left out: ${s.notConsented} did not say yes at checkout, and ${s.unsubscribed} unsubscribed.` : 'Everyone shown is OK to email.'}`;
+}
+// The list for "Copy emails" and "Download CSV": OK to email, and matching the filters on screen.
+function emailList() { return db.customers.filter(x => custOk(x) && matchCustomer(x, ui.custFilter)); }
+function coachTabs(page) {
+  const tab = (p, label) => `<button class="tab ${page === p ? 'on' : ''}" data-act="coachPage" data-p="${p}">${label}</button>`;
+  return `<nav class="tabs">${tab('clients', 'Clients')}${tab('customers', 'Customers')}</nav>`;
+}
+function renderCustomers() {
+  const f = ui.custFilter || {};
+  const products = [...new Set(db.customers.flatMap(custProducts))].sort();
+  const statusOpts = [['', 'All statuses'], ...Object.entries(CUSTOMER_STATUS)];
+  const rowsHtml = db.customers.slice().sort((a, b) => a.name.localeCompare(b.name)).map(x => {
+    const ok = custOk(x);
+    const why = !x.marketingConsent ? 'Did not say yes' : x.unsubscribed ? `Unsubscribed ${fmtDate(x.unsubscribedDate)}` : '';
+    const hidden = matchCustomer(x, f) ? '' : 'hidden';
+    return `<tr data-cust-row data-id="${esc(x.id)}" ${hidden}>
+      <td><b>${esc(x.name)}</b><div class="mini">${esc(x.country || '')}</div></td>
+      <td>${esc(x.email)}</td>
+      <td>${custProducts(x).map(p => `<span class="pi-tag">${esc(p)}</span>`).join('')}</td>
+      <td>${esc(custLastPurchase(x) ? fmtDate(custLastPurchase(x)) : '-')}</td>
+      <td>${esc(CUSTOMER_STATUS[x.status] || x.status)}</td>
+      <td>${ok ? '<span class="ok-yes">Yes</span>' : `<span class="ok-no">No</span><div class="mini">${esc(why)}</div>`}</td>
+      <td>${x.dataDeleted ? `Data deleted<div class="mini">${esc(fmtDate(x.dataDeletedDate))}</div>` : 'No'}</td>
+      <td>${x.unsubscribed ? '<span class="mini">Unsubscribed</span>' : `<button class="btn-ghost btn-sm" data-act="unsubscribe" data-id="${esc(x.id)}">Unsubscribe</button>`}</td>
+    </tr>`;
+  }).join('');
+  const sel = (key, opts, cur) => opts.map(([v, l]) => `<option value="${esc(v)}" ${cur === v ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  return `${coachTabs('customers')}
+    <section class="hero"><h1>Customers</h1><p class="muted" style="margin:0">Everyone who has bought, past and present. Kept even when a client deletes their data.</p></section>
+    <div class="card">
+      <div class="filters">
+        <div class="field" style="margin:0"><label for="custQ">Search name or email</label>
+          <input id="custQ" type="search" data-inp="custSearch" value="${esc(f.q || '')}" placeholder="e.g. sam or sam@example.com"></div>
+        <div class="field" style="margin:0"><label for="custProduct">Product</label>
+          <select id="custProduct" data-ch="custFilter" data-f="product"><option value="">All products</option>${sel('product', products.map(p => [p, p]), f.product || '')}</select></div>
+        <div class="field" style="margin:0"><label for="custStatus">Status</label>
+          <select id="custStatus" data-ch="custFilter" data-f="status">${sel('status', statusOpts, f.status || '')}</select></div>
+        <div class="field" style="margin:0"><label for="custOk">OK to email</label>
+          <select id="custOk" data-ch="custFilter" data-f="ok">${sel('ok', [['', 'Any'], ['yes', 'Yes'], ['no', 'No']], f.ok || '')}</select></div>
+      </div>
+      <div class="cust-actions">
+        <button class="btn-green btn-sm" data-act="copyEmails">Copy emails</button>
+        <button class="btn-ghost btn-sm" data-act="downloadCsv">Download CSV</button>
+        <span class="mini" id="custCount"></span>
+      </div>
+      <p class="cust-note" id="custNote">${custNoteHtml(f)}</p>
+      <textarea id="emailBox" hidden aria-label="Emails to copy" style="min-height:70px"></textarea>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Customer</th><th>Email</th><th>Products</th><th>Last purchase</th><th>Status</th><th>OK to email</th><th>Data</th><th></th></tr></thead>
+        <tbody id="custRows">${rowsHtml || '<tr><td colspan="8">No customers yet.</td></tr>'}</tbody>
+      </table></div>
+    </div>`;
+}
+// Filters update the rows in place (no re-render, so typing keeps focus).
+function applyCustFilters() {
+  const f = ui.custFilter || {};
+  let shown = 0;
+  document.querySelectorAll('[data-cust-row]').forEach(row => {
+    const x = db.customers.find(y => y.id === row.dataset.id);
+    const on = !!x && matchCustomer(x, f);
+    row.hidden = !on;
+    if (on) shown++;
+  });
+  const count = document.getElementById('custCount');
+  if (count) count.textContent = `${shown} shown`;
+  const note = document.getElementById('custNote');
+  if (note) note.innerHTML = custNoteHtml(f);
+}
+// Copy emails: OK-to-email customers only. Falls back to a box to copy from if the clipboard is blocked.
+async function copyEmailsAction() {
+  const list = emailList();
+  if (!list.length) { toast('No customers are OK to email with these filters.'); return; }
+  const text = list.map(x => x.email).join(', ');
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(`Copied ${list.length} email${list.length === 1 ? '' : 's'}. Only customers who are OK to email.`);
+  } catch (e) {
+    const box = document.getElementById('emailBox');
+    box.hidden = false; box.value = text; box.select();
+    toast('Copy is blocked here. The emails are in the box below.');
+  }
+}
+function csvCell(v) { const s = String(v == null ? '' : v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+function downloadCsvAction() {
+  const list = emailList();
+  if (!list.length) { toast('No customers are OK to email with these filters.'); return; }
+  const head = ['name', 'email', 'country', 'products', 'last_purchase', 'status', 'ok_to_email', 'data_deleted'];
+  const lines = list.map(x => [x.name, x.email, x.country, custProducts(x).join('; '), custLastPurchase(x), CUSTOMER_STATUS[x.status] || x.status,
+    custOk(x) ? 'yes' : 'no', x.dataDeleted ? 'yes' : 'no'].map(csvCell).join(','));
+  const blob = new Blob([[head.join(','), ...lines].join('\n') + '\n'], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `beast-coach-customers-ok-to-email-${todayS()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast(`Downloaded ${list.length} customer${list.length === 1 ? '' : 's'} who are OK to email.`);
+}
+
 function renderCoachList() {
   const capCard = t => {
     const T = TIERS[t];
@@ -1926,7 +2236,7 @@ function renderCoachList() {
       <td>${relDay(lastLogDate(c))}</td>
       <td>${needsYou(c).map(n => `<span class="need">${esc(n)}</span>`).join('') || '<span class="mini">Nothing</span>'}</td>
     </tr>`).join('');
-  return `<section class="hero"><h1>Clients</h1><p class="muted" style="margin:0">Spots, waitlist and who needs you today.</p></section>
+  return `${coachTabs('clients')}<section class="hero"><h1>Clients</h1><p class="muted" style="margin:0">Spots, waitlist and who needs you today.</p></section>
     <div class="grid2">${cards}
       <div class="card" style="grid-column:1/-1"><h3>Waitlist</h3>${wl}</div>
     </div>
@@ -1980,6 +2290,7 @@ function overviewHtml(c) {
     <dt>Plan</dt><dd>${TIERS[c.tier].name}</dd>
     <dt>Paid</dt><dd>${esc(paid)}</dd>
     <dt>Start date</dt><dd>${esc(fmtDate(c.startDate))}</dd>
+    <dt>Time zone</dt><dd>${tzHtml(c.ob)}</dd>
     <dt>Week</dt><dd>${esc(weekLabel(c))}</dd>
     <dt>End date</dt><dd>${c.startDate ? esc(fmtDate(endDateOf(c))) : 'Not started'}</dd>
     <dt>Pause days used</dt><dd>${c.pauseUsed + (c.status === 'paused' && c.pauseStart ? diffDays(c.pauseStart, todayS()) : 0)} of ${PAUSE_MAX}</dd>
@@ -2027,12 +2338,13 @@ function onboardingAnswersHtml(c) {
   const rows = [
     ['Age', ob.age], ['Sex', ob.sex], ['Height', ob.heightCm ? ob.heightCm + ' cm (entered as ' + (ob.heightUnit === 'ftin' ? ob.heightFt + ' ft ' + ob.heightIn + ' in' : ob.heightCm + ' cm') + ')' : ''],
     ['Weight', ob.weightKg != null ? weightText(ob.weightKg, 'kg') + ' (' + weightText(ob.weightKg, 'lb') + ')' : ''],
-    ['WhatsApp', ob.whatsapp], ['Time zone', ob.timezone],
+    ['WhatsApp', ob.whatsapp], ['Time zone', tzHtml(ob), true],
     ['Goal', ob.goal], ['Timeframe', ob.timeframe || '-'], ['Why now', ob.goalWhy],
-    ['Job', ob.job], ['Activity', ob.activity], ['Steps a day', ob.steps],
-    ['Foods they like', ob.likedFoods.concat(ob.likedOther ? [ob.likedOther] : []).join(', ')],
-    ['Foods they will not eat', ob.avoid], ['Allergies or intolerances', ob.allergies],
-    ['Dietary style', ob.diet], ['Meals per day', ob.mealsPerDay], ['Cooking time', ob.cookTime], ['Who cooks', ob.whoCooks],
+    ['Job', ob.job], ['Activity', ob.activity],
+    ['Everyday steps (not counting planned walks)', ob.stepsEveryday], ['Realistic daily steps target', ob.stepsRealistic],
+    ['Foods they like', chipList(ob.likedFoods.concat(splitList(ob.likedOther))), true],
+    ['Foods they will not eat', chipList(splitList(ob.avoid)), true], ['Allergies or intolerances', chipList(splitList(ob.allergies)), true],
+    ['Dietary style', ob.diet], ['Currently eats', ob.mealsPerDay], ['Cooking time', ob.cookTime], ['Who cooks', ob.whoCooks],
     ['Eats out per week', ob.eatsOut], ['Alcoholic drinks per week', ob.alcohol], ['Typical day', ob.typicalDay],
     ['Training days', ob.trainingDays.join(', ')], ['Time of day', ob.timeOfDay], ['Session length', ob.sessionLength + ' min'],
     ['Where they train', ob.place], ['Equipment', ob.equipment.join(', ')], ['Experience', ob.experience],
@@ -2043,7 +2355,15 @@ function onboardingAnswersHtml(c) {
     ['Doctor clearance confirmed', ob.healthClearance ? 'Yes' : 'No'],
     ['Submitted', ob.submittedAt ? fmtDate(ob.submittedAt.slice(0, 10)) : 'Not yet']
   ];
-  return `<div class="card"><h3>Onboarding answers</h3><dl class="dl">${rows.map(r => `<dt>${esc(r[0])}</dt><dd>${esc(r[1] || '-')}</dd>`).join('')}</dl></div>`;
+  return `<div class="card"><h3>Onboarding answers</h3><dl class="dl">${rows.map(r => `<dt>${esc(r[0])}</dt><dd>${r[2] ? (r[1] || '-') : esc(r[1] || '-')}</dd>`).join('')}</dl></div>`;
+}
+// Commas separate foods in the three free-text food boxes: "halloumi, chickpeas" -> ["halloumi", "chickpeas"].
+function splitList(s) { return String(s || '').split(',').map(x => x.trim()).filter(Boolean); }
+// Time zone for the coach: the zone used, or a flag when what the client typed was not recognised.
+function tzHtml(ob) {
+  const zone = resolveTimeZone(ob.timezone);
+  if (zone) return `${esc(ob.timezone)} (${esc(zone)})`;
+  return `${esc(ob.timezone || 'Not given')} <span class="tz-flag">Not recognised: ${esc(DEFAULT_TZ)} is used</span>`;
 }
 function chipList(items) { return items.length ? items.map(i => `<span class="need" style="background:#eef6ef;color:var(--ink)">${esc(i)}</span>`).join('') : '<span class="mini">None given</span>'; }
 function planInputsHtml(c) {
@@ -2055,17 +2375,19 @@ function planInputsHtml(c) {
   const liked = Object.keys(FOOD_GROUPS).map(g => {
     const p = FOOD_GROUPS[g].filter(f => ob.likedFoods.includes(f));
     return p.length ? `<div class="mini" style="margin-top:6px">${g}</div><div>${p.map(x => `<span class="pi-tag">${esc(x)}</span>`).join('')}</div>` : '';
-  }).join('') + (ob.likedOther ? `<p class="mini" style="margin-top:6px">Also: ${esc(ob.likedOther)}</p>` : '');
+  }).join('') + (splitList(ob.likedOther).length ? `<div class="mini" style="margin-top:6px">Other foods they like</div><div>${chipList(splitList(ob.likedOther))}</div>` : '');
   const sec = (title, body) => `<div class="pi-sec"><h4>${title}</h4>${body}</div>`;
   return `<section class="plan-inputs">${head}<div class="pi-grid">
     ${sec('Goal and body', `<p><b>${esc(ob.goal || '-')}</b></p>
       <p class="mini">Timeframe: ${esc(ob.timeframe || '-')}. Why now: ${esc(ob.goalWhy || '-')}</p>
       <p>${esc(ob.age)} years, ${esc(ob.sex || '-')}, ${esc(ob.heightCm)} cm (${ob.heightUnit === 'ftin' ? esc(ob.heightFt) + ' ft ' + esc(ob.heightIn) + ' in' : 'entered in cm'}), ${ob.weightKg != null ? weightText(ob.weightKg, 'kg') : '-'}</p>
-      <p class="mini">${esc(ob.job || '-')}. ${esc(ob.activity || '-')}, ${esc(ob.steps || '-')} steps a day. Diet: ${esc(ob.diet)}</p>`)}
+      <p class="mini">${esc(ob.job || '-')}. ${esc(ob.activity || '-')}. Diet: ${esc(ob.diet)}</p>
+      <p><span class="mini">Everyday steps (not counting planned walks)</span><br><b>${esc(ob.stepsEveryday || '-')}</b></p>
+      <p><span class="mini">Realistic target (including planned walks)</span><br><b>${esc(ob.stepsRealistic || '-')}</b></p>`)}
     ${sec('Food they like', liked || '<p class="mini">None given</p>')}
-    ${sec('Food to avoid', `<p>${esc(ob.avoid || 'Nothing listed')}</p>
-      ${ob.allergies ? `<div class="hl-red" style="margin:8px 0"><b>Allergies: ${esc(ob.allergies)}</b></div>` : '<p class="mini">No allergies given</p>'}
-      <p class="mini">${esc(ob.mealsPerDay)} meals a day. Cooking time ${esc(ob.cookTime)}, cooked by ${esc(ob.whoCooks)}. Eats out ${esc(ob.eatsOut || '0')} times and drinks ${esc(ob.alcohol || '0')} a week.</p>`)}
+    ${sec('Food to avoid', `<p class="mini">Will not eat</p><div style="margin-bottom:8px">${chipList(splitList(ob.avoid))}</div>
+      <p class="mini">Allergies or intolerances</p>${ob.allergies ? `<div class="hl-red" style="margin:8px 0">${chipList(splitList(ob.allergies))}</div>` : '<p class="mini">No allergies given</p>'}
+      <p class="mini">Currently eats ${esc(ob.mealsPerDay || '-')}. Cooking time ${esc(ob.cookTime)}, cooked by ${esc(ob.whoCooks)}. Eats out ${esc(ob.eatsOut || '0')} times and drinks ${esc(ob.alcohol || '0')} a week.</p>`)}
     ${sec('Training days', `<div>${ob.trainingDays.map(d => `<span class="pi-tag day">${d}</span>`).join('') || '<span class="mini">None given</span>'}</div>
       <p class="mini" style="margin-top:8px">${esc(ob.timeOfDay)}, ${esc(ob.sessionLength)} min, ${esc(ob.place)}. Experience: ${esc(ob.experience)}.</p>`)}
     ${sec('Equipment', `<p>${esc(ob.equipment.join(', ') || 'None given')}</p>`)}
@@ -2191,45 +2513,77 @@ function coachSessionHtml(c, w) {
 }
 function logsHtml(c) {
   const t = c.targets;
+  const start = c.startDate;                    // null until activation
+  // Day list: from the activation date to today, newest first. No days before activation.
   const days = [];
-  for (let i = 0; i < 21; i++) days.push(addDays(todayS(), -i));
-  return `<div class="card"><h3>Last 21 days</h3><p class="mini" style="margin-top:0">Newest first. Tap a day to open it. <span class="up-badge">Up</span> marks a lift that went up since it was last logged.</p>
+  for (let i = 0; i < 21; i++) {
+    const d = addDays(todayS(), -i);
+    if (!start || d < start) break;
+    days.push(d);
+  }
+  // Meals logged while waiting for activation, or dated before it: one collapsed group at the bottom.
+  const baseline = [];
+  Object.keys(c.logs).sort().forEach(d => (c.logs[d] || []).forEach(m => {
+    if (m.waiting || !start || d < start) baseline.push({ date: d, m });
+  }));
+  const baselineHtml = baseline.length ? `<details class="baseline"><summary>Logged before activation (baseline) <span class="mini" style="font-weight:400">${baseline.length} meal${baseline.length === 1 ? '' : 's'}, not part of the plan</span></summary>
+      <div style="padding:4px 0 6px">${baseline.map(({ date, m }) => `<div class="meal" style="padding:8px 0">
+        <div style="flex:1 1 200px"><span class="mini">${fmtDate(date)}${m.time ? ' · ' + esc(m.time) : ''}</span> <b>${esc(m.name)}</b> <span class="mini">${esc(sourceLabel(m))}</span>
+        <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div></div>`).join('')}</div></details>` : '';
+  const intro = start
+    ? `<p class="mini" style="margin-top:0">From activation on ${esc(fmtDate(start))}, newest first. Tap a day to open it. <span class="up-badge">Up</span> marks a lift that went up since it was last logged.</p>`
+    : '<p class="mini" style="margin-top:0">Not activated yet. Logs start on the activation date. Anything logged before then is in the baseline group below.</p>';
+  return `<div class="card"><h3>${start ? 'Logs' : 'Logs before activation'}</h3>${intro}
     ${days.map((date, idx) => {
-      const meals = c.logs[date] || [];
+      const meals = (c.logs[date] || []).filter(m => !m.waiting);
       const tot = sumNut(meals);
       const wos = (c.workouts || []).filter(w => w.date === date);
       const wi = c.weighIns.find(w => w.date === date);
       const steps = c.steps[date];
+      const late = v => v ? '<span class="late">added later</span>' : '';
       const calOver = t && tot.calories > t.calories, proOver = t && tot.protein > t.protein;
       const summary = `<summary><span>${fmtDate(date)}</span>
         <span class="mini" style="font-weight:400;margin-left:8px">${meals.length ? `<span style="color:${macroInk('calories', tot.calories, t && t.calories)}">${tot.calories} kcal${calOver ? ' (over)' : ''}</span> · <span style="color:${macroInk('protein', tot.protein, t && t.protein)}">P ${tot.protein}g${proOver ? ' (over)' : ''}</span> · ${meals.length} meal${meals.length === 1 ? '' : 's'}` : 'No meals logged'}
-        · ${steps ? fmtSteps(steps) + ' steps' : 'No steps'} · ${wos.length ? wos.length + ' workout' + (wos.length === 1 ? '' : 's') : 'No workout'} · ${wi ? weightText(wi.kg, 'kg') : 'No weigh-in'}</span></summary>`;
+        · ${steps ? fmtSteps(steps) + ' steps' + late(c.stepsLate && c.stepsLate[date]) : 'No steps'} · ${wos.length ? wos.length + ' workout' + (wos.length === 1 ? '' : 's') : 'No workout'} · ${wi ? weightText(wi.kg, 'kg') : 'No weigh-in'}</span></summary>`;
       const body = meals.length ? meals.map(m => `<div class="meal" style="padding:8px 0">
-          <div style="flex:1 1 200px"><span class="mini">${esc(m.time || '')}</span> <b>${esc(m.name)}</b> <span class="mini">${esc(sourceLabel(m))}</span>
+          <div style="flex:1 1 200px"><span class="mini">${esc(m.time || '')}</span> <b>${esc(m.name)}</b> <span class="mini">${esc(sourceLabel(m))}</span>${late(m.addedLate)}
           <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div>
           ${m.edited && m.ai ? `<div class="edited">Changed by client. Beast AI said ${m.ai.calories} kcal, P ${m.ai.protein}g.</div>` : ''}</div></div>`).join('')
         : '<p class="mini">No meals logged.</p>';
-      const woTxt = wos.map(w => w.session ? coachSessionHtml(c, w)
-        : `<div class="mini">Other activity: ${esc(w.what)}${w.minutes ? ' (' + w.minutes + ' min)' : ''}${w.notes ? ' · ' + esc(w.notes) : ''}</div>`).join('');
+      const woTxt = wos.map(w => (w.session ? `${late(w.addedLate)}${coachSessionHtml(c, w)}`
+        : `<div class="mini">Other activity: ${esc(w.what)}${w.minutes ? ' (' + w.minutes + ' min)' : ''}${w.notes ? ' · ' + esc(w.notes) : ''}${late(w.addedLate)}</div>`)).join('');
       return `<details ${idx === 0 ? 'open' : ''}>${summary}<div style="padding:4px 0 6px">${body}${woTxt}</div></details>`;
     }).join('')}
+    ${baselineHtml}
   </div>`;
 }
 
 const ACT = {};
 const CH = {};
 const INP = {};
+/* Customers page handlers (defined with the customer code above) */
+ACT.coachPage = el => { ui.coachPage = el.dataset.p; saveUi(); render(); };
+CH.custFilter = el => { ui.custFilter = Object.assign({}, ui.custFilter, { [el.dataset.f]: el.value }); saveUi(); applyCustFilters(); };
+INP.custSearch = el => { ui.custFilter = Object.assign({}, ui.custFilter, { q: el.value }); saveUi(); applyCustFilters(); };
+ACT.unsubscribe = el => {
+  const x = db.customers.find(y => y.id === el.dataset.id);
+  if (!x) return;
+  x.unsubscribed = true; x.unsubscribedDate = todayS();
+  persist(); render(); toast(`${x.name} is unsubscribed. They are left out of copies and CSV files.`);
+};
+ACT.copyEmails = () => { copyEmailsAction(); };
+ACT.downloadCsv = () => { downloadCsvAction(); };
 ACT.howTo = el => { openExercise(el.dataset.name); };
 ACT.closeSheet = () => closeSheet();
 
 ACT.reset = () => {
   if (!confirm('Reset the demo? This clears everything you have added and reseeds the sample clients.')) return;
-  db = Store.reset();
+  db = seedDb();                       // reseeds the four sample clients and the customers
   persist();
   ui = { view:'coach', coachClientId:null, coachTab:'overview', clientId:null, clientTab:'today',
     clientDay: todayS(), clientPlanDay: dowNum(todayS()), coachPlanDay: dowNum(todayS()),
-    addMode:'describe', unit:'kg', newStep:'plans', newTier:null, describe:'', aiResult:null, bText:'',
-    bMeal:'Lunch', bEffort:'15 minutes', buildResults:null, editId:null, logOpen:{} };
+    addMode:null, unit:'kg', newStep:'plans', newTier:null, coachPage:'clients', describe:'', aiResult:null, bText:'',
+    bMeal:'Lunch', bEffort:'15 minutes', buildResults:null, editId:null, logOpen:{}, custFilter:{ product:'', status:'', ok:'', q:'' } };
   saveUi(); render(); toast('Demo reset.');
 };
 ACT.backClients = () => { ui.coachClientId = null; saveUi(); render(); };
@@ -2240,7 +2594,11 @@ ACT.unit = el => { ui.unit = el.dataset.u; saveUi(); render(); };
 ACT.clientTab = el => { ui.clientTab = el.dataset.tab; saveUi(); render(); };
 ACT.clientPlanDay = el => { ui.clientPlanDay = Number(el.dataset.d); saveUi(); render(); };
 
-ACT.dayPrev = () => { ui.clientDay = addDays(ui.clientDay, -1); ui.editId = null; saveUi(); render(); };
+ACT.dayPrev = () => {
+  const prev = addDays(ui.clientDay, -1);
+  if (!canLogDay(prev)) { toast('You can go back 3 days. Older days are read-only.'); return; }
+  ui.clientDay = prev; ui.editId = null; saveUi(); render();
+};
 ACT.dayNext = () => { if (ui.clientDay < todayS()) { ui.clientDay = addDays(ui.clientDay, 1); ui.editId = null; saveUi(); render(); } };
 ACT.addMode = el => { ui.addMode = el.dataset.m; saveUi(); render(); };
 
@@ -2265,7 +2623,8 @@ ACT.saveDescribe = () => {
   const n = readNut('r-');
   const est = r.estimate;
   const edited = NUT.some(k => n[k] !== est[k]);
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const day = logDay();
+  if (!guardDay(day)) return;
   addMealTo(c, day, { id: uid(), time: day === todayS() ? nowHHMM() : '', name: n.name || r.name || 'Meal',
     calories: n.calories, protein: n.protein, carbs: n.carbs, fat: n.fat, fibre: n.fibre,
     source:'ai', ai: est, edited, text: ui.describe });
@@ -2275,7 +2634,8 @@ ACT.saveTyped = () => {
   const c = clientById(ui.clientId);
   const n = readNut('m-');
   if (!n.name) { toast('Give the meal a name.'); return; }
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const day = logDay();
+  if (!guardDay(day)) return;
   addMealTo(c, day, { id: uid(), time: day === todayS() ? nowHHMM() : '', name: n.name, calories: n.calories, protein: n.protein,
     carbs: n.carbs, fat: n.fat, fibre: n.fibre, source:'typed', ai:null, edited:false, text:'' });
   render(); toast('Meal saved.');
@@ -2289,6 +2649,7 @@ ACT.logPlan = el => {
   const m = (pub[Number(el.dataset.d)] || [])[Number(el.dataset.i)];
   if (!m) return;
   const date = el.dataset.date || ui.clientDay;
+  if (!guardDay(date)) return;
   addMealTo(c, date, { id: uid(), time: date === todayS() ? nowHHMM() : '', name: m.name, calories: m.calories, protein: m.protein,
     carbs: m.carbs, fat: m.fat, fibre: m.fibre, source:'plan', ai:null, edited:false, text: m.text });
   render(); toast('Logged from your plan.');
@@ -2332,7 +2693,7 @@ ACT.build = async () => {
   }
   if (!have) { toast('Add a photo or type what you have.'); return; }
   const t = c.targets;
-  const eaten = totalsFor(c, ui.clientDay > todayS() ? todayS() : ui.clientDay);
+  const eaten = totalsFor(c, logDay());
   const body = { mode: 'create', have: have.slice(0, 600), meal: ui.bMeal, effort: ui.bEffort };
   if (t) body.targets = {
     calories: Math.min(900, Math.max(0, t.calories - eaten.calories)),
@@ -2359,7 +2720,8 @@ ACT.logBuilt = el => {
   const c = clientById(ui.clientId);
   const m = (ui.buildResults || [])[Number(el.dataset.i)];
   if (!m) return;
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const day = logDay();
+  if (!guardDay(day)) return;
   addMealTo(c, day, Object.assign({ id: uid(), time: day === todayS() ? nowHHMM() : '', source:'builder', ai:null, edited:false }, m));
   ui.buildResults = null; saveUi(); render(); toast('Meal logged.');
 };
@@ -2367,7 +2729,8 @@ ACT.saveBuilderManual = () => {
   const c = clientById(ui.clientId);
   const n = readNut('b-');
   if (!n.name) { toast('Give the meal a name.'); return; }
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const day = logDay();
+  if (!guardDay(day)) return;
   addMealTo(c, day, { id: uid(), time: day === todayS() ? nowHHMM() : '', name: n.name, calories: n.calories, protein: n.protein,
     carbs: n.carbs, fat: n.fat, fibre: n.fibre, source:'typed', ai:null, edited:false, text:'' });
   render(); toast('Meal saved.');
@@ -2378,7 +2741,8 @@ ACT.editMeal = el => { ui.editId = el.dataset.id; saveUi(); render(); };
 ACT.cancelEditMeal = () => { ui.editId = null; saveUi(); render(); };
 ACT.saveEditMeal = el => {
   const c = clientById(ui.clientId);
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const day = logDay();
+  if (!guardDay(day)) return;
   const m = (c.logs[day] || []).find(x => x.id === el.dataset.id);
   if (!m) return;
   const n = readNut('e-');
@@ -2389,7 +2753,8 @@ ACT.saveEditMeal = el => {
 };
 ACT.deleteMeal = el => {
   const c = clientById(ui.clientId);
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const day = logDay();
+  if (!guardDay(day)) return;
   c.logs[day] = (c.logs[day] || []).filter(x => x.id !== el.dataset.id);
   persist(); render(); toast('Meal deleted.');
 };
@@ -2423,8 +2788,10 @@ ACT.woSetDel = el => {
 };
 ACT.saveWorkout = () => {
   const c = clientById(ui.clientId);
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const day = logDay();
+  if (!guardDay(day)) return;
   const wo = ui.wo || {};
+  const late = day < todayS() ? { addedLate: true } : {};
   if (wo.mode === 'plan' && wo.ex) {
     const exercises = wo.ex.map(e => ({
       name: e.name, unit: e.unit || '', skipped: !!e.skipped,
@@ -2436,26 +2803,35 @@ ACT.saveWorkout = () => {
     }));
     if (!exercises.some(e => e.skipped || e.sets.length)) { toast('Log a set for at least one exercise, or mark it skipped.'); return; }
     const session = planSessions(c).find(s => s.day === dowNum(day));
-    c.workouts.push({ id: uid(), date: day, what: session ? session.title : 'Workout', minutes: null,
-      notes: (wo.notes || '').trim().slice(0, 300), session: { exercises } });
+    c.workouts.push(Object.assign({ id: uid(), date: day, what: session ? session.title : 'Workout', minutes: null,
+      notes: (wo.notes || '').trim().slice(0, 300), session: { exercises } }, late));
   } else {
+    // Other activity: what, minutes (blank means no minutes, not 0) and notes.
     const what = (wo.what || '').trim();
     if (!what) { toast('Say what you did.'); return; }
-    c.workouts.push({ id: uid(), date: day, what: what.slice(0, 120), minutes: clampNum(wo.minutes, 600), notes: (wo.notes || '').trim().slice(0, 300) });
+    const minutes = String(wo.minutes == null ? '' : wo.minutes).trim() === '' ? null : clampNum(wo.minutes, 600);
+    c.workouts.push(Object.assign({ id: uid(), date: day, what: what.slice(0, 120), minutes,
+      notes: (wo.notes || '').trim().slice(0, 300) }, late));
   }
   ui.wo = null; persist(); saveUi(); render(); toast('Workout saved.');
 };
 ACT.deleteWorkout = el => {
   const c = clientById(ui.clientId);
-  c.workouts = c.workouts.filter(w => w.id !== el.dataset.id);
+  const w = c.workouts.find(x => x.id === el.dataset.id);
+  if (w && !guardDay(w.date)) return;
+  c.workouts = c.workouts.filter(x => x.id !== el.dataset.id);
   persist(); render();
 };
 ACT.saveSteps = () => {
   const c = clientById(ui.clientId);
-  const day = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+  const day = logDay();
+  if (!guardDay(day)) return;
   const v = document.getElementById('st-val').value;
-  if (v === '') delete c.steps[day];
-  else c.steps[day] = clampNum(v, 60000);
+  if (v === '') { delete c.steps[day]; delete c.stepsLate[day]; }
+  else {
+    c.steps[day] = clampNum(v, 60000);
+    if (day < todayS()) c.stepsLate[day] = true; else delete c.stepsLate[day];
+  }
   persist(); render(); toast('Steps saved.');
 };
 ACT.saveWeigh = () => {
@@ -2476,6 +2852,8 @@ ACT.renew = () => {
   const c = clientById(ui.clientId);
   c.status = 'awaiting'; c.startDate = null; c.pauseUsed = 0; c.pauseStart = null;
   c.paid = { date: todayS(), amount: Math.round(TIERS[c.tier].price * 0.8 * 100) / 100, renewal: true };
+  const renewed = db.customers.find(x => x.clientId === c.id);
+  if (renewed) renewed.purchases.push({ product: TIERS[c.tier].name, date: todayS(), price: c.paid.amount });
   persist(); render(); toast('Renewal saved. Stefan will confirm your start date.');
 };
 ACT.dropBasic = () => {
@@ -2483,6 +2861,8 @@ ACT.dropBasic = () => {
   const today = todayS();
   c.tier = 'basic'; c.status = 'active'; c.startDate = today; c.nextBilling = addDays(today, 84);
   c.paid = { date: today, amount: 30 }; c.pauseUsed = 0; c.pauseStart = null;
+  const dropped = db.customers.find(x => x.clientId === c.id);
+  if (dropped) dropped.purchases.push({ product: 'Basic', date: today, price: 30 });
   persist(); render(); toast('You are on Basic: $30 every 12 weeks. Your targets are kept.');
 };
 ACT.updateTargets = () => {
@@ -2490,7 +2870,7 @@ ACT.updateTargets = () => {
   const latest = sortedWeighIns(c).slice(-1)[0];
   const inp = basicInputs(c.ob, latest ? latest.kg : c.ob.weightKg);
   const t = BasicTargets.calcTargets(inp);
-  c.targets = { calories: t.calories, protein: t.protein, carbs: t.carbs, fat: t.fat, fibre: t.fibre, steps: BasicTargets.stepsTarget(inp.steps) };
+  c.targets = { calories: t.calories, protein: t.protein, carbs: t.carbs, fat: t.fat, fibre: t.fibre, steps: BasicTargets.stepsTarget(parseFloat(c.ob.stepsRealistic)) };
   persist(); render();
   toast(latest ? 'Targets updated from your latest weigh-in.' : 'Targets updated from your starting weight.');
 };
@@ -2519,11 +2899,16 @@ ACT.pay = el => {
   document.getElementById('err-nc-email').textContent = emailOk ? '' : 'Enter a valid email.';
   nameEl.classList.toggle('invalid', !name);
   emailEl.classList.toggle('invalid', !emailOk);
-  if (!name || !emailOk) return;
+  const country = document.getElementById('nc-country').value;
+  document.getElementById('err-nc-country').textContent = country ? '' : 'Choose your country.';
+  document.getElementById('nc-country').classList.toggle('invalid', !country);
+  if (!name || !emailOk || !country) return;
   if (CAP_TIERS.includes(t) && spotsLeft(t) <= 0) { toast('That plan just filled up. Join the waitlist instead.'); ui.newStep = 'plans'; saveUi(); render(); return; }
   const c = mkClient({ name, email, tier: t, status: 'onboarding', paid: { date: todayS(), amount: TIERS[t].price } });
   c.ob = blankOb();
   db.clients.push(c);
+  // The customer record: kept for good, even if the client later deletes their data.
+  recordPurchase(c, { name, email, country, product: TIERS[t].name, price: TIERS[t].price, news: document.getElementById('nc-news').checked });
   persist();
   ui.view = 'client'; ui.clientId = c.id; ui.clientTab = 'today'; ui.newStep = 'plans';
   saveUi(); render(); window.scrollTo(0, 0);
@@ -2567,7 +2952,7 @@ ACT.basicSubmit = () => {
   ob.weightKg = ob.weightUnit === 'kg' ? parseFloat(ob.weight) : lbToKg(parseFloat(ob.weight));
   ob.submittedAt = new Date().toISOString();
   const t = BasicTargets.calcTargets(basicInputs(ob, ob.weightKg));
-  c.targets = { calories: t.calories, protein: t.protein, carbs: t.carbs, fat: t.fat, fibre: t.fibre, steps: BasicTargets.stepsTarget(parseFloat(ob.steps)) };
+  c.targets = { calories: t.calories, protein: t.protein, carbs: t.carbs, fat: t.fat, fibre: t.fibre, steps: BasicTargets.stepsTarget(parseFloat(ob.stepsRealistic)) };
   c.basicStage = 'targets';
   persist(); render(); window.scrollTo(0, 0);
 };
@@ -2590,9 +2975,16 @@ CH.cap = el => {
 ACT.deleteClient = el => {
   const c = clientById(el.dataset.id);
   if (!c) return;
-  if (!confirm(`Delete ${c.name} and all their data? This cannot be undone.`)) return;
+  if (!confirm(`Delete ${c.name} and all their data? Their onboarding answers, plans, logs and notes are removed. Their customer record is kept.`)) return;
+  // The customer record stays (name, email, purchases, email choices), marked Data deleted.
+  // A client who had not finished their plan is recorded as Cancelled.
+  const cust = db.customers.find(x => x.clientId === c.id);
+  if (cust) {
+    if (c.status !== 'finished') cust.status = 'cancelled';
+    cust.dataDeleted = true; cust.dataDeletedDate = todayS(); cust.clientId = null;
+  }
   db.clients = db.clients.filter(x => x.id !== c.id);
-  ui.coachClientId = null; persist(); saveUi(); render(); toast('Client deleted.');
+  ui.coachClientId = null; persist(); saveUi(); render(); toast('Client data deleted. The customer record is kept.');
 };
 ACT.activate = () => {
   const c = clientById(ui.coachClientId);
@@ -2756,7 +3148,11 @@ document.addEventListener('change', e => {
     const v = el.value;
     if (v === 'coach') { ui.view = 'coach'; ui.coachClientId = null; }
     else if (v === 'new') { ui.view = 'new'; ui.newStep = 'plans'; }
-    else if (v.startsWith('client:')) { ui.view = 'client'; ui.clientId = v.slice(7); ui.clientTab = 'today'; ui.clientDay = todayS(); ui.editId = null; }
+    else if (v.startsWith('client:')) {
+      ui.view = 'client'; ui.clientId = v.slice(7); ui.clientTab = 'today'; ui.editId = null;
+      activeZone = zoneFor(clientById(ui.clientId));        // their "today", before picking the day
+      ui.clientDay = todayS();
+    }
     saveUi(); render(); window.scrollTo(0, 0);
     return;
   }
@@ -2817,7 +3213,9 @@ function handleObInput(el) {
 db = Store.load();
 initUi();
 if (ui.view === 'client' && !clientById(ui.clientId)) { ui.view = 'coach'; ui.clientId = null; }
-ui.clientDay = ui.clientDay > todayS() ? todayS() : ui.clientDay;
+activeZone = zoneFor(ui.view === 'client' ? clientById(ui.clientId) : null);
+ui.clientDay = logDay();
+document.getElementById('tzList').innerHTML = TZ_CITIES.map(([city, zone]) => `<option value="${city}">${zone}</option>`).join('');
 saveUi();
 render();
 </script>

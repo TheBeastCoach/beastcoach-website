@@ -44,9 +44,10 @@
     };
   }
 
-  // Steps target: current average plus 2,000, never below 7,000 or above 10,000.
-  function stepsTarget(avgSteps) {
-    return Math.min(10000, Math.max(7000, Math.round(avgSteps) + 2000));
+  // Steps target: the realistic daily target the client gave, kept between 3,000 and 20,000.
+  // Calories use the everyday steps (steps without planned walks), the conservative choice.
+  function stepsTarget(realisticSteps) {
+    return Math.min(20000, Math.max(3000, Math.round(realisticSteps)));
   }
 
   var api = { GOALS: GOALS, calcTargets: calcTargets, stepsTarget: stepsTarget };
