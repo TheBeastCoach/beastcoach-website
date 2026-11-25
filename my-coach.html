@@ -175,7 +175,8 @@ const OB_STEPS = ['About you', 'Your goal and your day', 'Food you like', 'Food 
 const STEPS_EVERYDAY_Q = 'About how many steps do you do on a normal day, NOT counting any walks you do on purpose? (work, errands, around the house)';
 const STEPS_REALISTIC_Q = 'What daily steps target feels realistic for you, including walks you do on purpose?';
 const OB_CHOOSE = 'Choose one.';
-const CLIENT_COLUMNS = 'id,user_id,email,name,tier,status,start_date,activated_at,end_date,time_zone,whatsapp,onboarding,targets,created_at';
+// paused_at and pause_days_used come with supabase/coaching-portal-4c.sql (run it before this page goes live).
+const CLIENT_COLUMNS = 'id,user_id,email,name,tier,status,start_date,activated_at,end_date,time_zone,whatsapp,onboarding,targets,created_at,paused_at,pause_days_used';
 
 /* Exercise library for "How to do it" (the demo's library, unchanged). */
 const EXERCISES = [
@@ -476,6 +477,13 @@ function toast(msg) {
   window.__toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
 }
 
+/* The Beast: the coach's WhatsApp number, from the database. Nothing for any other plan. */
+async function loadCoachWhatsapp() {
+  S.coachWa = null;
+  if (!S.cur || S.cur.tier !== 'beast' || !['active', 'paused'].includes(S.cur.status)) return;
+  const { data, error } = await sb.rpc('get_coach_whatsapp');
+  if (!error && typeof data === 'string') S.coachWa = data;
+}
 /* The signed-in client's own marketing setting, true or false (get_my_marketing_consent in the database). */
 async function loadMarketing() {
   const { data, error } = await sb.rpc('get_my_marketing_consent');
@@ -559,11 +567,13 @@ function statusHeader() {
   const first = String(r.name || '').trim().split(/\s+/)[0] || '';
   const week = r.activated_at ? Math.min(12, Math.floor(diffDays(activatedDay(r), clientToday(r)) / 7) + 1) : null;
   const weighDay = DAYS_FULL[DAYS.indexOf((r.onboarding || {}).weighInDay) >= 0 ? DAYS.indexOf(r.onboarding.weighInDay) : 0];
-  const showWa = r.tier === 'beast' && r.status !== 'finished' && r.status !== 'cancelled';
+  // The coach's number comes from the database (get_coach_whatsapp), only for The Beast, active or paused.
+  const waDigits = String(S.coachWa || '').replace(/\D/g, '');
+  const showWa = r.tier === 'beast' && (r.status === 'active' || r.status === 'paused') && waDigits.length >= 6;
   return `<section class="hero"><div class="row"><div><div class="eyebrow">${first ? 'Hi ' + esc(first) : 'Hi'}</div>
       <h1>${esc(PLAN_NAMES[r.tier] || 'Coaching')} plan</h1></div><span class="pill">${esc(STATUS_LABEL[r.status] || r.status)}</span></div>
       ${week ? `<p class="muted" style="margin:10px 0 0">Week ${week} of 12.${r.end_date ? ' Ends ' + esc(fmtDate(r.end_date)) + '.' : ''} Weigh-in day: ${esc(weighDay)}.</p>` : ''}
-      ${showWa ? `<div style="margin-top:12px"><a class="btn btn-amber btn-sm" style="background:var(--amber);color:#1B1200;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:800;display:inline-block" href="https://wa.me/" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>` : ''}
+      ${showWa ? `<div style="margin-top:12px"><a class="btn btn-amber btn-sm" style="background:var(--amber);color:#1B1200;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:800;display:inline-block" href="https://wa.me/${waDigits}" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>` : ''}
     </section>`;
 }
 const STATUS_LABEL = { awaiting_onboarding: 'Onboarding', awaiting_activation: 'Awaiting activation', active: 'Active', paused: 'Paused', finished: 'Finished', cancelled: 'Cancelled' };
@@ -578,7 +588,7 @@ function statusNotice() {
     return '<div class="card"><h3>Stefan is building your plan</h3><p style="margin:8px 0 0">It will be ready within 3 business days. Logging starts when Stefan activates your plan.</p></div>';
   }
   const msg = {
-    paused: ['Your plan is paused', 'Stefan will restart you when you are ready. Your history is below, and you can read it here.'],
+    paused: ['Your plan is paused', `Paused since ${r.paused_at ? fmtDate(ymdIn(new Date(r.paused_at), zoneFor(r))) : 'recently'}. Pause days used: ${Math.min(14, (r.pause_days_used || 0) + (r.paused_at ? Math.max(0, diffDays(ymdIn(new Date(r.paused_at), zoneFor(r)), clientToday(r))) : 0))} of 14. Stefan will resume you when you are ready.`],
     finished: ['Your 12 weeks are finished', 'Renew with 20% off and keep your place, or drop to Basic for $30 AUD every 12 weeks. Stefan will email you the options. Your history is below.'],
     cancelled: ['This plan is cancelled', 'If you think this is a mistake, email info@beastcoach.fit. Your history is below.']
   }[r.status];
@@ -949,7 +959,7 @@ function planPick() {
   const p = S.plans[S.cur.id];
   const meals = p && p.plan && p.plan.meals ? (p.plan.meals[dowNum(S.day)] || []) : [];
   if (!meals.length) return '<p class="muted">No plan is published yet for this day. Stefan is working on it.</p>';
-  return meals.map((m, i) => `<div class="meal"><div style="flex:1 1 200px"><b>${esc(m.label)}: ${esc(m.name)}</b><div class="mini">${esc(m.text)}</div>
+  return meals.map((m, i) => `<div class="meal"><div style="flex:1 1 200px"><b>${esc(m.label)}: ${esc(m.name)}</b>${m.text && m.text !== m.name ? `<div class="mini">${esc(m.text)}</div>` : ''}
     <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div>
     <button class="btn-sm" data-act="logPlan" data-i="${i}">Log</button></div>`).join('');
 }
@@ -1084,7 +1094,7 @@ function planHtml() {
   else {
     const list = pub[day];
     const tot = sumNut(list.map(m => ({ calories: m.calories, protein: m.protein, carbs: m.carbs, fat: m.fat, fibre: m.fibre })));
-    meals = list.map(m => `<div class="meal"><div style="flex:1 1 200px"><b>${esc(m.label)}: ${esc(m.name)}</b><div class="mini">${esc(m.text)}</div>
+    meals = list.map(m => `<div class="meal"><div style="flex:1 1 200px"><b>${esc(m.label)}: ${esc(m.name)}</b>${m.text && m.text !== m.name ? `<div class="mini">${esc(m.text)}</div>` : ''}
       <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div></div>`).join('')
       + `<p class="mini" style="margin:10px 0 0"><b>Day total:</b> ${Math.round(tot.calories)} kcal · P ${Math.round(tot.protein)}g · C ${Math.round(tot.carbs)}g · F ${Math.round(tot.fat)}g · Fibre ${Math.round(tot.fibre)}g</p>`;
   }
@@ -1573,6 +1583,7 @@ async function boot() {
     return;
   }
   await loadMarketing();
+  await loadCoachWhatsapp();
   S.day = clientToday(S.cur);
   await loadDay();
   render();

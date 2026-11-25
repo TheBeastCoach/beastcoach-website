@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coach | Beast Coach</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1B3022;--green:#2D6A4F;--mint:#52B788;--bg:#F4F7F2;--amber:#F59E0B;--amber-hover:#FFB62E;--muted:#3B4F43;--line:#D5E0D8;--red:#b42318;--amber-text:#8a5300}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Manrope',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5}
+h1,h2,h3,.disp{font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;font-weight:400;letter-spacing:.02em;margin:0;color:var(--ink)}
+h1{font-size:clamp(48px,7vw,80px);line-height:.95}h2{font-size:clamp(36px,5vw,52px);line-height:1}h3{font-size:30px;line-height:1.05}
+p{margin:0 0 10px}
+a{color:var(--green)}a:hover{color:var(--ink)}
+:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+.wrap{max-width:1120px;margin:0 auto;padding:18px 20px}
+.muted{color:var(--muted);font-size:14px}
+.eyebrow{font-weight:800;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--green)}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px}
+.card h3{margin-bottom:12px}
+.hero{background:var(--ink);color:#fff;border-radius:22px;padding:26px 24px;margin-bottom:16px}
+.hero h1{color:#fff}.hero .muted{color:#D5E6DB}
+.hero .eyebrow{color:#8FD3B0}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr}
+.grid3{display:grid;gap:14px;grid-template-columns:1fr}
+.grid5{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+@media(min-width:900px){.grid2{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}.grid5{grid-template-columns:repeat(5,1fr)}}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.stack>*+*{margin-top:10px}
+.hidden,[hidden]{display:none !important}
+/* demo bar */
+.demo-bar{background:var(--ink);color:#fff;padding:12px 20px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+@media(min-width:900px){.demo-bar{position:sticky;top:0;z-index:50}}
+.logo{font-family:'Bebas Neue',Impact,sans-serif;font-size:24px;letter-spacing:.1em;color:#fff}
+.logo span{color:var(--mint)}
+.tag{background:var(--amber);color:#1B1200;font-weight:800;border-radius:6px;padding:3px 9px;font-size:12px;letter-spacing:1px}
+.demo-bar select{width:auto;min-width:230px;max-width:100%}
+.demo-bar .note{font-size:13px;color:#D5E6DB;flex:1 1 260px}
+.ai{font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px}
+.ai.on{background:#d8f3e3;color:#1b5e3a}.ai.off{background:#fde7c2;color:#7a4a00}
+/* form controls */
+select,input,textarea{font:inherit;color:var(--ink);background:#fff;border:1px solid #C5D3C8;border-radius:12px;padding:10px 12px;width:100%;max-width:100%}
+select option{color:var(--ink);background:#fff}
+textarea{min-height:92px;resize:vertical}
+input[type=checkbox],input[type=radio]{width:auto;margin:0;accent-color:var(--green)}
+label{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.field{margin-bottom:12px}
+.field.inline label{display:inline}
+.err{color:var(--red);font-size:13px;margin-top:4px;min-height:0}
+.err:empty{display:none}
+.invalid{border-color:var(--red)!important;box-shadow:0 0 0 2px #fbd4cf}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid #C5D3C8;border-radius:999px;padding:7px 13px;background:#fff;cursor:pointer;font-size:14px;font-weight:600;margin:0}
+.chip:has(input:checked){background:#d8f3e3;border-color:var(--mint)}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:600;margin:0 0 10px;cursor:pointer}
+.check input{margin-top:4px}
+.hl-red{background:#fdecea;border-left:4px solid var(--red);padding:9px 12px;border-radius:10px}
+.hl-amber{background:#fff6e0;border-left:4px solid var(--amber);padding:9px 12px;border-radius:10px}
+.note-box{background:#EEF5F0;border-radius:14px;padding:12px 14px;font-size:15px}
+/* buttons: amber is the primary action, as on the sales page */
+button,.btn{font:inherit;font-weight:800;border:0;border-radius:14px;padding:13px 20px;min-height:48px;cursor:pointer;background:var(--amber);color:#1B1200;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;text-align:center}
+button:hover{background:var(--amber-hover)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--ink);color:#fff}
+.btn-ghost{background:#fff;color:var(--ink);border:1px solid #C5D3C8}.btn-ghost:hover{background:#F4F7F2}
+.btn-danger{background:#fff;color:var(--red);border:1px solid #f0c4c0}.btn-danger:hover{background:#fdecea}
+.btn-sm{padding:7px 12px;min-height:36px;font-size:14px;border-radius:10px}
+.btn-link{background:none;color:var(--green);padding:0;min-height:0;text-decoration:underline;font-weight:800}.btn-link:hover{background:none;color:var(--ink)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tab{background:#fff;color:var(--ink);border:1px solid #C5D3C8;padding:9px 16px;border-radius:999px;min-height:40px}
+.tab:hover{background:#F4F7F2}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pill{display:inline-block;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:800;white-space:nowrap}
+.p-onboarding{background:#eef1f4;color:#3b4a57}.p-awaiting{background:#fff3d6;color:#8a5a00}.p-active{background:#d8f3e3;color:#1b5e3a}.p-paused{background:#e6ecff;color:#2c3e9a}.p-finished{background:#ececec;color:#444}
+.need{display:inline-block;background:#fde7c2;color:#7a4a00;border-radius:8px;padding:3px 9px;font-size:12px;font-weight:800;margin:2px 4px 2px 0}
+.bar{height:10px;background:#E3EBE4;border-radius:99px;overflow:hidden}
+.bar>span{display:block;height:100%;border-radius:99px;background:var(--mint)}
+.bar>span.g{background:#2fa36b}.bar>span.a{background:var(--amber)}.bar>span.r{background:var(--red)}
+.c-green{color:#1b7a46}.c-amber{color:var(--amber-text)}.c-red{color:var(--red)}
+.metric{margin-bottom:14px}
+.metric .top{display:flex;justify-content:space-between;gap:8px;font-size:15px;margin-bottom:5px;flex-wrap:wrap}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+td input,td select{padding:7px 9px;font-size:14px}
+td.num input{width:76px}
+.meal{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);align-items:flex-start;flex-wrap:wrap}
+.meal:last-child{border-bottom:0}
+.meal .kcal{font-family:'Bebas Neue',Impact,sans-serif;font-size:28px;line-height:1;white-space:nowrap}
+.meal .acts{display:flex;gap:6px}
+.meal-edit{display:grid;gap:8px;grid-template-columns:repeat(2,1fr);width:100%}
+.meal-edit .wide{grid-column:1/-1}
+@media(min-width:700px){.meal-edit{grid-template-columns:repeat(6,1fr)}.meal-edit .wide{grid-column:span 2}}
+.mini{font-size:14px;color:var(--muted)}
+.edited{font-size:13px;color:var(--amber-text);background:#fff6e0;border-radius:8px;padding:4px 9px;display:inline-block;margin-top:5px}
+.dl{display:grid;grid-template-columns:1fr;gap:2px 14px}
+.dl dt{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:10px}
+.dl dd{margin:0 0 4px;font-size:15px}
+@media(min-width:700px){.dl{grid-template-columns:200px 1fr}.dl dt{margin-top:9px}}
+.cap-nums{display:flex;gap:24px;margin:6px 0 14px}
+.cap-nums b{font-family:'Bebas Neue',Impact,sans-serif;font-size:44px;line-height:1;display:block}
+.cap-nums span{font-size:14px;color:var(--muted)}
+.plans{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:900px){.plans{grid-template-columns:repeat(3,1fr)}}
+.plan-card{display:flex;flex-direction:column;gap:8px}
+.price{font-family:'Bebas Neue',Impact,sans-serif;font-size:52px;line-height:1}
+.chart{width:100%;height:auto;display:block;margin:10px 0}
+details{margin-bottom:10px}
+summary{cursor:pointer;font-weight:800;padding:8px 0;list-style:none}
+summary::-webkit-details-marker{display:none}
+.day-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.day-row button{padding:8px 13px;border-radius:999px;font-size:14px;min-height:38px}
+.day-row button.on{background:var(--ink);color:#fff}
+.day-row button.dot::after{content:" \2022";color:var(--mint)}
+.pre{white-space:pre-wrap;font-family:inherit;margin:0;font-size:15px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 18px;border-radius:14px;z-index:99;display:none;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast.show{display:block}
+.status-line{font-weight:700;font-size:17px;color:#fff}
+.fine{font-size:13px;color:var(--muted)}
+.list-clean{margin:6px 0 0;padding-left:18px}
+.sr{position:absolute;left:-9999px}
+.plan-inputs{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px}
+.pi-grid{display:grid;gap:18px 26px;grid-template-columns:1fr;margin-top:14px}
+@media(min-width:760px){.pi-grid{grid-template-columns:repeat(3,1fr)}}
+.pi-sec h4{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:22px;margin:0 0 8px;letter-spacing:.02em}
+.pi-sec p{margin:0 0 6px;font-size:15px}
+.pi-tag{display:inline-block;background:#E8F3EC;border-radius:999px;padding:4px 11px;font-size:13px;font-weight:700;margin:0 6px 6px 0}
+.pi-tag.day{background:#d8f3e3}
+@media(max-width:899px){h3{font-size:26px}}
+
+.mchip{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:14px;color:var(--ink)}
+.mchip i{width:12px;height:12px;border-radius:50%;background:var(--mc);display:inline-block;flex:none}
+.ex-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #EEF3EF;flex-wrap:wrap}
+.ex-row span{font-weight:700}
+.pt-line{padding:7px 0;font-weight:800}
+.pt-gap{height:8px}
+.sheet-back{position:fixed;inset:0;background:rgba(15,28,20,.55);z-index:95}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:20px 20px 28px;z-index:96;box-shadow:0 -12px 40px rgba(0,0,0,.25)}
+@media(min-width:700px){.sheet{left:50%;transform:translateX(-50%);width:620px;max-width:92vw;border-radius:22px;bottom:24px}}
+@media(max-width:699px){.sheet{top:0;bottom:0;max-height:none;border-radius:0}}
+.sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:6px}
+.sheet h4{font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;font-weight:400;font-size:24px;margin:18px 0 6px;letter-spacing:.02em}
+.sheet p{margin:0 0 6px;font-size:16px}
+.sheet ol,.sheet ul{padding-left:22px;margin:0}
+.sheet li{margin:6px 0;font-size:16px}
+
+.banner{background:#FFF6E0;border:2px solid var(--amber);color:#4a2c00;border-radius:14px;padding:13px 16px;margin-bottom:14px;font-weight:700}
+.progress{height:10px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden;margin-top:14px}
+.progress span{display:block;height:100%;background:var(--amber);border-radius:99px}
+.ob-nav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:4px 0 24px}
+@media(max-width:699px){.ob-nav{flex-direction:column-reverse}.ob-nav button,.ob-nav .btn-ghost{width:100%}.ob-nav span{display:none}}
+
+.ob-msg{color:var(--red);font-weight:700;margin:4px 0 12px;min-height:0}
+.ob-msg:empty{display:none}
+.target-row{display:flex;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);align-items:center}
+.target-row:last-child{border-bottom:0}
+.target-val{font-family:'Bebas Neue',Impact,sans-serif;font-size:40px;line-height:1;white-space:nowrap}
+.target-val small{font-size:16px}
+.wo-set{display:grid;grid-template-columns:44px 1fr 1fr auto;gap:8px;align-items:center;margin-top:6px}
+.wo-set input{padding:8px 10px}
+.wo-head{font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.log-ex{padding:4px 0}
+.up-badge{display:inline-block;background:#d8f3e3;color:#1b5e3a;border:1px solid var(--mint);border-radius:999px;padding:1px 9px;font-size:12px;font-weight:800;margin-left:4px}
+.plans{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+/* add a meal: an action card with a segmented control and one primary button */
+.add-card{border:2px solid var(--mint)}
+.add-card .lede{font-size:15px;color:var(--ink);margin:0 0 12px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:#EEF5F0;border-radius:14px;padding:4px;margin-bottom:14px}
+.seg button{background:transparent;color:var(--ink);font-size:14px;font-weight:700;padding:9px 6px;min-height:42px;border-radius:11px;white-space:normal;line-height:1.15}
+.seg button:hover{background:#fff}
+.seg button.on{background:var(--ink);color:#fff}
+.seg.one{grid-template-columns:1fr}
+.late{display:inline-block;background:#eef1f4;color:#3b4a57;border-radius:6px;padding:1px 7px;font-size:12px;font-weight:700;margin-left:6px}
+.ro-note{background:#EEF1F4;border-radius:14px;padding:12px 14px;font-size:15px;margin-bottom:12px}
+.filters{display:grid;gap:10px;grid-template-columns:1fr;margin:8px 0 14px}
+@media(min-width:900px){.filters{grid-template-columns:2fr 1fr 1fr 1fr}}
+.filters label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.cust-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.cust-note{background:#EEF5F0;border-radius:14px;padding:12px 14px;font-size:14px;margin:10px 0}
+.ok-yes{color:#1b7a46;font-weight:800}.ok-no{color:var(--muted)}
+.tz-flag{font-size:13px;color:var(--amber-text);background:#fff6e0;border-radius:8px;padding:4px 9px;display:inline-block;margin-top:5px}
+.hint{font-size:13px;color:var(--muted);margin:4px 0 0}
+/* Screenshot mode (?shot=1, used by scripts/capture-portal.js): hides the demo-only bar and toasts. Normal use is unchanged. */
+body.shot #demoBar,body.shot .toast{display:none !important}
+.checkin-card{border:2px solid var(--mint)}
+.checkin-card h3{margin:2px 0 0}
+/* Coach page additions */
+.demo-bar .btn-ghost{color:var(--ink)}
+.qr{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;width:200px;height:200px}
+.mfa-secret{display:inline-block;font-size:15px;letter-spacing:.08em;background:#eef6ef;border-radius:8px;padding:6px 10px;word-break:break-all;user-select:all}
+.badge-health{background:#FEE4E2;color:#912018;border:1px solid #F4B2AB}
+.badge-await{font-size:12px}
+.client-time{color:var(--green)}
+#confirmBox .btn-ghost{background:#fff}
+</style>
+</head>
+<body>
+<header class="demo-bar" id="coachBar"></header>
+<main class="wrap" id="app"><p class="muted">Loading...</p></main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ==========================================================================
+   Beast Coach: the coach's page (/coach). Real data, through supabase-js.
+   Every read and write runs with the coach's own session. The database only lets it through when the user is in
+   coaching_admins AND the session is MFA-verified (aal2), see is_coach(). No service role key is used here.
+   ========================================================================== */
+const SUPABASE_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
+// No "remember me": the session is kept for this browser tab only (sessionStorage), and ends after
+// IDLE_MINUTES without activity. Closing the tab signs you out.
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: { storage: window.sessionStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+});
+const IDLE_MINUTES = 30;
+
+/* ---------------------------------------------------------------- constants (the demo's) */
+const MELB = 'Australia/Melbourne';
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYS_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const WEEKS = 12, PAUSE_MAX = 14;
+const PLAN_NAMES = { basic: 'Basic', essential: 'Essential', core: 'Core', beast: 'The Beast' };
+const CAP_TIERS = ['essential', 'core', 'beast'];
+const OPEN = ['awaiting_onboarding', 'awaiting_activation', 'active', 'paused'];
+const STATUS = {
+  awaiting_onboarding: ['Onboarding', 'p-onboarding'], awaiting_activation: ['Awaiting activation', 'p-awaiting'],
+  active: ['Active', 'p-active'], paused: ['Paused', 'p-paused'], finished: ['Finished', 'p-finished'], cancelled: ['Cancelled', 'p-finished']
+};
+const NUT = ['calories','protein','carbs','fat','fibre'];
+const NUT_LABEL = { calories:'Calories', protein:'Protein', carbs:'Carbs', fat:'Fat', fibre:'Fibre' };
+const MACRO = {
+  calories: { label:'Calories', unit:'kcal', bar:'#F59E0B', over:'#B45309', ink:'#92400E' },
+  protein:  { label:'Protein',  unit:'g',    bar:'#2563EB', over:'#1E3A8A', ink:'#1D4ED8' },
+  carbs:    { label:'Carbs',    unit:'g',    bar:'#7C3AED', over:'#4C1D95', ink:'#6D28D9' },
+  fat:      { label:'Fat',      unit:'g',    bar:'#E11D48', over:'#9F1239', ink:'#BE123C' },
+  fibre:    { label:'Fibre',    unit:'g',    bar:'#0891B2', over:'#155E75', ink:'#0E7490' }
+};
+const FOOD_GROUPS = {
+  Proteins:['Chicken','Beef','Pork','Lamb','Fish','Tuna','Salmon','Prawns','Eggs','Tofu','Tempeh','Greek yoghurt','Cottage cheese','Protein powder'],
+  Carbs:['Rice','Pasta','Potato','Sweet potato','Bread','Wraps','Oats','Noodles','Quinoa','Couscous'],
+  Vegetables:['Broccoli','Spinach','Salad leaves','Capsicum','Carrots','Zucchini','Green beans','Mushrooms','Tomatoes','Cauliflower'],
+  Fruit:['Banana','Apple','Berries','Orange','Grapes','Mango','Kiwi'],
+  Snacks:['Nuts','Cheese','Popcorn','Rice cakes','Dark chocolate','Protein bars']
+};
+const WEIGH_TIMES = ['05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00'];
+const CHECKIN_TYPES = ['Kick-off call', 'Check-in', 'Video call'];
+const CHECKIN_SLOTS = (() => { const out = []; for (let h = 6; h <= 21; h++) out.push(pad(h) + ':00', pad(h) + ':30'); return out; })();
+const SOURCES = { ai: 'Beast AI', plan: 'From plan', builder: 'Meal Builder', typed: 'Typed in' };
+const CLIENT_COLS = 'id,user_id,email,name,tier,status,start_date,activated_at,end_date,time_zone,whatsapp,onboarding,targets,created_at,health_flag,health_cleared_at,health_cleared_by,paused_at,pause_days_used';
+
+/* ---------------------------------------------------------------- small helpers */
+function pad(n) { return String(n).padStart(2, '0'); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
+function ymdIn(date, zone) { return new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date); }
+function todayMel() { return ymdIn(new Date(), MELB); }
+function pd(s) { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return new Date(y, m - 1, d); }
+function addDays(s, n) { const d = pd(s); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function diffDays(a, b) { return Math.round((pd(b) - pd(a)) / 86400000); }
+function fmtDate(s) { return s ? pd(s).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : 'Not set'; }
+function fmtTime(t) { const h = Number(t.slice(0, 2)), m = t.slice(3, 5); return ((h % 12) || 12) + ':' + m + (h < 12 ? 'am' : 'pm'); }
+function fmtSteps(n) { return Number(n).toLocaleString('en-AU'); }
+function money(cents) { return '$' + (Math.round(cents) / 100).toFixed(2).replace(/\.00$/, '') + ' AUD'; }
+function clampNum(v, max) { const x = Math.round(parseFloat(v)); return isFinite(x) ? Math.max(0, Math.min(max, x)) : 0; }
+function sumNut(list) { const t = { calories:0, protein:0, carbs:0, fat:0, fibre:0 }; list.forEach(m => NUT.forEach(k => { t[k] += Number(m[k]) || 0; })); return t; }
+function validZone(z) { if (!z) return null; try { new Intl.DateTimeFormat('en-AU', { timeZone: z }); return z; } catch (e) { return null; } }
+function zoneOf(c) { return validZone(c && c.time_zone) || MELB; }
+function clientToday(c) { return ymdIn(new Date(), zoneOf(c)); }
+function tzOffsetMin(date, zone) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: zone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit' }).formatToParts(date).map(x => [x.type, x.value]));
+  return (Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - date.getTime()) / 60000;
+}
+// A wall-clock date and time in a zone (here, Melbourne) as an instant.
+function wallToInstant(dateStr, timeStr, zone) {
+  const [y, m, d] = dateStr.split('-').map(Number), [hh, mm] = timeStr.split(':').map(Number);
+  const guess = Date.UTC(y, m - 1, d, hh, mm);
+  let inst = guess - tzOffsetMin(new Date(guess), zone) * 60000;
+  inst = guess - tzOffsetMin(new Date(inst), zone) * 60000;
+  return new Date(inst);
+}
+function fmtInZone(inst, zone) {
+  return { date: inst.toLocaleDateString('en-AU', { timeZone: zone, weekday: 'short', day: 'numeric', month: 'short' }),
+           time: inst.toLocaleTimeString('en-AU', { timeZone: zone, hour: 'numeric', minute: '2-digit' }).replace(/\s/g, '').toLowerCase(),
+           ymd: ymdIn(inst, zone), hm: new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(inst) };
+}
+function splitList(s) { return String(s || '').split(',').map(x => x.trim()).filter(Boolean); }
+function chipList(items) { return items.length ? items.map(i => `<span class="need" style="background:#eef6ef;color:var(--ink)">${esc(i)}</span>`).join('') : '<span class="mini">None given</span>'; }
+function statusPill(s) { const [label, cls] = STATUS[s] || [s, '']; return `<span class="pill ${cls}">${esc(label)}</span>`; }
+function tone(kind, val, target) {
+  if (!target) return '';
+  const p = val / target;
+  if (kind === 'fat') return p <= 1.05 ? 'g' : p <= 1.10 ? 'a' : 'r';
+  if (kind === 'protein' || kind === 'fibre') return p >= 0.95 ? 'g' : p >= 0.90 ? 'a' : 'r';
+  const dev = Math.abs(p - 1);
+  return dev <= 0.05 ? 'g' : dev <= 0.10 ? 'a' : 'r';
+}
+const TONE_TEXT = { g:'c-green', a:'c-amber', r:'c-red', '':'' };
+function macroChip(k) { return `<span class="mchip" style="--mc:${MACRO[k].bar}"><i></i>${MACRO[k].label}</span>`; }
+function healthOpen(c) { return !!c.health_flag && !c.health_cleared_at; }
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
+}
+function friendly(err) {
+  const msg = String((err && (err.message || err.msg)) || '');
+  const code = err && err.code;
+  if (code === 'P0001' && msg) return msg;
+  if (code === '42501' || /row-level security|permission denied/i.test(msg)) return 'Not allowed. Sign out, then sign in again with your authenticator code.';
+  if (code === '23505' || /duplicate key/i.test(msg)) return 'That already exists.';
+  if (code === '23514' || /violates check constraint/i.test(msg)) return 'That value is not allowed.';
+  if (code === 'coach_limit' || code === 'coach_only' || code === 'busy' || code === 'try_again') return msg;
+  return 'Something went wrong. Please try again.';
+}
+async function q(promise) { const { data, error } = await promise; if (error) throw error; return data; }
+
+/* ---------------------------------------------------------------- state */
+const C = {
+  screen: 'loading', user: null, factors: [], factorId: null, enrol: null, signinError: '', codeError: '',
+  page: 'clients', clientId: null, tab: 'overview',
+  clients: [], capacity: [], customers: [], currentPlans: {}, lastLog: {}, settings: null,
+  filter: { status: '', tier: '', q: '' }, custFilter: { q: '', product: '', status: '', ok: '' },
+  d: null, confirm: null, ciEditId: null, planDay: 1, planInputsOpen: true, addResult: null, startDate: null,
+  noteState: '', backup: null
+};
+
+/* ==========================================================================
+   Sign in, then MFA
+   ========================================================================== */
+async function boot() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session || !session.user) { C.screen = 'signin'; return render(); }
+  C.user = session.user;
+  await afterPassword();
+}
+async function afterPassword() {
+  const { data: st, error } = await sb.rpc('coach_status');
+  if (error || !st || !st.admin) { C.screen = 'notcoach'; return render(); }
+  const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal && aal.currentLevel === 'aal2') return enterApp();
+  const { data: f } = await sb.auth.mfa.listFactors();
+  const verified = ((f && f.totp) || []).filter(x => x.status === 'verified');
+  if (verified.length) {
+    C.factors = verified; C.factorId = verified[0].id; C.codeError = '';
+    C.screen = 'challenge'; return render();
+  }
+  await startEnrol(false);
+}
+// Enrol a TOTP authenticator. Leftover unfinished enrolments are removed first (Supabase keeps them).
+async function startEnrol(backup) {
+  const { data: f } = await sb.auth.mfa.listFactors();
+  const stale = ((f && f.all) || []).filter(x => x.factor_type === 'totp' && x.status !== 'verified');
+  for (const x of stale) await sb.auth.mfa.unenroll({ factorId: x.id });
+  const name = (backup ? 'Backup authenticator ' : 'Authenticator ') + new Date().toISOString().slice(0, 16).replace('T', ' ');
+  const { data, error } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: name });
+  if (error || !data) { toast(friendly(error)); if (!backup) { C.screen = 'signin'; C.signinError = 'Could not start the authenticator set-up. Please try again.'; render(); } return; }
+  const qr = String(data.totp.qr_code || '');
+  const enrol = { factorId: data.id, qr: qr.startsWith('data:') ? qr : 'data:image/svg+xml;utf-8,' + encodeURIComponent(qr), secret: data.totp.secret };
+  if (backup) { C.backup = enrol; C.codeError = ''; render(); return; }
+  C.enrol = enrol; C.codeError = ''; C.screen = 'enrol'; render();
+}
+async function signIn() {
+  const email = document.getElementById('si-email').value.trim();
+  const password = document.getElementById('si-pass').value;
+  if (!email || !password) { C.signinError = 'Enter your email and password.'; return render(); }
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error || !data || !data.user) { C.signinError = 'That email and password did not match.'; return render(); }
+  C.signinError = ''; C.user = data.user;
+  await afterPassword();
+}
+async function submitCode(mode) {
+  const box = document.getElementById('mfa-code');
+  const code = String(box ? box.value : '').replace(/\s/g, '');
+  if (!/^\d{6}$/.test(code)) { C.codeError = 'Enter the 6-digit code from your authenticator app.'; return render(); }
+  if (mode === 'challenge') {
+    const sel = document.getElementById('mfa-factor');
+    const factorId = sel ? sel.value : C.factorId;
+    const { data: ch, error: e1 } = await sb.auth.mfa.challenge({ factorId });
+    if (e1 || !ch) { C.codeError = 'Could not check the code. Please try again.'; return render(); }
+    const { error: e2 } = await sb.auth.mfa.verify({ factorId, challengeId: ch.id, code });
+    if (e2) { C.codeError = 'That code did not work. Check the time on your phone and try the newest code.'; return render(); }
+    C.codeError = '';
+    return enterApp();
+  }
+  const target = mode === 'backup' ? C.backup : C.enrol;
+  const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: target.factorId, code });
+  if (error) { C.codeError = 'That code did not work. Check the time on your phone and try the newest code.'; return render(); }
+  C.codeError = '';
+  if (mode === 'backup') { C.backup = null; await loadFactors(); toast('Backup authenticator added.'); return render(); }
+  C.enrol = null;
+  toast('Authenticator set up. Add a backup authenticator in Settings.');
+  return enterApp();
+}
+async function signOut(reason) {
+  try { await sb.auth.signOut(); } catch (e) { /* signed out locally anyway */ }
+  try { sessionStorage.clear(); } catch (e) {}
+  Object.assign(C, { screen: 'signin', user: null, enrol: null, backup: null, d: null, clients: [], customers: [], page: 'clients', clientId: null, confirm: null,
+    signinError: reason || '' });
+  render();
+}
+// Signed out after IDLE_MINUTES with no clicks, keys or touches.
+let lastActive = Date.now();
+['click', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true }));
+setInterval(() => {
+  if (C.user && Date.now() - lastActive > IDLE_MINUTES * 60000) signOut(`Signed out after ${IDLE_MINUTES} minutes without activity.`);
+}, 30000);
+
+/* ==========================================================================
+   Data
+   ========================================================================== */
+async function enterApp() {
+  C.screen = 'app';
+  try { await loadAll(); } catch (err) { C.screen = 'app'; toast(friendly(err)); }
+  render();
+}
+async function loadAll() {
+  C.clients = (await q(sb.from('coaching_clients').select(CLIENT_COLS).order('created_at', { ascending: false }))) || [];
+  C.capacity = (await q(sb.from('coaching_capacity').select('tier,place_limit'))) || [];
+  C.customers = (await q(sb.from('coaching_customers').select('id,email,name,country,tier,purchased_at,amount_cents,marketing_consent,unsubscribed_at').order('purchased_at', { ascending: false }))) || [];
+  const plans = (await q(sb.from('coaching_plans').select('client_id,version,is_current,plan,created_at').eq('is_current', true))) || [];
+  C.currentPlans = {}; plans.forEach(p => { C.currentPlans[p.client_id] = p; });
+  const since = addDays(todayMel(), -30);
+  const logs = (await q(sb.from('coaching_meal_logs').select('client_id,log_date').gte('log_date', since).order('log_date', { ascending: false }))) || [];
+  C.lastLog = {}; logs.forEach(l => { if (!C.lastLog[l.client_id] || l.log_date > C.lastLog[l.client_id]) C.lastLog[l.client_id] = l.log_date; });
+  const st = (await q(sb.from('coaching_settings').select('coach_whatsapp').limit(1))) || [];
+  C.settings = st[0] || { coach_whatsapp: '' };
+  await loadFactors();
+}
+async function loadFactors() {
+  const { data: f } = await sb.auth.mfa.listFactors();
+  C.factors = ((f && f.totp) || []).filter(x => x.status === 'verified');
+}
+function clientById(id) { return C.clients.find(c => String(c.id) === String(id)) || null; }
+async function loadDetail(id) {
+  const c = clientById(id);
+  const d = { meals: [], workouts: [], steps: [], weighIns: [], checkins: [], note: '', plans: [] };
+  if (c && c.tier !== 'basic') {
+    d.meals = (await q(sb.from('coaching_meal_logs').select('id,client_id,log_date,meal_time,name,calories,protein,carbs,fat,fibre,source,edited,ai,added_late').eq('client_id', id).order('logged_at', { ascending: true }))) || [];
+    d.workouts = (await q(sb.from('coaching_workout_logs').select('id,client_id,log_date,kind,what,minutes,notes,session,added_late').eq('client_id', id))) || [];
+    d.steps = (await q(sb.from('coaching_step_logs').select('client_id,log_date,steps,added_late').eq('client_id', id))) || [];
+    d.weighIns = (await q(sb.from('coaching_weigh_ins').select('client_id,weigh_date,kg').eq('client_id', id).order('weigh_date', { ascending: true }))) || [];
+    d.checkins = (await q(sb.from('coaching_checkins').select('id,client_id,type,scheduled_at,status').eq('client_id', id).order('scheduled_at', { ascending: true }))) || [];
+    const n = (await q(sb.from('coaching_notes').select('client_id,body').eq('client_id', id))) || [];
+    d.note = n[0] ? n[0].body : '';
+    d.plans = (await q(sb.from('coaching_plans').select('client_id,version,is_current,plan,created_at').eq('client_id', id).order('version', { ascending: false }))) || [];
+  }
+  C.d = d;
+}
+async function refreshClient() {
+  C.clients = (await q(sb.from('coaching_clients').select(CLIENT_COLS).order('created_at', { ascending: false }))) || [];
+  if (C.clientId) await loadDetail(C.clientId);
+}
+
+/* ==========================================================================
+   Derived values (the demo's rules, on real rows)
+   ========================================================================== */
+function placesTaken(tier) { return C.clients.filter(c => c.tier === tier && OPEN.includes(c.status)).length; }
+function placeLimit(tier) { const r = C.capacity.find(x => x.tier === tier); return r ? r.place_limit : 0; }
+function hasPlanMeals(plan) { return !!plan && !!plan.meals && Object.values(plan.meals).some(a => Array.isArray(a) && a.length); }
+function weekOf(c) {
+  if (!c.activated_at || !c.start_date) return 0;
+  const e = diffDays(c.start_date, clientToday(c)) - (c.pause_days_used || 0);
+  if (e < 0) return 0;
+  return Math.min(WEEKS, Math.floor(e / 7) + 1);
+}
+function weekLabel(c) {
+  if (c.status === 'finished') return WEEKS + ' of ' + WEEKS;
+  if (!c.activated_at || c.status === 'awaiting_onboarding' || c.status === 'awaiting_activation') return '-';
+  return weekOf(c) + ' of ' + WEEKS;
+}
+function relDay(s) {
+  if (!s) return 'Never';
+  const n = diffDays(s, todayMel());
+  if (n === 0) return 'Today';
+  if (n === 1) return 'Yesterday';
+  if (n < 0) return fmtDate(s);
+  return n + ' days ago';
+}
+function pauseDaysNow(c) {
+  const live = c.status === 'paused' && c.paused_at ? Math.max(0, diffDays(ymdIn(new Date(c.paused_at), MELB), todayMel())) : 0;
+  return Math.min(PAUSE_MAX, (c.pause_days_used || 0) + live);
+}
+function activationMissing(c) {
+  const m = [];
+  const plan = C.currentPlans[c.id] && C.currentPlans[c.id].plan;
+  if (!c.targets) m.push('Daily targets are not set');
+  if (!hasPlanMeals(plan)) m.push('Meal plan is not published');
+  if (!plan || !plan.training) m.push('Training plan is not published');
+  if (healthOpen(c)) m.push('Health flag: tick "Cleared to start"');
+  return m;
+}
+function needsYou(c) {
+  const n = [];
+  const plan = C.currentPlans[c.id] && C.currentPlans[c.id].plan;
+  if (healthOpen(c) && OPEN.includes(c.status)) n.push('Health check');
+  if (c.status === 'awaiting_activation' && !hasPlanMeals(plan)) n.push('Build plan');
+  if (c.status === 'awaiting_activation' && hasPlanMeals(plan) && plan.training) n.push('Book call, activate');
+  if (c.status === 'active' && c.tier !== 'basic') {
+    const last = C.lastLog[c.id];
+    if (!last || diffDays(last, todayMel()) >= 3) n.push('No logs 3+ days');
+  }
+  return n;
+}
+function paidFor(c) {
+  const rows = C.customers.filter(x => String(x.email).toLowerCase() === String(c.email).toLowerCase() && x.tier === c.tier);
+  return rows[0] || null;
+}
+function custStatus(email) {
+  const rows = C.clients.filter(c => String(c.email).toLowerCase() === String(email).toLowerCase());
+  if (!rows.length) return 'none';
+  const open = rows.find(c => OPEN.includes(c.status));
+  return (open || rows[0]).status;
+}
+function custOk(email) {
+  const rows = C.customers.filter(x => String(x.email).toLowerCase() === String(email).toLowerCase());
+  return rows.some(x => x.marketing_consent) && !rows.some(x => x.unsubscribed_at);
+}
+
+/* ==========================================================================
+   Rendering
+   ========================================================================== */
+function render() {
+  const bar = document.getElementById('coachBar');
+  bar.innerHTML = `<span class="logo">BEAST<span>COACH</span></span><span class="tag">COACH</span>
+    <span class="note">${C.user ? esc(C.user.email || '') : ''}</span>
+    ${C.user ? '<button class="btn-ghost btn-sm" data-act="signOut" id="signOutBtn" style="background:#fff">Sign out</button>' : ''}`;
+  const app = document.getElementById('app');
+  if (C.screen === 'loading') { app.innerHTML = '<p class="muted">Loading...</p>'; return; }
+  if (C.screen === 'signin') { app.innerHTML = signinHtml(); return; }
+  if (C.screen === 'notcoach') { app.innerHTML = '<div class="card" id="notCoach"><h3>This page is for the coach only</h3></div>'; return; }
+  if (C.screen === 'enrol') { app.innerHTML = enrolHtml(); return; }
+  if (C.screen === 'challenge') { app.innerHTML = challengeHtml(); return; }
+  let body;
+  if (C.page === 'client' && clientById(C.clientId)) body = clientPageHtml(clientById(C.clientId));
+  else if (C.page === 'customers') body = customersHtml();
+  else if (C.page === 'settings') body = settingsHtml();
+  else body = clientsHtml();
+  app.innerHTML = coachTabs() + body;
+  if (C.page === 'clients') applyClientFilters();
+  if (C.page === 'customers') applyCustFilters();
+}
+function coachTabs() {
+  const page = C.page === 'client' ? 'clients' : C.page;
+  const tab = (p, label) => `<button class="tab ${page === p ? 'on' : ''}" data-act="coachPage" data-p="${p}">${label}</button>`;
+  return `<nav class="tabs">${tab('clients', 'Clients')}${tab('customers', 'Customers')}${tab('settings', 'Settings')}</nav>`;
+}
+
+/* ---------------------------------------------------------------- sign-in screens */
+function signinHtml() {
+  return `<section class="hero"><div class="eyebrow">Coach</div><h1>Sign in</h1>
+      <p class="muted" style="margin:0">For the coach only. You will need your password and your authenticator app.</p></section>
+    <div class="card" style="max-width:480px"><form id="signinForm" novalidate>
+      <div class="field"><label for="si-email">Email</label><input id="si-email" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="si-pass">Password</label><input id="si-pass" type="password" autocomplete="current-password" required></div>
+      <button type="submit" style="width:100%">Sign in</button>
+      <p class="err" id="si-err" role="alert">${esc(C.signinError)}</p>
+      <p class="mini" style="margin:8px 0 0">There is no "remember me". You stay signed in in this tab only, and you are signed out after ${IDLE_MINUTES} minutes without activity. Sign out when you finish on a shared device.</p>
+    </form></div>`;
+}
+function backupAdvice() {
+  return `<div class="hl-amber" id="backupAdvice" style="margin-top:14px"><b>Set up a second authenticator as a backup.</b>
+    Authenticator codes here come with no recovery codes. If your only authenticator is lost, you cannot sign in to this page.
+    Add a second one as soon as you are in (Settings, Add a backup authenticator): a second phone, or a password manager that stores codes, such as 1Password or Bitwarden.
+    If you are ever locked out, the way back in is by hand: in the Supabase dashboard, go to Authentication, Users, open your user, remove the authenticator factor, then sign in here and set it up again.</div>`;
+}
+function codeFormHtml(mode) {
+  return `<form id="codeForm" data-mode="${mode}" novalidate>
+      <div class="field"><label for="mfa-code">6-digit code from your authenticator app</label>
+        <input id="mfa-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*" placeholder="123456" style="max-width:200px;font-size:22px;letter-spacing:.2em"></div>
+      <button type="submit">${mode === 'challenge' ? 'Verify and continue' : 'Verify'}</button>
+      <p class="err" id="code-err" role="alert">${esc(C.codeError)}</p></form>`;
+}
+function qrBlock(e) {
+  return `<div class="row" style="align-items:flex-start;justify-content:flex-start;gap:20px">
+      <img class="qr" src="${esc(e.qr)}" alt="QR code to add Beast Coach to your authenticator app" width="200" height="200">
+      <div style="flex:1 1 220px"><p><b>Scan the QR code</b> with your authenticator app (for example Google Authenticator, Microsoft Authenticator, 1Password or Bitwarden).</p>
+        <p class="mini" style="margin:0">Cannot scan it? Type this key into the app instead:</p>
+        <p><code id="mfaSecret" class="mfa-secret">${esc(e.secret)}</code></p></div></div>`;
+}
+function enrolHtml() {
+  return `<section class="hero"><div class="eyebrow">Coach</div><h1>Set up your authenticator</h1>
+      <p class="muted" style="margin:0">Every sign-in to this page needs your password and a code from an authenticator app.</p></section>
+    <div class="card" id="enrolCard"><h3>1. Add Beast Coach to your app</h3>${qrBlock(C.enrol)}
+      <h3 style="margin-top:14px">2. Enter the code it shows</h3>${codeFormHtml('enrol')}${backupAdvice()}</div>`;
+}
+function challengeHtml() {
+  const pick = C.factors.length > 1
+    ? `<div class="field"><label for="mfa-factor">Authenticator</label><select id="mfa-factor">${C.factors.map(f => `<option value="${esc(f.id)}">${esc(f.friendly_name || 'Authenticator')}</option>`).join('')}</select></div>` : '';
+  return `<section class="hero"><div class="eyebrow">Coach</div><h1>Enter your code</h1>
+      <p class="muted" style="margin:0">Open your authenticator app and enter the code for Beast Coach.</p></section>
+    <div class="card" id="challengeCard" style="max-width:520px">${pick}${codeFormHtml('challenge')}
+      <p class="mini" style="margin:10px 0 0">Lost your phone? Use your backup authenticator. If you have none, remove the factor in the Supabase dashboard (Authentication, Users, your user), then sign in again to set it up.</p></div>`;
+}
+
+/* ---------------------------------------------------------------- clients list */
+function clientsHtml() {
+  const capCard = t => {
+    if (t === 'basic') {
+      const n = C.clients.filter(c => c.tier === 'basic' && OPEN.includes(c.status)).length;
+      return `<div class="card"><div class="row"><h3 style="margin:0">Basic</h3><span class="muted">$2.50 AUD a week</span></div>
+        <div class="cap-nums"><div><b>${n}</b><span>active</span></div><div><b class="c-green">Unlimited</b><span>places</span></div></div>
+        <p class="mini" style="margin:0">Basic clients run themselves, so there is no limit to set.</p></div>`;
+    }
+    const left = placeLimit(t) - placesTaken(t);
+    return `<div class="card"><div class="row"><h3 style="margin:0">${PLAN_NAMES[t]}</h3></div>
+      <div class="cap-nums"><div><b>${placesTaken(t)}</b><span>taken (open plans)</span></div>
+        <div><b class="${left > 0 ? 'c-green' : 'c-red'}">${Math.max(0, left)}</b><span>places left</span></div></div>
+      <label for="cap-${t}">Capacity</label>
+      <input id="cap-${t}" type="number" min="0" max="500" inputmode="numeric" value="${placeLimit(t)}" data-ch="cap" data-tier="${t}" style="max-width:160px"></div>`;
+  };
+  const sorted = C.clients.slice().sort((a, b) => String(a.name || a.email).localeCompare(String(b.name || b.email)));
+  const rows = sorted.map(c => {
+    const badges = [
+      c.status === 'awaiting_activation' ? '<span class="pill p-awaiting badge-await">Awaiting activation</span>' : '',
+      healthOpen(c) ? '<span class="pill badge-health">Health flag</span>' : ''
+    ].join(' ');
+    return `<tr data-client-row data-id="${esc(c.id)}" data-status="${esc(c.status)}" data-tier="${esc(c.tier)}" data-search="${esc((String(c.name || '') + ' ' + c.email).toLowerCase())}">
+      <td><button class="btn-link" data-act="openClient" data-id="${esc(c.id)}">${esc(c.name || c.email)}</button><div class="mini">${esc(c.email)}</div><div>${badges}</div></td>
+      <td>${PLAN_NAMES[c.tier] || esc(c.tier)}</td>
+      <td>${statusPill(c.status)}</td>
+      <td>${c.tier === 'basic' ? '-' : esc(weekLabel(c))}</td>
+      <td>${c.tier === 'basic' ? '<span class="mini">Private</span>' : esc(relDay(C.lastLog[c.id]))}</td>
+      <td>${needsYou(c).map(n => `<span class="need">${esc(n)}</span>`).join('') || '<span class="mini">Nothing</span>'}</td></tr>`;
+  }).join('');
+  const f = C.filter;
+  const opt = (v, l, cur) => `<option value="${esc(v)}" ${cur === v ? 'selected' : ''}>${esc(l)}</option>`;
+  return `<section class="hero"><h1>Clients</h1><p class="muted" style="margin:0">Places, new clients and who needs you today.</p></section>
+    <div class="grid2">${['essential', 'core', 'beast', 'basic'].map(capCard).join('')}</div>
+    ${addClientHtml()}
+    <div class="card"><h3>All clients</h3>
+      <div class="filters">
+        <div class="field" style="margin:0"><label for="fStatus">Status</label><select id="fStatus" data-ch="clientFilter" data-k="status">${opt('', 'All statuses', f.status)}${Object.keys(STATUS).map(s => opt(s, STATUS[s][0], f.status)).join('')}</select></div>
+        <div class="field" style="margin:0"><label for="fTier">Plan</label><select id="fTier" data-ch="clientFilter" data-k="tier">${opt('', 'All plans', f.tier)}${Object.keys(PLAN_NAMES).map(t => opt(t, PLAN_NAMES[t], f.tier)).join('')}</select></div>
+        <div class="field" style="margin:0"><label for="fQ">Search name or email</label><input id="fQ" type="search" data-inp="clientSearch" value="${esc(f.q)}" placeholder="e.g. sam or sam@example.com"></div>
+      </div>
+      <p class="mini" id="clientCount" style="margin:8px 0 0"></p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Client</th><th>Plan</th><th>Status</th><th>Week</th><th>Last logged</th><th>Needs you</th></tr></thead>
+        <tbody id="clientRows">${rows || '<tr><td colspan="6">No clients yet.</td></tr>'}</tbody></table></div></div>`;
+}
+function applyClientFilters() {
+  const f = C.filter; let shown = 0;
+  document.querySelectorAll('[data-client-row]').forEach(row => {
+    const on = (!f.status || row.dataset.status === f.status) && (!f.tier || row.dataset.tier === f.tier) && (!f.q || row.dataset.search.includes(f.q.toLowerCase().trim()));
+    row.hidden = !on; if (on) shown++;
+  });
+  const el = document.getElementById('clientCount'); if (el) el.textContent = `${shown} shown`;
+}
+function addClientHtml() {
+  const r = C.addResult;
+  const msg = !r ? '' : r.ok
+    ? `<div class="note-box" id="addResult" role="status" style="margin-top:12px"><b>Added ${esc(r.name)} (${esc(PLAN_NAMES[r.tier])}).</b> Tell them to sign up or sign in at beastcoach.fit/dashboard with exactly this email: <b>${esc(r.email)}</b>. Their plan is linked to that email, and their onboarding starts from My Coach.</div>`
+    : `<div class="hl-red" id="addResult" role="alert" style="margin-top:12px">${esc(r.error)}</div>`;
+  return `<div class="card"><h3>Add a client by hand</h3>
+    <p class="mini" style="margin-top:0">For someone who paid outside the website. This makes their plan (waiting for onboarding) and their customer record, with marketing emails off.</p>
+    <div class="grid2">
+      <div class="field" style="margin:0"><label for="ac-email">Email</label><input id="ac-email" type="email" autocomplete="off"></div>
+      <div class="field" style="margin:0"><label for="ac-name">Name</label><input id="ac-name" autocomplete="off"></div>
+      <div class="field" style="margin:0"><label for="ac-tier">Plan</label><select id="ac-tier">${Object.keys(PLAN_NAMES).map(t => `<option value="${t}" ${t === 'core' ? 'selected' : ''}>${PLAN_NAMES[t]}</option>`).join('')}</select></div>
+      <div class="field" style="margin:0"><label for="ac-amount">Amount paid (AUD)</label><input id="ac-amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 299"></div>
+      <div class="field" style="margin:0"><label for="ac-date">Date paid</label><input id="ac-date" type="date" value="${todayMel()}"></div>
+    </div>
+    <div class="row" style="justify-content:flex-start;margin-top:12px"><button data-act="addClient">Add client</button></div>${msg}</div>`;
+}
+
+/* ---------------------------------------------------------------- client page */
+function clientPageHtml(c) {
+  const back = '<div class="row" style="margin-bottom:10px"><button class="btn-ghost btn-sm" data-act="backClients">‹ All clients</button></div>';
+  if (c.tier === 'basic') return back + basicViewHtml(c);
+  const tabs = [['overview','Overview'],['checkins','Check-ins'],['onboarding','Onboarding'],['plan','Targets and plan'],['logs','Logs'],['progress','Progress'],['notes','Notes']];
+  let body = '';
+  if (!C.d) body = '<p class="muted">Loading...</p>';
+  else if (C.tab === 'checkins') body = checkinsHtml(c);
+  else if (C.tab === 'onboarding') body = onboardingAnswersHtml(c);
+  else if (C.tab === 'plan') body = planEditorHtml(c);
+  else if (C.tab === 'logs') body = logsHtml(c);
+  else if (C.tab === 'progress') body = progressHtml(c);
+  else if (C.tab === 'notes') body = `<div class="card"><h3>Private notes</h3><p class="mini">Only you see these. The client never can. Saved as you type.</p>
+      <textarea id="noteBox" data-inp="notes" style="min-height:180px">${esc(C.d.note)}</textarea><p class="mini" id="noteState">${esc(C.noteState)}</p></div>`;
+  else body = overviewHtml(c);
+  return `${back}<section class="hero"><div class="row"><div>
+      <h1>${esc(c.name || c.email)}</h1>
+      <div class="muted">${esc(c.email)} · ${esc(c.whatsapp || (c.onboarding || {}).whatsapp || 'No WhatsApp')} · ${PLAN_NAMES[c.tier]}</div>
+    </div><div>${statusPill(c.status)} ${healthOpen(c) ? '<span class="pill badge-health">Health flag</span>' : ''}</div></div></section>
+    <nav class="tabs">${tabs.map(t => `<button class="tab ${C.tab === t[0] ? 'on' : ''}" data-act="coachTab" data-tab="${t[0]}">${t[1]}</button>`).join('')}</nav>
+    ${body}`;
+}
+function basicViewHtml(c) {
+  const paid = paidFor(c);
+  return `<section class="hero"><div class="row"><div><h1>${esc(c.name || c.email)}</h1><div class="muted">${esc(c.email)} · Basic</div></div><div>${statusPill(c.status)}</div></div></section>
+    <div class="card"><h3>Plan</h3><dl class="dl">
+      <dt>Plan</dt><dd>Basic: $2.50 AUD a week, $30 AUD billed every 12 weeks</dd>
+      <dt>Status</dt><dd>${esc(STATUS[c.status] ? STATUS[c.status][0] : c.status)}</dd>
+      <dt>Paid</dt><dd>${paid ? esc(fmtDate(ymdIn(new Date(paid.purchased_at), MELB)) + ', ' + money(paid.amount_cents)) : 'Not recorded'}</dd>
+      <dt>Started</dt><dd>${esc(c.activated_at ? fmtDate(c.start_date) : 'Not started')}</dd>
+      <dt>Ends</dt><dd>${esc(c.end_date ? fmtDate(c.end_date) : 'Not set')}</dd></dl>
+      <p class="mini" style="margin-top:12px">Basic clients log privately. You see their plan, status and billing only. Their meals, steps, workouts and weigh-ins are not shown here, and the database does not let you read them.</p></div>`;
+}
+function tzText(c) {
+  const ob = c.onboarding || {};
+  const zone = validZone(c.time_zone);
+  return zone ? `${esc(ob.timezone || zone)} (${esc(zone)})` : `${esc(ob.timezone || 'Not given')} <span class="tz-flag">Not recognised: ${esc(MELB)} is used</span>`;
+}
+function healthAnswers(c) {
+  const ob = c.onboarding || {}, h = ob.health || {};
+  const out = [];
+  if (h.heart === 'yes') out.push('heart condition or high blood pressure');
+  if (h.chest === 'yes') out.push('chest pain, dizziness or fainting during exercise');
+  if (h.other === 'yes') out.push('another condition or medication' + (ob.healthNote ? ': ' + ob.healthNote : ''));
+  if (ob.injuries && c.health_flag) out.push('injury: ' + ob.injuries);
+  return out;
+}
+function overviewHtml(c) {
+  const ob = c.onboarding || {};
+  const paid = paidFor(c);
+  const flag = !c.health_flag ? 'No flags'
+    : c.health_cleared_at ? `Flagged. Cleared to start on ${fmtDate(ymdIn(new Date(c.health_cleared_at), MELB))}.`
+    : 'Flagged. Not cleared yet.';
+  const info = `<dl class="dl">
+    <dt>Plan</dt><dd>${PLAN_NAMES[c.tier]}</dd>
+    <dt>Paid</dt><dd>${paid ? esc(fmtDate(ymdIn(new Date(paid.purchased_at), MELB)) + ', ' + money(paid.amount_cents)) : 'Not recorded'}</dd>
+    <dt>Start date</dt><dd>${esc(c.activated_at ? fmtDate(c.start_date) : 'Not started')}</dd>
+    <dt>Time zone</dt><dd>${tzText(c)}</dd>
+    <dt>Week</dt><dd>${esc(weekLabel(c))}</dd>
+    <dt>End date</dt><dd>${esc(c.end_date ? fmtDate(c.end_date) : 'Not started')}</dd>
+    ${['core', 'beast'].includes(c.tier) ? `<dt>Pause days used</dt><dd id="pauseDays">${pauseDaysNow(c)} of ${PAUSE_MAX}</dd>` : ''}
+    <dt>Health</dt><dd>${esc(flag)}</dd></dl>`;
+  const healthBox = c.health_flag ? `<div class="${c.health_cleared_at ? 'note-box' : 'hl-red'}" id="healthBox" style="margin-bottom:12px">
+      <b>${c.health_cleared_at ? 'Health flag, cleared' : 'Health flag'}</b>
+      <ul class="list-clean">${healthAnswers(c).map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+      <p class="mini" style="margin:6px 0">Client has confirmed their doctor cleared them: ${ob.healthClearance ? 'Yes' : 'No'}.</p>
+      <label class="check"><input type="checkbox" id="clearedBox" data-ch="cleared" ${c.health_cleared_at ? 'checked' : ''}><span>Cleared to start</span></label>
+      ${c.health_cleared_at ? `<p class="mini" style="margin:6px 0 0">Recorded by the database at ${esc(new Date(c.health_cleared_at).toLocaleString('en-AU', { timeZone: MELB }))} (Melbourne time).</p>` : ''}</div>` : '';
+  const conf = C.confirm ? `<div class="hl-amber" id="confirmBox" role="alertdialog" aria-labelledby="confirmText" style="margin:12px 0">
+      <p id="confirmText" style="margin:0 0 10px"><b>${esc(C.confirm.text)}</b></p>
+      <div class="row" style="justify-content:flex-start"><button class="${C.confirm.danger ? 'btn-danger' : ''}" data-act="confirmYes">${esc(C.confirm.yes)}</button><button class="btn-ghost" data-act="confirmNo">Not now</button></div></div>` : '';
+  let actions = '';
+  if (c.status === 'awaiting_onboarding') {
+    actions = '<p class="muted">Waiting for the client to finish onboarding.</p>';
+  } else if (c.status === 'awaiting_activation') {
+    const miss = activationMissing(c);
+    const start = C.startDate || todayMel();
+    actions = `<h3>Activate</h3>
+      <div class="field"><label for="startDate">Start date</label><input id="startDate" type="date" value="${esc(start)}" data-ch="startDate"></div>
+      <p class="mini">Their 12 weeks end on ${esc(fmtDate(addDays(start, WEEKS * 7)))}.</p>
+      ${miss.length ? `<div class="hl-amber"><b>Still needed:</b><ul class="list-clean">${miss.map(m => `<li>${esc(m)}</li>`).join('')}</ul></div>` : '<div class="note-box">Everything is ready to activate.</div>'}
+      <div class="row" style="margin-top:10px;justify-content:flex-start"><button data-act="askActivate" ${miss.length ? 'disabled' : ''}>Activate</button></div>`;
+  } else if (c.status === 'active') {
+    const canPause = ['core', 'beast'].includes(c.tier) && (c.pause_days_used || 0) < PAUSE_MAX;
+    actions = `<div class="row" style="justify-content:flex-start">
+      ${['core', 'beast'].includes(c.tier) ? `<button class="btn-ghost" data-act="askPause" ${canPause ? '' : 'disabled'}>Pause</button>` : ''}
+      <button class="btn-ghost" data-act="askFinish">Finish</button><button class="btn-danger" data-act="askCancel">Cancel plan</button></div>
+      ${['core', 'beast'].includes(c.tier) && !canPause ? '<p class="mini">All 14 pause days are used.</p>' : ''}`;
+  } else if (c.status === 'paused') {
+    actions = `<p class="mini" style="margin-top:0">Paused since ${esc(c.paused_at ? fmtDate(ymdIn(new Date(c.paused_at), MELB)) : '-')}. The end date moves by the days paused, up to ${PAUSE_MAX} days in total.</p>
+      <div class="row" style="justify-content:flex-start"><button data-act="askResume">Resume</button><button class="btn-ghost" data-act="askFinish">Finish</button><button class="btn-danger" data-act="askCancel">Cancel plan</button></div>`;
+  } else {
+    actions = `<p class="mini">This plan is ${esc(STATUS[c.status][0].toLowerCase())}. The client can still read their history.</p>`;
+  }
+  const wDay = `<select id="cWDay" data-ch="weighDay">${DAYS.map((d, i) => `<option value="${d}" ${(ob.weighInDay || 'Mon') === d ? 'selected' : ''}>${DAYS_FULL[i]}</option>`).join('')}</select>`;
+  const wTime = `<select id="cWTime" data-ch="weighTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${(ob.weighInTime || '07:00') === t ? 'selected' : ''}>${fmtTime(t)}</option>`).join('')}</select>`;
+  const tierSel = `<div class="field"><label for="newTier">Change plan</label><div class="row" style="flex-wrap:nowrap">
+    <select id="newTier" style="flex:1">${Object.keys(PLAN_NAMES).filter(t => t !== 'basic').map(t => `<option value="${t}" ${t === c.tier ? 'selected' : ''}>${PLAN_NAMES[t]}</option>`).join('')}</select>
+    <button class="btn-ghost" data-act="askTier">Apply</button></div></div>`;
+  return `<div class="grid2">
+    <div class="card"><h3>Status</h3>${info}</div>
+    <div class="card"><h3>Weigh-in</h3>
+      <div class="field"><label for="cWDay">Weigh-in day</label>${wDay}</div>
+      <div class="field"><label for="cWTime">Weigh-in time</label>${wTime}</div>
+      <p class="mini">Saved as you change them. The client can only weigh in on this day. Same day, same time each week, after the toilet and before eating or drinking.</p></div>
+    <div class="card" style="grid-column:1/-1" id="actionsCard"><h3>Actions</h3>${healthBox}${actions}${conf}
+      <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">${tierSel}
+      <button class="btn-danger" data-act="askDelete">Delete client and data</button></div>
+  </div>`;
+}
+function onboardingAnswersHtml(c) {
+  const ob = c.onboarding || {}, h = ob.health || {};
+  const list = v => Array.isArray(v) ? v.join(', ') : (v || '');
+  const rows = [
+    ['Age', ob.age], ['Sex', ob.sex], ['Height', ob.heightCm ? ob.heightCm + ' cm' : ''],
+    ['Weight', ob.weightKg != null ? ob.weightKg + ' kg (' + (Math.round(ob.weightKg * 2.20462 * 10) / 10) + ' lb)' : ''],
+    ['WhatsApp', ob.whatsapp], ['Time zone', tzText(c), true],
+    ['Goal', ob.goal || ob.goalKind], ['Timeframe', ob.timeframe], ['Why now', ob.goalWhy],
+    ['Job', ob.job || ob.jobMult], ['Activity', ob.activity],
+    ['Everyday steps (not counting planned walks)', ob.stepsEveryday], ['Realistic daily steps target', ob.stepsRealistic],
+    ['Foods they like', chipList((ob.likedFoods || []).concat(splitList(ob.likedOther))), true],
+    ['Foods they will not eat', chipList(splitList(ob.avoid)), true], ['Allergies or intolerances', chipList(splitList(ob.allergies)), true],
+    ['Dietary style', ob.diet], ['Currently eats', ob.mealsPerDay], ['Cooking time', ob.cookTime], ['Who cooks', ob.whoCooks],
+    ['Eats out per week', ob.eatsOut], ['Alcoholic drinks per week', ob.alcohol], ['Typical day', ob.typicalDay],
+    ['Training days', list(ob.trainingDays)], ['Time of day', ob.timeOfDay], ['Session length', ob.sessionLength ? ob.sessionLength + ' min' : ''],
+    ['Where they train', ob.place], ['Equipment', list(ob.equipment)], ['Experience', ob.experience],
+    ['Enjoys', ob.enjoys], ['Hates', ob.hates], ['Injuries or limits', ob.injuries],
+    ['What has worked', ob.worked], ['What has not', ob.didnt], ['Weigh-in day', ob.weighInDay], ['Weigh-in time', fmtTime(ob.weighInTime || '07:00')],
+    ['Health: heart or blood pressure', h.heart], ['Health: chest pain or fainting', h.chest],
+    ['Health: other condition or medication', (h.other || '') + (ob.healthNote ? ' (' + ob.healthNote + ')' : '')],
+    ['Doctor clearance confirmed', ob.healthClearance ? 'Yes' : 'No']
+  ];
+  return `<div class="card"><h3>Onboarding answers</h3><dl class="dl">${rows.map(r => `<dt>${esc(r[0])}</dt><dd>${r[2] ? (r[1] || '-') : esc(r[1] == null || r[1] === '' ? '-' : r[1])}</dd>`).join('')}</dl></div>`;
+}
+
+/* ---------------------------------------------------------------- check-ins */
+function checkinTypesFor(tier) { return tier === 'essential' ? ['Kick-off call'] : tier === 'basic' ? [] : CHECKIN_TYPES; }
+function checkinsHtml(c) {
+  const types = checkinTypesFor(c.tier);
+  const now = Date.now();
+  const zone = zoneOf(c);
+  const list = C.d.checkins.slice().sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
+  const live = list.filter(x => x.status !== 'cancelled');
+  const editing = list.find(x => x.id === C.ciEditId) || null;
+  const blocked = c.tier === 'essential' && live.length >= 1 && !editing;
+  const label = x => x.status === 'cancelled' ? 'Cancelled' : new Date(x.scheduled_at).getTime() >= now ? 'Upcoming' : 'Past';
+  const rows = list.length ? list.map(x => {
+    const inst = new Date(x.scheduled_at);
+    const mel = fmtInZone(inst, MELB), mine = fmtInZone(inst, zone);
+    const differs = zone !== MELB && (mel.date !== mine.date || mel.time !== mine.time);
+    return `<div class="meal" data-checkin="${esc(x.id)}"><div style="flex:1 1 220px"><b>${esc(x.type)}</b> <span class="mini">${esc(label(x))}</span>
+      <div>${esc(mel.date)}, ${esc(mel.time)} <span class="mini">Melbourne time</span></div>
+      ${differs ? `<div class="mini client-time">Client: ${esc(mine.date)}, ${esc(mine.time)} (${esc(zone)})</div>` : ''}</div>
+      ${x.status === 'cancelled' ? '' : `<div class="acts"><button class="btn-ghost btn-sm" data-act="editCheckin" data-id="${esc(x.id)}">Edit</button>
+        <button class="btn-danger btn-sm" data-act="askCancelCheckin" data-id="${esc(x.id)}">Cancel</button></div>`}</div>`;
+  }).join('') : '<p class="muted">No check-ins scheduled yet.</p>';
+  const em = editing ? fmtInZone(new Date(editing.scheduled_at), MELB) : null;
+  const defDate = em ? em.ymd : addDays(todayMel(), 1);
+  const defTime = em ? em.hm : '18:30';
+  const defType = editing ? editing.type : types[0];
+  const conf = C.confirm ? `<div class="hl-amber" id="confirmBox" role="alertdialog" style="margin:12px 0"><p style="margin:0 0 10px"><b>${esc(C.confirm.text)}</b></p>
+      <div class="row" style="justify-content:flex-start"><button class="btn-danger" data-act="confirmYes">${esc(C.confirm.yes)}</button><button class="btn-ghost" data-act="confirmNo">Not now</button></div></div>` : '';
+  const preview = zone !== MELB ? `<p class="mini" id="ciPreview" style="margin:8px 0 0">${esc(previewText(defDate, defTime, zone))}</p>` : '';
+  const form = blocked
+    ? '<div class="note-box">Essential includes one kick-off call. Edit it or cancel it to change the time.</div>'
+    : `<div class="grid2">
+        <div class="field" style="margin:0"><label for="ci-date">Date</label><input id="ci-date" type="date" value="${esc(defDate)}" data-ch="ciPreview"></div>
+        <div class="field" style="margin:0"><label for="ci-time">Time (Melbourne time)</label>
+          <select id="ci-time" data-ch="ciPreview">${CHECKIN_SLOTS.concat(CHECKIN_SLOTS.includes(defTime) ? [] : [defTime]).map(t => `<option value="${t}" ${t === defTime ? 'selected' : ''}>${esc(fmtTime(t))}</option>`).join('')}</select></div></div>
+      ${preview}
+      <div class="field" style="margin:12px 0 0"><label for="ci-type">Type</label>
+        <select id="ci-type">${types.map(t => `<option ${t === defType ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></div>
+      <div class="row" style="justify-content:flex-start;margin-top:12px">
+        <button data-act="saveCheckin">${editing ? 'Save changes' : 'Schedule check-in'}</button>
+        ${editing ? '<button class="btn-ghost" data-act="stopEditCheckin">Stop editing</button>' : ''}</div>`;
+  const plan = c.tier === 'essential' ? 'Essential: one kick-off call at the start.'
+    : 'Check-ins and calls happen on WhatsApp, outside the portal. The client sees the next one on Today.';
+  return `<div class="card"><h3>Schedule check-in</h3>
+      <p class="mini" style="margin-top:0">${esc(plan)} Times are entered in Melbourne time (Australia/Melbourne). The client sees it in their own time zone (${esc(zone)}).</p>${form}</div>
+    <div class="card"><h3>Check-ins</h3><p class="mini" style="margin-top:0">Upcoming and past, in date order. Cancelled ones stay here, not on the client's Today.</p>${conf}${rows}</div>`;
+}
+function previewText(date, time, zone) {
+  const inst = wallToInstant(date, time, MELB);
+  const mine = fmtInZone(inst, zone);
+  return `For the client that is ${mine.date}, ${mine.time} (${zone}).`;
+}
+
+/* ---------------------------------------------------------------- plan inputs and plan editor */
+function draftKey(c) { return 'bc_coach_draft_' + c.id; }
+function emptyDraft() { const meals = {}; for (let d = 1; d <= 7; d++) meals[d] = { lines: '', meals: [] }; return { meals, training: '' }; }
+function draftFromPlan(plan) {
+  const dr = emptyDraft();
+  if (plan && plan.meals) for (let d = 1; d <= 7; d++) {
+    const list = plan.meals[d] || plan.meals[String(d)] || [];
+    dr.meals[d] = { meals: list.map(m => ({ label: m.label || 'Meal', text: m.text || m.name || '', calories: m.calories || 0, protein: m.protein || 0, carbs: m.carbs || 0, fat: m.fat || 0, fibre: m.fibre || 0 })),
+                    lines: list.map(m => (m.label || 'Meal') + ': ' + (m.text || m.name || '')).join('\n') };
+  }
+  dr.training = (plan && plan.training) || '';
+  return dr;
+}
+function getDraft(c) {
+  try { const s = localStorage.getItem(draftKey(c)); if (s) return JSON.parse(s); } catch (e) {}
+  const cur = C.currentPlans[c.id];
+  return draftFromPlan(cur && cur.plan);
+}
+function saveDraft(c, dr) { try { localStorage.setItem(draftKey(c), JSON.stringify(dr)); } catch (e) {} }
+// The plan JSON the client portal reads: { meals: { 1..7: [ {label, name, text, calories, protein, carbs, fat, fibre} ] }, training }
+function planFromDraft(dr) {
+  const meals = {};
+  for (let d = 1; d <= 7; d++) meals[d] = (dr.meals[d].meals || []).map(m => ({ label: String(m.label || 'Meal').slice(0, 40), name: String(m.text || '').slice(0, 80),
+    text: String(m.text || '').slice(0, 300), calories: clampNum(m.calories, 5000), protein: clampNum(m.protein, 500), carbs: clampNum(m.carbs, 800), fat: clampNum(m.fat, 400), fibre: clampNum(m.fibre, 200) }));
+  return { meals, training: String(dr.training || '') };
+}
+function planChanged(c, dr) {
+  const cur = C.currentPlans[c.id];
+  return JSON.stringify(planFromDraft(dr)) !== JSON.stringify(planFromDraft(draftFromPlan(cur && cur.plan)));
+}
+function planInputsHtml(c) {
+  const ob = c.onboarding || {};
+  const open = C.planInputsOpen !== false;
+  const head = `<div class="row"><div><div class="eyebrow">From onboarding</div><h3 style="margin:0">Plan inputs</h3></div>
+    <button class="btn-ghost btn-sm" data-act="togglePlanInputs">${open ? 'Hide plan inputs' : 'Show plan inputs'}</button></div>`;
+  if (!open) return `<section class="plan-inputs">${head}</section>`;
+  const liked = ob.likedFoods || [];
+  const likedHtml = Object.keys(FOOD_GROUPS).map(g => {
+    const p = FOOD_GROUPS[g].filter(f => liked.includes(f));
+    return p.length ? `<div class="mini" style="margin-top:6px">${g}</div><div>${p.map(x => `<span class="pi-tag">${esc(x)}</span>`).join('')}</div>` : '';
+  }).join('') + (splitList(ob.likedOther).length ? `<div class="mini" style="margin-top:6px">Other foods they like</div><div>${chipList(splitList(ob.likedOther))}</div>` : '');
+  const sec = (title, body) => `<div class="pi-sec"><h4>${title}</h4>${body}</div>`;
+  const list = v => Array.isArray(v) ? v : [];
+  return `<section class="plan-inputs">${head}<div class="pi-grid">
+    ${sec('Goal and body', `<p><b>${esc(ob.goal || '-')}</b></p>
+      <p class="mini">Timeframe: ${esc(ob.timeframe || '-')}. Why now: ${esc(ob.goalWhy || '-')}</p>
+      <p>${esc(ob.age || '-')} years, ${esc(ob.sex || '-')}, ${esc(ob.heightCm || '-')} cm, ${ob.weightKg != null ? esc(ob.weightKg) + ' kg' : '-'}</p>
+      <p class="mini">${esc(ob.job || '-')}. ${esc(ob.activity || '-')}. Diet: ${esc(ob.diet || '-')}</p>
+      <p><span class="mini">Everyday steps (not counting planned walks)</span><br><b>${esc(ob.stepsEveryday || '-')}</b></p>
+      <p><span class="mini">Realistic target (including planned walks)</span><br><b>${esc(ob.stepsRealistic || '-')}</b></p>`)}
+    ${sec('Food they like', likedHtml || '<p class="mini">None given</p>')}
+    ${sec('Food to avoid', `<p class="mini">Will not eat</p><div style="margin-bottom:8px">${chipList(splitList(ob.avoid))}</div>
+      <p class="mini">Allergies or intolerances</p>${ob.allergies ? `<div class="hl-red" style="margin:8px 0">${chipList(splitList(ob.allergies))}</div>` : '<p class="mini">No allergies given</p>'}
+      <p class="mini">Currently eats ${esc(ob.mealsPerDay || '-')}. Cooking time ${esc(ob.cookTime || '-')}, cooked by ${esc(ob.whoCooks || '-')}. Eats out ${esc(ob.eatsOut || '0')} times and drinks ${esc(ob.alcohol || '0')} a week.</p>`)}
+    ${sec('Training days', `<div>${list(ob.trainingDays).map(d => `<span class="pi-tag day">${esc(d)}</span>`).join('') || '<span class="mini">None given</span>'}</div>
+      <p class="mini" style="margin-top:8px">${esc(ob.timeOfDay || '-')}, ${esc(ob.sessionLength || '-')} min, ${esc(ob.place || '-')}. Experience: ${esc(ob.experience || '-')}.</p>`)}
+    ${sec('Equipment', `<p>${esc(list(ob.equipment).join(', ') || 'None given')}</p>`)}
+    ${sec('Injuries', ob.injuries ? `<div class="hl-amber">${esc(ob.injuries)}</div>` : '<p class="mini">None given</p>')}
+    ${sec('What worked and what did not', `<p><b>Worked:</b> ${esc(ob.worked || '-')}</p><p><b>Did not:</b> ${esc(ob.didnt || '-')}</p>
+      <p class="mini">Enjoys: ${esc(ob.enjoys || '-')}. Hates: ${esc(ob.hates || '-')}.</p>`)}
+  </div></section>`;
+}
+function planEditorHtml(c) {
+  const dr = getDraft(c);
+  const d = C.planDay;
+  const day = dr.meals[d];
+  const t = c.targets;
+  const targetsCard = `<div class="card"><h3>Daily targets</h3>
+    <div class="grid5">${NUT.map(k => `<div class="field" style="margin:0"><label for="t-${k}">${NUT_LABEL[k]}${k === 'calories' ? ' (kcal)' : ' (g)'}</label>
+      <input id="t-${k}" type="number" min="0" inputmode="numeric" value="${t && t[k] != null ? t[k] : ''}" data-ch="target" data-k="${k}"></div>`).join('')}</div>
+    <div class="field" style="max-width:260px;margin-top:12px"><label for="t-steps">Steps a day</label>
+      <input id="t-steps" type="number" min="0" inputmode="numeric" value="${t && t.steps != null ? t.steps : ''}" data-ch="target" data-k="steps"></div>
+    <p class="mini">Targets show to the client straight away.</p></div>`;
+  const dayBtns = DAYS.map((x, i) => `<button class="tab ${d === i + 1 ? 'on' : ''} ${dr.meals[i + 1].meals.length ? 'dot' : ''}" data-act="pDay" data-d="${i + 1}">${x}</button>`).join('');
+  const sum = sumNut(day.meals);
+  const rows = day.meals.map((m, i) => `<tr>
+      <td style="min-width:120px"><input value="${esc(m.label)}" data-ch="row" data-i="${i}" data-f="label" aria-label="Label"></td>
+      <td style="min-width:220px"><input value="${esc(m.text)}" data-ch="row" data-i="${i}" data-f="text" aria-label="Foods"></td>
+      ${NUT.map(k => `<td class="num"><input type="number" min="0" inputmode="numeric" value="${m[k]}" data-ch="row" data-i="${i}" data-f="${k}" aria-label="${NUT_LABEL[k]}"></td>`).join('')}
+      <td><button class="btn-danger btn-sm" data-act="delRow" data-i="${i}">Remove</button></td></tr>`).join('');
+  const totalRow = day.meals.length ? `<tr><td colspan="2"><b>Day total</b></td>${NUT.map(k => {
+      const tn = t ? tone(k, sum[k], t[k]) : '';
+      return `<td class="num ${TONE_TEXT[tn]}"><b>${Math.round(sum[k])}</b>${t && t[k] != null ? '<div class="mini">of ' + t[k] + '</div>' : ''}</td>`;
+    }).join('')}<td></td></tr>` : '';
+  const copyOpts = DAYS.map((x, i) => i + 1).filter(n => n !== d).map(n => `<option value="${n}">${DAYS_FULL[n - 1]}</option>`).join('');
+  const cur = C.currentPlans[c.id];
+  const status = planChanged(c, dr) ? '<b class="c-amber" id="planStatus">Changes not published yet</b>'
+    : cur ? `<span class="mini" id="planStatus">Published ${esc(fmtDate(ymdIn(new Date(cur.created_at), MELB)))} (version ${cur.version})</span>` : '<span class="mini" id="planStatus">Nothing published yet</span>';
+  return `${planInputsHtml(c)}
+    <div>${targetsCard}
+      <div class="card"><h3>Meal plan</h3>
+        <div class="day-row">${dayBtns}</div>
+        <div class="field"><label for="dayLines">${DAYS_FULL[d - 1]}: one meal per line, "Label: foods with amounts"</label>
+          <textarea id="dayLines" data-inp="dayLines" placeholder="Breakfast: 60g oats, 150g Greek yoghurt, 1 banana&#10;Lunch: 150g chicken, 150g rice, broccoli">${esc(day.lines)}</textarea></div>
+        <div class="row" style="justify-content:flex-start">
+          <button data-act="calcDay">Calculate with Beast AI</button>
+          <button class="btn-ghost" data-act="addRow">Add a row</button></div>
+        <div class="table-wrap" style="margin-top:12px"><table>
+          <thead><tr><th>Label</th><th>Foods</th>${NUT.map(k => `<th>${macroChip(k)}</th>`).join('')}<th></th></tr></thead>
+          <tbody id="mealRows">${rows}${totalRow}</tbody></table></div>
+        ${day.meals.length ? `<div class="row" style="margin-top:12px;justify-content:flex-start">
+          <label for="copyTo" class="sr">Copy this day to</label>
+          <select id="copyTo" style="width:auto;min-width:200px"><option value="all">All other days</option>${copyOpts}</select>
+          <button class="btn-ghost" data-act="copyDay">Copy this day</button></div>` : ''}</div>
+      <div class="card"><h3>Training plan</h3>
+        <p class="mini" style="margin-top:0">One day per line, then its exercises: "Mon: Full body A", then "- Squat 3x8".</p>
+        <textarea id="trainDraft" data-inp="trainDraft" style="min-height:150px" placeholder="Mon: Full body A&#10;- Squat 3x8&#10;- Push-up 3x10">${esc(dr.training)}</textarea>
+        <div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn-ghost" data-act="trainStart">Start from their training days</button></div></div>
+      <div class="card"><div class="row"><div>${status}</div><button data-act="publish">Approve and publish</button></div>
+        <p class="mini" style="margin:8px 0 0">Publishes the meal plan and training plan to the client as a new version. Older versions are kept.</p></div>
+    </div>`;
+}
+
+/* ---------------------------------------------------------------- logs (from activation) */
+function bestSet(e) {
+  if (!e || e.skipped || !e.sets || !e.sets.length) return null;
+  const weighted = e.sets.filter(s => s.kg != null);
+  if (!weighted.length) { const reps = Math.max(...e.sets.map(s => s.reps || 0)); return reps > 0 ? { kg: null, reps } : null; }
+  const kg = Math.max(...weighted.map(s => s.kg));
+  return { kg, reps: Math.max(...weighted.filter(s => s.kg === kg).map(s => s.reps || 0)) };
+}
+function progressNote(w, e) {
+  const cur = bestSet(e); if (!cur) return null;
+  const prior = C.d.workouts.filter(x => x.session && x.log_date < w.log_date).sort((a, b) => (a.log_date < b.log_date ? 1 : -1));
+  let prev = null;
+  for (const x of prior) { const b = bestSet((x.session.exercises || []).find(y => y.name === e.name && !y.skipped)); if (b) { prev = b; break; } }
+  if (!prev) return null;
+  if (cur.kg != null && prev.kg != null) {
+    if (cur.kg > prev.kg) return '+' + (Math.round((cur.kg - prev.kg) * 10) / 10) + ' kg';
+    if (cur.kg === prev.kg && cur.reps > prev.reps) return '+' + (cur.reps - prev.reps) + ' reps';
+    return null;
+  }
+  if (cur.kg == null && prev.kg == null && cur.reps > prev.reps) return '+' + (cur.reps - prev.reps) + ' reps';
+  return null;
+}
+function sessionHtml(w) {
+  const rows = (w.session.exercises || []).map(e => {
+    if (e.skipped) return `<div class="log-ex"><b>${esc(e.name)}</b> <span class="mini">skipped</span></div>`;
+    const sets = (e.sets || []).map(s => (s.kg != null ? (Math.round(s.kg * 10) / 10) + ' kg x ' : '') + (s.reps != null ? s.reps : '-'));
+    const note = progressNote(w, e);
+    return `<div class="log-ex"><b>${esc(e.name)}</b> ${note ? `<span class="up-badge">Up ${esc(note)}</span>` : ''}<div class="mini">${esc(sets.join(', ') || 'no sets')}</div></div>`;
+  }).join('');
+  return `<div style="margin:6px 0 10px"><div><b>${esc(w.what)}</b></div>${rows}${w.notes ? `<div class="mini">${esc(w.notes)}</div>` : ''}</div>`;
+}
+function logsHtml(c) {
+  const t = c.targets;
+  const start = c.activated_at ? ymdIn(new Date(c.activated_at), zoneOf(c)) : null;
+  const today = clientToday(c);
+  const days = [];
+  if (start) for (let d = today; d >= start && days.length < 120; d = addDays(d, -1)) days.push(d);
+  const late = v => v ? '<span class="late">added later</span>' : '';
+  const before = C.d.meals.filter(m => !start || m.log_date < start);
+  const baseline = before.length ? `<details class="baseline"><summary>Logged before activation (baseline) <span class="mini" style="font-weight:400">${before.length} meal${before.length === 1 ? '' : 's'}, not part of the plan</span></summary>
+      <div style="padding:4px 0 6px">${before.map(m => `<div class="meal" style="padding:8px 0"><div style="flex:1 1 200px"><span class="mini">${esc(fmtDate(m.log_date))}</span> <b>${esc(m.name)}</b>
+        <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div></div>`).join('')}</div></details>` : '';
+  const intro = start
+    ? `<p class="mini" style="margin-top:0">From activation on ${esc(fmtDate(start))}, newest first, in the client's own days (${esc(zoneOf(c))}). <span class="up-badge">Up</span> marks a lift that went up since it was last logged.</p>`
+    : '<p class="mini" style="margin-top:0">Not activated yet. Logs start on the activation date.</p>';
+  return `<div class="card" id="logsCard"><h3>${start ? 'Logs' : 'Logs before activation'}</h3>${intro}
+    ${days.map((date, idx) => {
+      const meals = C.d.meals.filter(m => m.log_date === date);
+      const tot = sumNut(meals);
+      const wos = C.d.workouts.filter(w => w.log_date === date);
+      const wi = C.d.weighIns.find(w => w.weigh_date === date);
+      const st = C.d.steps.find(s => s.log_date === date);
+      const ink = (k, v) => t && t[k] && v > t[k] ? MACRO[k].over : MACRO[k].ink;
+      const summary = `<summary><span>${esc(fmtDate(date))}</span>
+        <span class="mini" style="font-weight:400;margin-left:8px">${meals.length ? `<span style="color:${ink('calories', tot.calories)}">${Math.round(tot.calories)} kcal</span> · <span style="color:${ink('protein', tot.protein)}">P ${Math.round(tot.protein)}g</span> · ${meals.length} meal${meals.length === 1 ? '' : 's'}` : 'No meals logged'}
+        · ${st ? fmtSteps(st.steps) + ' steps' : 'No steps'} · ${wos.length ? wos.length + ' workout' + (wos.length === 1 ? '' : 's') : 'No workout'} · ${wi ? wi.kg + ' kg' : 'No weigh-in'}</span></summary>`;
+      const body = meals.length ? meals.map(m => `<div class="meal" style="padding:8px 0"><div style="flex:1 1 200px"><span class="mini">${esc(m.meal_time || '')}</span> <b>${esc(m.name)}</b> <span class="mini">${esc(SOURCES[m.source] || m.source)}</span>${late(m.added_late)}
+          <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div>
+          ${m.edited && m.ai ? `<div class="edited">Changed by client. Beast AI said ${esc(m.ai.calories)} kcal, P ${esc(m.ai.protein)}g.</div>` : ''}</div></div>`).join('') : '<p class="mini">No meals logged.</p>';
+      const woTxt = wos.map(w => w.session ? late(w.added_late) + sessionHtml(w)
+        : `<div class="mini">Other activity: ${esc(w.what)}${w.minutes ? ' (' + w.minutes + ' min)' : ''}${w.notes ? ' · ' + esc(w.notes) : ''}${late(w.added_late)}</div>`).join('');
+      return `<details ${idx === 0 ? 'open' : ''} data-day="${date}">${summary}<div style="padding:4px 0 6px">${body}${woTxt}${st ? `<div class="mini">Steps: ${fmtSteps(st.steps)}${late(st.added_late)}</div>` : ''}</div></details>`;
+    }).join('')}
+    ${baseline}</div>`;
+}
+function progressHtml(c) {
+  const ob = c.onboarding || {};
+  const pts = [];
+  if (ob.weightKg != null && ob.weightKg !== '') pts.push({ date: ymdIn(new Date(c.created_at), MELB), kg: Number(ob.weightKg) });
+  C.d.weighIns.forEach(w => pts.push({ date: w.weigh_date, kg: Number(w.kg) }));
+  let stats = '<p class="muted">No weigh-ins yet.</p>';
+  if (pts.length) {
+    const first = pts[0].kg, last = pts[pts.length - 1].kg, prev = pts.length > 1 ? pts[pts.length - 2].kg : null, ch = last - first;
+    stats = `<div class="grid3"><div class="note-box"><div class="mini">Latest weight</div><b>${last.toFixed(1)} kg</b></div>
+      <div class="note-box"><div class="mini">Change since start</div><b class="${ch <= 0 ? 'c-green' : 'c-red'}">${ch.toFixed(1)} kg (${(first ? ch / first * 100 : 0).toFixed(1)}%)</b></div>
+      <div class="note-box"><div class="mini">Change since last weigh-in</div><b>${prev == null ? 'n/a' : (last - prev).toFixed(1) + ' kg'}</b></div></div>
+      <div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>Date</th><th>Weight</th></tr></thead><tbody>${pts.slice().reverse().map(p => `<tr><td>${esc(fmtDate(p.date))}</td><td>${p.kg.toFixed(1)} kg</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  const start = c.activated_at ? ymdIn(new Date(c.activated_at), zoneOf(c)) : null;
+  const week = []; const today = clientToday(c);
+  for (let i = 0; i < 7; i++) { const d = addDays(today, -i); if (start && d >= start) week.push(d); }
+  const stepVals = C.d.steps.filter(s => week.includes(s.log_date)).map(s => Number(s.steps));
+  const avgSteps = stepVals.length ? Math.round(stepVals.reduce((a, b) => a + b, 0) / stepVals.length) : null;
+  const byDay = week.map(d => C.d.meals.filter(m => m.log_date === d)).filter(l => l.length);
+  const avg = k => byDay.length ? Math.round(byDay.reduce((a, l) => a + sumNut(l)[k], 0) / byDay.length) : null;
+  return `<div class="card"><h3>Weight</h3>${stats}</div>
+    <div class="card"><h3>Last 7 days</h3>
+      <p>Steps, average per day: <b>${avgSteps == null ? 'Nothing logged' : fmtSteps(avgSteps)}</b>${c.targets && c.targets.steps ? ` (target ${fmtSteps(c.targets.steps)})` : ''}</p>
+      ${byDay.length ? NUT.map(k => `<p class="mini" style="margin:4px 0">${NUT_LABEL[k]}: <b>${avg(k)}</b>${c.targets && c.targets[k] != null ? ' of ' + c.targets[k] : ''} ${k === 'calories' ? 'kcal' : 'g'}</p>`).join('') : '<p class="muted">No meals logged in the last 7 days.</p>'}
+    </div>`;
+}
+
+/* ---------------------------------------------------------------- customers */
+function customersByEmail() {
+  const map = new Map();
+  C.customers.forEach(x => {
+    const k = String(x.email).toLowerCase();
+    if (!map.has(k)) map.set(k, { email: x.email, name: x.name, country: x.country, purchases: [] });
+    map.get(k).purchases.push(x);
+  });
+  return [...map.values()];
+}
+function customersHtml() {
+  const f = C.custFilter;
+  const people = customersByEmail().sort((a, b) => String(a.name || a.email).localeCompare(String(b.name || b.email)));
+  const sel = (opts, cur) => opts.map(([v, l]) => `<option value="${esc(v)}" ${cur === v ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  const rows = people.map(x => {
+    const ok = custOk(x.email);
+    const said = x.purchases.some(p => p.marketing_consent), unsub = x.purchases.find(p => p.unsubscribed_at);
+    const why = unsub ? `Unsubscribed ${fmtDate(ymdIn(new Date(unsub.unsubscribed_at), MELB))}` : !said ? 'Did not say yes' : '';
+    const products = [...new Set(x.purchases.map(p => PLAN_NAMES[p.tier] || p.tier))];
+    const last = x.purchases.map(p => p.purchased_at).sort().slice(-1)[0];
+    const st = custStatus(x.email);
+    return `<tr data-cust-row data-email="${esc(x.email.toLowerCase())}" data-search="${esc((String(x.name || '') + ' ' + x.email).toLowerCase())}" data-products="${esc(x.purchases.map(p => p.tier).join(' '))}" data-status="${esc(st)}" data-ok="${ok ? 'yes' : 'no'}">
+      <td><b>${esc(x.name || '-')}</b><div class="mini">${esc(x.country || '')}</div></td>
+      <td>${esc(x.email)}</td>
+      <td>${products.map(p => `<span class="pi-tag">${esc(p)}</span>`).join('')}</td>
+      <td>${esc(last ? fmtDate(ymdIn(new Date(last), MELB)) : '-')}</td>
+      <td>${st === 'none' ? '<span class="mini">No client data</span>' : esc(STATUS[st] ? STATUS[st][0] : st)}</td>
+      <td>${ok ? '<span class="ok-yes">Yes</span>' : `<span class="ok-no">No</span><div class="mini">${esc(why)}</div>`}</td>
+      <td>${unsub ? '<span class="mini">Unsubscribed</span>' : `<button class="btn-ghost btn-sm" data-act="askUnsub" data-email="${esc(x.email)}">Unsubscribe</button>`}</td></tr>`;
+  }).join('');
+  const conf = C.confirm ? `<div class="hl-amber" id="confirmBox" role="alertdialog" style="margin:12px 0"><p style="margin:0 0 10px"><b>${esc(C.confirm.text)}</b></p>
+      <div class="row" style="justify-content:flex-start"><button class="btn-danger" data-act="confirmYes">${esc(C.confirm.yes)}</button><button class="btn-ghost" data-act="confirmNo">Not now</button></div></div>` : '';
+  return `<section class="hero"><h1>Customers</h1><p class="muted" style="margin:0">Everyone who has bought, past and present. Kept even when a client deletes their data.</p></section>
+    <div class="card">
+      <div class="filters">
+        <div class="field" style="margin:0"><label for="custQ">Search name or email</label><input id="custQ" type="search" data-inp="custSearch" value="${esc(f.q)}" placeholder="e.g. sam or sam@example.com"></div>
+        <div class="field" style="margin:0"><label for="custProduct">Plan</label><select id="custProduct" data-ch="custFilter" data-k="product">${sel([['', 'All plans']].concat(Object.keys(PLAN_NAMES).map(t => [t, PLAN_NAMES[t]])), f.product)}</select></div>
+        <div class="field" style="margin:0"><label for="custStatus">Status</label><select id="custStatus" data-ch="custFilter" data-k="status">${sel([['', 'All statuses']].concat(Object.keys(STATUS).map(s => [s, STATUS[s][0]])).concat([['none', 'No client data']]), f.status)}</select></div>
+        <div class="field" style="margin:0"><label for="custOk">OK to email</label><select id="custOk" data-ch="custFilter" data-k="ok">${sel([['', 'Any'], ['yes', 'Yes'], ['no', 'No']], f.ok)}</select></div>
+      </div>
+      <div class="cust-actions"><button class="btn-green btn-sm" data-act="copyEmails">Copy emails</button><button class="btn-ghost btn-sm" data-act="exportCsv">Export CSV</button><span class="mini" id="custCount"></span></div>
+      <p class="cust-note">Only customers who said yes to marketing emails and have not unsubscribed are in the copy and the CSV (email, name, plan, date), as worked out by the database. The search and plan filters above apply too.</p>
+      <textarea id="emailBox" hidden aria-label="Emails to copy" style="min-height:70px"></textarea>
+      ${conf}
+      <div class="table-wrap"><table>
+        <thead><tr><th>Customer</th><th>Email</th><th>Plans</th><th>Last purchase</th><th>Status</th><th>OK to email</th><th></th></tr></thead>
+        <tbody id="custRows">${rows || '<tr><td colspan="7">No customers yet.</td></tr>'}</tbody></table></div></div>`;
+}
+function custRowMatch(row) {
+  const f = C.custFilter;
+  return (!f.q || row.dataset.search.includes(f.q.toLowerCase().trim())) && (!f.product || row.dataset.products.split(' ').includes(f.product))
+    && (!f.status || row.dataset.status === f.status) && (!f.ok || row.dataset.ok === f.ok);
+}
+function applyCustFilters() {
+  let shown = 0;
+  document.querySelectorAll('[data-cust-row]').forEach(row => { const on = custRowMatch(row); row.hidden = !on; if (on) shown++; });
+  const el = document.getElementById('custCount'); if (el) el.textContent = `${shown} shown`;
+}
+// The marketing list from the database, narrowed by the search and plan filters on screen.
+async function marketingList() {
+  const rows = (await q(sb.rpc('coach_marketing_export'))) || [];
+  const f = C.custFilter;
+  return rows.filter(r => (!f.q || (String(r.name || '') + ' ' + r.email).toLowerCase().includes(f.q.toLowerCase().trim()))
+    && (!f.product || customersByEmail().some(x => x.email.toLowerCase() === String(r.email).toLowerCase() && x.purchases.some(p => p.tier === f.product))));
+}
+function csvCell(v) {
+  let s = String(v == null ? '' : v);
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;                 // never let a spreadsheet run a cell as a formula
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+/* ---------------------------------------------------------------- settings */
+function settingsHtml() {
+  const wa = (C.settings && C.settings.coach_whatsapp) || '';
+  const factors = C.factors.map(f => `<div class="meal"><div style="flex:1 1 220px"><b>${esc(f.friendly_name || 'Authenticator')}</b><div class="mini">Added ${esc(f.created_at ? fmtDate(ymdIn(new Date(f.created_at), MELB)) : '')}</div></div>
+      ${C.factors.length > 1 ? `<button class="btn-danger btn-sm" data-act="askRemoveFactor" data-id="${esc(f.id)}">Remove</button>` : ''}</div>`).join('');
+  const conf = C.confirm ? `<div class="hl-amber" id="confirmBox" role="alertdialog" style="margin:12px 0"><p style="margin:0 0 10px"><b>${esc(C.confirm.text)}</b></p>
+      <div class="row" style="justify-content:flex-start"><button class="btn-danger" data-act="confirmYes">${esc(C.confirm.yes)}</button><button class="btn-ghost" data-act="confirmNo">Not now</button></div></div>` : '';
+  const backup = C.backup ? `<div class="note-box" id="backupCard" style="margin-top:12px">${qrBlock(C.backup)}${codeFormHtml('backup')}</div>` : '';
+  return `<section class="hero"><h1>Settings</h1></section>
+    <div class="card"><h3>Your WhatsApp number</h3>
+      <p class="mini" style="margin-top:0">The Message Stefan on WhatsApp button uses it. Only clients on an active or paused The Beast plan can get it, from the database. It is never in the website's code.</p>
+      <div class="row" style="flex-wrap:nowrap;justify-content:flex-start"><input id="waNumber" type="tel" inputmode="tel" value="${esc(wa)}" placeholder="+61 400 000 000" style="max-width:260px"><button data-act="saveWhatsapp">Save</button></div></div>
+    <div class="card" id="factorsCard"><h3>Authenticators</h3>
+      <p class="mini" style="margin-top:0">Each one can give you the code to sign in. Keep at least two, so losing one phone does not lock you out.</p>
+      ${factors || '<p class="muted">None.</p>'}${conf}
+      ${C.factors.length < 2 ? '<div class="hl-amber" style="margin:10px 0">You have one authenticator. Add a backup now.</div>' : ''}
+      ${C.backup ? '' : '<button class="btn-ghost" data-act="addBackup">Add a backup authenticator</button>'}${backup}
+      <p class="mini" style="margin:12px 0 0">Locked out with no authenticator? In the Supabase dashboard go to Authentication, Users, open your user and remove the authenticator factor. Then sign in here and set it up again.</p></div>`;
+}
+
+/* ==========================================================================
+   Actions
+   ========================================================================== */
+const ACT = {}, CH = {}, INP = {};
+ACT.signOut = () => signOut('');
+ACT.coachPage = el => { C.page = el.dataset.p; C.clientId = null; C.confirm = null; C.backup = null; render(); };
+ACT.openClient = async el => {
+  C.page = 'client'; C.clientId = el.dataset.id; C.tab = 'overview'; C.confirm = null; C.ciEditId = null; C.planDay = 1; C.startDate = null; C.d = null; C.noteState = '';
+  render();
+  await loadDetail(C.clientId); render();
+};
+ACT.backClients = () => { C.page = 'clients'; C.clientId = null; C.confirm = null; render(); };
+ACT.coachTab = el => { C.tab = el.dataset.tab; C.confirm = null; C.ciEditId = null; render(); };
+ACT.confirmNo = () => { C.confirm = null; render(); };
+ACT.confirmYes = async () => { const job = C.confirm; C.confirm = null; if (job && job.run) await job.run(); render(); };
+
+async function updateClient(c, patch, done) {
+  await q(sb.from('coaching_clients').update(patch).eq('id', c.id));
+  await refreshClient(); render(); if (done) toast(done);
+}
+ACT.askActivate = () => {
+  const c = clientById(C.clientId);
+  const start = (document.getElementById('startDate') || {}).value || todayMel();
+  C.confirm = { text: `Activate ${c.name || c.email} from ${fmtDate(start)}? Their 12 weeks end on ${fmtDate(addDays(start, WEEKS * 7))}.`, yes: 'Yes, activate',
+    run: () => updateClient(c, { status: 'active', start_date: start }, 'Activated.') };
+  render();
+};
+ACT.askPause = () => { const c = clientById(C.clientId); C.confirm = { text: `Pause ${c.name || c.email}? Pause days used so far: ${c.pause_days_used || 0} of ${PAUSE_MAX}.`, yes: 'Yes, pause', run: () => updateClient(c, { status: 'paused' }, 'Paused.') }; render(); };
+ACT.askResume = () => { const c = clientById(C.clientId); C.confirm = { text: `Resume ${c.name || c.email}? The days paused are added to their end date.`, yes: 'Yes, resume', run: () => updateClient(c, { status: 'active' }, 'Resumed.') }; render(); };
+ACT.askFinish = () => { const c = clientById(C.clientId); C.confirm = { text: `Finish ${c.name || c.email}'s plan? Their place opens up and logging stops.`, yes: 'Yes, finish', danger: true, run: () => updateClient(c, { status: 'finished' }, 'Finished.') }; render(); };
+ACT.askCancel = () => { const c = clientById(C.clientId); C.confirm = { text: `Cancel ${c.name || c.email}'s plan? Their place opens up and logging stops.`, yes: 'Yes, cancel the plan', danger: true, run: () => updateClient(c, { status: 'cancelled' }, 'Cancelled.') }; render(); };
+ACT.askTier = () => {
+  const c = clientById(C.clientId); const t = document.getElementById('newTier').value;
+  if (t === c.tier) { toast('That is already their plan.'); return; }
+  C.confirm = { text: `Change ${c.name || c.email} from ${PLAN_NAMES[c.tier]} to ${PLAN_NAMES[t]}?`, yes: 'Yes, change plan', run: () => updateClient(c, { tier: t }, 'Plan changed.') }; render();
+};
+ACT.askDelete = () => {
+  const c = clientById(C.clientId);
+  C.confirm = { text: `Delete ${c.name || c.email} and all their coaching data (plans, logs, check-ins, notes)? Their customer record is kept. This cannot be undone.`, yes: 'Yes, delete', danger: true,
+    run: async () => { await q(sb.from('coaching_clients').delete().eq('id', c.id)); try { localStorage.removeItem(draftKey(c)); } catch (e) {} C.page = 'clients'; C.clientId = null; await loadAll(); toast('Client deleted.'); } };
+  render();
+};
+CH.cleared = async el => {
+  const c = clientById(C.clientId);
+  await updateClient(c, { health_cleared_at: el.checked ? new Date().toISOString() : null }, el.checked ? 'Cleared to start.' : 'Clearance removed.');
+};
+CH.startDate = el => { C.startDate = el.value; render(); };
+CH.weighDay = async el => { const c = clientById(C.clientId); await updateClient(c, { onboarding: Object.assign({}, c.onboarding, { weighInDay: el.value }) }, 'Weigh-in day saved.'); };
+CH.weighTime = async el => { const c = clientById(C.clientId); await updateClient(c, { onboarding: Object.assign({}, c.onboarding, { weighInTime: el.value }) }, 'Weigh-in time saved.'); };
+
+/* capacity, filters, add client */
+CH.cap = async el => {
+  const v = clampNum(el.value, 500);
+  await q(sb.from('coaching_capacity').update({ place_limit: v, updated_at: new Date().toISOString() }).eq('tier', el.dataset.tier));
+  C.capacity = (await q(sb.from('coaching_capacity').select('tier,place_limit'))) || [];
+  render(); toast(`${PLAN_NAMES[el.dataset.tier]} capacity saved: ${v}.`);
+};
+CH.clientFilter = el => { C.filter[el.dataset.k] = el.value; applyClientFilters(); };
+INP.clientSearch = el => { C.filter.q = el.value; applyClientFilters(); };
+ACT.addClient = async () => {
+  const v = id => document.getElementById(id).value;
+  const email = v('ac-email').trim(), name = v('ac-name').trim(), tier = v('ac-tier'), amount = parseFloat(v('ac-amount')), date = v('ac-date');
+  const { data, error } = await sb.rpc('coach_add_client', { p_email: email, p_name: name, p_tier: tier, p_amount_cents: isFinite(amount) ? Math.round(amount * 100) : null, p_paid_on: date || null });
+  if (error) { C.addResult = { ok: false, error: friendly(error) }; return render(); }
+  if (!data || !data.ok) { C.addResult = { ok: false, error: (data && data.error) || 'Could not add the client.' }; return render(); }
+  C.addResult = { ok: true, email, name, tier };
+  await loadAll(); render();
+};
+
+/* check-ins */
+CH.ciPreview = () => {
+  const c = clientById(C.clientId), el = document.getElementById('ciPreview');
+  if (el) el.textContent = previewText(document.getElementById('ci-date').value, document.getElementById('ci-time').value, zoneOf(c));
+};
+ACT.editCheckin = el => { C.ciEditId = el.dataset.id; render(); };
+ACT.stopEditCheckin = () => { C.ciEditId = null; render(); };
+ACT.saveCheckin = async () => {
+  const c = clientById(C.clientId);
+  const date = document.getElementById('ci-date').value, time = document.getElementById('ci-time').value, type = document.getElementById('ci-type').value;
+  if (!date || !time) { toast('Choose a date and a time.'); return; }
+  const at = wallToInstant(date, time, MELB).toISOString();
+  if (C.ciEditId) await q(sb.from('coaching_checkins').update({ type, scheduled_at: at }).eq('id', C.ciEditId));
+  else await q(sb.from('coaching_checkins').insert({ client_id: c.id, type, scheduled_at: at }));
+  const was = C.ciEditId; C.ciEditId = null;
+  await loadDetail(c.id); render(); toast(was ? 'Check-in changed.' : 'Check-in scheduled.');
+};
+ACT.askCancelCheckin = el => {
+  const c = clientById(C.clientId); const id = el.dataset.id;
+  C.confirm = { text: 'Cancel this check-in? It disappears from the client\'s Today.', yes: 'Yes, cancel it', run: async () => {
+    await q(sb.from('coaching_checkins').update({ status: 'cancelled' }).eq('id', id)); await loadDetail(c.id); toast('Check-in cancelled.'); } };
+  render();
+};
+
+/* plan editor */
+ACT.togglePlanInputs = () => { C.planInputsOpen = !(C.planInputsOpen !== false); render(); };
+ACT.pDay = el => { C.planDay = Number(el.dataset.d); render(); };
+CH.target = async el => {
+  const c = clientById(C.clientId);
+  const targets = Object.assign({ calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 }, c.targets || {});
+  targets[el.dataset.k] = el.value === '' ? null : clampNum(el.value, el.dataset.k === 'steps' ? 60000 : 5000);
+  await updateClient(c, { targets }, 'Targets saved.');
+};
+function parseLines(text) {
+  return text.split('\n').map(s => s.trim()).filter(Boolean).map((line, i) => {
+    const idx = line.indexOf(':');
+    if (idx > 0) return { label: line.slice(0, idx).trim().slice(0, 40), text: line.slice(idx + 1).trim().slice(0, 300) };
+    return { label: 'Meal ' + (i + 1), text: line.slice(0, 300) };
+  });
+}
+INP.dayLines = el => { const c = clientById(C.clientId); const dr = getDraft(c); dr.meals[C.planDay].lines = el.value; saveDraft(c, dr); };
+INP.trainDraft = el => { const c = clientById(C.clientId); const dr = getDraft(c); dr.training = el.value; saveDraft(c, dr); const st = document.getElementById('planStatus'); if (st && planChanged(c, dr)) { st.className = 'c-amber'; st.innerHTML = '<b>Changes not published yet</b>'; } };
+ACT.calcDay = async () => {
+  const c = clientById(C.clientId); const dr = getDraft(c); const d = C.planDay;
+  const text = (document.getElementById('dayLines') || {}).value || dr.meals[d].lines;
+  const lines = text.split('\n').map(s => s.trim()).filter(Boolean);
+  if (!lines.length) { toast('Type the meals first, one per line.'); return; }
+  dr.meals[d].lines = text; saveDraft(c, dr);
+  toast('Calculating...');
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch('/api/coach-ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (session ? session.access_token : '') },
+      body: JSON.stringify({ mode: 'day', text: lines.join('\n').slice(0, 2000) }) });
+    let data = {}; try { data = await r.json(); } catch (e) {}
+    if (!r.ok || data.error) { const err = new Error(data.message || 'Beast AI could not answer that. Type the numbers in yourself.'); err.code = data.error || 'try_again'; throw err; }
+    if (!Array.isArray(data.meals) || data.meals.length !== lines.length) throw Object.assign(new Error('Beast AI returned a different number of meals. Check the numbers by hand.'), { code: 'try_again' });
+    dr.meals[d].meals = data.meals.map((m, i) => { const p = parseLines(lines[i])[0]; return { label: String(m.label || p.label).slice(0, 40), text: String(m.text || p.text).slice(0, 300),
+      calories: clampNum(m.calories, 5000), protein: clampNum(m.protein, 500), carbs: clampNum(m.carbs, 800), fat: clampNum(m.fat, 400), fibre: clampNum(m.fibre, 200) }; });
+    saveDraft(c, dr); render(); toast('Numbers calculated. Check them before you publish.');
+  } catch (err) {
+    dr.meals[d].meals = parseLines(lines.join('\n')).map(p => ({ label: p.label, text: p.text, calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 }));
+    saveDraft(c, dr); render(); toast(friendly(err) || 'Beast AI could not answer. Type the numbers in yourself.');
+  }
+};
+ACT.addRow = () => { const c = clientById(C.clientId); const dr = getDraft(c); dr.meals[C.planDay].meals.push({ label: 'Meal', text: '', calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 }); saveDraft(c, dr); render(); };
+ACT.delRow = el => { const c = clientById(C.clientId); const dr = getDraft(c); dr.meals[C.planDay].meals.splice(Number(el.dataset.i), 1); saveDraft(c, dr); render(); };
+CH.row = el => {
+  const c = clientById(C.clientId); const dr = getDraft(c); const day = dr.meals[C.planDay];
+  const m = day.meals[Number(el.dataset.i)]; if (!m) return;
+  const f = el.dataset.f;
+  if (f === 'label' || f === 'text') m[f] = el.value.slice(0, f === 'label' ? 40 : 300);
+  else m[f] = clampNum(el.value, f === 'calories' ? 5000 : 800);
+  day.lines = day.meals.map(x => x.label + ': ' + x.text).join('\n');
+  saveDraft(c, dr); render();
+};
+ACT.copyDay = () => {
+  const c = clientById(C.clientId); const dr = getDraft(c); const from = C.planDay;
+  const to = document.getElementById('copyTo').value;
+  const targets = to === 'all' ? [1, 2, 3, 4, 5, 6, 7].filter(n => n !== from) : [Number(to)];
+  targets.forEach(n => { dr.meals[n] = JSON.parse(JSON.stringify(dr.meals[from])); });
+  saveDraft(c, dr); render(); toast(targets.length > 1 ? 'Copied to every other day.' : 'Copied to ' + DAYS_FULL[targets[0] - 1] + '.');
+};
+ACT.trainStart = () => {
+  const c = clientById(C.clientId); const dr = getDraft(c);
+  const days = ((c.onboarding || {}).trainingDays || []).filter(d => DAYS.includes(String(d).slice(0, 3)));
+  if (!days.length) { toast('They did not choose training days.'); return; }
+  dr.training = days.map((d, i) => `${String(d).slice(0, 3)}: Session ${String.fromCharCode(65 + i)}\n- Exercise 3x10`).join('\n');
+  saveDraft(c, dr); render();
+};
+ACT.publish = async () => {
+  const c = clientById(C.clientId); const dr = getDraft(c);
+  const plan = planFromDraft(dr);
+  if (!hasPlanMeals(plan) && !plan.training.trim()) { toast('Add some meals or a training plan first.'); return; }
+  const data = await q(sb.rpc('coach_publish_plan', { p_client_id: c.id, p_plan: plan }));
+  if (!data || !data.ok) { toast((data && data.error) || 'Could not publish.'); return; }
+  try { localStorage.removeItem(draftKey(c)); } catch (e) {}
+  await loadAll(); await loadDetail(c.id); render();
+  toast(`Published as version ${data.version}. The client sees it now.`);
+};
+
+/* notes: saved as you type */
+let noteTimer = null;
+INP.notes = el => {
+  const id = C.clientId, body = el.value;
+  C.d.note = body; C.noteState = 'Saving...';
+  const st = document.getElementById('noteState'); if (st) st.textContent = C.noteState;
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(async () => {
+    try { await q(sb.from('coaching_notes').upsert({ client_id: Number(id), body, updated_at: new Date().toISOString() }, { onConflict: 'client_id' })); C.noteState = 'Saved.'; }
+    catch (err) { C.noteState = friendly(err); }
+    const s2 = document.getElementById('noteState'); if (s2) s2.textContent = C.noteState;
+  }, 600);
+};
+
+/* customers */
+CH.custFilter = el => { C.custFilter[el.dataset.k] = el.value; applyCustFilters(); };
+INP.custSearch = el => { C.custFilter.q = el.value; applyCustFilters(); };
+ACT.copyEmails = async () => {
+  const list = await marketingList();
+  if (!list.length) { toast('No customers are OK to email with these filters.'); return; }
+  const text = list.map(x => x.email).join(', ');
+  try { await navigator.clipboard.writeText(text); toast(`Copied ${list.length} email${list.length === 1 ? '' : 's'}. Only customers who are OK to email.`); }
+  catch (e) { const box = document.getElementById('emailBox'); box.hidden = false; box.value = text; box.select(); toast('Copy is blocked here. The emails are in the box below.'); }
+};
+ACT.exportCsv = async () => {
+  const list = await marketingList();
+  if (!list.length) { toast('No customers are OK to email with these filters.'); return; }
+  const lines = list.map(x => [x.email, x.name, PLAN_NAMES[x.plan] || x.plan, x.purchased_on].map(csvCell).join(','));
+  const blob = new Blob([['email,name,plan,date', ...lines].join('\n') + '\n'], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = `beast-coach-marketing-${todayMel()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast(`Exported ${list.length} customer${list.length === 1 ? '' : 's'} who are OK to email.`);
+};
+ACT.askUnsub = el => {
+  const email = el.dataset.email;
+  C.confirm = { text: `Unsubscribe ${email} from marketing emails? Only they can turn it back on, from My Coach.`, yes: 'Yes, unsubscribe', run: async () => {
+    const ids = C.customers.filter(x => String(x.email).toLowerCase() === String(email).toLowerCase()).map(x => x.id);
+    await q(sb.from('coaching_customers').update({ marketing_consent: false, unsubscribed_at: new Date().toISOString() }).in('id', ids));
+    await loadAll(); toast('Unsubscribed.'); } };
+  render();
+};
+
+/* settings */
+ACT.saveWhatsapp = async () => {
+  const v = document.getElementById('waNumber').value.trim();
+  if (v && !/^\+?[0-9 ]{6,20}$/.test(v)) { toast('Enter the number with digits only, for example +61 400 000 000.'); return; }
+  await q(sb.from('coaching_settings').upsert({ id: true, coach_whatsapp: v || null, updated_at: new Date().toISOString() }, { onConflict: 'id' }));
+  C.settings = { coach_whatsapp: v }; render(); toast('WhatsApp number saved.');
+};
+ACT.addBackup = () => startEnrol(true);
+ACT.askRemoveFactor = el => {
+  const id = el.dataset.id;
+  C.confirm = { text: 'Remove this authenticator? It will no longer give you codes for this page.', yes: 'Yes, remove it', run: async () => {
+    const { error } = await sb.auth.mfa.unenroll({ factorId: id }); if (error) throw error; await loadFactors(); toast('Authenticator removed.'); } };
+  render();
+};
+
+/* ---------------------------------------------------------------- events */
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  try { await ACT[el.dataset.act](el, e); } catch (err) { toast(friendly(err)); }
+});
+document.addEventListener('change', async e => {
+  const el = e.target.closest('[data-ch]');
+  if (!el) return;
+  try { await CH[el.dataset.ch](el, e); } catch (err) { toast(friendly(err)); render(); }
+});
+document.addEventListener('input', e => {
+  const el = e.target.closest('[data-inp]');
+  if (!el) return;
+  try { INP[el.dataset.inp](el, e); } catch (err) { toast(friendly(err)); }
+});
+document.addEventListener('submit', async e => {
+  const form = e.target;
+  if (form.id === 'signinForm') { e.preventDefault(); try { await signIn(); } catch (err) { C.signinError = friendly(err); render(); } }
+  if (form.id === 'codeForm') { e.preventDefault(); try { await submitCode(form.dataset.mode); } catch (err) { C.codeError = friendly(err); render(); } }
+});
+boot().catch(err => { C.screen = 'signin'; C.signinError = friendly(err); render(); });
+</script>
+</body>
+</html>

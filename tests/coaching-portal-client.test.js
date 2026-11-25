@@ -214,6 +214,8 @@ function handleRpc(db, name, args) {
     return { status: 200, body: { ok: true, status: 'awaiting_activation' } };
   }
   if (name === 'set_marketing_consent') { db.consent.push(args.p_on); db.marketing = args.p_on; return { status: 200, body: { ok: true, customer_records: 1 } }; }
+  // As the database: the number only for a The Beast client who is active or paused, and only if the coach set one.
+  if (name === 'get_coach_whatsapp') { const c = db.clients[0]; return { status: 200, body: c && c.tier === 'beast' && ['active', 'paused'].includes(c.status) ? (db.coachWa === undefined ? '+61 400 000 999' : db.coachWa) : null }; }
   if (name === 'get_my_marketing_consent') { return { status: 200, body: db.marketing === true } ; }
   if (name === 'delete_my_coaching_data') { db.deleted = true; db.clients.splice(0, db.clients.length); db.meals.length = 0; db.workouts.length = 0; db.steps.length = 0; db.weighIns.length = 0; db.checkins.length = 0; db.plans.length = 0; return { status: 200, body: { deleted: true, client_rows_removed: 1, customer_record_kept: true } }; }
   return { status: 404, body: { code: 'PGRST202', message: 'no function ' + name } };
@@ -324,6 +326,8 @@ test('The Beast: the WhatsApp button is shown', SKIP, async () => {
   const { ctx, page } = await open(backend);
   await waitForApp(page);
   assert.equal(await page.locator('a', { hasText: 'Message Stefan on WhatsApp' }).count(), 1);
+  assert.equal(await page.getAttribute('a:has-text("Message Stefan on WhatsApp")', 'href'), 'https://wa.me/61400000999', 'the number comes from get_coach_whatsapp');
+  assert.ok(backend.rpc.some(r => r.name === 'get_coach_whatsapp'));
   await ctx.close();
 });
 
@@ -779,5 +783,25 @@ test('signed in with no coaching plan: a friendly "No plan found" page, not an e
   await page.waitForSelector('h1');
   assert.match(await txt(page, 'h1'), /No plan found/);
   assert.equal(page.errors.length, 0);
+  await ctx.close();
+});
+
+test('The Beast with no coach number set: no WhatsApp button (never a link to nobody)', SKIP, async () => {
+  const backend = newBackend({ row: { tier: 'beast' }, extra: { coachWa: null } });
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  assert.equal(await page.locator('a', { hasText: 'Message Stefan on WhatsApp' }).count(), 0);
+  await ctx.close();
+});
+
+test('a paused client sees the date paused and "Pause days used N of 14", as in the demo', SKIP, async () => {
+  const pausedAt = new Date(Date.now() - 3 * 86400000).toISOString();
+  const backend = newBackend({ row: { status: 'paused', paused_at: pausedAt, pause_days_used: 5 } });
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  const text = await txt(page, '#app');
+  assert.match(text, /Paused since /);
+  assert.match(text, /Pause days used: 8 of 14\./, 'the 5 used before plus the 3 days of this pause');
+  assert.match(text, /Stefan will resume you when you are ready\./);
   await ctx.close();
 });

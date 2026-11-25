@@ -224,8 +224,74 @@ What the tests cannot prove: the page is tested on a stub of Supabase and of Bea
 
 Agreement pages: reviewed by Stefan's attorney. Australian Consumer Law refund wording and Australian Privacy Principles to be confirmed before launch.
 
-## Open for 4c
+## Step 4c: the coach side (`/coach`)
 
-- **Coach side.** Admin and client list, activation (start date, targets, plan publishing), the plan editor in the JSON shape above, check-in scheduling (with the Essential one-kick-off rule), and two-factor sign-in for the coach.
-- **Activation check for doctor clearance.** The client confirms it in onboarding. The coach checks it before activating.
-- **WhatsApp number** for The Beast's button.
+### What 4c adds
+
+- **`coach.html` at `/coach`.** Not linked from anywhere, `noindex`. Sign in with your email and password, then a code from an authenticator app (Supabase MFA, TOTP). The first time, you set the authenticator up with a QR code or a typed key. Every later sign-in asks for a code, so the session is `aal2`. If your account is not in `coaching_admins`, the page shows only "This page is for the coach only".
+- **No "remember me".** The session is kept in this browser tab only (`sessionStorage`), closing the tab signs you out, and you are signed out after 30 minutes without activity. There is a Sign out button on every screen.
+- **The coach screens from the demo, on real data:** Clients (capacity you can edit, add a client by hand, filters by status and plan, search, badges for awaiting activation and health flags, "needs you"), and each client's Overview, Check-ins, Onboarding, Targets and plan (plan inputs, targets, meal plan with Calculate with Beast AI, training plan, Approve and publish), Logs (from activation, sets and reps, lifts that went up, a baseline group), Progress and Notes. Also Customers (filters, Copy emails, Export CSV) and Settings (your WhatsApp number, your authenticators).
+- **Database rules (`supabase/coaching-portal-4c.sql`).** Each one holds even if someone writes to the table directly:
+  - **Health flag:** any "yes" to the three health questions, or an injury written in onboarding. Activation is refused until "Cleared to start" is ticked. The database records who ticked it and when.
+  - **Activation:** `activated_at` is now, and the end date is the start date plus 12 weeks.
+  - **Pauses:** Core and The Beast only, from active only, 14 pause days per plan at most. The end date moves by the days paused. A pause longer than the days left is counted only up to 14 in total.
+  - **Check-ins:** Basic gets none. Essential gets one kick-off call (a cancelled one does not count, so you can rebook it). Core and The Beast get any number.
+  - **Capacity:** the coach can change `place_limit`. Add client by hand is refused when the plan is full.
+  - **Publishing** makes a new version in `coaching_plans`. Old versions are kept.
+  - **CSV export:** `coach_marketing_export()` returns one row per email (email, name, plan, date of last purchase), only for customers who said yes and have not unsubscribed.
+  - **WhatsApp number:** stored in `coaching_settings` (coach only). `get_coach_whatsapp()` gives it only to a signed-in client on an active or paused The Beast plan. The client's button uses it. It is not in the code.
+  - **Basic privacy:** the coach cannot read a Basic client's meals, workouts, steps or weigh-ins, as the privacy page says.
+- **Beast AI for the coach.** `/api/coach-ai` with `mode: 'day'` is the meal plan builder. It works only for a token whose user is in `coaching_admins` AND that is `aal2`. Coach calls have their own limit of 200 a day (`coach_ai_use_coach`), and never count against any client or the shared client total.
+- **My Coach (client):** the WhatsApp button shows only when the database returns your number. A paused client sees "Paused since ... Pause days used: N of 14".
+
+### Run order (Supabase SQL Editor, in this order)
+
+1. `supabase/coaching.sql`, `supabase/coaching-portal.sql`, `supabase/coaching-portal-4b.sql`, `supabase/coaching-portal-4b2.sql` (all already run on the live project).
+2. `supabase/coaching-portal-4c.sql` (4c). Safe to run twice. **Run it before this branch's pages go live:** My Coach now reads `paused_at` and `pause_days_used`, which 4c adds.
+3. `supabase/coaching-portal-verify.sql`. Every row should say PASS (64 checks). It rolls back, so it leaves nothing behind.
+
+No new environment variables. `/api/coach-ai` uses the same `ANTHROPIC_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` as before.
+
+### Add yourself as the coach, and set up your authenticator
+
+1. Have a normal account on the site: sign up at beastcoach.fit/dashboard with your email, and confirm the email.
+2. In the Supabase dashboard, check MFA is on: Authentication, then Multi-Factor (or Sign In / Providers), and make sure **TOTP (App Authenticator)** is enabled.
+3. In the SQL Editor, run this with your email:
+   ```sql
+   insert into public.coaching_admins (user_id)
+   select id from auth.users where email = 'you@example.com'
+   on conflict do nothing;
+   ```
+   Check it: `select a.user_id, u.email from public.coaching_admins a join auth.users u on u.id = a.user_id;` should show only you.
+4. Open `/coach` and sign in with your email and password.
+5. The page shows a QR code and a key. Scan the code with an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password or Bitwarden), or type the key in. Enter the 6-digit code and press Verify. You are in.
+6. **Straight away, add a backup.** Go to Settings, Add a backup authenticator, and set up a second one: another phone, or a password manager that stores codes. Supabase authenticator codes come with no recovery codes, so a backup is the only way to sign in if your phone is lost.
+7. From then on, every sign-in asks for a code from either authenticator.
+
+**If you are locked out** (no working authenticator): in the Supabase dashboard go to Authentication, Users, open your user, and remove the MFA factor. Then sign in at `/coach` and set up the authenticator again (and a backup).
+
+### Decisions in 4c, and where it differs from the demo
+
+- **Basic clients:** the coach sees plan, status and billing only, as in the demo and the privacy page, and the database now enforces it. 4a had let the coach read Basic logs; 4c closes that.
+- **Waitlist card:** not built. There is no waitlist table yet.
+- **Customers "Data deleted" column:** shown as Status, worked out from the client rows ("No client data" when there are none). The database does not record a deletion date.
+- **Customer CSV:** your columns (email, name, plan, date), not the demo's longer list. The date is the date of their last purchase.
+- **Unsubscribe** on the Customers page has a confirm step, which the demo does not.
+- **Every status change** (activate, pause, resume, finish, cancel, change plan, delete) has a confirm step.
+- **Check-in times** are entered in Melbourne time. The client's own time is shown beside it, as you schedule and in the list.
+- **Plan meals:** the client portal shows "Label: foods", and no longer repeats the foods underneath when they are the same.
+
+### Tests added in 4c
+
+- `tests/coach-portal.test.js` (19 tests): sign-in, wrong password, not-a-coach screen, MFA enrol (QR, key, backup advice) and challenge-then-verify, sign out, the clients list filters and badges, capacity, add client (and full), health flag and activation with confirm, pause and resume with "N of 14", check-ins (Essential limit, Melbourne time with the client's own time beside), the plan editor and publish (plan JSON shape), targets, logs, notes, the Basic view, the CSV, settings and a backup authenticator, and that `/coach` has no secret keys and no links to it.
+- `tests/coach-ai.test.js`: the coach path (aal2 and admin), aal1 refused, not admin refused, the coach limit, and that coach calls touch no client counter.
+- `tests/coaching-portal-rls.test.js`: 4c runs twice cleanly, anon cannot run the new functions, and the verify script passes (also at the fixed 10pm London clock).
+- `supabase/coaching-portal-verify.sql`: now 64 checks.
+
+What the tests cannot prove: Supabase's real MFA (the page is tested against a fake of supabase-js). Before launch, sign in at `/coach` on the preview with your real account and authenticator, add a backup, activate a test client, publish a plan and schedule a check-in.
+
+## Open after 4c
+
+- **Payments into the portal:** Stripe purchases still need to create the client and customer rows automatically (today: Add a client by hand).
+- **Waitlist** table and card.
+- **Renew and drop-to-Basic buttons** for finished clients.

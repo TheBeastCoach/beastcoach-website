@@ -34,6 +34,8 @@ function mockFetch(routes) {
     calls.push({ url: u, body, headers: opts && opts.headers });
     if (u.endsWith('/auth/v1/user')) return routes.user ? routes.user() : jsonResponse(200, { id: 'user-1', email: 'client@example.com' });
     if (u.includes('/rest/v1/coaching_clients')) return routes.plan ? routes.plan() : jsonResponse(200, [{ id: 7 }]);
+    if (u.includes('/rest/v1/coaching_admins')) return routes.admins ? routes.admins() : jsonResponse(200, []);
+    if (u.includes('/rest/v1/rpc/coach_ai_use_coach')) return routes.coachLimit ? routes.coachLimit() : jsonResponse(200, [{ allowed: true, reason: 'ok' }]);
     if (u.includes('/rest/v1/rpc/coach_ai_use')) return routes.limit ? routes.limit() : jsonResponse(200, [{ allowed: true, reason: 'ok' }]);
     if (u.includes('api.anthropic.com')) {
       return routes.ai ? routes.ai(body) : jsonResponse(200, { content: [{ text: JSON.stringify({ name: 'Eggs on toast', calories: 380, protein: 18, carbs: 30, fat: 19, fibre: 4, items: [], note: 'Standard portions.', confidence: 'high' }) }] });
@@ -142,13 +144,14 @@ test('a valid Describe it request returns the estimate', async () => {
   assert.equal(res.body.calories, 380);
 });
 
-test('the day mode is coach-only: a client gets 400 bad_mode', async () => {
+test('the day mode is coach-only: a client gets 403 coach_only, and no AI call or counter', async () => {
   const calls = mockFetch({});
   const res = makeRes();
-  await handler(req({ body: { mode: 'day', text: 'Breakfast: eggs' } }), res);
-  assert.equal(res.statusCode, 400);
-  assert.equal(res.body.error, 'bad_mode');
-  assert.equal(called(calls, 'rpc/coach_ai_use'), 0);
+  await handler(req({ body: { mode: 'day', text: 'Breakfast: oats' } }), res);
+  assert.equal(res.statusCode, 403);
+  assert.equal(res.body.error, 'coach_only');
+  assert.equal(called(calls, 'api.anthropic.com'), 0);
+  assert.equal(called(calls, '/rpc/coach_ai_use'), 0, 'no counter is touched');
 });
 
 test('an unreachable usage counter: 503 busy, and no Anthropic call (the limit must hold)', async () => {
@@ -185,4 +188,71 @@ test('GET is refused', async () => {
 test('the friendly limit messages are plain English', () => {
   assert.doesNotMatch(limitMessage('client').message, /—|–/);
   assert.doesNotMatch(limitMessage('shared').message, /—|–/);
+});
+
+// The coach: a token whose payload says aal2 (signed in with an authenticator code).
+const b64url = o => Buffer.from(JSON.stringify(o)).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const COACH_TOKEN = b64url({ alg: 'HS256' }) + '.' + b64url({ sub: 'coach-1', aal: 'aal2' }) + '.sig';
+const AAL1_TOKEN = b64url({ alg: 'HS256' }) + '.' + b64url({ sub: 'coach-1', aal: 'aal1' }) + '.sig';
+const DAY_AI = () => jsonResponse(200, { content: [{ text: JSON.stringify({ meals: [
+  { calories: 420, protein: 25, carbs: 55, fat: 10, fibre: 8 }, { calories: 610, protein: 45, carbs: 60, fat: 18, fibre: 6 }] }) }] });
+const coachReq = (token, body) => req({ headers: { authorization: 'Bearer ' + token }, body: body || { mode: 'day', text: 'Breakfast: 60g oats, 1 banana\nLunch: 150g chicken, 150g rice' } });
+
+test('coach (in coaching_admins, aal2): the meal plan builder returns numbers per line, counted on the coach\'s own limit of 200', async () => {
+  const calls = mockFetch({ admins: () => jsonResponse(200, [{ user_id: 'user-1' }]), ai: DAY_AI });
+  const res = makeRes();
+  await handler(coachReq(COACH_TOKEN), res);
+  assert.equal(res.statusCode, 200, JSON.stringify(res.body));
+  assert.equal(res.body.meals.length, 2);
+  assert.equal(res.body.meals[0].label, 'Breakfast');
+  const counter = calls.find(c => c.url.includes('/rpc/coach_ai_use_coach'));
+  assert.deepEqual(counter.body, { p_limit: 200 });
+  assert.equal(calls.filter(c => /\/rpc\/coach_ai_use$/.test(c.url)).length, 0, 'the client and shared counters are not touched');
+  assert.equal(called(calls, '/rest/v1/coaching_clients'), 0, 'no client plan lookup');
+  const adminCall = calls.find(c => c.url.includes('/rest/v1/coaching_admins'));
+  assert.equal(adminCall.headers.Authorization, 'Bearer ' + COACH_TOKEN, 'the admin list is read with the coach\'s own token');
+});
+
+test('coach signed in without an authenticator code (aal1): 403 coach_only, no AI call', async () => {
+  const calls = mockFetch({ admins: () => jsonResponse(200, [{ user_id: 'user-1' }]), ai: DAY_AI });
+  const res = makeRes();
+  await handler(coachReq(AAL1_TOKEN), res);
+  assert.equal(res.statusCode, 403);
+  assert.equal(res.body.error, 'coach_only');
+  assert.equal(called(calls, 'api.anthropic.com'), 0);
+  assert.equal(called(calls, '/rpc/coach_ai_use_coach'), 0);
+});
+
+test('an aal2 user who is not in coaching_admins: 403 coach_only, no AI call', async () => {
+  const calls = mockFetch({ admins: () => jsonResponse(200, []), ai: DAY_AI });
+  const res = makeRes();
+  await handler(coachReq(COACH_TOKEN), res);
+  assert.equal(res.statusCode, 403);
+  assert.equal(called(calls, 'api.anthropic.com'), 0);
+});
+
+test('coach over the daily limit: 429 coach_limit, no AI call', async () => {
+  const calls = mockFetch({ admins: () => jsonResponse(200, [{ user_id: 'user-1' }]), coachLimit: () => jsonResponse(200, [{ allowed: false, reason: 'coach' }]) });
+  const res = makeRes();
+  await handler(coachReq(COACH_TOKEN), res);
+  assert.equal(res.statusCode, 429);
+  assert.equal(res.body.error, 'coach_limit');
+  assert.match(res.body.message, /200/);
+  assert.equal(called(calls, 'api.anthropic.com'), 0);
+});
+
+test('the coach cannot use the client modes through the coach path (only day is coach-only; log still needs a client plan)', async () => {
+  const calls = mockFetch({ admins: () => jsonResponse(200, [{ user_id: 'user-1' }]), plan: () => jsonResponse(200, []) });
+  const res = makeRes();
+  await handler(coachReq(COACH_TOKEN, { mode: 'log', text: 'two eggs' }), res);
+  assert.equal(res.statusCode, 403);
+  assert.equal(res.body.error, 'no_active_plan');
+  assert.equal(called(calls, 'api.anthropic.com'), 0);
+});
+
+test('tokenAal reads the assurance level, and a broken token gives null', () => {
+  const { tokenAal } = handler._test;
+  assert.equal(tokenAal(COACH_TOKEN), 'aal2');
+  assert.equal(tokenAal(AAL1_TOKEN), 'aal1');
+  assert.equal(tokenAal('not-a-jwt'), null);
 });

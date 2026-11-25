@@ -1,4 +1,4 @@
--- Coaching portal: verification (run AFTER supabase/coaching-portal.sql).
+-- Coaching portal: verification (run AFTER every coaching-portal SQL file, up to and including coaching-portal-4c.sql).
 -- Run in Supabase: Dashboard -> SQL Editor -> New query -> paste this whole file -> Run.
 --
 -- What it does:
@@ -75,7 +75,10 @@ insert into verify_ids (name, id, email) values
   ('U', gen_random_uuid(), 'verify-unconfirmed@verify.invalid'),
   ('N', gen_random_uuid(), 'VERIFY-New.Client@Verify.invalid'),
   ('X', gen_random_uuid(), 'verify-stranger@verify.invalid'),
-  ('L', gen_random_uuid(), 'verify-london@verify.invalid');   -- a confirmed client in London (time zone checks)
+  ('L', gen_random_uuid(), 'verify-london@verify.invalid'),   -- a confirmed client in London (time zone checks)
+  ('H', gen_random_uuid(), 'verify-health@verify.invalid'),   -- 4c: a Core client with a health flag, awaiting activation
+  ('W', gen_random_uuid(), 'verify-beast@verify.invalid'),    -- 4c: an active The Beast client
+  ('P', gen_random_uuid(), 'verify-basic@verify.invalid');    -- 4c: an active Basic client
 
 do $$
 declare
@@ -366,18 +369,19 @@ declare seen int; total int; seen_c int; total_c int; seen_m int; total_m int;
 begin
   select count(*) into total from public.coaching_clients;
   select count(*) into total_c from public.coaching_customers;
-  select count(*) into total_m from public.coaching_meal_logs;
+  -- Basic clients log privately (4c), so the coach sees the meals of coached plans only.
+  select count(*) into total_m from public.coaching_meal_logs m join public.coaching_clients c on c.id = m.client_id where c.tier <> 'basic';
   perform pg_temp.verify_as('authenticated', 'C', 'aal2');
   select count(*) into seen from public.coaching_clients;
   select count(*) into seen_c from public.coaching_customers;
   select count(*) into seen_m from public.coaching_meal_logs;
   perform pg_temp.verify_reset();
-  perform pg_temp.verify_record('coach with MFA (aal2) sees every client, customer and log',
+  perform pg_temp.verify_record('coach with MFA (aal2) sees every client, customer and coached-plan log',
     seen = total and seen_c = total_c and seen_m = total_m and total >= 2,
     'clients ' || seen || '/' || total || ', customers ' || seen_c || '/' || total_c || ', meals ' || seen_m || '/' || total_m);
 exception when others then
   perform pg_temp.verify_reset();
-  perform pg_temp.verify_record('coach with MFA (aal2) sees every client, customer and log', false, 'error: ' || sqlerrm);
+  perform pg_temp.verify_record('coach with MFA (aal2) sees every client, customer and coached-plan log', false, 'error: ' || sqlerrm);
 end $$;
 
 -- 6. Claiming a plan -----------------------------------------------------------------
@@ -624,6 +628,326 @@ begin
 exception when others then
   perform pg_temp.verify_reset();
   perform pg_temp.verify_record('marketing: consent checks', false, 'error: ' || sqlerrm);
+end $$;
+
+-- 9. The coach side (4c) ----------------------------------------------------------------------------
+-- The open row for an email (client A also has an older, finished plan with the same email).
+create function pg_temp.verify_open_id(p_email text)
+returns bigint language sql as $$
+  select c.id from public.coaching_clients c where lower(c.email) = lower(p_email)
+   order by (c.status in ('finished', 'cancelled')), c.created_at desc limit 1;
+$$;
+
+-- Stub rows for 4c, written as the database owner: a health-flagged Core client (H), an active The Beast
+-- client (W), an active Basic client with a meal (P), a note on A, the coach's WhatsApp number, and an
+-- unsubscribed customer.
+do $$
+declare v_p bigint;
+begin
+  insert into public.coaching_clients (user_id, email, name, tier, status, start_date, onboarding)
+  select i.id, i.email, 'Verify Health', 'core', 'awaiting_activation', public.melbourne_today(),
+         '{"health": {"heart": "yes", "chest": "no", "other": "no"}, "healthClearance": true}'::jsonb
+    from verify_ids i where i.name = 'H';
+  insert into public.coaching_clients (user_id, email, name, tier, status, activated_at, start_date, end_date, onboarding)
+  select i.id, i.email, 'Verify Beast', 'beast', 'active', now() - interval '3 days', public.melbourne_today() - 3,
+         public.melbourne_today() + 81, '{}'::jsonb
+    from verify_ids i where i.name = 'W';
+  insert into public.coaching_clients (user_id, email, name, tier, status, activated_at, start_date, end_date, onboarding)
+  select i.id, i.email, 'Verify Basic', 'basic', 'active', now() - interval '3 days', public.melbourne_today() - 3,
+         public.melbourne_today() + 81, '{}'::jsonb
+    from verify_ids i where i.name = 'P';
+  select id into v_p from public.coaching_clients where email = 'verify-basic@verify.invalid';
+  insert into public.coaching_meal_logs (client_id, log_date, name, calories, source) values (v_p, public.melbourne_today(), 'Verify private toast', 300, 'typed');
+  insert into public.coaching_notes (client_id, body)
+  select id, 'Verify coach-only note' from public.coaching_clients where id = pg_temp.verify_open_id('verify-a@verify.invalid')
+  on conflict (client_id) do update set body = excluded.body;
+  insert into public.coaching_settings (id, coach_whatsapp) values (true, '+61 400 000 999')
+  on conflict (id) do update set coach_whatsapp = excluded.coach_whatsapp;
+  insert into public.coaching_customers (email, name, tier, amount_cents, marketing_consent, unsubscribed_at) values
+    ('verify-unsub@verify.invalid', 'Verify Unsubscribed', 'core', 29900, true, now());
+exception when others then
+  perform pg_temp.verify_record('4c setup: stub data', false, sqlerrm);
+end $$;
+
+-- A client cannot schedule a check-in, read notes, change their status, activate themselves or publish a plan.
+do $$
+declare sched_refused boolean := false; notes_seen int; upd int; publish_refused boolean := false;
+begin
+  perform pg_temp.verify_as('authenticated', 'A');
+  begin
+    insert into public.coaching_checkins (client_id, type, scheduled_at)
+      values (pg_temp.verify_open_id('verify-a@verify.invalid'), 'Check-in', now() + interval '1 day');
+  exception when others then sched_refused := true; end;
+  select count(*) into notes_seen from public.coaching_notes;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('client: cannot schedule a check-in', sched_refused, '');
+  perform pg_temp.verify_record('client: cannot read coach notes', notes_seen = 0, 'notes visible: ' || notes_seen);
+
+  perform pg_temp.verify_as('authenticated', 'H');
+  update public.coaching_clients set status = 'active' where email = 'verify-health@verify.invalid';
+  get diagnostics upd = row_count;
+  begin
+    perform public.coach_publish_plan(pg_temp.verify_open_id('verify-health@verify.invalid'), '{"meals": {}}'::jsonb);
+  exception when others then publish_refused := true; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('client: cannot change their status or activate themselves',
+    upd = 0 and (select status from public.coaching_clients where email = 'verify-health@verify.invalid') = 'awaiting_activation', 'rows changed: ' || upd);
+  perform pg_temp.verify_record('client: cannot publish a plan', publish_refused, '');
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('client: coach-only actions are refused', false, 'error: ' || sqlerrm);
+end $$;
+
+-- A coach signed in without MFA (aal1) can do nothing.
+do $$
+declare cap_upd int; st_upd int; sched_refused boolean := false; add_refused boolean := false;
+  publish_refused boolean := false; settings_seen int; export_rows int; notes_seen int;
+begin
+  perform pg_temp.verify_as('authenticated', 'C', 'aal1');
+  update public.coaching_capacity set place_limit = place_limit + 1 where tier = 'core';
+  get diagnostics cap_upd = row_count;
+  update public.coaching_clients set status = 'active' where email = 'verify-health@verify.invalid';
+  get diagnostics st_upd = row_count;
+  begin
+    insert into public.coaching_checkins (client_id, type, scheduled_at)
+      values ((select 1::bigint), 'Check-in', now() + interval '1 day');
+  exception when others then sched_refused := true; end;
+  begin
+    perform public.coach_add_client('verify-aal1@verify.invalid', 'Verify aal1', 'core', 100, current_date);
+  exception when others then add_refused := true; end;
+  begin
+    perform public.coach_publish_plan(1, '{"meals": {}}'::jsonb);
+  exception when others then publish_refused := true; end;
+  select count(*) into settings_seen from public.coaching_settings;
+  select count(*) into export_rows from public.coach_marketing_export();
+  select count(*) into notes_seen from public.coaching_notes;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('coach without MFA (aal1): can change, schedule, add, publish and read nothing',
+    cap_upd = 0 and st_upd = 0 and sched_refused and add_refused and publish_refused and settings_seen = 0 and export_rows = 0 and notes_seen = 0
+      and not exists (select 1 from public.coaching_clients where email = 'verify-aal1@verify.invalid'),
+    'capacity ' || cap_upd || ', status ' || st_upd || ', schedule refused ' || sched_refused || ', add refused ' || add_refused
+      || ', publish refused ' || publish_refused || ', settings ' || settings_seen || ', export ' || export_rows || ', notes ' || notes_seen);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('coach without MFA (aal1): can change, schedule, add, publish and read nothing', false, 'error: ' || sqlerrm);
+end $$;
+
+-- Activation is refused while a health flag is not cleared; after "Cleared to start" it works,
+-- and the database records who cleared it, activated_at and the 12-week end date.
+do $$
+declare refused boolean := false; r public.coaching_clients%rowtype; coach_id uuid;
+begin
+  select id into coach_id from verify_ids where name = 'C';
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  begin
+    update public.coaching_clients set status = 'active' where email = 'verify-health@verify.invalid';
+  exception when others then refused := true; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('health flag: activation is refused until "Cleared to start" is ticked',
+    refused and (select status from public.coaching_clients where email = 'verify-health@verify.invalid') = 'awaiting_activation', '');
+
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  update public.coaching_clients set health_cleared_at = now() where email = 'verify-health@verify.invalid';
+  update public.coaching_clients set status = 'active' where email = 'verify-health@verify.invalid';
+  perform pg_temp.verify_reset();
+  select * into r from public.coaching_clients where email = 'verify-health@verify.invalid';
+  perform pg_temp.verify_record('health flag: once cleared, activation works, with who cleared it and the 12-week end date',
+    r.status = 'active' and r.health_flag and r.health_cleared_by = coach_id and r.health_cleared_at is not null
+      and r.activated_at is not null and r.end_date = r.start_date + 84,
+    'status ' || r.status || ', cleared by coach ' || (r.health_cleared_by = coach_id) || ', end ' || coalesce(r.end_date::text, 'none'));
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('health flag: activation rules', false, 'error: ' || sqlerrm);
+end $$;
+
+-- Check-ins: Essential gets one kick-off call only; Basic gets none; Core gets any number.
+do $$
+declare first_ok boolean := false; second_refused boolean := false; type_refused boolean := false;
+  basic_refused boolean := false; core_ok boolean := false;
+begin
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  begin
+    insert into public.coaching_checkins (client_id, type, scheduled_at)
+      values (pg_temp.verify_open_id('verify-b@verify.invalid'), 'Kick-off call', now() + interval '1 day');
+    first_ok := true;
+  exception when others then first_ok := false; end;
+  begin
+    insert into public.coaching_checkins (client_id, type, scheduled_at)
+      values (pg_temp.verify_open_id('verify-b@verify.invalid'), 'Kick-off call', now() + interval '2 days');
+  exception when others then second_refused := true; end;
+  begin
+    insert into public.coaching_checkins (client_id, type, scheduled_at)
+      values (pg_temp.verify_open_id('verify-b@verify.invalid'), 'Check-in', now() + interval '3 days');
+  exception when others then type_refused := true; end;
+  begin
+    insert into public.coaching_checkins (client_id, type, scheduled_at)
+      values (pg_temp.verify_open_id('verify-basic@verify.invalid'), 'Check-in', now() + interval '1 day');
+  exception when others then basic_refused := true; end;
+  begin
+    insert into public.coaching_checkins (client_id, type, scheduled_at)
+      values (pg_temp.verify_open_id('verify-a@verify.invalid'), 'Check-in', now() + interval '3 days'),
+             (pg_temp.verify_open_id('verify-a@verify.invalid'), 'Video call', now() + interval '4 days');
+    core_ok := true;
+  exception when others then core_ok := false; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('check-ins: Essential gets one kick-off call, and a second one is refused', first_ok and second_refused and type_refused,
+    'first ' || first_ok || ', second refused ' || second_refused || ', other type refused ' || type_refused);
+  perform pg_temp.verify_record('check-ins: Basic cannot get any', basic_refused, '');
+  perform pg_temp.verify_record('check-ins: Core can get more than one', core_ok, '');
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('check-ins: plan rules', false, 'error: ' || sqlerrm);
+end $$;
+
+-- Pauses: Essential cannot pause; pause days can never go over 14; a long pause is counted only up to 14,
+-- and the end date moves by the days counted.
+do $$
+declare ess_refused boolean := false; over_refused boolean := false; again_refused boolean := false;
+  end_before date; r public.coaching_clients%rowtype;
+begin
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  begin
+    update public.coaching_clients set status = 'paused' where email = 'verify-b@verify.invalid';
+  exception when others then ess_refused := true; end;
+  begin
+    update public.coaching_clients set pause_days_used = 15 where id = pg_temp.verify_open_id('verify-a@verify.invalid');
+  exception when others then over_refused := true; end;
+  update public.coaching_clients set end_date = start_date + 84, pause_days_used = 10 where id = pg_temp.verify_open_id('verify-a@verify.invalid');
+  select end_date into end_before from public.coaching_clients where id = pg_temp.verify_open_id('verify-a@verify.invalid');
+  update public.coaching_clients set status = 'paused' where id = pg_temp.verify_open_id('verify-a@verify.invalid');
+  update public.coaching_clients set paused_at = now() - interval '20 days' where id = pg_temp.verify_open_id('verify-a@verify.invalid');
+  update public.coaching_clients set status = 'active' where id = pg_temp.verify_open_id('verify-a@verify.invalid');
+  begin
+    update public.coaching_clients set status = 'paused' where id = pg_temp.verify_open_id('verify-a@verify.invalid');
+  exception when others then again_refused := true; end;
+  perform pg_temp.verify_reset();
+  select * into r from public.coaching_clients where id = pg_temp.verify_open_id('verify-a@verify.invalid');
+  perform pg_temp.verify_record('pauses: Essential cannot be paused', ess_refused, '');
+  perform pg_temp.verify_record('pauses: pause days cannot be set over 14', over_refused, '');
+  perform pg_temp.verify_record('pauses: a 20-day pause with 10 used counts only to 14, and moves the end date by 4',
+    r.pause_days_used = 14 and r.end_date = end_before + 4 and r.status = 'active' and r.paused_at is null,
+    'used ' || r.pause_days_used || ', end moved by ' || (r.end_date - end_before));
+  perform pg_temp.verify_record('pauses: no new pause once all 14 days are used', again_refused, '');
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('pauses: rules', false, 'error: ' || sqlerrm);
+end $$;
+
+-- The coach's WhatsApp number: only an active or paused The Beast client gets it.
+do $$
+declare w_active text; w_paused text; a_val text; b_val text; anon_blocked boolean := false;
+begin
+  perform pg_temp.verify_as('authenticated', 'W');
+  w_active := public.get_coach_whatsapp();
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_as('authenticated', 'A');
+  a_val := public.get_coach_whatsapp();
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_as('authenticated', 'B');
+  b_val := public.get_coach_whatsapp();
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_as('anon', 'anon');
+  begin
+    perform public.get_coach_whatsapp();
+  exception when others then anon_blocked := true; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  update public.coaching_clients set status = 'paused' where email = 'verify-beast@verify.invalid';
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_as('authenticated', 'W');
+  w_paused := public.get_coach_whatsapp();
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('WhatsApp: an active and a paused The Beast client get the number',
+    w_active = '+61 400 000 999' and w_paused = '+61 400 000 999', 'active: ' || coalesce(w_active, 'nothing') || ', paused: ' || coalesce(w_paused, 'nothing'));
+  perform pg_temp.verify_record('WhatsApp: Core and Essential clients get nothing, and anon cannot call it',
+    a_val is null and b_val is null and anon_blocked, 'Core: ' || coalesce(a_val, 'nothing') || ', Essential: ' || coalesce(b_val, 'nothing') || ', anon blocked ' || anon_blocked);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('WhatsApp: who can read the number', false, 'error: ' || sqlerrm);
+end $$;
+
+-- Add a client by hand: refused when the plan is full; otherwise both rows are made (consent off).
+do $$
+declare r_full jsonb; r_ok jsonb; taken int; full_rows int; new_status text; cust_consent boolean;
+begin
+  select count(*) into taken from public.coaching_clients
+   where tier = 'beast' and status in ('awaiting_onboarding', 'awaiting_activation', 'active', 'paused');
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  update public.coaching_capacity set place_limit = taken where tier = 'beast';
+  r_full := public.coach_add_client('verify-full@verify.invalid', 'Verify Full', 'beast', 69900, public.melbourne_today());
+  update public.coaching_capacity set place_limit = place_limit + 5 where tier = 'core';
+  r_ok := public.coach_add_client('verify-added@verify.invalid', 'Verify Added', 'core', 29900, public.melbourne_today());
+  perform pg_temp.verify_reset();
+  select count(*) into full_rows from public.coaching_clients where email = 'verify-full@verify.invalid';
+  select status into new_status from public.coaching_clients where email = 'verify-added@verify.invalid';
+  select marketing_consent into cust_consent from public.coaching_customers where email = 'verify-added@verify.invalid';
+  perform pg_temp.verify_record('add client by hand: refused when the plan is full',
+    (r_full ->> 'ok') = 'false' and full_rows = 0, coalesce(r_full ->> 'error', ''));
+  perform pg_temp.verify_record('add client by hand: makes the client (awaiting onboarding) and the customer (consent off)',
+    (r_ok ->> 'ok') = 'true' and new_status = 'awaiting_onboarding' and cust_consent = false,
+    'status ' || coalesce(new_status, 'none') || ', consent ' || coalesce(cust_consent::text, 'none'));
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('add client by hand', false, 'error: ' || sqlerrm);
+end $$;
+
+-- The CSV export returns only customers who said yes and have not unsubscribed. A client gets nothing.
+do $$
+declare has_a boolean; has_b boolean; has_unsub boolean; bad int; client_rows int;
+begin
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  create temp table verify_export on commit drop as select * from public.coach_marketing_export();
+  perform pg_temp.verify_reset();
+  select exists (select 1 from verify_export where lower(email) = 'verify-a@verify.invalid') into has_a;
+  select exists (select 1 from verify_export where lower(email) = 'verify-b@verify.invalid') into has_b;
+  select exists (select 1 from verify_export where lower(email) = 'verify-unsub@verify.invalid') into has_unsub;
+  -- Every exported email has a yes and no unsubscribe in the customer records.
+  select count(*) into bad from verify_export e
+   where not exists (select 1 from public.coaching_customers cu where lower(cu.email) = lower(e.email) and cu.marketing_consent)
+      or exists (select 1 from public.coaching_customers cu where lower(cu.email) = lower(e.email) and cu.unsubscribed_at is not null);
+  perform pg_temp.verify_as('authenticated', 'A');
+  select count(*) into client_rows from public.coach_marketing_export();
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('CSV export: only customers who said yes and have not unsubscribed',
+    has_a and not has_b and not has_unsub and bad = 0,
+    'yes-customer in ' || has_a || ', no-customer in ' || has_b || ', unsubscribed in ' || has_unsub || ', wrong rows ' || bad);
+  perform pg_temp.verify_record('CSV export: a client gets nothing', client_rows = 0, 'rows: ' || client_rows);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('CSV export', false, 'error: ' || sqlerrm);
+end $$;
+
+-- Basic logs are private: the coach sees a coached client's meals, but not a Basic client's.
+do $$
+declare basic_seen int; coached_seen int;
+begin
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  select count(*) into basic_seen from public.coaching_meal_logs
+   where client_id = pg_temp.verify_open_id('verify-basic@verify.invalid');
+  select count(*) into coached_seen from public.coaching_meal_logs
+   where client_id = pg_temp.verify_open_id('verify-a@verify.invalid');
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('Basic privacy: the coach cannot read a Basic client''s meals', basic_seen = 0 and coached_seen >= 1,
+    'Basic meals seen ' || basic_seen || ', coached meals seen ' || coached_seen);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('Basic privacy', false, 'error: ' || sqlerrm);
+end $$;
+
+-- Publishing makes a new current version and keeps the old one.
+do $$
+declare r jsonb; versions int; currents int; a_id bigint;
+begin
+  a_id := pg_temp.verify_open_id('verify-a@verify.invalid');
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  r := public.coach_publish_plan(a_id, '{"meals": {"1": []}, "training": "Mon: Full body A"}'::jsonb);
+  perform pg_temp.verify_reset();
+  select count(*), count(*) filter (where is_current) into versions, currents from public.coaching_plans where client_id = a_id;
+  perform pg_temp.verify_record('publish plan: a new current version, older versions kept',
+    (r ->> 'ok') = 'true' and versions >= 2 and currents = 1, 'versions ' || versions || ', current ' || currents);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('publish plan', false, 'error: ' || sqlerrm);
 end $$;
 
 -- 8. Delete: B removes their own data; B's customer row stays; A's data is untouched. Runs last. ---
