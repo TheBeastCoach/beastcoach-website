@@ -318,7 +318,7 @@ What the tests cannot prove: Supabase's real MFA (the page is tested against a f
 
 1. `supabase/coaching.sql`, `supabase/coaching-portal.sql`, `supabase/coaching-portal-4b.sql`, `supabase/coaching-portal-4b2.sql`, `supabase/coaching-portal-4c.sql`, `supabase/coaching-portal-4c2.sql` (all already run on the live project).
 2. `supabase/coaching-portal-4d.sql` (4d). Safe to run twice. **Run it before the coaching-portal preview takes payments.**
-3. `supabase/coaching-portal-verify.sql`. Every row should say PASS (74 checks). It rolls back, so it leaves nothing behind.
+3. `supabase/coaching-portal-verify.sql`. Every row should say PASS (76 checks). It rolls back, so it leaves nothing behind.
 
 ### Environment variables
 
@@ -355,6 +355,20 @@ For the test setup and the test cards, see docs/STRIPE-TEST-SETUP.md. For Resend
 - `tests/coaching-day-card.test.js`: the lift badges (Up, Same, Down).
 - `tests/coach-portal.test.js`: the lift badge on the coach's Logs.
 - `supabase/coaching-portal-verify.sql`: 74 checks, including the 6 payment checks (clients cannot read processed events, rate limits, settings or Stripe ids; anon cannot create a client; a full plan at payment time is refused; a repeated session makes one client; a repeated event is handled once; the rate limit holds; a refund cancels and notes).
+
+## Step 4d2: duplicate plans, Basic refunds, and owner alerts
+
+- **Run `supabase/coaching-portal-4d2.sql`** after 4d. Safe to run twice. It makes the duplicate-plan check name the plan the email already has, and lets a refund match a Basic subscription.
+- **A second purchase while a plan is open** is still refunded automatically. The client gets an email with a sign-in link, and a reply-to if they meant to change plans. Stefan gets an alert with both plans and the refunded amount.
+- **A full refund of a Basic payment** cancels the Stripe subscription first (so the client is never charged again), then finishes the plan. A partial refund only notes it, and emails Stefan.
+- **Owner alerts** go only to stefan@stefanbotha.com, and only from fixed templates: each purchase (new, renewal, Drop to Basic, with the marketing choice and a link to /coach), each refund, a failed Basic payment, a cancelled Basic plan, a duplicate payment, and each Discipline Path purchase.
+- **Discipline Path alert**: after the existing webhook records a purchase, it emails Stefan the buyer, amount, date and the Stripe reference. The purchase is recorded exactly as before. If the email fails, it is logged and the purchase still succeeds.
+
+### Run order (Supabase SQL Editor, in this order)
+
+1. The earlier files, through `supabase/coaching-portal-4d.sql` (already run on the live project once 4d is done).
+2. `supabase/coaching-portal-4d2.sql` (4d2). Safe to run twice.
+3. `supabase/coaching-portal-verify.sql`. Every row should say PASS (76 checks).
 
 ## Open after 4c
 

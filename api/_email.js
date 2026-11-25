@@ -5,7 +5,12 @@ const { money, siteUrl, PLANS } = require('./_coaching.js');
 
 const FROM = 'Stefan at Beast Coach <stefan@beastcoach.fit>';
 const REPLY_TO = 'stefan@stefanbotha.com';
-const KINDS = ['welcome', 'receipt', 'spot_filled', 'basic_renewed', 'basic_failed', 'basic_cancelled'];
+const OWNER = 'stefan@stefanbotha.com';
+// Messages to clients.
+const CLIENT_KINDS = ['welcome', 'receipt', 'spot_filled', 'basic_renewed', 'basic_failed', 'basic_cancelled', 'already_open'];
+// Alerts to the owner (Stefan). Always sent to OWNER, whatever address the caller passes.
+const OWNER_KINDS = ['owner_purchase', 'owner_duplicate', 'owner_refund', 'owner_basic_failed', 'owner_basic_cancelled', 'owner_discipline'];
+const KINDS = CLIENT_KINDS.concat(OWNER_KINDS);
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const planName = key => (PLANS[key] && PLANS[key].name) || 'Coaching';
@@ -158,11 +163,81 @@ Stefan`;
   return { subject: 'Your Basic plan is cancelled', html, text };
 }
 
-const BUILDERS = { welcome, receipt, spot_filled: spotFilled, basic_renewed: basicRenewed, basic_failed: basicFailed, basic_cancelled: basicCancelled };
+// The client's duplicate payment: refunded, and how to sign in.
+function alreadyOpen({ name, plan, existingPlan, amountCents }) {
+  const site = siteUrl();
+  const text = `Hi ${name || 'there'},
+
+We have refunded your payment of ${money(amountCents)} for ${planName(plan)}. Your email already has an active ${planName(existingPlan)} plan with Beast Coach, so we did not open a second one. The refund goes back to your card and can take a few days to show.
+
+If you are signed in already, you can see your plan at beastcoach.fit/dashboard. If you meant to change plans, reply to this email and tell us which plan you want. We will sort it out with you.
+
+Stefan`;
+  const html = layout('Your payment has been refunded', `
+<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:30px;margin:0 0 12px;">Your payment has been refunded</h1>
+<p style="margin:0 0 12px;">Hi ${esc(name || 'there')}, we have refunded your payment of <b>${esc(money(amountCents))}</b> for <b>${esc(planName(plan))}</b>. Your email already has an active <b>${esc(planName(existingPlan))}</b> plan with Beast Coach, so we did not open a second one.</p>
+<p style="margin:0 0 12px;">The refund goes back to your card and can take a few days to show.</p>
+<p style="margin:0 0 12px;">Sign in at beastcoach.fit/dashboard with this email to see your plan. If you meant to change plans, reply to this email and tell us which plan you want.</p>
+${button(site + '/dashboard', 'Sign in to Beast Coach')}
+<p style="margin:12px 0 0;">Stefan</p>`);
+  return { subject: 'Your payment has been refunded: you already have a plan', html, text };
+}
+
+// ---------- owner alerts: plain and short, for Stefan only
+function ownerBox(title, rows, extra) {
+  const trs = rows.map(([k, v]) => `<tr><td style="padding:6px 10px 6px 0;color:#4c6354;vertical-align:top;">${esc(k)}</td><td style="padding:6px 0;"><b>${esc(v)}</b></td></tr>`).join('');
+  return `<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:28px;margin:0 0 10px;">${esc(title)}</h1>
+<table role="presentation" style="border-collapse:collapse;font-size:15px;">${trs}</table>${extra || ''}`;
+}
+function ownerText(title, rows, tail) {
+  return title + '\n\n' + rows.map(([k, v]) => k + ': ' + v).join('\n') + (tail ? '\n\n' + tail : '');
+}
+function ownerPurchase({ name, email, plan, amountCents, marketing, kind }) {
+  const what = kind === 'renewal' ? 'Renewal (20% off)' : kind === 'drop_to_basic' ? 'Drop to Basic' : 'New purchase';
+  const rows = [['Type', what], ['Name', name || '-'], ['Email', email], ['Plan', planName(plan)], ['Amount', money(amountCents)],
+    ['Marketing emails ticked', marketing ? 'Yes' : 'No']];
+  const link = siteUrl() + '/coach';
+  return { subject: 'New coaching purchase: ' + planName(plan) + ', ' + (name || email),
+    html: layout('New coaching purchase', ownerBox('New coaching purchase', rows, `<p style="margin:14px 0 0;"><a href="${esc(link)}" style="color:#2D6A4F;">Open the coach page</a></p>`)),
+    text: ownerText('New coaching purchase', rows, 'Open the coach page: ' + link) };
+}
+function ownerDuplicate({ name, email, plan, existingPlan, amountCents }) {
+  const rows = [['Email', email], ['Name', name || '-'], ['Paid for', planName(plan)], ['Already has an open plan', planName(existingPlan)],
+    ['Refunded', money(amountCents) + ' (refunded automatically)']];
+  return { subject: 'Duplicate payment refunded: ' + email,
+    html: layout('Duplicate payment refunded', ownerBox('Duplicate payment refunded', rows)),
+    text: ownerText('Duplicate payment refunded', rows, 'The client has been emailed. If they meant to change plans, reply to them.') };
+}
+function ownerRefund({ name, email, plan, amountCents, full, outcome }) {
+  const rows = [['Email', email], ['Name', name || '-'], ['Plan', planName(plan)], ['Refunded', money(amountCents) + (full ? ' (in full)' : ' (part)')], ['What happened', outcome]];
+  return { subject: (full ? 'Refund done: ' : 'Partial refund: ') + email,
+    html: layout('Refund', ownerBox(full ? 'Refund done' : 'Partial refund', rows)),
+    text: ownerText(full ? 'Refund done' : 'Partial refund', rows) };
+}
+function ownerBasicFailed({ name, email }) {
+  const rows = [['Email', email], ['Name', name || '-'], ['Plan', 'Basic'], ['What happened', 'The payment failed. The client has been emailed to update their card.']];
+  return { subject: 'Basic payment failed: ' + email, html: layout('Basic payment failed', ownerBox('Basic payment failed', rows)),
+    text: ownerText('Basic payment failed', rows) };
+}
+function ownerBasicCancelled({ name, email }) {
+  const rows = [['Email', email], ['Name', name || '-'], ['Plan', 'Basic'], ['What happened', 'Cancelled. The plan is finished.']];
+  return { subject: 'Basic cancelled: ' + email, html: layout('Basic cancelled', ownerBox('Basic cancelled', rows)),
+    text: ownerText('Basic cancelled', rows) };
+}
+function ownerDiscipline({ email, amountCents, date, reference }) {
+  const rows = [['Buyer', email], ['Amount', money(amountCents)], ['Date', date], ['Stripe reference', reference]];
+  return { subject: 'Discipline Path purchase: ' + email, html: layout('Discipline Path purchase', ownerBox('Discipline Path purchase', rows)),
+    text: ownerText('Discipline Path purchase', rows) };
+}
+
+const BUILDERS = { welcome, receipt, spot_filled: spotFilled, basic_renewed: basicRenewed, basic_failed: basicFailed, basic_cancelled: basicCancelled,
+  already_open: alreadyOpen, owner_purchase: ownerPurchase, owner_duplicate: ownerDuplicate, owner_refund: ownerRefund,
+  owner_basic_failed: ownerBasicFailed, owner_basic_cancelled: ownerBasicCancelled, owner_discipline: ownerDiscipline };
 
 // Sends one transactional email. kind must be one of KINDS. Returns true when Resend accepted it.
 async function sendEmail(kind, to, data) {
   if (!KINDS.includes(kind)) throw new Error('not a transactional email: ' + kind);
+  if (OWNER_KINDS.includes(kind)) to = OWNER;   // owner alerts never go anywhere else
   const key = process.env.RESEND_API_KEY;
   if (!key) { console.error('RESEND_API_KEY is not set; email not sent:', kind); return false; }
   const msg = BUILDERS[kind](data || {});
@@ -175,4 +250,10 @@ async function sendEmail(kind, to, data) {
   return true;
 }
 
-module.exports = { sendEmail, KINDS, FROM, REPLY_TO, gstLine, _build: BUILDERS };
+// The same send, but a failure is logged and never thrown. Used where a purchase must not be affected by email.
+async function sendEmailSafe(kind, to, data) {
+  try { return await sendEmail(kind, to, data); }
+  catch (e) { console.error('email ' + kind + ' failed: ' + e.message); return false; }
+}
+
+module.exports = { sendEmail, sendEmailSafe, KINDS, CLIENT_KINDS, OWNER_KINDS, OWNER, FROM, REPLY_TO, gstLine, _build: BUILDERS };

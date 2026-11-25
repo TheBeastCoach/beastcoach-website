@@ -7,7 +7,7 @@
 const {
   PLANS, verifyStripeSignature, stripeCall, svc, money
 } = require('./_coaching.js');
-const { sendEmail } = require('./_email.js');
+const { sendEmail, sendEmailSafe } = require('./_email.js');
 
 module.exports.config = { api: { bodyParser: false } };
 
@@ -44,12 +44,18 @@ async function onCheckoutCompleted(s) {
     p_stripe_customer_id: s.customer || null, p_subscription_id: s.subscription || null, p_paid_on: melbToday()
   });
   if (!paid.ok) {
-    // The plan filled up (or the email already has an open plan) between checkout and now: refund in full.
+    // The plan filled up, or the email already has an open plan, between checkout and now: refund in full.
     if (s.mode === 'payment' && s.payment_intent) {
       await stripeCall('POST', 'refunds', { payment_intent: s.payment_intent, 'metadata[reason]': paid.reason });
     }
     if (paid.reason === 'full') {
       await sendEmail('spot_filled', email, { name, plan, amountCents: cents });
+      await sendEmailSafe('owner_refund', null, { name, email, plan, amountCents: cents, full: true,
+        outcome: 'The plan was full at payment time. Nothing was created. Refunded in full.' });
+    } else if (paid.reason === 'already_open') {
+      // Tell the client, and tell Stefan with both plans. Emails never affect the refund.
+      await sendEmailSafe('already_open', email, { name, plan, existingPlan: paid.existing_tier, amountCents: cents });
+      await sendEmailSafe('owner_duplicate', null, { name, email, plan, existingPlan: paid.existing_tier, amountCents: cents });
     } else {
       console.error('Refunded a checkout that could not be turned into a plan (' + paid.reason + '): session ' + s.id);
     }
@@ -67,6 +73,10 @@ async function onCheckoutCompleted(s) {
       currency: s.currency || 'aud', product: 'discipline-path'
     }, 'resolution=merge-duplicates');
   }
+  // Stefan is told about every purchase: new, renewal (20% off), or Drop to Basic.
+  const meta = s.metadata || {};
+  const kind = meta.renewal === 'discount' ? 'renewal' : meta.renewal === 'basic_return' ? 'drop_to_basic' : 'new';
+  await sendEmailSafe('owner_purchase', null, { name, email, plan, amountCents: cents, marketing: news, kind });
 }
 
 async function clientForSubscription(subId) {
@@ -94,7 +104,10 @@ async function handle(event) {
   if (event.type === 'invoice.payment_failed') {
     if (!o.subscription) return;
     const c = await clientForSubscription(o.subscription);
-    if (c) await sendEmail('basic_failed', c.email, { name: c.name });
+    if (c) {
+      await sendEmail('basic_failed', c.email, { name: c.name });
+      await sendEmailSafe('owner_basic_failed', null, { name: c.name, email: c.email });
+    }
     return;
   }
   if (event.type === 'customer.subscription.deleted') {
@@ -104,12 +117,31 @@ async function handle(event) {
     const today = melbToday();
     await svc('PATCH', 'coaching_clients?id=eq.' + c.id, { status: 'finished', end_date: c.end_date && c.end_date < today ? c.end_date : today });
     await sendEmail('basic_cancelled', c.email, { name: c.name, endDate: niceDate(today) });
+    await sendEmailSafe('owner_basic_cancelled', null, { name: c.name, email: c.email });
     return;
   }
   if (event.type === 'charge.refunded') {
     const full = o.amount_refunded >= o.amount;
     const note = (full ? 'Refunded in full' : 'Partly refunded') + ' ' + money(o.amount_refunded) + ' on ' + niceDate(melbToday());
-    await svc('POST', 'rpc/coaching_apply_refund', { p_payment_intent: o.payment_intent, p_full: full, p_note: note });
+    // A Basic subscription's payment comes with its invoice. The subscription is what to stop.
+    let subId = null;
+    if (o.invoice) {
+      const inv = await stripeCall('GET', 'invoices/' + o.invoice);
+      subId = inv.subscription || null;
+    }
+    let cancelled = false;
+    if (subId && full) {
+      // Stop the subscription now, so the client is never charged again. Already gone (a retry) is fine.
+      try { await stripeCall('DELETE', 'subscriptions/' + subId); }
+      catch (e) { if (!(e.stripe && e.stripe.error && e.stripe.error.code === 'resource_missing')) throw e; }
+    }
+    const r = await svc('POST', 'rpc/coaching_apply_refund', { p_payment_intent: o.payment_intent || null, p_full: full, p_note: note, p_subscription_id: subId });
+    cancelled = !!(r && r.cancelled);
+    const who = r && r.found ? { email: r.email, name: r.name, tier: r.tier } : { email: (o.billing_details && o.billing_details.email) || 'unknown', name: '', tier: subId ? 'basic' : '' };
+    const outcome = full
+      ? (subId ? 'Subscription cancelled now, and the plan is finished. The client will not be charged again.' : (cancelled ? 'Plan cancelled. The place is free.' : 'Refund noted. No open plan was found to cancel.'))
+      : 'Partial refund noted. The plan is unchanged.';
+    await sendEmailSafe('owner_refund', null, { name: who.name, email: who.email, plan: who.tier || 'basic', amountCents: o.amount_refunded, full, outcome });
     return;
   }
 }

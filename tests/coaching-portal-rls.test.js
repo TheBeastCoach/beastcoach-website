@@ -464,19 +464,20 @@ test('the customer list and the coach notes never reach a client, even by guessi
 
 // The verification script you run in the Supabase SQL Editor (supabase/coaching-portal-verify.sql).
 // It must pass here too, and it must leave nothing behind.
-test('supabase/coaching-portal-verify.sql: every check passes, and nothing is left behind (after 4a to 4d)', async () => {
+test('supabase/coaching-portal-verify.sql: every check passes, and nothing is left behind (after 4a to 4d2)', async () => {
   const db = await newDb();
   await db.exec(read('supabase/coaching-portal-4b.sql'));
   await db.exec(read('supabase/coaching-portal-4b2.sql'));
   await db.exec(read('supabase/coaching-portal-4c.sql'));
   await db.exec(read('supabase/coaching-portal-4c2.sql'));
   await db.exec(read('supabase/coaching-portal-4d.sql'));
+  await db.exec(read('supabase/coaching-portal-4d2.sql'));
   const results = await db.exec(read('supabase/coaching-portal-verify.sql'));
   const table = results.find(r => r.rows && r.rows.length && r.rows[0].check_name);
   assert.ok(table, 'the script ends with a results table');
   const failed = table.rows.filter(r => r.result !== 'PASS');
   assert.deepEqual(failed.map(r => r.check_name + ': ' + r.detail), [], 'no FAIL rows');
-  assert.ok(table.rows.length >= 74, 'the checks ran: ' + table.rows.length);
+  assert.ok(table.rows.length >= 76, 'the checks ran: ' + table.rows.length);
   const left = await scalar(db, `select count(*)::int as n from auth.users where email like 'verify-%'`);
   assert.equal(left.n, 0, 'the stub users are gone after the rollback');
   await db.close();
@@ -523,7 +524,7 @@ const atFixedClock = sql => sql.replace(/\bnow\(\)/g, FIXED_NOW);
 test('London at a fixed clock (10pm London, Melbourne already the next day): the verify script passes, and the zones really differ', async () => {
   const db = new PGlite();
   await db.exec(SHIM);
-  for (const f of ['supabase/coaching.sql', 'supabase/coaching-portal.sql', 'supabase/coaching-portal-4b.sql', 'supabase/coaching-portal-4b2.sql', 'supabase/coaching-portal-4c.sql', 'supabase/coaching-portal-4c2.sql', 'supabase/coaching-portal-4d.sql']) {
+  for (const f of ['supabase/coaching.sql', 'supabase/coaching-portal.sql', 'supabase/coaching-portal-4b.sql', 'supabase/coaching-portal-4b2.sql', 'supabase/coaching-portal-4c.sql', 'supabase/coaching-portal-4c2.sql', 'supabase/coaching-portal-4d.sql', 'supabase/coaching-portal-4d2.sql']) {
     await db.exec(atFixedClock(read(f)));
   }
   await db.exec(fixtureSql());
@@ -547,8 +548,10 @@ test('supabase/coaching-portal-4c.sql: applies on top of 4b2, and running it a s
   await db.exec(read('supabase/coaching-portal-4c.sql'));
   await db.exec(read('supabase/coaching-portal-4c2.sql'));
   await db.exec(read('supabase/coaching-portal-4d.sql'));
+  await db.exec(read('supabase/coaching-portal-4d2.sql'));
   await db.exec(read('supabase/coaching-portal-4c2.sql'));
   await db.exec(read('supabase/coaching-portal-4d.sql'));
+  await db.exec(read('supabase/coaching-portal-4d2.sql'));
   const cols = await scalar(db, `select count(*)::int as n from information_schema.columns
     where table_name = 'coaching_clients' and column_name in ('health_flag', 'health_cleared_at', 'health_cleared_by', 'paused_at', 'pause_days_used')`);
   assert.equal(cols.n, 5);

@@ -13,6 +13,7 @@
 //   signing secret into STRIPE_WEBHOOK_SECRET above.
 
 const crypto = require('crypto');
+const { sendEmailSafe } = require('./_email.js');
 
 const SUPABASE_URL = 'https://jgbcgbdbmqtsozwlllfj.supabase.co';
 
@@ -99,6 +100,13 @@ module.exports = async function handler(req, res) {
         });
         if (!resp.ok) {
           console.error('Failed to record purchase in Supabase:', await resp.text());
+        } else {
+          // Stefan is told about each Discipline Path purchase. sendEmailSafe never throws, so the purchase is unaffected.
+          await sendEmailSafe('owner_discipline', null, {
+            email: email.toLowerCase().trim(), amountCents: session.amount_total,
+            date: new Date().toLocaleDateString('en-AU', { timeZone: 'Australia/Melbourne', day: 'numeric', month: 'long', year: 'numeric' }),
+            reference: session.id + (session.payment_intent ? ' / ' + session.payment_intent : '')
+          });
         }
       } catch (err) {
         console.error('Error writing purchase to Supabase:', err);

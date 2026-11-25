@@ -1097,7 +1097,7 @@ begin
   lim_hit1 := public.coaching_rate_hit('verify:limit', 2, 3600);
   lim_hit2 := public.coaching_rate_hit('verify:limit', 2, 3600);
   lim_hit3 := public.coaching_rate_hit('verify:limit', 2, 3600);
-  rf := public.coaching_apply_refund('pi_verify_1', true, 'Refunded in full, verify');
+  rf := public.coaching_apply_refund('pi_verify_1', true, 'Refunded in full, verify', null);
   perform pg_temp.verify_reset();
   select count(*) into n_rows from public.coaching_clients where email = 'verify-pay@verify.invalid';
   select refunded_at into cust_refunded from public.coaching_customers where stripe_session_id = 'cs_verify_pay_1';
@@ -1113,6 +1113,38 @@ begin
 exception when others then
   perform pg_temp.verify_reset();
   perform pg_temp.verify_record('payments: session, event, limit and refund rules', false, 'error: ' || sqlerrm);
+end $$;
+
+-- 9d. Payments (4d2): a second purchase while a plan is open names the open plan; a full refund of a Basic
+-- subscription finishes the plan (not cancelled). Server role only. -----------------------------------------------
+do $$
+declare dup jsonb; sub_rf jsonb; st text;
+begin
+  perform pg_temp.verify_as('service_role', 'anon');
+  -- Essential's stub client A is not open any more, so give the email an open Core plan first, then pay again for Core.
+  dup := public.coaching_create_from_purchase('cs_verify_dup_1', 'verify-dup@verify.invalid', 'Verify Dup', 'core', 29900, 'aud', false, 'x', 'pi_dup_1', null, null, current_date);
+  dup := public.coaching_create_from_purchase('cs_verify_dup_2', 'verify-dup@verify.invalid', 'Verify Dup', 'essential', 11000, 'aud', false, 'x', 'pi_dup_2', null, null, current_date);
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('payments: a second purchase while a plan is open says which plan is open',
+    (dup ->> 'reason') = 'already_open' and (dup ->> 'existing_tier') = 'core', coalesce(dup::text, 'none'));
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('payments: a second purchase while a plan is open says which plan is open', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare sub_rf jsonb; st text;
+begin
+  perform pg_temp.verify_as('service_role', 'anon');
+  perform public.coaching_create_from_purchase('cs_verify_basic_1', 'verify-basic-rf@verify.invalid', 'Verify Basic RF', 'basic', 3000, 'aud', false, 'x', null, 'cus_b', 'sub_verify_1', current_date);
+  sub_rf := public.coaching_apply_refund(null, true, 'Refunded in full, verify', 'sub_verify_1');
+  perform pg_temp.verify_reset();
+  select status into st from public.coaching_clients where email = 'verify-basic-rf@verify.invalid';
+  perform pg_temp.verify_record('payments: a full refund of a Basic subscription finishes the plan',
+    (sub_rf ->> 'status') = 'finished' and st = 'finished', 'status ' || coalesce(st, 'none'));
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('payments: a full refund of a Basic subscription finishes the plan', false, 'error: ' || sqlerrm);
 end $$;
 
 -- 8. Delete: B removes their own data; B's customer row stays; A's data is untouched. Runs last. ---
