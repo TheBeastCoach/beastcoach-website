@@ -514,3 +514,18 @@ test('Discipline Path: a failed alert email does not break the purchase, and Str
   assert.equal(res.statusCode, 200);
   assert.equal(called(calls, '/rest/v1/purchases').length, 1, 'the purchase was recorded');
 });
+
+test('site URLs: with SITE_URL unset (or empty) the links go to https://www.beastcoach.fit, the production site', () => {
+  const { siteUrl } = require(path.join(ROOT, 'api', '_coaching.js'));
+  const saved = process.env.SITE_URL;
+  try {
+    delete process.env.SITE_URL;
+    assert.equal(siteUrl(), 'https://www.beastcoach.fit');
+    process.env.SITE_URL = '';
+    assert.equal(siteUrl(), 'https://www.beastcoach.fit');
+    process.env.SITE_URL = 'https://preview.example.test/';
+    assert.equal(siteUrl(), 'https://preview.example.test', 'a trailing slash is removed');
+  } finally {
+    if (saved === undefined) delete process.env.SITE_URL; else process.env.SITE_URL = saved;
+  }
+});
