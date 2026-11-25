@@ -382,6 +382,7 @@
     </div>
     <div class="tile-grid">
       <a class="tile" href="/beast-challenge" style="border-color:var(--green)"><h3>Beast Challenge</h3><p>New &middot; Free 30 days: log your steps and walk a real city-to-city journey.</p></a>
+      <a class="tile" id="myCoachTile" href="/my-coach" style="display:none"><h3>My Coach</h3><p>Your coaching plan, status and portal.</p></a>
       <a class="tile" id="disciplineTile" href="/discipline-path"><h3>8-Step Discipline Program</h3><p>View the program and get started.</p></a>
       <a class="tile" href="/challenge"><h3>30-Day Challenge</h3><p>Log today's entry and see your progress.</p></a>
       <a class="tile" data-nav="calculator"><h3>BMI &amp; Macro Calculator</h3><p>Your calories, macros, and BMI.</p></a>
@@ -1152,6 +1153,11 @@ resetForm.addEventListener("submit", async (e) => {
 });
 
 function enterPortal(user) {
+  // Came from /my-coach while signed out: take them back there now that they are signed in.
+  if (new URLSearchParams(window.location.search).get("next") === "my-coach") {
+    window.location.replace("/my-coach");
+    return;
+  }
   const name = user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : user.email;
   document.getElementById("dash-greeting").textContent = "Welcome back, " + name;
   showView("dashboard");
@@ -1161,6 +1167,23 @@ function enterPortal(user) {
   }
   checkDisciplinePurchase(user);
   checkDonation(user);
+  checkCoaching();
+}
+
+/* ---------- My Coach tile (coaching portal) ----------
+   claim_coaching() links a coaching plan to this signed-in user by their confirmed email. The tile only
+   shows when it finds one. If the call fails (for example before the database step has run), the tile
+   stays hidden and the rest of the dashboard works as normal. */
+async function checkCoaching() {
+  const tile = document.getElementById("myCoachTile");
+  if (!tile || !sb) return;
+  try {
+    const { data, error } = await sb.rpc("claim_coaching");
+    if (error) { tile.style.display = "none"; return; }
+    tile.style.display = data && data.linked ? "" : "none";
+  } catch (err) {
+    tile.style.display = "none";
+  }
 }
 
 /* ---------- Donation ---------- */

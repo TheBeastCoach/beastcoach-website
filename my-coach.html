@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Coach | Beast Coach</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1B3022;--green:#2D6A4F;--mint:#52B788;--bg:#F4F7F2;--amber:#F59E0B;--amber-hover:#FFB62E;--muted:#3B4F43;--line:#D5E0D8;--red:#b42318}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;font-weight:400;letter-spacing:.02em;margin:0;color:var(--ink)}
+h1{font-size:clamp(44px,12vw,72px);line-height:.95}h3{font-size:26px;line-height:1.05}
+p{margin:0 0 10px}
+a{color:var(--green)}a:hover{color:var(--ink)}
+:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+.wrap{max-width:560px;margin:0 auto;padding:18px 18px 48px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.logo{font-family:'Bebas Neue',Impact,sans-serif;font-size:22px;letter-spacing:.1em;color:var(--ink);text-decoration:none}
+.logo span{color:var(--mint)}
+.hero{background:var(--ink);color:#fff;border-radius:22px;padding:24px 22px;margin-bottom:16px}
+.hero h1{color:#fff}
+.eyebrow{font-weight:800;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8FD3B0;margin-bottom:8px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+.muted{color:var(--muted);font-size:14px}
+.pill{display:inline-block;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:800;background:#d8f3e3;color:#1b5e3a}
+.pill.muted-pill{background:#eef1f4;color:#3b4a57}
+button,.btn{font:inherit;font-weight:800;border:0;border-radius:14px;padding:13px 20px;min-height:48px;cursor:pointer;background:var(--amber);color:#1B1200;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;text-align:center;width:100%}
+button:hover{background:var(--amber-hover)}
+.btn-ghost{background:#fff;color:var(--ink);border:1px solid #C5D3C8}
+.btn-ghost:hover{background:#F4F7F2}
+.note{background:#EEF5F0;border-radius:14px;padding:12px 14px;font-size:15px;margin-top:12px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 18px;border-radius:14px;display:none;max-width:92vw;z-index:9}
+.toast.show{display:block}
+.loading{color:var(--muted);font-weight:700}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top">
+    <a class="logo" href="/">BEAST<span>COACH</span></a>
+    <button class="btn-ghost" id="signOutBtn" style="width:auto;min-height:40px;padding:8px 14px;font-size:14px;display:none">Sign out</button>
+  </div>
+
+  <section class="hero" aria-live="polite">
+    <div class="eyebrow" id="planName">My Coach</div>
+    <h1 id="heading">Loading your plan…</h1>
+  </section>
+
+  <section class="card" id="statusCard" hidden>
+    <h3 id="statusTitle"></h3>
+    <p id="statusText" style="margin:10px 0 0"></p>
+    <div id="actionWrap" style="margin-top:16px" hidden>
+      <button type="button" id="setupBtn">Start setup</button>
+      <p class="muted" style="margin:8px 0 0">The setup questions arrive in the next update.</p>
+    </div>
+  </section>
+
+  <section class="card" id="linkCard" hidden>
+    <p class="loading" style="margin:0">We could not find a coaching plan for this email. If you have just bought a plan, email <a href="mailto:info@beastcoach.fit">info@beastcoach.fit</a> and we will sort it out.</p>
+  </section>
+
+  <p class="muted" style="margin-top:8px">Questions? Email <a href="mailto:info@beastcoach.fit">info@beastcoach.fit</a>.</p>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+// Public values only. The publishable key is safe in the browser. No secret keys live on this page.
+const SUPABASE_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
+
+const PLAN_NAMES = { basic: 'Basic', essential: 'Essential', core: 'Core', beast: 'The Beast' };
+
+// What each status says to the client. Plain English, no jargon.
+const STATUS_COPY = {
+  awaiting_onboarding: { title: "Let's set up your plan", text: "Answer a few questions so Stefan can build your plan. It takes about ten minutes.", action: true },
+  awaiting_activation: { title: 'Stefan is building your plan', text: "Your answers are in. Stefan is building your plan and will be in touch on WhatsApp to set your start date." },
+  active: { title: 'Your portal is coming in the next update', text: 'Your meals, steps and workouts will show here soon. Thanks for your patience.' },
+  paused: { title: 'Your plan is paused', text: 'Stefan will restart you when you are ready. Your pause days are counted in your plan.' },
+  finished: { title: 'Your 12 weeks are finished', text: 'Renew with 20% off and keep your place, or drop to Basic for $30 every 12 weeks. Stefan will email you the options.' },
+  cancelled: { title: 'This plan is cancelled', text: 'If you think this is a mistake, email info@beastcoach.fit and we will look into it.' }
+};
+
+function show(id, on) { document.getElementById(id).hidden = !on; }
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+async function init() {
+  let sb;
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  } catch (e) {
+    document.getElementById('heading').textContent = 'My Coach is unavailable right now';
+    return;
+  }
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session || !session.user) {
+    // Signed out: go to the dashboard sign-in, and come back here afterwards.
+    window.location.replace('/dashboard?next=my-coach');
+    return;
+  }
+  document.getElementById('signOutBtn').style.display = '';
+  document.getElementById('signOutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.replace('/dashboard');
+  });
+
+  let claim = null;
+  try {
+    const { data, error } = await sb.rpc('claim_coaching');
+    if (!error) claim = data;
+  } catch (e) { claim = null; }
+
+  if (!claim || !claim.linked) {
+    document.getElementById('heading').textContent = 'My Coach';
+    show('linkCard', true);
+    return;
+  }
+
+  const copy = STATUS_COPY[claim.status];
+  document.getElementById('planName').textContent = (PLAN_NAMES[claim.tier] || 'Coaching') + ' plan';
+  document.getElementById('heading').textContent = copy ? copy.title : 'Your plan';
+  if (copy) {
+    document.getElementById('statusTitle').textContent = copy.title;
+    document.getElementById('statusText').textContent = copy.text;
+    show('statusCard', true);
+    show('actionWrap', !!copy.action);
+  }
+  // Setup is the next step; for now the button only says so.
+  document.getElementById('setupBtn').addEventListener('click', () => toast('Setup opens in the next update.'));
+}
+
+init();
+</script>
+</body>
+</html>
