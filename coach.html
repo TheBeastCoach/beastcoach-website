@@ -209,6 +209,7 @@ body.shot #demoBar,body.shot .toast{display:none !important}
 <main class="wrap" id="app"><p class="muted">Loading...</p></main>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/coaching-day-card.js"></script>
 <script>
 /* ==========================================================================
    Beast Coach: the coach's page (/coach). Real data, through supabase-js.
@@ -448,7 +449,7 @@ async function loadDetail(id) {
   const c = clientById(id);
   const d = { meals: [], workouts: [], steps: [], weighIns: [], checkins: [], note: '', plans: [] };
   if (c && c.tier !== 'basic') {
-    d.meals = (await q(sb.from('coaching_meal_logs').select('id,client_id,log_date,meal_time,name,calories,protein,carbs,fat,fibre,source,edited,ai,added_late').eq('client_id', id).order('logged_at', { ascending: true }))) || [];
+    d.meals = (await q(sb.from('coaching_meal_logs').select('id,client_id,log_date,meal_time,name,calories,protein,carbs,fat,fibre,source,edited,ai,added_late,entry_text').eq('client_id', id).order('logged_at', { ascending: true }))) || [];
     d.workouts = (await q(sb.from('coaching_workout_logs').select('id,client_id,log_date,kind,what,minutes,notes,session,added_late').eq('client_id', id))) || [];
     d.steps = (await q(sb.from('coaching_step_logs').select('client_id,log_date,steps,added_late').eq('client_id', id))) || [];
     d.weighIns = (await q(sb.from('coaching_weigh_ins').select('client_id,weigh_date,kg').eq('client_id', id).order('weigh_date', { ascending: true }))) || [];
@@ -1057,39 +1058,61 @@ function sessionHtml(w) {
   }).join('');
   return `<div style="margin:6px 0 10px"><div><b>${esc(w.what)}</b></div>${rows}${w.notes ? `<div class="mini">${esc(w.notes)}</div>` : ''}</div>`;
 }
+// The plan's training sessions, as the client portal reads them (the same parse as my-coach.html).
+function planSessionsOf(p) {
+  if (!p || typeof p.training !== 'string') return [];
+  const out = []; let cur = null;
+  const days = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 };
+  p.training.split('\n').forEach(raw => {
+    const line = raw.trim(); if (!line) return;
+    const head = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\w*\s*[:\-]\s*(.+)$/i.exec(line);
+    if (head) { cur = { day: days[head[1][0].toUpperCase() + head[1].slice(1, 3).toLowerCase()], title: head[2].trim(), exercises: [] }; out.push(cur); return; }
+    const ex = /^[-•*]\s*(.+?)\s+(\d+)\s*[x×]\s*(\d+)/i.exec(line);
+    if (ex && cur) cur.exercises.push({ name: ex[1], sets: Number(ex[2]), reps: Number(ex[3]) });
+  });
+  return out;
+}
+// What the plan said for each exercise on this date: { "Bench press": "3 × 10" }.
+function plannedOn(plan, date) {
+  const out = {}, dow = ((pd(date).getDay() + 6) % 7) + 1;
+  planSessionsOf(plan).filter(s => s.day === dow).forEach(s => s.exercises.forEach(e => { out[e.name] = e.sets + ' × ' + e.reps; }));
+  return out;
+}
+// Logs, newest first, grouped by week. The last 7 days are open; older days are collapsed to header and summary.
 function logsHtml(c) {
-  const t = c.targets;
   const start = c.activated_at ? ymdIn(new Date(c.activated_at), zoneOf(c)) : null;
   const today = clientToday(c);
+  const plan = (C.currentPlans[c.id] || {}).plan || null;
   const days = [];
   if (start) for (let d = today; d >= start && days.length < 120; d = addDays(d, -1)) days.push(d);
-  const late = v => v ? '<span class="late">added later</span>' : '';
+  const weekOf = d => Math.min(WEEKS, Math.floor(diffDays(start, d) / 7) + 1);
+  const dayData = d => {
+    const st = C.d.steps.find(x => x.log_date === d), wi = C.d.weighIns.find(x => x.weigh_date === d);
+    return { date: d, meals: C.d.meals.filter(m => m.log_date === d), workouts: C.d.workouts.filter(w => w.log_date === d),
+      steps: st ? Number(st.steps) : null, weigh: wi ? Number(wi.kg) : null };
+  };
+  const groups = [];
+  days.forEach((d, i) => {
+    const w = weekOf(d);
+    let g = groups.find(x => x.week === w);
+    if (!g) { g = { week: w, items: [] }; groups.push(g); }
+    g.items.push({ d, i });
+  });
+  const targets = c.targets || {};
+  const body = groups.map(g => {
+    const avg = DayCard.weekAverages(g.items.map(x => dayData(x.d)));
+    return DayCard.weekHeading('Week ' + g.week + ' of ' + WEEKS, avg) +
+      g.items.map(x => DayCard.render(dayData(x.d), { today, targets, open: x.i < 7, planned: plannedOn(plan, x.d) })).join('');
+  }).join('');
   const before = C.d.meals.filter(m => !start || m.log_date < start);
   const baseline = before.length ? `<details class="baseline"><summary>Logged before activation (baseline) <span class="mini" style="font-weight:400">${before.length} meal${before.length === 1 ? '' : 's'}, not part of the plan</span></summary>
       <div style="padding:4px 0 6px">${before.map(m => `<div class="meal" style="padding:8px 0"><div style="flex:1 1 200px"><span class="mini">${esc(fmtDate(m.log_date))}</span> <b>${esc(m.name)}</b>
         <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div></div>`).join('')}</div></details>` : '';
   const intro = start
-    ? `<p class="mini" style="margin-top:0">From activation on ${esc(fmtDate(start))}, newest first, in the client's own days (${esc(zoneOf(c))}). <span class="up-badge">Up</span> marks a lift that went up since it was last logged.</p>`
+    ? `<p class="mini" style="margin-top:0">From activation on ${esc(fmtDate(start))}, newest first, in the client's own days (${esc(zoneOf(c))}). The last 7 days are open; tap a day to open it.</p>`
     : '<p class="mini" style="margin-top:0">Not activated yet. Logs start on the activation date.</p>';
-  return `<div class="card" id="logsCard"><h3>${start ? 'Logs' : 'Logs before activation'}</h3>${intro}
-    ${days.map((date, idx) => {
-      const meals = C.d.meals.filter(m => m.log_date === date);
-      const tot = sumNut(meals);
-      const wos = C.d.workouts.filter(w => w.log_date === date);
-      const wi = C.d.weighIns.find(w => w.weigh_date === date);
-      const st = C.d.steps.find(s => s.log_date === date);
-      const ink = (k, v) => t && t[k] && v > t[k] ? MACRO[k].over : MACRO[k].ink;
-      const summary = `<summary><span>${esc(fmtDate(date))}</span>
-        <span class="mini" style="font-weight:400;margin-left:8px">${meals.length ? `<span style="color:${ink('calories', tot.calories)}">${Math.round(tot.calories)} kcal</span> · <span style="color:${ink('protein', tot.protein)}">P ${Math.round(tot.protein)}g</span> · ${meals.length} meal${meals.length === 1 ? '' : 's'}` : 'No meals logged'}
-        · ${st ? fmtSteps(st.steps) + ' steps' : 'No steps'} · ${wos.length ? wos.length + ' workout' + (wos.length === 1 ? '' : 's') : 'No workout'} · ${wi ? wi.kg + ' kg' : 'No weigh-in'}</span></summary>`;
-      const body = meals.length ? meals.map(m => `<div class="meal" style="padding:8px 0"><div style="flex:1 1 200px"><span class="mini">${esc(m.meal_time || '')}</span> <b>${esc(m.name)}</b> <span class="mini">${esc(SOURCES[m.source] || m.source)}</span>${late(m.added_late)}
-          <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div>
-          ${m.edited && m.ai ? `<div class="edited">Changed by client. Beast AI said ${esc(m.ai.calories)} kcal, P ${esc(m.ai.protein)}g.</div>` : ''}</div></div>`).join('') : '<p class="mini">No meals logged.</p>';
-      const woTxt = wos.map(w => w.session ? late(w.added_late) + sessionHtml(w)
-        : `<div class="mini">Other activity: ${esc(w.what)}${w.minutes ? ' (' + w.minutes + ' min)' : ''}${w.notes ? ' · ' + esc(w.notes) : ''}${late(w.added_late)}</div>`).join('');
-      return `<details ${idx === 0 ? 'open' : ''} data-day="${date}">${summary}<div style="padding:4px 0 6px">${body}${woTxt}${st ? `<div class="mini">Steps: ${fmtSteps(st.steps)}${late(st.added_late)}</div>` : ''}</div></details>`;
-    }).join('')}
-    ${baseline}</div>`;
+  return `<section id="logsCard" style="max-width:760px" aria-label="${start ? 'Logs' : 'Logs before activation'}"><h3 style="margin:0 0 6px">${start ? 'Logs' : 'Logs before activation'}</h3>${intro}
+    ${body || '<p class="muted">Nothing logged yet.</p>'}${baseline}</section>`;
 }
 function progressHtml(c) {
   const ob = c.onboarding || {};

@@ -547,7 +547,7 @@ test('a returning client: an earlier 12-week plan shows as its own block in Prog
   const { ctx, page } = await open(backend);
   await waitForApp(page);
   await page.click('button[data-act="tab"][data-tab="progress"]');
-  const sections = await page.$$eval('section[aria-label]', ss => ss.map(s => s.getAttribute('aria-label')));
+  const sections = (await page.$$eval('section[aria-label]', ss => ss.map(s => s.getAttribute('aria-label')))).filter(x => /plan$/.test(x));
   assert.deepEqual(sections, ['Current plan', 'Earlier plan'], 'each plan is its own block, current first');
   assert.match(await page.textContent('section[aria-label="Earlier plan"]'), /Core/);
   await ctx.close();
@@ -576,6 +576,30 @@ test('an invalid stored zone falls back to Australia/Melbourne', SKIP, async () 
   const { ctx, page } = await open(backend);
   await waitForApp(page);
   assert.equal(await page.evaluate(() => zoneFor(S.cur)), 'Australia/Melbourne');
+  await ctx.close();
+});
+
+test('past days (client): Progress shows each past day as a card, yesterday labelled and open, empty days as one quiet line', SKIP, async () => {
+  const backend = newBackend();
+  const yesterday = addDaysStr(backend.today, -1);
+  backend.meals.push({ id: 'pd1', client_id: 1, log_date: yesterday, name: 'Porridge', calories: 420, protein: 22, carbs: 55, fat: 9, fibre: 7, source: 'ai', entry_text: 'Porridge with milk and banana', meal_time: '07:15', logged_at: NOW_ISO() });
+  backend.steps.push({ client_id: 1, log_date: yesterday, steps: 9100 });
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  await page.click('button[data-act="tab"][data-tab="progress"]');
+  await page.waitForSelector('section[aria-label="Past days"] details.dc');
+  const yCard = page.locator(`section[aria-label="Past days"] details.dc[data-date="${yesterday}"]`);
+  assert.equal(await yCard.getAttribute('open'), '', 'yesterday is open (inside the last 7 days)');
+  const yText = await yCard.textContent();
+  assert.match(yText, /Yesterday/);
+  assert.match(yText, /420 kcal/);
+  assert.match(yText, /9,100/);
+  await page.click(`section[aria-label="Past days"] details.dc[data-date="${yesterday}"] details.dc-meal summary`);
+  assert.match(await yCard.textContent(), /Porridge with milk and banana/, 'a tap on the meal shows its description');
+  assert.match(await txt(page, 'section[aria-label="Past days"]'), /Nothing logged/, 'empty days are quiet lines');
+  // Set SHOT_DIR to save a full-page screenshot of this view (used to check the layout by eye).
+  if (process.env.SHOT_DIR) await page.screenshot({ path: path.join(process.env.SHOT_DIR, 'client-past-days-390.png'), fullPage: true });
+  assert.equal(page.errors.length, 0, page.errors.join('; '));
   await ctx.close();
 });
 

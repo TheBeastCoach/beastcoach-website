@@ -128,6 +128,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/coaching-day-card.js"></script>
 <script>
 'use strict';
 /* Public values only. The publishable key is safe in the browser. No secret keys live on this page.
@@ -504,7 +505,7 @@ async function loadAll() {
     S.plans[r.id] = got(p, 'plan').find(x => x.is_current) || null;
     S.weighIns = S.weighIns.concat(got(await sb.from('coaching_weigh_ins').select('client_id,weigh_date,kg,week_start,id').eq('client_id', r.id).order('weigh_date', { ascending: true }), 'weigh-ins'));
     S.steps = S.steps.concat(got(await sb.from('coaching_step_logs').select('client_id,log_date,steps').eq('client_id', r.id), 'steps'));
-    S.mealsAll = S.mealsAll.concat(got(await sb.from('coaching_meal_logs').select('id,client_id,log_date,name,calories,protein,carbs,fat,fibre,source,meal_time').eq('client_id', r.id), 'meals'));
+    S.mealsAll = S.mealsAll.concat(got(await sb.from('coaching_meal_logs').select('id,client_id,log_date,name,calories,protein,carbs,fat,fibre,source,meal_time,entry_text,edited,ai,added_late').eq('client_id', r.id), 'meals'));
     S.workoutsAll = S.workoutsAll.concat(got(await sb.from('coaching_workout_logs').select('id,client_id,log_date,kind,what,minutes,notes,session').eq('client_id', r.id), 'workouts'));
   }
   if (S.cur) {
@@ -1229,12 +1230,43 @@ function progressBlock(r, current) {
     <h2 style="font-size:18px;margin:4px 0 10px">${esc(title)}</h2>
     ${weightCardHtml(weighPointsFor(r))}${stepsCard}${macroCard}${workouts}</section>`;
 }
+// Past days, newest first, from activation. The last 7 days are open. The same day card as the coach sees.
+function pastDaysHtml() {
+  const r = S.cur;
+  const start = r ? activatedDay(r) : null;
+  if (!r || !start) return '';
+  const today = clientToday(r);
+  const plan = S.plans[r.id] || null;
+  const days = [];
+  for (let d = today; d >= start && days.length < 120; d = addDays(d, -1)) days.push(d);
+  const weekOf = d => Math.min(12, Math.floor(diffDays(start, d) / 7) + 1);
+  const dayData = d => {
+    const st = S.steps.find(x => x.client_id === r.id && x.log_date === d), wi = S.weighIns.find(x => x.client_id === r.id && x.weigh_date === d);
+    return { date: d, meals: S.mealsAll.filter(x => x.client_id === r.id && x.log_date === d), workouts: S.workoutsAll.filter(x => x.client_id === r.id && x.log_date === d),
+      steps: st ? Number(st.steps) : null, weigh: wi ? Number(wi.kg) : null };
+  };
+  const planned = d => { const out = {}; const dow = dowNum(d); planSessions(plan).filter(x => x.day === dow).forEach(x => x.exercises.forEach(e => { out[e.name] = e.sets + ' × ' + e.reps; })); return out; };
+  const groups = [];
+  days.forEach((d, i) => {
+    const w = weekOf(d);
+    let g = groups.find(x => x.week === w);
+    if (!g) { g = { week: w, items: [] }; groups.push(g); }
+    g.items.push({ d, i });
+  });
+  const body = groups.map(g => {
+    const avg = DayCard.weekAverages(g.items.map(x => dayData(x.d)));
+    return DayCard.weekHeading('Week ' + g.week + ' of 12', avg) +
+      g.items.map(x => DayCard.render(dayData(x.d), { today, targets: r.targets || {}, open: x.i < 7, planned: planned(x.d) })).join('');
+  }).join('');
+  return `<section aria-label="Past days" style="margin-top:18px"><h3 style="margin:0 0 6px">Past days</h3>
+    <p class="mini" style="margin-top:0">From your activation, newest first, in your own days. The last 7 days are open; tap a day to open it.</p>${body || '<p class="muted">Nothing logged yet.</p>'}</section>`;
+}
 function progressHtml() {
   const ordered = S.rows.slice().sort((a, b) => (isCurrentRow(b) - isCurrentRow(a)) || (b.start_date || '').localeCompare(a.start_date || ''));
   const unitBtns = `<div class="seg" role="group" aria-label="Weight unit" style="margin:0"><button class="${S.unit !== 'lb' ? 'on' : ''}" aria-pressed="${S.unit !== 'lb'}" data-act="unit" data-u="kg">kg</button><button class="${S.unit === 'lb' ? 'on' : ''}" aria-pressed="${S.unit === 'lb'}" data-act="unit" data-u="lb">lb</button></div>`;
   const notice = S.loadProblems && S.loadProblems.length ? `<div class="hl-red" style="margin-bottom:12px"><b>Part of your history could not be loaded</b> (${esc([...new Set(S.loadProblems)].join(', '))}). <button class="btn-ghost btn-sm" data-act="refreshProgress">Try again</button></div>` : '';
   const blocks = ordered.map(r => progressBlock(r, isCurrentRow(r))).join('');
-  return `${notice}<div class="row" style="margin-bottom:10px"><p class="muted" style="margin:0">Each 12-week plan is shown on its own, so earlier blocks stay separate from your current plan.</p>${unitBtns}</div>${blocks || '<p class="muted">No history yet.</p>'}`;
+  return `${notice}<div class="row" style="margin-bottom:10px"><p class="muted" style="margin:0">Each 12-week plan is shown on its own, so earlier blocks stay separate from your current plan.</p>${unitBtns}</div>${blocks || '<p class="muted">No history yet.</p>'}${pastDaysHtml()}`;
 }
 function settingsHtml() {
   const r = S.cur;

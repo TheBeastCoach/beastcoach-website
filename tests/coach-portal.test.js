@@ -141,7 +141,8 @@ function seed(over) {
   const today = TODAY();
   const act10 = addDaysStr(today, -10);
   const coleMeals = [
-    { id: 'm1', client_id: 3, log_date: today, name: 'Oats', calories: 450, protein: 25, carbs: 60, fat: 10, fibre: 8, source: 'plan', logged_at: daysAgoIso(0) },
+    { id: 'm1', client_id: 3, log_date: today, name: 'Oats', calories: 450, protein: 25, carbs: 60, fat: 10, fibre: 8, source: 'plan', logged_at: daysAgoIso(0), entry_text: 'Oats with berries and a banana' },
+    { id: 'm2', client_id: 3, log_date: addDaysStr(today, -9), name: 'Old lunch', calories: 600, protein: 40, carbs: 50, fat: 20, fibre: 5, source: 'ai', logged_at: daysAgoIso(9) },
     { id: 'm0', client_id: 3, log_date: addDaysStr(act10, -2), name: 'Baseline toast', calories: 300, protein: 10, carbs: 40, fat: 8, fibre: 2, source: 'typed', logged_at: daysAgoIso(12) }
   ];
   const db = {
@@ -624,18 +625,34 @@ test('targets: changing one saves the targets straight away', SKIP, async () => 
   await ctx.close();
 });
 
-test('logs: from activation, with sets and reps, a lift that went up, steps, and the baseline kept apart', SKIP, async () => {
+test('logs: newest first, grouped by week; the last 7 days open, older days collapsed; a day opens on tap', SKIP, async () => {
   const { ctx, page } = await open(SIGNED_IN_AAL2());
   await openClient(page, 'Cole Core');
   await tab(page, 'Logs');
-  const logs = await txt(page, '#logsCard');
-  assert.match(logs, /62\.5 kg x 8, 62\.5 kg x 7/);
-  assert.match(logs, /Up \+2\.5 kg/);
-  assert.match(logs, /7,400 steps/);
-  assert.match(logs, /Logged before activation \(baseline\)/);
+  await page.waitForSelector('#logsCard details.dc');
+  const cards = await page.$$eval('#logsCard details.dc', els => els.map(e => ({ date: e.dataset.date, open: e.open })));
+  const cutoff = addDaysStr(TODAY(), -6);           // today and the 6 days before it are the last 7 days
+  assert.ok(cards.length >= 3, 'logged days are cards: ' + JSON.stringify(cards));
+  assert.deepEqual(cards.map(c => c.date), [...cards.map(c => c.date)].sort().reverse(), 'newest first');
+  cards.forEach(c => assert.equal(c.open, c.date >= cutoff, c.date + ' is open only inside the last 7 days'));
+  assert.ok(cards.some(c => !c.open), 'there is at least one collapsed day');
+  assert.match(await txt(page, '#logsCard'), /Week 1 of 12/);
+  assert.match(await txt(page, '#logsCard'), /Nothing logged/, 'an empty day is a quiet line');
+  // Tap the collapsed day nine days back: it opens and shows its meal.
+  const oldDay = cards.find(c => c.date === addDaysStr(TODAY(), -9));   // the seeded lunch, nine days back, collapsed
+  await page.click(`#logsCard details.dc[data-date="${oldDay.date}"] > summary`);
+  await page.waitForFunction(d => document.querySelector(`#logsCard details.dc[data-date="${d}"]`).open, oldDay.date);
+  assert.match(await txt(page, `#logsCard details.dc[data-date="${oldDay.date}"]`), /Old lunch/);
+  // Tap a meal: its full description appears.
+  await page.click('#logsCard details.dc[open] details.dc-meal summary >> nth=0');
+  assert.match(await txt(page, '#logsCard'), /Oats with berries and a banana/);
+  // Today's numbers and the workout sets, as the cards show them.
+  assert.match(await txt(page, '#logsCard'), /7,400/);
+  assert.match(await txt(page, '#logsCard'), /62\.5 kg × 8, 62\.5 kg × 7/);
+  assert.match(await txt(page, '#logsCard'), /Logged before activation \(baseline\)/);
+  assert.equal(page.errors.length, 0, page.errors.join('; '));
   await ctx.close();
 });
-
 test('notes: private, saved as you type', SKIP, async () => {
   const { ctx, page } = await open(SIGNED_IN_AAL2());
   await openClient(page, 'Cole Core');
