@@ -416,6 +416,97 @@ exception when others then
   perform pg_temp.verify_record('claim: a confirmed user with no plan is told so, and linked to nothing', false, 'error: ' || sqlerrm);
 end $$;
 
+-- 6b. Older plans (4b): A reads A's older plan, B cannot read it, and A cannot write to it -------
+do $$
+declare old_id bigint; old_meal_id uuid; n int; upd int; refused boolean := false;
+begin
+  -- An older, finished 12-week plan for client A, with one meal from that plan.
+  insert into public.coaching_clients (user_id, email, name, tier, status, activated_at, start_date, onboarding)
+  select i.id, i.email, 'Verify A older plan', 'core', 'finished', now() - interval '150 days',
+         public.melbourne_today() - 150, '{}'
+    from verify_ids i where i.name = 'A';
+  select id into old_id from public.coaching_clients where name = 'Verify A older plan';
+  insert into public.coaching_meal_logs (client_id, log_date, name, calories, source)
+    values (old_id, public.melbourne_today() - 120, 'Verify older meal', 400, 'typed')
+    returning id into old_meal_id;
+exception when others then
+  perform pg_temp.verify_record('setup: older plan for client A', false, sqlerrm);
+end $$;
+
+do $$
+declare n int;
+begin
+  perform pg_temp.verify_as('authenticated', 'A');
+  select count(*) into n from public.coaching_meal_logs
+   where client_id = (select id from public.coaching_clients where name = 'Verify A older plan');
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('client A (4b): reads A''s older plan', n = 1, 'rows: ' || n);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('client A (4b): reads A''s older plan', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare n int;
+begin
+  perform pg_temp.verify_as('authenticated', 'B');
+  select count(*) into n from public.coaching_meal_logs
+   where client_id = (select id from public.coaching_clients where name = 'Verify A older plan');
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('client B (4b): cannot read A''s older plan', n = 0, 'rows: ' || n);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('client B (4b): cannot read A''s older plan', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare upd int; refused boolean := false;
+begin
+  perform pg_temp.verify_as('authenticated', 'A');
+  update public.coaching_meal_logs set calories = 1
+   where client_id = (select id from public.coaching_clients where name = 'Verify A older plan');
+  get diagnostics upd = row_count;
+  begin
+    insert into public.coaching_meal_logs (client_id, log_date, name, calories, source)
+      values ((select id from public.coaching_clients where name = 'Verify A older plan'), public.melbourne_today(), 'Sneaky', 100, 'typed');
+  exception when others then refused := true; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('client A (4b): cannot change or add to an older plan', upd = 0 and refused,
+    'rows changed: ' || upd || ', insert refused: ' || refused);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('client A (4b): cannot change or add to an older plan', false, 'error: ' || sqlerrm);
+end $$;
+
+-- Beast AI usage counter (4b): stops at the client limit, and clients cannot use it at all.
+do $$
+declare r1 boolean; r2 boolean; r3 boolean; r3_reason text; a_id bigint;
+begin
+  select id into a_id from public.coaching_clients where email = 'verify-a@verify.invalid' and status = 'active';
+  select u.allowed into r1 from public.coach_ai_use(a_id, 2, 300000) u;
+  select u.allowed into r2 from public.coach_ai_use(a_id, 2, 300000) u;
+  select u.allowed, u.reason into r3, r3_reason from public.coach_ai_use(a_id, 2, 300000) u;
+  perform pg_temp.verify_record('Beast AI: the client limit stops the third call of the day',
+    r1 = true and r2 = true and r3 = false and r3_reason = 'client',
+    'calls: ' || r1 || ', ' || r2 || ', then ' || r3 || ' (' || r3_reason || ')');
+exception when others then
+  perform pg_temp.verify_record('Beast AI: the client limit stops the third call of the day', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare call_refused boolean := false; read_refused boolean := false;
+begin
+  perform pg_temp.verify_as('authenticated', 'A');
+  begin perform 1 from public.coach_ai_use(1, 40, 300); exception when others then call_refused := true; end;
+  begin perform 1 from public.coach_ai_usage; exception when others then read_refused := true; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('Beast AI: a client cannot call the counter or read it', call_refused and read_refused,
+    'call refused: ' || call_refused || ', read refused: ' || read_refused);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('Beast AI: a client cannot call the counter or read it', false, 'error: ' || sqlerrm);
+end $$;
+
 -- 7. Spot counts: the function must agree with a direct count, for each capacity tier -----
 do $$
 declare f_taken int; direct_taken int; t text;
@@ -457,7 +548,7 @@ begin
   select count(*) into a_left from public.coaching_clients where email = 'verify-a@verify.invalid';
   select count(*) into cust_left from public.coaching_customers where email = 'verify-b@verify.invalid';
   perform pg_temp.verify_record('delete_my_coaching_data: removes B''s client row, keeps B''s customer record and A''s data',
-    (r ->> 'deleted') = 'true' and b_left = 0 and cust_left = 1 and a_left = 1,
+    (r ->> 'deleted') = 'true' and b_left = 0 and cust_left = 1 and a_left = 2,
     'B row left: ' || b_left || ', B customer left: ' || cust_left || ', A row left: ' || a_left);
 exception when others then
   perform pg_temp.verify_reset();

@@ -313,3 +313,5 @@ module.exports = async function handler(req, res) {
 };
 
 module.exports._test = { readInput, parseDayLine, cleanTargets, createText, keyMatches, DAILY_LIMIT, MAX_DAY_LINES, EXERCISE_PROMPT };
+// The mode runners, shared with api/coach-ai.js (the real clients' Beast AI endpoint). Same prompts and checks.
+module.exports._core = { readInput, runLog, runDay, runFridge, runExercise, runCreate, send };

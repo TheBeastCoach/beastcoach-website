@@ -1,4 +1,4 @@
-// Browser tests for the login side of the coaching portal: the My Coach tile on dashboard.html, and /my-coach.
+// Browser tests for the login side of the coaching portal: the My Coach tile on dashboard.html, and the /my-coach redirect.
 // The Supabase library is replaced by a stub, so the tests choose what the sign-in and claim_coaching() return.
 // The database rules are tested in tests/coaching-portal-rls.test.js.
 //
@@ -97,50 +97,7 @@ test('/my-coach signed out: sends the visitor to the dashboard sign-in, and brin
   await ctx.close();
 });
 
-test('/my-coach signed in, plan awaiting onboarding: the plan name, the message and the setup placeholder', SKIP, async () => {
-  const { ctx, page } = await openPage('/my-coach', { session: SIGNED_IN, claim: { linked: true, status: 'awaiting_onboarding', tier: 'core' } });
-  await page.waitForSelector('#statusCard:not([hidden])');
-  assert.equal(await page.textContent('#planName'), 'Core plan');
-  assert.equal(await page.textContent('#heading'), "Let's set up your plan");
-  assert.equal(await page.isVisible('#setupBtn'), true, 'the setup button shows');
-  await page.click('#setupBtn');
-  await page.waitForFunction(() => document.getElementById('toast').textContent.includes('next update'));
-  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
-  await ctx.close();
-});
-
-const STATUSES = [
-  ['awaiting_activation', 'Stefan is building your plan', false],
-  ['active', 'Your portal is coming in the next update', false],
-  ['paused', 'Your plan is paused', false],
-  ['finished', 'Your 12 weeks are finished', false],
-  ['cancelled', 'This plan is cancelled', false]
-];
-for (const [status, heading, action] of STATUSES) {
-  test(`/my-coach status "${status}" shows its message and no setup button`, SKIP, async () => {
-    const { ctx, page } = await openPage('/my-coach', { session: SIGNED_IN, claim: { linked: true, status, tier: 'essential' } });
-    await page.waitForSelector('#statusCard:not([hidden])');
-    assert.match(await page.textContent('#heading'), new RegExp(heading));
-    assert.equal(await page.isVisible('#setupBtn'), action);
-    assert.equal(await page.textContent('#planName'), 'Essential plan');
-    await ctx.close();
-  });
-}
-
-test('/my-coach signed in with no plan for the email: a friendly message, not an error', SKIP, async () => {
-  const { ctx, page } = await openPage('/my-coach', { session: SIGNED_IN, claim: { linked: false, reason: 'no_plan_for_this_email' } });
-  await page.waitForSelector('#linkCard:not([hidden])');
-  assert.match(await page.textContent('#linkCard'), /could not find a coaching plan/);
-  assert.equal(page.errors.length, 0);
-  await ctx.close();
-});
-
-test('/my-coach when the claim call fails (for example before the database step has run): the same friendly message', SKIP, async () => {
-  const { ctx, page } = await openPage('/my-coach', { session: SIGNED_IN, claimError: { message: 'function not found' } });
-  await page.waitForSelector('#linkCard:not([hidden])');
-  assert.equal(page.errors.length, 0, 'no page errors');
-  await ctx.close();
-});
+// The status screens, the onboarding and the client portal are tested in tests/coaching-portal-client.test.js.
 
 test('the My Coach page carries no secret keys (only the public publishable key)', SKIP, async () => {
   const html = fs.readFileSync(path.join(ROOT, 'my-coach.html'), 'utf8');

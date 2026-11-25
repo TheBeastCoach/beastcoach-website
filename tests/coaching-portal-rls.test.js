@@ -464,8 +464,9 @@ test('the customer list and the coach notes never reach a client, even by guessi
 
 // The verification script you run in the Supabase SQL Editor (supabase/coaching-portal-verify.sql).
 // It must pass here too, and it must leave nothing behind.
-test('supabase/coaching-portal-verify.sql: every check passes, and nothing is left behind', async () => {
+test('supabase/coaching-portal-verify.sql: every check passes, and nothing is left behind (after 4a and 4b)', async () => {
   const db = await newDb();
+  await db.exec(read('supabase/coaching-portal-4b.sql'));
   const results = await db.exec(read('supabase/coaching-portal-verify.sql'));
   const table = results.find(r => r.rows && r.rows.length && r.rows[0].check_name);
   assert.ok(table, 'the script ends with a results table');
@@ -474,5 +475,38 @@ test('supabase/coaching-portal-verify.sql: every check passes, and nothing is le
   assert.ok(table.rows.length >= 25, 'the checks ran: ' + table.rows.length);
   const left = await scalar(db, `select count(*)::int as n from auth.users where email like 'verify-%'`);
   assert.equal(left.n, 0, 'the stub users are gone after the rollback');
+  await db.close();
+});
+
+// 4b: a returning client is linked to their NEW plan, and still sees their old one.
+// 4b: a returning client is linked to a NEW plan, and still reads the old one.
+test('4b: a returning client is linked to a new plan, and keeps reading the old one', async () => {
+  const db = await newDb();
+  await db.exec(read('supabase/coaching-portal-4b.sql'));
+  // Only one open plan per email, so the old plan is finished first (the coach does this in step 4c).
+  await db.query(`update public.coaching_clients set status = 'finished' where email = 'a@example.com'`);
+  await db.query(`insert into public.coaching_clients (email, name, tier, status, start_date)
+                  values ('a@example.com', 'Client A again', 'core', 'awaiting_onboarding', public.melbourne_today())`);
+  const r = await as(db, 'authenticated', signedIn(U.A), () => db.query('select public.claim_coaching() as r'));
+  assert.equal(r.rows[0].r.linked, true);
+  assert.equal(r.rows[0].r.status, 'awaiting_onboarding', 'the new plan is the one linked');
+  const linked = await scalar(db, `select count(*)::int as n from public.coaching_clients where user_id = $1`, [U.A.id]);
+  assert.equal(linked.n, 2, 'A now has the new plan and the older finished one');
+  const seen = await as(db, 'authenticated', signedIn(U.A), () => db.query('select id from public.coaching_clients'));
+  assert.equal(seen.rows.length, 2, 'history reads cover both plans');
+  await db.close();
+});
+
+test('4b: the Beast AI counter is per client and shared, and anon cannot reach it', async () => {
+  const db = await newDb();
+  await db.exec(read('supabase/coaching-portal-4b.sql'));
+  const aId = await clientId(db, 'a@example.com');
+  const bId = await clientId(db, 'b@example.com');
+  const use = (id, lim, shared) => scalar(db, 'select allowed, reason from public.coach_ai_use($1, $2, $3)', [id, lim, shared]);
+  assert.equal((await use(aId, 1, 2)).allowed, true);
+  assert.equal((await use(bId, 1, 2)).allowed, true, 'the shared cap is 2, so the second client is still in');
+  const third = await use(aId, 1, 2);
+  assert.deepEqual([third.allowed, third.reason], [false, 'shared'], 'the shared cap stops the third call of the day');
+  await expectError(as(db, 'anon', {}, () => db.query('select * from public.coach_ai_use(1, 40, 300)')), /permission denied/);
   await db.close();
 });

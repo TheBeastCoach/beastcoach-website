@@ -135,7 +135,7 @@ Do these in order. Use the SQL Editor (Dashboard, SQL Editor, New query).
    - It acts as anon, two clients, a coach without MFA and a coach with MFA, and re-checks the rules from `tests/coaching-portal-rls.test.js`.
    - Every check is recorded even if it errors (recorded as FAIL), so one failure does not stop the rest.
    - It checks against counts taken during the run, not fixed numbers, so it is correct on the live project.
-   - Expect 28 rows, all PASS. If any row is FAIL, do not go on to step 4: send me the row's text.
+   - Expect 33 rows, all PASS (28 from 4a, plus the 4b checks). If any row is FAIL, do not go on to step 4: send me the row's text.
    - The stub users need the standard `auth.users` columns (`id`, `email`, `email_confirmed_at`). If the first row says FAIL on the setup check, paste me its detail.
 4. Add yourself as the coach, and add a test client, as described below.
 
@@ -164,6 +164,56 @@ Do these in order. Use the SQL Editor (Dashboard, SQL Editor, New query).
 - **The coach's client list** must name its columns, not use `select *`, because of the notes column.
 - **Branch and main:** `coaching-portal` starts from `coaching-demo`, which does not yet have the security fixes that are on `main` (the dashboard ratings change). When this branch is merged into `main`, `dashboard.html` will need the two changes combined.
 
-## Open for 4b
+## Step 4b: the client side on real data
 
-- **Full client history.** `my_client_id()` returns only the client's newest plan. A returning client therefore cannot see logs from an earlier 12-week plan, because those rows belong to a finished plan row. Decide in 4b whether clients see their full history across plans, and if so change `my_client_id()` or the policies that use it.
+What 4b adds, on top of 4a:
+
+| Part | What it is | Where |
+|---|---|---|
+| Full history | A client reads every coaching row linked to their login: the current plan and older 12-week plans. Writes still go only to the current active plan. | `supabase/coaching-portal-4b.sql` (`my_client_ids()`, read policies) |
+| Returning clients | `claim_coaching()` links a new plan for the same email, not only the first one. | `supabase/coaching-portal-4b.sql` |
+| Beast AI counter | 40 calls per client per Melbourne day, and 300 shared across all clients per day. Only the server can use it. | `supabase/coaching-portal-4b.sql` (`coach_ai_usage`, `coach_ai_use()`) |
+| Beast AI endpoint | `/api/coach-ai`: checks the user's token with Supabase, checks an active plan, counts the call, then calls Anthropic. Modes: Describe it, Meal Builder (fridge and create), How to do it. | `api/coach-ai.js`, and the runners exported from `api/demo-ai.js` |
+| Client portal | The onboarding (six steps and the Basic screen), the status screens, Today (Add a meal in three modes, workouts, Other activity, steps, weigh-in), My plan, Progress, and Settings (news, delete my data). | `my-coach.html` |
+| Checks | The 4b checks are in the verify script, which now also runs 4b first in the test suite. | `supabase/coaching-portal-verify.sql` |
+
+### Run order (Supabase SQL Editor, in this order)
+
+1. `supabase/coaching.sql`, only if it has never been run.
+2. `supabase/coaching-portal.sql` (4a). Already run on the live project.
+3. `supabase/coaching-portal-4b.sql` (4b). Safe to run twice. Run it once now.
+4. `supabase/coaching-portal-verify.sql`. Read the results panel: every row should say PASS. It now expects the older-plan and counter checks as well, and it still rolls back, so it leaves nothing behind.
+
+### Environment for `/api/coach-ai` (Vercel)
+
+- `ANTHROPIC_API_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` (the counter only). Both must be set for the environments you use. Without them the endpoint returns 500 `not_configured` and no AI call is made.
+- The browser only ever receives the signed-in user's access token. No secret key is in the page.
+
+### Decisions, and where the portal differs from the demo
+
+- **Storage.** The demo kept everything in the browser. The portal reads and writes Supabase directly, and relies on the database rules. The only thing kept in the browser is the onboarding draft, so answers survive a reload.
+- **Logging dates.** The window uses Melbourne's date, the same day the database uses. A client in another zone may see a different "today" in their own time, but logging follows Melbourne's day.
+- **Weigh-in edits.** Saving a second weigh-in in the same week updates the one you already have, rather than failing. The database still allows only one per week.
+- **Refused days.** The page checks the logging window before it writes, so a refused day shows a clear message. The database checks again on every write, and that check is the one that counts.
+- **Consent.** A client cannot read their news choice (the customer list is coach-only), so Settings shows two explicit buttons and reports what was just saved, rather than showing the current state.
+- **Delete my data.** Two steps: an explanation and a confirm button. The purchase record is kept, as the page says.
+- **Plans.** The coach's plan is read as JSON: `{ "meals": { "1".."7": [meal, ...] }, "training": "Mon: Full body A\n- Squat 3x8" }`. Step 4c writes plans in this shape.
+- **Basic targets.** Worked out on the server by `submit_onboarding()`, so a client cannot type their own. The Basic targets screen appears straight after submitting.
+- **Beast AI limits.** Each call counts before Anthropic is called, including a call that then fails. That keeps the limit honest, and it is the simplest rule to explain. A failed call therefore uses up one of the 40.
+- **Exercise library.** Copied unchanged from the demo, so the wording matches.
+- **WhatsApp.** The Beast's button still links to `https://wa.me/`, as in the demo. The real Stefan number is not yet in the page. Add it before launch.
+- **Check-ins.** The client sees the next check-in from `coaching_checkins`. Scheduling it, and the one-kick-off rule for Essential, are step 4c (coach side).
+
+### Tests added in 4b
+
+- `tests/coaching-portal-client.test.js`: the client portal on a stubbed Supabase, which applies the same window and weigh-in rules as the database. It covers both onboarding flows (the six steps and the Basic screen), the status screens, the check-in card, The Beast only WhatsApp, From my plan, Describe it, Meal Builder, workouts (plan and Other activity), steps, the weigh-in day, past-day logging, refused days with a friendly message, read-only plans, earlier plans in Progress, the consent buttons, delete my data, How to do it, and no coach-only notes.
+- `tests/coach-ai.test.js`: no token, a bad token, no active plan, the client limit, the shared cap, the order of the checks, the day mode refused for clients, an unreachable counter, missing keys.
+- `tests/coaching-portal-rls.test.js`: the 4b database rules (older plans, the returning-client claim, the counter per client and shared, anon refused), and the extended verify script, all PASS, nothing left behind.
+
+What the tests cannot prove: the page is tested on a stub of Supabase and of Beast AI, and the database on PGlite. Before launch, sign in on a Supabase preview project with a real client account and check one day of logging end to end, and one call to Describe it.
+
+## Open for 4c
+
+- **Coach side.** Admin and client list, activation (start date, targets, plan publishing), the plan editor in the JSON shape above, check-in scheduling (with the Essential one-kick-off rule), and two-factor sign-in for the coach.
+- **Activation check for doctor clearance.** The client confirms it in onboarding. The coach checks it before activating.
+- **WhatsApp number** for The Beast's button.
