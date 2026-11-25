@@ -110,6 +110,27 @@ img{max-width:100%}
 }
 .yes{display:inline-flex;width:30px;height:30px;border-radius:50%;background:#2D6A4F;align-items:center;justify-content:center}
 .no{display:inline-flex;width:30px;height:30px;border-radius:50%;background:#F1E7DA;align-items:center;justify-content:center}
+/* Inside your coaching portal: phone frames, a swipe strip on phones, a grid on desktop */
+.portal-strip{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:6px 20px 14px;scroll-padding:0 20px;scrollbar-width:none}
+.portal-strip::-webkit-scrollbar{display:none}
+.portal-item{flex:0 0 min(74vw,290px);scroll-snap-align:center;margin:0;display:flex;flex-direction:column;align-items:center;gap:14px}
+.phone{width:100%;background:#0A1A12;border-radius:40px;padding:10px;box-shadow:0 22px 44px rgba(27,48,34,.26)}
+.phone img{display:block;width:100%;height:auto;aspect-ratio:390/844;border-radius:30px;object-fit:cover;object-position:top}
+.portal-cap{margin:0;font-size:16px;font-weight:700;line-height:1.35;color:#1B3022;text-align:center}
+@media (min-width:900px){
+  .portal-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:44px 32px;overflow:visible;scroll-snap-type:none;padding:0}
+  .portal-item{flex:none;width:100%}
+  .phone{max-width:260px;margin:0 auto}
+  .portal-cap{font-size:18px}
+}
+/* Tablet widths: the comparison table fits the card instead of scrolling sideways */
+@media (min-width:760px) and (max-width:1023px){
+.cmp{min-width:0}
+.cmp th:first-child,.cmp td:first-child{min-width:170px;font-size:15px}
+.cmp th,.cmp td{padding:12px 6px}
+.cmp thead .pn{font-size:21px}
+.cmp .txt{font-size:14px}
+}
 </style>
 </head>
 <body>
@@ -190,14 +211,13 @@ img{max-width:100%}
 <p class="what">A fully personalised 12-week meal and workout plan I build for you. An initial video call, then you follow your 12-week plan.</p>
 <div class="price"><span class="n">$110</span><span class="u">AUD for 12 weeks</span></div>
 <div class="places" data-places="essential">100 spots left</div>
-<div class="fmt">Online: portal plus one WhatsApp call</div>
+<div class="fmt">Online: portal plus one kick-off call on WhatsApp</div>
 <ul>
-<li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>Personalised meal and training plan</span></li>
+<li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>One personalised 12-week meal and training plan</span></li>
 <li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>Your calorie and macro targets</span></li>
 <li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>Log your meals online against your plan</span></li>
-<li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>Beast AI Meal Builder and Meal Log</span></li>
-<li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>1:1 WhatsApp video setup call</span></li>
-<li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>Plan refresh at week 6</span></li>
+<li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>Meal Builder and Add a meal, with Beast AI</span></li>
+<li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>Kick-off video call on WhatsApp, at the start</span></li>
 </ul>
 <p class="best"><b>Best for:</b> self-motivated people who mainly need the right plan.</p>
 <a class="cta ghost" data-cta="essential" href="mailto:info@beastcoach.fit?subject=Beast%20Coach%20Essential">Get Essential</a>
@@ -278,15 +298,15 @@ img{max-width:100%}
 <tr><td>Track progress against your targets</td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
 <tr><td>Weekly weigh-ins and weight trend</td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
 <tr><td>Log workouts</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
-<tr><td>Beast AI Meal Builder: fridge photo to a meal that fits your macros</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
+<tr><td>Meal Builder: fridge photo to a meal that fits your macros</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
 <tr class="grp"><td colspan="5">Your plan</td></tr>
 <tr><td>In-depth onboarding questionnaire</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
 <tr><td>Personalised meal plan</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
 <tr><td>Personalised training plan, home or gym</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
 <tr><td>How-to guide for every exercise in your plan</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
-<tr><td>Plan updates</td><td class="txt">None</td><td class="txt">Week 6</td><td class="txt core">Weeks 4 and 8</td><td class="txt">Whenever needed</td></tr>
+<tr><td>Plan updates</td><td class="txt">None</td><td class="txt">None</td><td class="txt core">Weeks 4 and 8</td><td class="txt">Whenever needed</td></tr>
 <tr class="grp"><td colspan="5">Coaching</td></tr>
-<tr><td>1:1 WhatsApp video setup call</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
+<tr><td>Kick-off video call on WhatsApp</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
 <tr><td>Logged meals reviewed by me to revise your plan</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
 <tr><td>Weekly WhatsApp check-in, reviewed against your logs</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
 <tr><td>WhatsApp video calls at weeks 4 and 8</td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td><span class="no"><svg width="16" height="16"><use href="#i-no"/></svg><span class="sr">Not included</span></span></td><td class="core"><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td><td><span class="yes"><svg width="18" height="18"><use href="#i-yes"/></svg><span class="sr">Included</span></span></td></tr>
@@ -308,6 +328,23 @@ img{max-width:100%}
 </div>
 </section>
 
+<!-- portal screens -->
+<section style="background:#F4F7F2;padding:80px 0 88px">
+<div style="max-width:1120px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;gap:14px">
+<div class="eyebrow">Inside the portal</div>
+<h2 class="disp" style="font-size:clamp(40px,5.5vw,64px);line-height:1;text-wrap:balance;max-width:16ch">Inside your coaching portal.</h2>
+<p style="margin:0 0 22px;font-size:18px;line-height:1.6;color:#3B4F43;max-width:60ch">These are the screens you will use every day, shown with a real demo client. Check-ins and calls happen on WhatsApp. The portal shows you when they are.</p>
+</div>
+<div class="portal-strip" role="list" aria-label="Screens from the coaching portal" style="max-width:1120px;margin:0 auto">
+<figure class="portal-item" role="listitem"><div class="phone"><img src="/coach-img/portal/today.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Today: daily totals, the next check-in and the day's meals"></div><figcaption class="portal-cap">See today at a glance</figcaption></figure>
+<figure class="portal-item" role="listitem"><div class="phone"><img src="/coach-img/portal/add-meal.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Add a meal: meals from your plan, ready to log"></div><figcaption class="portal-cap">Log a meal in seconds</figcaption></figure>
+<figure class="portal-item" role="listitem"><div class="phone"><img src="/coach-img/portal/meal-builder.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Meal Builder: a fridge list and what is left for the day"></div><figcaption class="portal-cap">Build meals from what's in your fridge</figcaption></figure>
+<figure class="portal-item" role="listitem"><div class="phone"><img src="/coach-img/portal/my-plan.jpg" width="390" height="844" loading="lazy" decoding="async" alt="My plan: your meals and training for the day"></div><figcaption class="portal-cap">Your plan, day by day</figcaption></figure>
+<figure class="portal-item" role="listitem"><div class="phone"><img src="/coach-img/portal/progress.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Progress: weight trend and steps over the weeks"></div><figcaption class="portal-cap">Track your progress weekly</figcaption></figure>
+<figure class="portal-item" role="listitem"><div class="phone"><img src="/coach-img/portal/workout.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Workout logging: sets, weights and reps for each exercise"></div><figcaption class="portal-cap">Log every set and rep</figcaption></figure>
+</div>
+</section>
+
 <!-- beast ai -->
 <section style="background:#1B3022;color:#fff;padding:88px 20px">
 <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:44px">
@@ -318,12 +355,12 @@ img{max-width:100%}
 </div>
 <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:stretch">
 <div style="flex:1 1 320px;min-width:0;background:#2D6A4F;border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:22px">
-<img src="/coach-img/ai-meal-builder.jpg" alt="Beast AI Meal Builder: a fridge photo with items recognised" style="width:100%;max-width:270px;aspect-ratio:720/963;object-fit:cover;object-position:top;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
+<img src="/coach-img/portal/meal-builder.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Meal Builder in the portal: fridge items and what is left for the day" style="width:100%;max-width:270px;aspect-ratio:390/844;object-fit:cover;object-position:top;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
 <div style="display:flex;flex-direction:column;gap:8px"><div class="disp" style="font-size:34px;line-height:1">Meal Builder</div><p style="margin:0;font-size:17px;line-height:1.55;color:#E3F4E9">Tell Beast AI what is in your fridge or snap a photo, set your calories and macros, and get a meal designed for you.</p></div>
 </div>
 <div style="flex:1 1 320px;min-width:0;background:#244A37;border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:22px">
-<img src="/coach-img/ai-meal-log.jpg" alt="Beast AI Meal Log: a meal turned into a calorie and macro estimate" style="width:100%;max-width:270px;aspect-ratio:720/963;object-fit:cover;object-position:top;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
-<div style="display:flex;flex-direction:column;gap:8px"><div class="disp" style="font-size:34px;line-height:1">Meal Log</div><p style="margin:0;font-size:17px;line-height:1.55;color:#D5E6DB">Type "150g chicken breast, no oil, with 150g cooked brown rice" and get calories and macros back. One tap adds it to your day.</p></div>
+<img src="/coach-img/portal/add-meal.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Add a meal in the portal: meals from your plan, ready to log" style="width:100%;max-width:270px;aspect-ratio:390/844;object-fit:cover;object-position:top;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
+<div style="display:flex;flex-direction:column;gap:8px"><div class="disp" style="font-size:34px;line-height:1">Add a meal</div><p style="margin:0;font-size:17px;line-height:1.55;color:#D5E6DB">Type "150g chicken breast, no oil, with 150g cooked brown rice" and get calories and macros back. One tap adds it to your day.</p></div>
 </div>
 </div>
 </div>

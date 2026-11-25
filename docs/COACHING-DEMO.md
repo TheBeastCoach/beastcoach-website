@@ -7,7 +7,9 @@ Branch: `coaching-demo` (not merged to `main`). Last updated 2026-11-25. Tests a
 | File | What it is |
 |---|---|
 | `coaching.html` | Sales page at `/coaching` ("Work With Me"). Plan cards, comparison table, FAQ. |
-| `coach-img/` | Images for the sales page (`stefan.jpg`, `ai-meal-builder.jpg`, `ai-meal-log.jpg`). |
+| `coach-img/` | Images for the sales page: `stefan.jpg`, and the six portal screens in `coach-img/portal/` (today, add-meal, meal-builder, my-plan, progress, workout). |
+| `scripts/capture-portal.js` | Captures the portal screens from the demo (`npm run screenshots`). Phone size, under 200KB each. |
+| `package.json` | Dev tools only: `playwright-core` for the tests and the screenshot script. The site has no build step. |
 | `coaching-demo.html` | No-login demo at `/coaching-demo`. Coach view (Clients and Customers pages) plus a client view for each client. Everything is stored in the browser (`localStorage`). |
 | `coaching-terms.html`, `coaching-health.html`, `coaching-privacy.html` | Draft agreement pages at `/coaching-terms`, `/coaching-health` and `/coaching-privacy`. Marked DRAFT, `noindex`. Linked from the onboarding agreements. |
 | `basic-targets.js` | Basic daily targets formula, shared by the demo page and the tests. |
@@ -23,7 +25,7 @@ Prices in AUD. Copy and prices are as written in the file; do not change them wi
 | Plan | Price | Places (from `coaching_capacity`) | Plan updates |
 |---|---|---|---|
 | Basic | $2.50 a week, $30 billed every 12 weeks | Unlimited | None |
-| Essential | $110 for 12 weeks | 100 | Week 6 |
+| Essential | $110 for 12 weeks | 100 | None |
 | Core | $299 for 12 weeks | 25 | Weeks 4 and 8 |
 | The Beast | $699 for 12 weeks | 4 | Whenever needed |
 
@@ -114,7 +116,7 @@ Steps (`OB_STEPS` in `coaching-demo.html`):
 
 ### Demo sample clients (`seedDb`)
 
-- Sam Taylor: Core, active. Said yes to news.
+- Sam Taylor: Core, active since 26 Oct (week 5 of 12). Said yes to news. Four Monday weigh-ins, and one upcoming check-in on Thu 26 Nov at 6:30pm (Melbourne time).
 - Mia Chen: Essential, awaiting activation.
 - Jordan Reid: The Beast, active.
 - Alex Lee: Basic, active.
@@ -153,40 +155,40 @@ Steps (`OB_STEPS` in `coaching-demo.html`):
 
 ## Running the tests
 
-Install the browser tooling once, outside the repo, so no `package.json` or lock file is created:
+Install once, from the repo root (creates `node_modules/`, which is git-ignored):
 
 ```
-mkdir -p /tmp/cb-tests && cd /tmp/cb-tests && npm init -y && npm install --no-save playwright-core
+npm install
 ```
 
-Then, from the repo:
+Then, from the repo root:
 
 ```
-export PLAYWRIGHT_CORE_PATH=/tmp/cb-tests/node_modules/playwright-core
+npm test                      # the unit and file checks that need no browser
+```
+
+Browser tests need Chrome. Set `CHROME_PATH` if Chrome is not at the default macOS location:
+
+```
 export CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-export SHOT_DIR=/tmp/cb-shots          # optional: where screenshots are written
-```
-
-Unit and file checks (no browser):
-
-```
-node --test tests/basic-targets.test.js tests/demo-ai.test.js tests/coaching-legal.test.js
-```
-
-Browser tests (Chrome):
-
-```
 node --test tests/coaching-demo.flows.test.js tests/coaching-demo.integration.test.js tests/coaching-demo.round2.test.js
+node --test tests/coaching-round3.test.js tests/coaching-sales.test.js
+node --test tests/security-pages.test.js tests/security-sql.test.js   # only if those files are on the branch
 ```
 
 - `coaching-demo.flows.test.js`: the flows at 390px, with the clock set to a Monday.
-- `coaching-demo.integration.test.js`: the real `api/demo-ai.js` handler in the browser, with only the Anthropic and Supabase calls mocked. Includes the AI error cases and the no-key case.
-- `coaching-demo.round2.test.js`: logs from activation (a new client onboards, is activated, and the Logs tab is checked), the steps questions, the Basic steps rule, food lists, time zones, Add a meal, Other activity, past days, weigh-in strictness, customers (checkout, delete keeps the record, copy and CSV only for OK-to-email, unsubscribe, search and filters), reset, the no-key run, and the agreement links. It also writes the screenshots: `add-a-meal-phone.png`, `onboarding-steps-phone.png`, `agreements-links-phone.png`, `coach-logs-new-client-phone.png`, `customers-desktop.png`.
-- If `playwright-core` cannot be loaded, the browser tests skip with a message.
+- `coaching-demo.integration.test.js`: the real `api/demo-ai.js` handler in the browser, with only the Anthropic and Supabase calls mocked.
+- `coaching-demo.round2.test.js`: logs from activation, the steps questions, time zones, Add a meal, Other activity, past days, customers, reset, the no-key run, and the agreement links. It also writes the round 2 screenshots.
+- `coaching-round3.test.js`: check-ins (Sam's card, the time-zone label, Core schedule, edit and cancel, Essential's single kick-off, Basic has none, The Beast's WhatsApp button) and Basic Maintain.
+- `coaching-sales.test.js`: the sales page at 390, 768 and 1280: spot counts from the live counter (and the fallback when it is down), no horizontal overflow, every image loads, no console errors, the swipe strip on a phone and the grid on desktop.
+- `coaching-legal.test.js` and `coaching-copy.test.js`: file checks. No week-6 wording, no em dashes, Meal Builder naming, the six portal images under 200KB.
+- `basic-targets.test.js`: the formula, the steps rule, and Maintain equal to maintenance across 2,916 input combinations.
 
-Counts as of 2026-11-25: unit and legal checks 42 passing (`basic-targets`, `demo-ai`, `coaching-legal`); browser flows, integration and round 2 39 passing.
+Counts and results are recorded in the session that changed them. Re-run the commands above before merging.
 
-There is no automated test for `/coaching` itself. It was checked by hand at 390px and 1280px: no broken images, no horizontal overflow. The one console error is the `coaching_places` 404, which goes away once `supabase/coaching.sql` is run.
+### Portal screenshots
+
+`npm run screenshots` opens the demo as Sam at 390x844 (2x) and writes `coach-img/portal/*.jpg`. Demo-only UI (the bar with the view switcher, Reset demo and the AI badge) is hidden by the `?shot=1` query parameter, which only the capture uses. Re-run it after any change to how the portal looks.
 
 ## Setup still needed
 
@@ -209,21 +211,21 @@ https://<preview-deployment>/coaching-demo?key=<DEMO_KEY>
 - The page opens without the key. The key only unlocks Beast AI. Without it the AI features show a "key" message, and the numbers can still be typed in.
 - Use the Preview deployment, not production.
 
-## Open decisions
+## Decided
 
-1. **Do Core check-ins and calls stay on WhatsApp?**
-   - Current copy: Core has a weekly WhatsApp check-in, two WhatsApp video calls at weeks 4 and 8, and form checks on WhatsApp. The Beast has weekly 1:1 WhatsApp video calls and direct WhatsApp access.
-   - The demo tells clients to "ask Stefan on WhatsApp" or "bring it to your weekly check-in". The terms page repeats the WhatsApp details.
-   - Where to change: `coaching.html` (plan cards and the comparison table), `coaching-terms.html`, and `coaching-demo.html` (the no-guide message, the status card and the WhatsApp links).
-2. **Does Essential keep the week 6 plan refresh?**
-   - Current copy: "Plan refresh at week 6" on the Essential card, "Plan updates: Week 6" in the table, and the same in `coaching-terms.html`.
+1. **Check-ins and calls happen on WhatsApp, outside the portal.** The portal shows the next check-in only (Essential, Core and The Beast). The coach schedules, edits and cancels them on the Check-ins tab, in Melbourne time. The client's Today card shows the next one in their own time zone, with "(Melbourne time ...)" when that differs.
+   - Essential: one kick-off call only. Core: Kick-off call, Check-in or Video call. The Beast: the same three types.
+   - Basic: no check-ins at all.
+   - WhatsApp button: The Beast only.
+2. **Essential is one plan for 12 weeks.** A kick-off video call at the start, then one meal and workout plan. There is no mid-plan update for Essential anywhere on the site, the demo or the agreements.
+3. **Basic "Maintain" is exact maintenance.** Calories equal the calculated maintenance, with no deficit or surplus. Tested across 2,916 input combinations.
 
 ## Other open items found in the code
 
-- Confirm the Maintain targets (see `basic-targets.js` header).
 - Get the three agreement pages reviewed before launch. They are drafts.
 - Decide whether a customer who is Cancelled should ever come back to Active. The demo sets Cancelled only when a client who has not finished is deleted.
 - The Discipline Path purchases are not recorded yet. The customer model is ready for them.
 - The `coaching_places` 404 stays until `supabase/coaching.sql` is run.
 - The demo model ID is hard-coded in `api/demo-ai.js`.
+- Check-ins and calls are not sent or reminded by the portal. Stefan schedules them and contacts the client on WhatsApp.
 - The Customers page and the customer records are demo-only, in browser storage. Do not treat them as real customer data.

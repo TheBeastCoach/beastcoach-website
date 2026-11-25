@@ -116,3 +116,26 @@ test('the calculator has no maintain goal, so maintain is the calculator mainten
   const m = BasicTargets.calcTargets({ sex: 'male', age: 34, heightCm: 182, weightKg: 84, activity: 1.15, steps: 5000, trainingSessions: 3, trainingIntensity: 350, goal: 'maintain' });
   assert.equal(m.calories, m.maintenance);
 });
+
+// Maintain must give exactly the calculated maintenance calories: no deficit, no surplus.
+test('maintain: calories equal the calculated maintenance for every combination of inputs', () => {
+  let checked = 0;
+  for (const sex of ['male', 'female']) for (const age of [18, 29, 45, 70, 100]) for (const heightCm of [150, 170, 195])
+    for (const weightKg of [48.5, 72, 110]) for (const activity of [1.15, 1.25, 1.35]) for (const steps of [0, 4000, 12000])
+      for (const trainingSessions of [0, 3, 7]) for (const trainingIntensity of [200, 350, 500]) {
+        const t = BasicTargets.calcTargets({ sex, age, heightCm, weightKg, activity, steps, trainingSessions, trainingIntensity, goal: 'maintain' });
+        assert.equal(t.calories, t.maintenance, `calories ${t.calories} vs maintenance ${t.maintenance}`);
+        checked++;
+      }
+  assert.equal(checked, 2 * 5 * 3 * 3 * 3 * 3 * 3 * 3);
+});
+
+test('maintain has no calorie adjustment, and the other goals still move calories', () => {
+  assert.equal(BasicTargets.GOALS.maintain.delta, 0);
+  const base = { sex: 'female', age: 40, heightCm: 165, weightKg: 70, activity: 1.25, steps: 6000, trainingSessions: 4, trainingIntensity: 350 };
+  const m = BasicTargets.calcTargets(Object.assign({ goal: 'maintain' }, base));
+  const f = BasicTargets.calcTargets(Object.assign({ goal: 'fatloss' }, base));
+  const u = BasicTargets.calcTargets(Object.assign({ goal: 'muscle' }, base));
+  assert.equal(f.calories, m.maintenance - 500, 'fat loss is 500 under maintenance');
+  assert.equal(u.calories, m.maintenance + 300, 'muscle is 300 over maintenance');
+});

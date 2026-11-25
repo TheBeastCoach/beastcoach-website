@@ -191,6 +191,10 @@ summary::-webkit-details-marker{display:none}
 .ok-yes{color:#1b7a46;font-weight:800}.ok-no{color:var(--muted)}
 .tz-flag{font-size:13px;color:var(--amber-text);background:#fff6e0;border-radius:8px;padding:4px 9px;display:inline-block;margin-top:5px}
 .hint{font-size:13px;color:var(--muted);margin:4px 0 0}
+/* Screenshot mode (?shot=1, used by scripts/capture-portal.js): hides the demo-only bar and toasts. Normal use is unchanged. */
+body.shot #demoBar,body.shot .toast{display:none !important}
+.checkin-card{border:2px solid var(--mint)}
+.checkin-card h3{margin:2px 0 0}
 </style>
 </head>
 <body>
@@ -208,7 +212,7 @@ summary::-webkit-details-marker{display:none}
    Constants
    ========================================================================== */
 // Bumped with the customer records, so older saved demo data is replaced by the new seeds.
-const DB_KEY = 'bc_demo_v3';
+const DB_KEY = 'bc_demo_v4';
 const UI_KEY = 'bc_demo_ui2';
 const DEMO_KEY_NAME = 'bc_demo_key';
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -682,6 +686,7 @@ function mkClient(o) {
     startDate:null, pauseUsed:0, pauseStart:null, healthFlag:false, ob: blankOb(), obStep: 1,
     steps:{}, stepsLate:{}, nextBilling:null, basicStage:null,     // stepsLate: days logged after the day itself
     weighIns:[], workouts:[], targets:null,
+    checkins:[],                       // scheduled on WhatsApp, shown in the portal: { id, date, time (Melbourne), type, status }
     plan:{ mealDraft: emptyDraft(), mealPublished: null, trainDraft:'', trainPublished: null, publishedAt: null },
     logs:{}, notes:''
   }, o);
@@ -762,8 +767,8 @@ function seedDb() {
 
   const sam = mkClient({
     id:'c_sam', name:'Sam Taylor', email:'sam@example.com', tier:'core', status:'active',
-    paid:{ date: addDays(t, -10), amount: 299 }, createdAt: addDays(t, -10) + 'T09:00:00.000Z',
-    startDate: addDays(t, -9), healthFlag:false,
+    paid:{ date: addDays(t, -30), amount: 299 }, createdAt: addDays(t, -30) + 'T09:00:00.000Z',
+    startDate: addDays(t, -28), healthFlag:false,
     ob: blankOb({
       age:'34', sex:'Male', heightUnit:'cm', heightCm:'182', weight:'84', weightUnit:'kg', weightKg:84, whatsapp:'+61 400 000 001', timezone:'Melbourne',
       goal:'Lose 6 kg and get back to lifting 3 days a week', timeframe:'3 months', goalWhy:'Trip in March and my knee is sick of the extra weight',
@@ -775,15 +780,16 @@ function seedDb() {
       experience:'Some', enjoys:'Lifting, cycling', hates:'Running', injuries:'Left knee gets sore on long walks',
       worked:'Tracking macros in an app for 6 weeks', didnt:'Cutting carbs completely', weighInDay:'Mon', weighInTime:'07:00',
       health:{ heart:'no', chest:'no', other:'no' }, healthClearance:false,
-      agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -9) + 'T18:00:00.000Z'
+      agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -28) + 'T18:00:00.000Z'
     }),
-    weighIns: weighsOn(addDays(t, -9), 'Mon', [83.6]),
+    weighIns: weighsOn(addDays(t, -28), 'Mon', [83.6, 83.1, 82.7, 82.2]),   // four Monday weigh-ins: a few weeks of Progress
+    checkins: [{ id: 'ci_sam_next', date: addDays(t, 3), time: '18:30', type: 'Check-in', status: 'scheduled' }],
     workouts: seedWorkouts(t, SAM_SCHEDULE).concat([
       { id: uid(), date: addDays(t, -3), what:'Bike intervals', minutes: 30, notes:'4 x 3 min hard' }
     ]),
     steps: seedSteps(t, 6600),
     targets: { calories:2000, protein:140, carbs:200, fat:70, fibre:28, steps:8000 },
-    plan: { mealDraft: draftFromPlan(samPlan), mealPublished: samPlan, trainDraft: SAM_TRAIN, trainPublished: SAM_TRAIN, publishedAt: addDays(t, -9) + 'T12:00:00.000Z' },
+    plan: { mealDraft: draftFromPlan(samPlan), mealPublished: samPlan, trainDraft: SAM_TRAIN, trainPublished: SAM_TRAIN, publishedAt: addDays(t, -28) + 'T12:00:00.000Z' },
     logs: samLogs,
     notes: 'Keep the step count up. Skip heavy squats this week if the knee flares. Responds well to short voice notes.'
   });
@@ -873,7 +879,7 @@ function seedDb() {
     dataDeleted: false, dataDeletedDate: null, clientId: null }, o);
   const customers = [
     customer({ name:'Sam Taylor', email:'sam@example.com', clientId:'c_sam', status:'active',
-      purchases:[{ product:'Core', date: addDays(t, -10), price: 299 }], marketingConsent: true, marketingDate: addDays(t, -10) }),
+      purchases:[{ product:'Core', date: addDays(t, -30), price: 299 }], marketingConsent: true, marketingDate: addDays(t, -30) }),
     customer({ name:'Mia Chen', email:'mia@example.com', clientId:'c_mia', status:'active',
       purchases:[{ product:'Essential', date: addDays(t, -2), price: 110 }], marketingDate: addDays(t, -2) }),
     customer({ name:'Jordan Reid', email:'jordan@example.com', clientId:'c_jordan', status:'active',
@@ -1830,7 +1836,7 @@ function statusLine(c) {
 function planReadyCopy(c) {
   if (c.tier === 'beast') return 'Your plan is ready to read. Message Stefan on WhatsApp to book your call and pick a start date.';
   if (c.tier === 'core') return 'Your plan is ready to read. Bring it to your weekly check-in to book your call and pick a start date.';
-  return 'Your plan is ready to read. Stefan will email you to book your call and pick a start date.';
+  return 'Your plan is ready to read. Stefan will message you on WhatsApp to book your kick-off call and pick a start date.';
 }
 function clientStatusCard(c) {
   let extra = '';
@@ -1882,7 +1888,7 @@ function renderToday(c) {
     <div style="text-align:center"><b>${isToday ? 'Today' : pd(day).toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'short' })}</b>
       <div class="mini">${fmtDate(day)}</div></div>
     <button class="btn-ghost btn-sm" data-act="dayNext" ${isToday ? 'disabled' : ''}>Next ›</button></div>`;
-  return `${dayNav}
+  return `${checkinCardHtml(c)}${dayNav}
     ${ro ? `<div class="ro-note">${READ_ONLY_MSG} You can still see what was logged.</div>` : ''}
     <div class="grid2">
       <div>
@@ -2248,6 +2254,94 @@ function renderCoachList() {
 /* ==========================================================================
    Coach: client page. Basic clients get a billing-only page: no logs, plan or notes.
    ========================================================================== */
+/* ==========================================================================
+   Scheduled check-ins. The calls and messages happen on WhatsApp, outside the portal.
+   The portal only shows when they are. Times are entered in Melbourne time.
+   ========================================================================== */
+const CHECKIN_TYPES = ['Kick-off call', 'Check-in', 'Video call'];
+const CHECKIN_SLOTS = (() => { const out = []; for (let h = 6; h <= 21; h++) { out.push(pad(h) + ':00', pad(h) + ':30'); } return out; })();
+// Essential: one kick-off call. Core and The Beast: any of the three types. Basic: none.
+function checkinTypesFor(tier) { return tier === 'essential' ? ['Kick-off call'] : tier === 'basic' ? [] : CHECKIN_TYPES; }
+// Offset of a zone from UTC in minutes, at a moment in time.
+function tzOffsetMin(date, zone) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: zone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit' }).formatToParts(date).map(x => [x.type, x.value]));
+  const asUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second);
+  return Math.round((asUtc - date.getTime()) / 60000);
+}
+// A wall-clock date and time in a zone, as a real moment in time.
+function wallToInstant(dateStr, timeStr, zone) {
+  const [y, m, d] = dateStr.split('-').map(Number), [hh, mm] = timeStr.split(':').map(Number);
+  const local = Date.UTC(y, m - 1, d, hh, mm);
+  const once = local - tzOffsetMin(new Date(local), zone) * 60000;
+  return new Date(local - tzOffsetMin(new Date(once), zone) * 60000);
+}
+// How a moment reads in a zone: "Tue 2 Dec" and "6:30pm".
+function fmtInZone(instant, zone) {
+  const parts = new Intl.DateTimeFormat('en-AU', { timeZone: zone, weekday: 'short', day: 'numeric', month: 'short',
+    hour: 'numeric', minute: '2-digit', hour12: true }).formatToParts(instant);
+  const g = t => ((parts.find(p => p.type === t) || {}).value || '');
+  return { date: `${g('weekday')} ${g('day')} ${g('month')}`, time: `${g('hour')}:${g('minute')}${g('dayPeriod').toLowerCase().replace(/\./g, '')}` };
+}
+function checkinInstant(ci) { return wallToInstant(ci.date, ci.time, DEFAULT_TZ); }
+// The next check-in still to come (scheduled, not cancelled, not yet passed).
+function upcomingCheckin(c) {
+  const now = Date.now();
+  return (c.checkins || []).filter(x => x.status === 'scheduled' && checkinInstant(x).getTime() >= now)
+    .sort((a, b) => checkinInstant(a) - checkinInstant(b))[0] || null;
+}
+// Client Today card. Hidden for Basic, and when nothing is scheduled.
+function checkinCardHtml(c) {
+  if (c.tier === 'basic') return '';
+  const ci = upcomingCheckin(c);
+  if (!ci) return '';
+  const inst = checkinInstant(ci);
+  const mine = fmtInZone(inst, zoneFor(c)), mel = fmtInZone(inst, DEFAULT_TZ);
+  const differs = mine.time !== mel.time || mine.date !== mel.date;
+  const melText = mel.date === mine.date ? mel.time : `${mel.date}, ${mel.time}`;
+  return `<div class="card checkin-card" id="checkinCard"><div class="eyebrow">${esc(ci.type)}</div>
+    <h3>Next check-in: ${esc(mine.date)}, ${esc(mine.time)}</h3>
+    ${differs ? `<p class="mini" style="margin:4px 0 0">(Melbourne time ${esc(melText)})</p>` : ''}
+    <p style="margin:10px 0 0">I'll contact you on WhatsApp at this time.</p></div>`;
+}
+// Coach: list of check-ins (upcoming, past, cancelled), and the form to schedule or edit one.
+function checkinsHtml(c) {
+  const types = checkinTypesFor(c.tier);
+  const now = Date.now();
+  const list = (c.checkins || []).slice().sort((a, b) => checkinInstant(a) - checkinInstant(b));
+  const live = list.filter(x => x.status !== 'cancelled');
+  const editing = list.find(x => x.id === ui.ciEditId) || null;
+  const blocked = c.tier === 'essential' && live.length >= 1 && !editing;
+  const label = x => x.status === 'cancelled' ? 'Cancelled' : checkinInstant(x).getTime() >= now ? 'Upcoming' : 'Past';
+  const rows = list.length ? list.map(x => {
+    const f = fmtInZone(checkinInstant(x), DEFAULT_TZ);
+    return `<div class="meal"><div style="flex:1 1 220px"><b>${esc(x.type)}</b> <span class="mini">${esc(label(x))}</span>
+      <div>${esc(f.date)}, ${esc(f.time)} <span class="mini">Melbourne time</span></div></div>
+      ${x.status === 'cancelled' ? '' : `<div class="acts"><button class="btn-ghost btn-sm" data-act="editCheckin" data-id="${esc(x.id)}">Edit</button>
+        <button class="btn-danger btn-sm" data-act="cancelCheckin" data-id="${esc(x.id)}">Cancel</button></div>`}</div>`;
+  }).join('')
+    : '<p class="muted">No check-ins scheduled yet.</p>';
+  const defDate = editing ? editing.date : addDays(todayS(), 1);
+  const defTime = editing ? editing.time : '18:30';
+  const defType = editing ? editing.type : types[0];
+  const form = blocked
+    ? `<div class="note-box">Essential includes one kick-off call. Edit it or cancel it to change the time.</div>`
+    : `<div class="grid2">
+        <div class="field" style="margin:0"><label for="ci-date">Date</label><input id="ci-date" type="date" value="${esc(defDate)}"></div>
+        <div class="field" style="margin:0"><label for="ci-time">Time (Melbourne time)</label>
+          <select id="ci-time">${CHECKIN_SLOTS.map(t => `<option value="${t}" ${t === defTime ? 'selected' : ''}>${esc(fmtTime(t))}</option>`).join('')}</select></div>
+      </div>
+      <div class="field" style="margin:12px 0 0"><label for="ci-type">Type</label>
+        <select id="ci-type">${types.map(t => `<option ${t === defType ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></div>
+      <div class="row" style="justify-content:flex-start;margin-top:12px">
+        <button data-act="saveCheckin">${editing ? 'Save changes' : 'Schedule check-in'}</button>
+        ${editing ? '<button class="btn-ghost" data-act="cancelEditCheckin">Stop editing</button>' : ''}</div>`;
+  const plan = c.tier === 'essential' ? 'Essential: one kick-off call at the start.'
+    : 'Check-ins and calls happen on WhatsApp, outside the portal. The client sees the next one on Today.';
+  return `<div class="card"><h3>Schedule check-in</h3>
+      <p class="mini" style="margin-top:0">${esc(plan)} Times are entered in Melbourne time (Australia/Melbourne).</p>${form}</div>
+    <div class="card"><h3>Check-ins</h3><p class="mini" style="margin-top:0">Upcoming and past, in date order. Cancelled ones stay here, not on the client's Today.</p>${rows}</div>`;
+}
 function renderBasicCoachView(c) {
   return `<div class="row" style="margin-bottom:10px"><button class="btn-ghost btn-sm" data-act="backClients">‹ All clients</button></div>
     <section class="hero"><div class="row"><div>
@@ -2266,9 +2360,10 @@ function renderBasicCoachView(c) {
 }
 function renderCoachClient(c) {
   if (c.tier === 'basic') return renderBasicCoachView(c);
-  const tabs = [['overview','Overview'],['onboarding','Onboarding'],['plan','Targets and plan'],['logs','Logs'],['progress','Progress'],['notes','Notes']];
+  const tabs = [['overview','Overview'],['checkins','Check-ins'],['onboarding','Onboarding'],['plan','Targets and plan'],['logs','Logs'],['progress','Progress'],['notes','Notes']];
   let body = '';
   if (ui.coachTab === 'overview') body = overviewHtml(c);
+  else if (ui.coachTab === 'checkins') body = checkinsHtml(c);
   else if (ui.coachTab === 'onboarding') body = onboardingAnswersHtml(c);
   else if (ui.coachTab === 'plan') body = planEditorHtml(c);
   else if (ui.coachTab === 'logs') body = logsHtml(c);
@@ -2573,6 +2668,36 @@ ACT.unsubscribe = el => {
 };
 ACT.copyEmails = () => { copyEmailsAction(); };
 ACT.downloadCsv = () => { downloadCsvAction(); };
+/* Check-in handlers (coach). Times are Melbourne time. */
+ACT.saveCheckin = () => {
+  const c = clientById(ui.coachClientId);
+  const date = document.getElementById('ci-date').value;
+  const time = document.getElementById('ci-time').value;
+  const type = document.getElementById('ci-type').value;
+  if (!date) { toast('Pick a date.'); return; }
+  if (!checkinTypesFor(c.tier).includes(type)) { toast('That check-in is not part of this plan.'); return; }
+  if (wallToInstant(date, time, DEFAULT_TZ).getTime() < Date.now()) { toast('Pick a time in the future.'); return; }
+  c.checkins = c.checkins || [];
+  if (ui.ciEditId) {
+    const ci = c.checkins.find(x => x.id === ui.ciEditId);
+    if (ci) Object.assign(ci, { date, time, type });
+    ui.ciEditId = null;
+  } else {
+    if (c.tier === 'essential' && c.checkins.some(x => x.status !== 'cancelled')) { toast('Essential includes one kick-off call. Edit it or cancel it instead.'); return; }
+    c.checkins.push({ id: uid(), date, time, type, status: 'scheduled' });
+  }
+  persist(); saveUi(); render(); toast('Check-in saved. Times are Melbourne time.');
+};
+ACT.editCheckin = el => { ui.ciEditId = el.dataset.id; saveUi(); render(); };
+ACT.cancelEditCheckin = () => { ui.ciEditId = null; saveUi(); render(); };
+ACT.cancelCheckin = el => {
+  const c = clientById(ui.coachClientId);
+  const ci = (c.checkins || []).find(x => x.id === el.dataset.id);
+  if (!ci) return;
+  ci.status = 'cancelled';
+  if (ui.ciEditId === ci.id) ui.ciEditId = null;
+  persist(); saveUi(); render(); toast('Check-in cancelled. The client no longer sees it.');
+};
 ACT.howTo = el => { openExercise(el.dataset.name); };
 ACT.closeSheet = () => closeSheet();
 
@@ -3214,6 +3339,7 @@ db = Store.load();
 initUi();
 if (ui.view === 'client' && !clientById(ui.clientId)) { ui.view = 'coach'; ui.clientId = null; }
 activeZone = zoneFor(ui.view === 'client' ? clientById(ui.clientId) : null);
+if (new URLSearchParams(location.search).has('shot')) document.body.classList.add('shot');
 ui.clientDay = logDay();
 document.getElementById('tzList').innerHTML = TZ_CITIES.map(([city, zone]) => `<option value="${city}">${zone}</option>`).join('');
 saveUi();

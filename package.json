@@ -1,0 +1,12 @@
+{
+  "name": "beastcoach-website",
+  "private": true,
+  "description": "Beast Coach website. Dev tools only: no build step, the site is static.",
+  "scripts": {
+    "screenshots": "node scripts/capture-portal.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.65.1"
+  }
+}

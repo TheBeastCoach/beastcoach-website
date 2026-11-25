@@ -254,10 +254,10 @@ test('Logs for seeded clients: Sam has a day for each day since activation and n
   const { ctx, page } = await openPage({ desktop: true, viewport: { width: 1280, height: 900 } });
   await coachOpens(page, 'c_sam');
   await page.click('button[data-act="coachTab"][data-tab="logs"]');
-  // Sam was activated 9 days before today: that is 10 days, counting both ends.
-  assert.equal(await page.locator('details:not(.baseline)').count(), 10);
+  // Sam was activated 28 days before today. The Logs tab lists the last 21 days, all from activation.
+  assert.equal(await page.locator('details:not(.baseline)').count(), 21);
   assert.equal(await page.locator('details.baseline').count(), 0, 'no baseline for Sam');
-  assert.match(await page.locator('details:not(.baseline)').last().textContent(), /14 Nov 2026/, 'the oldest day is the activation day, 14 Nov');
+  assert.match(await page.locator('details:not(.baseline)').last().textContent(), /3 Nov 2026/, 'the oldest day listed is 3 Nov, inside the activation window');
   assert.match(await page.locator('details:not(.baseline)').first().textContent(), /23 Nov 2026/, 'the newest day is today');
   noErrors(page);
   await ctx.close();

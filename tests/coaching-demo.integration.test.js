@@ -113,7 +113,7 @@ async function toastWith(page, phrase) {
 
 async function openSamToday(page) {
   await page.selectOption('#viewAs', 'client:c_sam');
-  await page.waitForSelector('text=Week 2 of 12');
+  await page.waitForSelector('text=Week 5 of 12');
   // Coached clients open on From my plan. The AI tests use Describe it.
   await page.click('button[data-act="addMode"][data-m="describe"]');
 }
