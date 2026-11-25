@@ -108,6 +108,12 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .top-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
 .logo{font-family:'Bebas Neue',Impact,sans-serif;font-size:22px;letter-spacing:.1em;color:var(--ink);text-decoration:none}
 .logo span{color:var(--mint)}
+.tz-btn{display:block;width:100%;text-align:left;min-height:48px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;font:inherit;color:var(--ink,#1B3022);cursor:pointer}
+.tz-panel{margin-top:8px;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+.tz-panel input[type=search]{width:100%;min-height:44px;font-size:16px;box-sizing:border-box}
+.tz-results{max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-top:8px}
+.tz-group{font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:14px 0 4px;color:#4c6354}
+.tz-opt{display:block;width:100%;text-align:left;min-height:44px;padding:10px 8px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;color:inherit;cursor:pointer}
 </style>
 </head>
 <body>
@@ -118,7 +124,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
   </div>
   <main id="app" aria-live="polite"><p class="muted">Loading your coaching…</p></main>
 </div>
-<datalist id="tzList"></datalist>
 <div id="sheetRoot"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -377,15 +382,16 @@ const EXERCISES = [
 ];
 
 /* Time zones, for "today" in the client's own zone and for check-in times. */
-const TZ_CITIES = [
-  ['Melbourne','Australia/Melbourne'], ['Sydney','Australia/Sydney'], ['Brisbane','Australia/Brisbane'],
-  ['Adelaide','Australia/Adelaide'], ['Perth','Australia/Perth'], ['Hobart','Australia/Hobart'], ['Darwin','Australia/Darwin'],
-  ['Auckland','Pacific/Auckland'], ['London','Europe/London'], ['Dublin','Europe/Dublin'], ['Paris','Europe/Paris'],
-  ['Berlin','Europe/Berlin'], ['Johannesburg','Africa/Johannesburg'], ['Dubai','Asia/Dubai'], ['Singapore','Asia/Singapore'],
-  ['Hong Kong','Asia/Hong_Kong'], ['Tokyo','Asia/Tokyo'], ['Mumbai','Asia/Kolkata'], ['New York','America/New_York'],
-  ['Chicago','America/Chicago'], ['Denver','America/Denver'], ['Los Angeles','America/Los_Angeles'],
-  ['Toronto','America/Toronto'], ['Vancouver','America/Vancouver']
+const TZ_GROUPS = [
+  { name: 'Australia', cities: [['Melbourne','Australia/Melbourne'],['Sydney','Australia/Sydney'],['Canberra','Australia/Sydney'],['Brisbane','Australia/Brisbane'],['Adelaide','Australia/Adelaide'],['Perth','Australia/Perth'],['Hobart','Australia/Hobart'],['Darwin','Australia/Darwin']] },
+  { name: 'New Zealand and Pacific', cities: [['Auckland','Pacific/Auckland'],['Wellington','Pacific/Auckland'],['Suva','Pacific/Fiji']] },
+  { name: 'Asia', cities: [['Singapore','Asia/Singapore'],['Hong Kong','Asia/Hong_Kong'],['Tokyo','Asia/Tokyo'],['Seoul','Asia/Seoul'],['Shanghai','Asia/Shanghai'],['Mumbai','Asia/Kolkata'],['Bangkok','Asia/Bangkok'],['Jakarta','Asia/Jakarta'],['Manila','Asia/Manila'],['Kuala Lumpur','Asia/Kuala_Lumpur']] },
+  { name: 'Middle East and Africa', cities: [['Dubai','Asia/Dubai'],['Riyadh','Asia/Riyadh'],['Cairo','Africa/Cairo'],['Johannesburg','Africa/Johannesburg'],['Nairobi','Africa/Nairobi'],['Lagos','Africa/Lagos']] },
+  { name: 'Europe and UK', cities: [['London','Europe/London'],['Dublin','Europe/Dublin'],['Paris','Europe/Paris'],['Amsterdam','Europe/Amsterdam'],['Berlin','Europe/Berlin'],['Madrid','Europe/Madrid'],['Rome','Europe/Rome'],['Lisbon','Europe/Lisbon'],['Stockholm','Europe/Stockholm'],['Athens','Europe/Athens'],['Istanbul','Europe/Istanbul']] },
+  { name: 'USA and Canada', cities: [['New York','America/New_York'],['Chicago','America/Chicago'],['Denver','America/Denver'],['Phoenix','America/Phoenix'],['Los Angeles','America/Los_Angeles'],['Anchorage','America/Anchorage'],['Honolulu','Pacific/Honolulu'],['Toronto','America/Toronto'],['Vancouver','America/Vancouver']] },
+  { name: 'Latin America', cities: [['Mexico City','America/Mexico_City'],['Sao Paulo','America/Sao_Paulo'],['Buenos Aires','America/Argentina/Buenos_Aires'],['Bogota','America/Bogota'],['Lima','America/Lima'],['Santiago','America/Santiago']] }
 ];
+const TZ_CITIES = TZ_GROUPS.reduce((all, g) => all.concat(g.cities), []);
 const TZ_BY_NAME = {};
 TZ_CITIES.forEach(([city, zone]) => {
   TZ_BY_NAME[city.toLowerCase()] = zone;
@@ -449,7 +455,8 @@ const S = {
   session: null, user: null, rows: [], cur: null,
   plans: {}, weighIns: [], steps: [], checkin: null,
   day: null, tab: 'today', addMode: null, wo: null, woMode: 'plan',
-  describe: null, build: null, sheet: null, confirmDelete: false, marketing: null, marketingError: false
+  describe: null, build: null, sheet: null, confirmDelete: false, marketing: null, marketingError: false,
+  planDay: null, tzOpen: false, tzQuery: '', unit: 'kg', editId: null, loadProblems: [], mealsAll: [], workoutsAll: []
 };
 
 function friendly(err) {
@@ -481,14 +488,16 @@ async function loadAll() {
   S.rows = rowsData || [];
   const open = S.rows.filter(r => r.status !== 'finished' && r.status !== 'cancelled');
   S.cur = open[0] || S.rows[0] || null;
-  S.plans = {}; S.weighIns = []; S.steps = []; S.checkin = null;
+  S.plans = {}; S.weighIns = []; S.steps = []; S.mealsAll = []; S.workoutsAll = []; S.checkin = null; S.loadProblems = [];
+  // A failed read is recorded (Progress says so and offers a retry), never shown as an empty history.
+  const got = (res, what) => { if (res.error) { S.loadProblems.push(what); return []; } return res.data || []; };
   for (const r of S.rows) {
     const p = await sb.from('coaching_plans').select('client_id,version,is_current,plan').eq('client_id', r.id);
-    S.plans[r.id] = (p.data || []).find(x => x.is_current) || null;
-    const w = await sb.from('coaching_weigh_ins').select('client_id,weigh_date,kg,week_start,id').eq('client_id', r.id).order('weigh_date', { ascending: true });
-    S.weighIns = S.weighIns.concat(w.data || []);
-    const st = await sb.from('coaching_step_logs').select('client_id,log_date,steps').eq('client_id', r.id);
-    S.steps = S.steps.concat(st.data || []);
+    S.plans[r.id] = got(p, 'plan').find(x => x.is_current) || null;
+    S.weighIns = S.weighIns.concat(got(await sb.from('coaching_weigh_ins').select('client_id,weigh_date,kg,week_start,id').eq('client_id', r.id).order('weigh_date', { ascending: true }), 'weigh-ins'));
+    S.steps = S.steps.concat(got(await sb.from('coaching_step_logs').select('client_id,log_date,steps').eq('client_id', r.id), 'steps'));
+    S.mealsAll = S.mealsAll.concat(got(await sb.from('coaching_meal_logs').select('id,client_id,log_date,name,calories,protein,carbs,fat,fibre,source,meal_time').eq('client_id', r.id), 'meals'));
+    S.workoutsAll = S.workoutsAll.concat(got(await sb.from('coaching_workout_logs').select('id,client_id,log_date,kind,what,minutes,notes,session').eq('client_id', r.id), 'workouts'));
   }
   if (S.cur) {
     const c = await sb.from('coaching_checkins').select('id,type,scheduled_at,status').eq('client_id', S.cur.id)
@@ -519,16 +528,12 @@ function render() {
   document.getElementById('signOutBtn').style.display = S.user ? '' : 'none';
   if (!S.cur) { app.innerHTML = noPlanHtml(); return; }
   if (S.cur.status === 'awaiting_onboarding') { app.innerHTML = S.cur.tier === 'basic' ? basicFormHtml() : sixStepHtml(); return; }
-  if (S.cur.status === 'awaiting_activation') { app.innerHTML = awaitingHtml(); return; }
-  if (S.cur.status === 'cancelled' || S.cur.status === 'finished' || S.cur.status === 'paused') {
-    app.innerHTML = readOnlyHtml(); return;
-  }
   if (S.cur.tier === 'basic' && S.tab === 'plan') S.tab = 'today';
   const body = S.tab === 'plan' ? planHtml() : S.tab === 'progress' ? progressHtml() : S.tab === 'settings' ? settingsHtml() : todayHtml();
   const tabs = S.cur.tier === 'basic'
     ? [['today', 'Today'], ['progress', 'Progress'], ['settings', 'Settings']]
     : [['today', 'Today'], ['plan', 'My plan'], ['progress', 'Progress'], ['settings', 'Settings']];
-  app.innerHTML = statusHeader() + `<nav class="tabs">${tabs.map(([k, l]) => `<button class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${l}</button>`).join('')}</nav>` + body;
+  app.innerHTML = statusHeader() + statusNotice() + `<nav class="tabs">${tabs.map(([k, l]) => `<button class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${l}</button>`).join('')}</nav>` + body;
 }
 function targetsHtml(t) {
   const rows = [
@@ -540,7 +545,7 @@ function targetsHtml(t) {
     ['Steps', Number(t.steps).toLocaleString('en-AU'), 'a day', 'Daily steps add to what you burn. Build up to this every day.']
   ];
   return `<section class="hero"><div class="eyebrow">Your daily targets</div><h1>Your daily targets</h1>
-      <p class="muted" style="margin:10px 0 0">Worked out from your answers with the same maths as our calculator.</p></section>
+      <p class="muted" style="margin:10px 0 0">Worked out from your answers with the same maths as our calculator. Update them from Progress after your weigh-ins.</p></section>
     <div class="card">${rows.map(([name, val, unit, text]) => `<div class="target-row"><div><b>${esc(name)}</b><div class="mini">${esc(text)}</div></div>
       <div class="target-val">${esc(val)}<small> ${esc(unit)}</small></div></div>`).join('')}</div>
     <button class="btn-block" data-act="startTracking">Start tracking</button>`;
@@ -551,33 +556,33 @@ function noPlanHtml() {
 }
 function statusHeader() {
   const r = S.cur;
+  const first = String(r.name || '').trim().split(/\s+/)[0] || '';
   const week = r.activated_at ? Math.min(12, Math.floor(diffDays(activatedDay(r), clientToday(r)) / 7) + 1) : null;
-  return `<section class="hero"><div class="row"><div><div class="muted">${esc(PLAN_NAMES[r.tier] || 'Coaching')} plan</div>
-      <h1>${esc(r.name || 'My Coach')}</h1></div><span class="pill">${esc(STATUS_LABEL[r.status] || r.status)}</span></div>
-      ${week ? `<p class="muted" style="margin:10px 0 0">Week ${week} of 12. Weigh-in day: ${esc(DAYS_FULL[DAYS.indexOf((r.onboarding || {}).weighInDay) >= 0 ? DAYS.indexOf(r.onboarding.weighInDay) : 0])}.</p>` : ''}
-      ${r.tier === 'beast' && r.status === 'active' ? `<div style="margin-top:12px"><a class="btn btn-amber btn-sm" style="background:var(--amber);color:#1B1200;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:800;display:inline-block" href="https://wa.me/" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>` : ''}
+  const weighDay = DAYS_FULL[DAYS.indexOf((r.onboarding || {}).weighInDay) >= 0 ? DAYS.indexOf(r.onboarding.weighInDay) : 0];
+  const showWa = r.tier === 'beast' && r.status !== 'finished' && r.status !== 'cancelled';
+  return `<section class="hero"><div class="row"><div><div class="eyebrow">${first ? 'Hi ' + esc(first) : 'Hi'}</div>
+      <h1>${esc(PLAN_NAMES[r.tier] || 'Coaching')} plan</h1></div><span class="pill">${esc(STATUS_LABEL[r.status] || r.status)}</span></div>
+      ${week ? `<p class="muted" style="margin:10px 0 0">Week ${week} of 12.${r.end_date ? ' Ends ' + esc(fmtDate(r.end_date)) + '.' : ''} Weigh-in day: ${esc(weighDay)}.</p>` : ''}
+      ${showWa ? `<div style="margin-top:12px"><a class="btn btn-amber btn-sm" style="background:var(--amber);color:#1B1200;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:800;display:inline-block" href="https://wa.me/" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>` : ''}
     </section>`;
 }
-const STATUS_LABEL = { awaiting_onboarding: 'Set up', awaiting_activation: 'Being built', active: 'Active', paused: 'Paused', finished: 'Finished', cancelled: 'Cancelled' };
+const STATUS_LABEL = { awaiting_onboarding: 'Onboarding', awaiting_activation: 'Awaiting activation', active: 'Active', paused: 'Paused', finished: 'Finished', cancelled: 'Cancelled' };
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
 
 /* ==========================================================================
    Status screens
    ========================================================================== */
-function awaitingHtml() {
-  return `<section class="hero"><div class="eyebrow">Your plan</div><h1>Stefan is building your plan</h1>
-    <p class="muted">Your answers are in. Stefan will message you on WhatsApp to set your start date.</p></section>`;
-}
-function readOnlyHtml() {
+function statusNotice() {
+  const r = S.cur;
+  if (r.status === 'awaiting_activation') {
+    return '<div class="card"><h3>Stefan is building your plan</h3><p style="margin:8px 0 0">It will be ready within 3 business days. Logging starts when Stefan activates your plan.</p></div>';
+  }
   const msg = {
     paused: ['Your plan is paused', 'Stefan will restart you when you are ready. Your history is below, and you can read it here.'],
-    finished: ['Your 12 weeks are finished', 'Renew with 20% off and keep your place, or drop to Basic for $30 every 12 weeks. Stefan will email you the options. Your history is below.'],
+    finished: ['Your 12 weeks are finished', 'Renew with 20% off and keep your place, or drop to Basic for $30 AUD every 12 weeks. Stefan will email you the options. Your history is below.'],
     cancelled: ['This plan is cancelled', 'If you think this is a mistake, email info@beastcoach.fit. Your history is below.']
-  }[S.cur.status];
-  const tabs = [['progress', 'History'], ['settings', 'Settings']];
-  const body = S.tab === 'settings' ? settingsHtml() : progressHtml();
-  return statusHeader() + `<div class="card"><h3>${esc(msg[0])}</h3><p style="margin:8px 0 0">${esc(msg[1])}</p></div>
-    <nav class="tabs">${tabs.map(([k, l]) => `<button class="tab ${S.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${l}</button>`).join('')}</nav>` + body;
+  }[r.status];
+  return msg ? `<div class="card"><h3>${esc(msg[0])}</h3><p style="margin:8px 0 0">${esc(msg[1])}</p></div>` : '';
 }
 
 /* ==========================================================================
@@ -609,10 +614,38 @@ function selectField(d, k, label, opts) {
 function checks(d, group, opts) {
   return `<div class="chips">${opts.map(o => `<label class="chip"><input type="checkbox" data-group="${group}" value="${esc(o)}" ${(d[group] || []).includes(o) ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`;
 }
+function tzLabelFor(zone) {
+  const city = TZ_CITIES.find(c => c[1] === zone);
+  return city ? city[0] : zone.split('/').pop().replace(/_/g, ' ');
+}
+function phoneZone() { try { return validZone(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch (e) { return null; } }
+const ALL_ZONES = (typeof Intl.supportedValuesOf === 'function') ? Intl.supportedValuesOf('timeZone') : TZ_CITIES.map(c => c[1]);
+function tzResultsHtml(q) {
+  const needle = String(q || '').trim().toLowerCase();
+  const opt = (label, zone) => `<button type="button" class="tz-opt" data-act="tzPick" data-label="${esc(label)}" data-iana="${esc(zone)}">${esc(label)} <span class="mini">${esc(zone)}</span></button>`;
+  let html = '';
+  TZ_GROUPS.forEach(g => {
+    const items = g.cities.filter(([label, zone]) => !needle || (label + ' ' + zone).toLowerCase().includes(needle));
+    if (items.length) html += `<h4 class="tz-group">${esc(g.name)}</h4>` + items.map(([l, z]) => opt(l, z)).join('');
+  });
+  if (needle.length >= 2) {
+    const known = new Set(TZ_CITIES.map(c => c[1]));
+    const more = ALL_ZONES.filter(z => !known.has(z) && z.toLowerCase().includes(needle.replace(/ /g, '_'))).slice(0, 40);
+    if (more.length) html += '<h4 class="tz-group">All time zones</h4>' + more.map(z => opt(tzLabelFor(z), z)).join('');
+  }
+  return html || '<p class="muted">No match. Try a city, or a zone such as Europe/Paris.</p>';
+}
 function tzField(d) {
-  return `<div class="field"><label for="f-timezone">Your time zone or city (e.g. Melbourne, London, New York)</label>
-    <input id="f-timezone" type="text" data-f="timezone" list="tzList" autocomplete="off" aria-required="true" value="${esc(d.timezone)}" placeholder="Start typing, e.g. Melbourne">
-    <p class="hint">Pick from the list, or type your own. It sets your daily totals and your weigh-in day.</p><div class="err" id="err-timezone"></div></div>`;
+  const chosen = validZone(d.tzIana);
+  const phone = phoneZone();
+  const suggest = !chosen && phone ? `<div class="note-box" style="margin:8px 0"><div>Looks like you are in <b>${esc(tzLabelFor(phone))}</b>. Use this?</div>
+      <button type="button" class="btn-sm" style="margin-top:8px" data-act="tzPick" data-label="${esc(tzLabelFor(phone))}" data-iana="${esc(phone)}">Use ${esc(tzLabelFor(phone))}</button></div>` : '';
+  return `<div class="field"><label id="tz-label">Your time zone or city</label>
+    <button type="button" class="tz-btn" data-act="tzToggle" aria-expanded="${S.tzOpen}" aria-labelledby="tz-label">${chosen ? esc(d.timezone || tzLabelFor(chosen)) + ' <span class="mini">' + esc(chosen) + '</span>' : 'Choose your city or time zone'}</button>
+    ${suggest}
+    ${S.tzOpen ? `<div class="tz-panel"><input id="tz-q" type="search" autocomplete="off" placeholder="Search a city or zone, e.g. Lisbon" aria-label="Search time zones" value="${esc(S.tzQuery)}">
+      <div id="tzResults" class="tz-results" role="group" aria-label="Time zones">${tzResultsHtml(S.tzQuery)}</div></div>` : ''}
+    <p class="hint">It sets your daily totals, your check-ins and your weigh-in day.</p><div class="err" id="err-timezone"></div></div>`;
 }
 function stepsFields(d) {
   return `<div class="field"><label for="f-stepsEveryday">${esc(STEPS_EVERYDAY_Q)}</label>
@@ -684,7 +717,7 @@ function sixStepHtml() {
       const q = (k, text) => `<div class="field"><label>${text}</label><div class="chips">${['yes', 'no'].map(v => `<label class="chip"><input type="radio" name="h-${k}" value="${v}" data-health="${k}" ${h[k] === v ? 'checked' : ''}>${v === 'yes' ? 'Yes' : 'No'}</label>`).join('')}</div></div>`;
       return `<div class="card"><h3>Weigh-ins</h3><p class="muted" style="margin-top:0">Weigh-ins happen once a week, on the day and time you choose here.</p>
         <div class="grid2">${selectField(d, 'weighInDay', 'Weekly weigh-in day', DAYS)}
-        <div class="field"><label for="f-weighInTime">Weigh-in time</label><select id="f-weighInTime" data-f="weighInTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${d.weighInTime === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
+        <div class="field"><label for="f-weighInTime">Weigh-in time</label><select id="f-weighInTime" data-f="weighInTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${d.weighInTime === t ? 'selected' : ''}>${fmtTimeP(t)}</option>`).join('')}</select>
           <p class="hint">Same day, same time each week, after the toilet and before eating or drinking.</p></div></div></div>
         <div class="card"><h3>What you have tried</h3><div class="grid2">
           <div class="field"><label for="f-worked">What has worked before?</label><textarea id="f-worked" data-f="worked">${esc(d.worked)}</textarea></div>
@@ -705,6 +738,7 @@ function sixStepHtml() {
   return `<section class="hero"><div class="eyebrow">Step ${step} of 6: ${esc(OB_STEPS[step - 1])}</div><h1>Tell Stefan about you</h1>
       <div class="progress" role="progressbar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="${step}"><span style="width:${Math.round(step / 6 * 100)}%"></span></div>
       <p class="muted" style="margin:10px 0 0">Answers save as you type. You can leave and come back to this step.</p></section>
+    ${step === 1 ? '<div class="note-box" role="status" style="margin-bottom:12px">Payment received. Finish these 6 short steps so Stefan can build your plan.</div>' : ''}
     <form id="onboardForm" novalidate>${bodies[step - 1]()}${obNav(d, step === 6)}</form>`;
 }
 function agree(d, k, text) {
@@ -731,7 +765,7 @@ function basicFormHtml() {
       <div class="card"><h3>Training</h3>${fld(d, 'trainingSessions', 'Training sessions a week', 'number', 'e.g. 3', 'min="0" max="14" inputmode="numeric"')}
         ${radiosMap(d, 'trainingIntensity', 'How hard are they?', BASIC_INTENSITY)}</div>
       <div class="card"><h3>Weekly weigh-in</h3><div class="grid2">${selectField(d, 'weighInDay', 'Weigh-in day', DAYS)}
-        <div class="field"><label for="f-weighInTime">Weigh-in time</label><select id="f-weighInTime" data-f="weighInTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${d.weighInTime === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div></div></div>
+        <div class="field"><label for="f-weighInTime">Weigh-in time</label><select id="f-weighInTime" data-f="weighInTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${d.weighInTime === t ? 'selected' : ''}>${fmtTimeP(t)}</option>`).join('')}</select><p class="hint">Same day, same time each week, after the toilet and before eating or drinking.</p></div></div></div>
       <div class="card"><h3>Agreements</h3>
         ${agree(d, 'agreeNotCoach', `I understand this is general guidance, not medical advice. <a href="/coaching-health" target="_blank" rel="noopener">Read the health notice</a>.`)}
         ${agree(d, 'agreeTerms', `I agree to the <a href="/coaching-terms" target="_blank" rel="noopener">terms</a>. Basic is $2.50 a week, billed as $30 every 12 weeks.`)}</div>
@@ -743,7 +777,6 @@ function basicFormHtml() {
 /* Validation for the current onboarding step, with the same messages as the demo. */
 function obErrors(d, step, tier) {
   const e = {}, n = v => parseFloat(v);
-  const tzOk = resolveTimeZone(d.timezone) !== null || String(d.timezone || '').trim() !== '';
   if (tier === 'basic') {
     if (!(n(d.age) >= 18 && n(d.age) <= 100)) e.age = n(d.age) > 0 && n(d.age) < 18 ? 'Coaching is for adults 18 and over.' : 'Enter your age (18 to 100).';
     if (!['Male', 'Female'].includes(d.sex)) e.sex = OB_CHOOSE;
@@ -755,7 +788,7 @@ function obErrors(d, step, tier) {
     Object.assign(e, stepsErrs(d));
     if (!(n(d.trainingSessions) >= 0 && n(d.trainingSessions) <= 14) || d.trainingSessions === '') e.trainingSessions = 'Enter how many sessions a week (0 if none).';
     if (!BASIC_INTENSITY.some(([v]) => v === d.trainingIntensity)) e.trainingIntensity = OB_CHOOSE;
-    if (!String(d.timezone || '').trim()) e.timezone = 'Enter your time zone or city.';
+    if (!validZone(d.tzIana)) e.timezone = 'Choose your time zone or city.';
     if (!d.agreeNotCoach) e.agreeNotCoach = 'Please confirm you understand this is general guidance.';
     if (!d.agreeTerms) e.agreeTerms = 'Please agree to the terms and billing.';
     return e;
@@ -766,7 +799,7 @@ function obErrors(d, step, tier) {
     else if (!(n(d.heightCm) >= 100 && n(d.heightCm) <= 250)) e.heightCm = 'Enter your height in cm (100 to 250).';
     if (!(n(d.weight) > 0)) e.weight = 'Enter your current weight.';
     if (String(d.whatsapp || '').replace(/\D/g, '').length < 6) e.whatsapp = 'Enter a WhatsApp number so Stefan can reach you.';
-    if (!String(d.timezone || '').trim()) e.timezone = 'Enter your time zone or city.';
+    if (!validZone(d.tzIana)) e.timezone = 'Choose your time zone or city.';
   }
   if (step === 2) {
     if (!String(d.goal || '').trim()) e.goal = 'Tell us what you want to achieve.';
@@ -807,6 +840,7 @@ function stepsErrs(d) {
   if (!(real >= 3000 && real <= 20000)) e.stepsRealistic = 'Enter a target from 3,000 to 20,000.';
   return e;
 }
+function fmtTimeP(t) { const [h, m] = t.split(':').map(Number); return ((h + 11) % 12 + 1) + ':' + pad(m) + (h < 12 ? 'am' : 'pm'); }
 function showErrors(errs) {
   document.querySelectorAll('#onboardForm .err').forEach(el => { el.textContent = ''; });
   document.querySelectorAll('#onboardForm .invalid').forEach(el => el.classList.remove('invalid'));
@@ -815,6 +849,7 @@ function showErrors(errs) {
     if (box) box.textContent = errs[k];
     document.querySelectorAll(`[data-f="${k}"]`).forEach(el => { if (el.type !== 'radio') el.classList.add('invalid'); });
   });
+  const firstBad = document.querySelector('#onboardForm .invalid'); if (firstBad) firstBad.scrollIntoView({ block: 'center' });
   const msg = document.getElementById('obMsg');
   if (msg) msg.textContent = Object.keys(errs).length ? 'Please answer the questions marked in red.' : '';
 }
@@ -823,7 +858,7 @@ function showErrors(errs) {
 function answersFrom(d, tier) {
   const heightCm = d.heightUnit === 'ftin' ? (parseFloat(d.heightFt) * 12 + parseFloat(d.heightIn)) * 2.54 : parseFloat(d.heightCm);
   const weightKg = d.weightUnit === 'kg' ? parseFloat(d.weight) : parseFloat(d.weight) / 2.20462;
-  const base = { timezone: String(d.timezone || '').trim(), timeZoneIana: resolveTimeZone(d.timezone) || MELB, age: parseFloat(d.age), sex: d.sex, heightCm: Math.round(heightCm * 10) / 10,
+  const base = { timezone: String(d.timezone || '').trim(), timeZoneIana: validZone(d.tzIana) || MELB, age: parseFloat(d.age), sex: d.sex, heightCm: Math.round(heightCm * 10) / 10,
     weightKg: Math.round(weightKg * 10) / 10, stepsEveryday: parseFloat(d.stepsEveryday), stepsRealistic: parseFloat(d.stepsRealistic),
     weighInDay: d.weighInDay || 'Mon', weighInTime: d.weighInTime || '07:00', agreeTerms: !!d.agreeTerms, agreeNotCoach: !!d.agreeNotCoach };
   if (tier === 'basic') {
@@ -856,15 +891,10 @@ function todayHtml() {
   const tot = { calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 };
   meals.forEach(m => NUT.forEach(k => { tot[k] += Number(m[k]) || 0; }));
   const t = r.targets;
-  const bars = NUT.map(k => {
-    const tg = t ? t[k] : null;
-    const pct = tg ? Math.min(100, Math.round(tot[k] / tg * 100)) : 0;
-    return `<div class="metric"><div class="top"><span><b style="color:${MACRO_BAR[k]}">${NUT_LABEL[k]}</b></span><span>${Math.round(tot[k])}${tg ? ' of ' + tg : ''} ${k === 'calories' ? 'kcal' : 'g'}</span></div>
-      <div class="bar"><span style="width:${pct}%;background:${MACRO_BAR[k]}"></span></div></div>`;
-  }).join('');
+  const bars = NUT.map(k => nutRow(k, Math.round(tot[k]), t ? t[k] : null)).join('');
   const nav = `<div class="row" style="margin-bottom:12px">
     <button class="btn-ghost btn-sm" data-act="dayPrev" ${canGoBack(r, day) ? '' : 'disabled'}>‹ Previous</button>
-    <div style="text-align:center"><b>${pday(r, day)}</b><div class="mini">${fmtDate(day)}</div></div>
+    <div style="text-align:center"><b>${day === clientToday(r) ? 'Today' : esc(pd(day).toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'short' }))}</b><div class="mini">${fmtDate(day)}</div></div>
     <button class="btn-ghost btn-sm" data-act="dayNext" ${isToday ? 'disabled' : ''}>Next ›</button></div>`;
   return checkinCard() + nav
     + (!editable ? `<div class="ro-note">${esc(readOnlyDayText(day))}</div>` : '')
@@ -873,9 +903,10 @@ function todayHtml() {
     ${editable ? addMealCard(basic) : ''}
     ${basic ? '' : workoutCard(editable)}
     ${stepsCard(editable)}
-    ${weighCard(editable, day)}`;
+    ${weighCard()}`;
 }
 function readOnlyDayText(day) {
+  if (S.cur.status === 'awaiting_activation') return 'Not started yet. Your plan starts when Stefan activates you.';
   return day < clientToday(S.cur) && day < addDays(clientToday(S.cur), -LOG_BACK_DAYS)
     ? 'That day is more than 3 days back, so it is read-only.'
     : 'This day is not open for logging yet, or your plan is not active.';
@@ -892,10 +923,19 @@ function checkinCard() {
     <p style="margin:10px 0 0">I'll contact you on WhatsApp at this time.</p></div>`;
 }
 function mealRow(m, editable) {
-  return `<div class="meal"><div style="flex:1 1 200px;min-width:0"><div><b>${esc(m.name)}</b> <span class="mini">${esc(SOURCES[m.source] || m.source)}</span>${m.added_late ? '<span class="late">added later</span>' : ''}</div>
+  if (editable && S.editId === m.id) return mealEditHtml(m);
+  const when = m.meal_time ? esc(m.meal_time) + ' · ' : '';
+  return `<div class="meal"><div style="flex:1 1 200px;min-width:0"><div><b>${esc(m.name)}</b> <span class="mini">${when}${esc(SOURCES[m.source] || m.source)}</span>${m.added_late ? '<span class="late">added later</span>' : ''}</div>
     <div class="mini">P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><div class="kcal">${m.calories} kcal</div>
-    ${editable ? `<button class="btn-danger btn-sm" data-act="deleteMeal" data-id="${esc(m.id)}">Delete</button>` : ''}</div></div>`;
+    ${editable ? `<div style="display:flex;gap:6px"><button class="btn-ghost btn-sm" data-act="editMeal" data-id="${esc(m.id)}">Edit</button><button class="btn-danger btn-sm" data-act="deleteMeal" data-id="${esc(m.id)}">Delete</button></div>` : ''}</div></div>`;
+}
+function mealEditHtml(m) {
+  const f = (k, label) => `<div class="field" style="margin:0"><label for="e-${k}">${label}</label><input id="e-${k}" type="number" min="0" inputmode="numeric" value="${esc(m[k])}"></div>`;
+  return `<div class="meal" style="display:block"><div class="stack">
+    <div class="field" style="margin:0"><label for="e-name">Name</label><input id="e-name" value="${esc(m.name)}"></div>
+    <div class="grid2">${f('calories', 'Calories')}${f('protein', 'Protein (g)')}${f('carbs', 'Carbs (g)')}${f('fat', 'Fat (g)')}${f('fibre', 'Fibre (g)')}</div>
+    <div class="row" style="justify-content:flex-start"><button data-act="saveMealEdit" data-id="${esc(m.id)}">Save changes</button><button class="btn-ghost" data-act="cancelMealEdit">Cancel</button></div></div></div>`;
 }
 function addMealCard(basic) {
   const mode = basic ? 'describe' : (S.addMode || 'plan');
@@ -953,7 +993,7 @@ function workoutCard(editable) {
   const todays = sessions.filter(s => s.day === dowNum(S.day));
   const logged = (S.workouts || []);
   const loggedHtml = logged.length ? logged.map(w => `<div class="meal"><div style="flex:1 1 200px"><b>${esc(w.what)}</b> <span class="mini">${w.kind === 'plan' ? 'Sets and reps' : (w.minutes ? w.minutes + ' min' : '')}</span>${w.added_late ? '<span class="late">added later</span>' : ''}
-      ${w.notes ? `<div class="mini">${esc(w.notes)}</div>` : ''}</div>${editable ? `<button class="btn-danger btn-sm" data-act="deleteWorkout" data-id="${esc(w.id)}">Delete</button>` : ''}</div>`).join('')
+      ${w.notes ? `<div class="mini">${esc(w.notes)}</div>` : ''}${workoutSummary(w)}</div>${editable ? `<button class="btn-danger btn-sm" data-act="deleteWorkout" data-id="${esc(w.id)}">Delete</button>` : ''}</div>`).join('')
     : '<p class="muted">Nothing logged for this day.</p>';
   if (!editable) return `<div class="card"><h3>Workout</h3>${loggedHtml}</div>`;
   const mode = S.woMode === 'other' || !todays.length ? 'other' : 'plan';
@@ -978,21 +1018,36 @@ function workoutCard(editable) {
     <button class="btn-block" data-act="saveWorkout" style="margin-top:8px">Save workout</button></div>`;
 }
 function stepsCard(editable) {
-  const v = S.dayStep ? S.dayStep.steps : '';
+  const v = S.dayStep ? S.dayStep.steps : null;
   const target = S.cur.targets && S.cur.targets.steps;
+  const hit = !!target && v != null && v >= target;
+  const pct = target && v ? Math.min(100, Math.round(v / target * 100)) : 0;
+  const label = v == null ? (target ? `Not logged yet. Target ${fmtSteps(target)} steps` : 'Not logged yet')
+    : target ? `${fmtSteps(v)} of ${fmtSteps(target)} steps` : `${fmtSteps(v)} steps`;
+  const note = target ? `Target: ${fmtSteps(target)} a day` : 'Stefan will set your steps target with your plan.';
   return `<div class="card"><h3>Steps</h3>
-    <p class="mini" style="margin-top:0">${target ? 'Your steps target: ' + target.toLocaleString('en-AU') + ' a day.' : 'Your steps target is set by Stefan.'}</p>
-    ${editable ? `<div class="row" style="flex-wrap:nowrap"><input id="st-val" type="number" inputmode="numeric" min="0" max="60000" value="${v}" placeholder="Steps" aria-label="Steps for the day" style="flex:1"><button data-act="saveSteps">Save steps</button></div>`
-      : `<p style="margin:0">${v ? Number(v).toLocaleString('en-AU') + ' steps' : 'Not logged'}</p>`}</div>`;
+    <div class="metric"><div class="top"><span><b>${S.day === clientToday(S.cur) ? 'Today' : esc(fmtDate(S.day))}</b></span><span style="color:${hit ? '#1b7a46' : 'inherit'}">${label}</span></div>
+      ${target ? `<div class="bar"><span style="width:${pct}%;background:${hit ? '#1b7a46' : STEPS_COLOUR}"></span></div>` : ''}</div>
+    <p class="mini" style="margin:6px 0 0">${esc(note)}</p>
+    ${editable ? `<div class="row" style="flex-wrap:nowrap;margin-top:10px"><input id="st-val" type="number" inputmode="numeric" min="0" max="60000" value="${v == null ? '' : v}" placeholder="Steps" aria-label="Steps for the day" style="flex:1"><button data-act="saveSteps">Save steps</button></div>` : ''}</div>`;
 }
-function weighCard(editable, day) {
+function weighCard() {
   const r = S.cur;
-  const wd = (r.onboarding || {}).weighInDay || 'Mon';
-  if (!editable || DAYS[dowNum(day) - 1] !== wd) return '';
-  const mine = S.weighIns.find(w => w.week_start === weekStartOf(day));
-  return `<div class="card"><h3>Weigh-in</h3><p class="mini" style="margin-top:0">Today is your weigh-in day. Weigh in at ${esc((r.onboarding || {}).weighInTime || '07:00')}, after the toilet and before eating or drinking.</p>
-    <div class="row" style="flex-wrap:nowrap"><input id="wi-val" type="number" step="0.1" inputmode="decimal" value="${mine ? mine.kg : ''}" placeholder="kg" aria-label="Weight in kg" style="flex:1"><button data-act="saveWeigh">Save weigh-in</button></div>
-    <p class="mini" style="margin:8px 0 0">One weigh-in per week. Saving again this week replaces it.</p></div>`;
+  if (r.status !== 'active') return '';
+  const today = clientToday(r);
+  const ob = r.onboarding || {};
+  const wd = ob.weighInDay || 'Mon', dayName = DAYS_FULL[DAYS.indexOf(wd)] || 'Monday', time = ob.weighInTime || '07:00';
+  const entry = S.weighIns.find(w => w.client_id === r.id && w.week_start === weekStartOf(today));
+  const rule = 'Same day, same time each week, after the toilet and before eating or drinking.';
+  if (DAYS[dowNum(today) - 1] === wd && (!entry || entry.weigh_date === today)) {
+    const shown = entry ? unitVal(Number(entry.kg)).toFixed(1) : '';
+    return `<div class="card"><h3>Weigh-in</h3><p class="mini" style="margin-top:0">Today is your weigh-in day. Weigh in at ${esc(time)}. ${rule}</p>
+      <div class="row" style="flex-wrap:nowrap"><input id="wi-val" type="number" step="0.1" inputmode="decimal" value="${shown}" placeholder="${S.unit}" aria-label="Weight in ${S.unit}" style="flex:1"><button data-act="saveWeigh">${entry ? 'Update this week' : 'Save weigh-in'} (${S.unit})</button></div>
+      <p class="mini" style="margin:8px 0 0">${entry ? 'You can change this entry until the end of today.' : 'One weigh-in per week. Saving again today replaces it.'}</p></div>`;
+  }
+  const readOnly = entry ? `<p style="margin:0 0 8px"><b>This week:</b> ${unitVal(Number(entry.kg)).toFixed(1)} ${S.unit} on ${esc(fmtDate(entry.weigh_date))}.</p>` : '';
+  return `<div class="card"><h3>Weigh-in</h3>${readOnly}<p style="margin:0"><b>Next weigh-in: ${esc(dayName)}, ${esc(time)}</b></p>
+    <p class="mini" style="margin:8px 0 0">Weigh-ins are only on your weigh-in day. ${rule}</p></div>`;
 }
 function weekStartOf(day) { const d = pd(day); const iso = (d.getDay() + 6) % 7; d.setDate(d.getDate() - iso); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
 
@@ -1016,36 +1071,149 @@ function planSessions(p) {
    ========================================================================== */
 function planHtml() {
   const p = S.plans[S.cur.id];
-  if (!p) return '<div class="card"><p class="muted">No plan is published yet. Stefan is working on it.</p></div>';
-  const days = [1, 2, 3, 4, 5, 6, 7];
-  const meals = days.map(d => `<div class="card"><h3>${DAYS_FULL[d - 1]}</h3>${((p.plan.meals || {})[d] || []).map(m => `<div class="meal"><div style="flex:1 1 200px"><b>${esc(m.label)}: ${esc(m.name)}</b><div class="mini">${esc(m.text)}</div></div><div class="kcal">${m.calories} kcal</div></div>`).join('') || '<p class="muted">Nothing planned.</p>'}</div>`).join('');
-  return `<div class="card"><h3>Training</h3><pre style="white-space:pre-wrap;font-family:inherit;margin:0">${esc(p.plan.training || 'Not published yet.')}</pre></div>${meals}`;
+  const pub = p && p.plan && p.plan.meals && Object.keys(p.plan.meals).length ? p.plan.meals : null;
+  const day = S.planDay || dowNum(clientToday(S.cur));
+  const seg = `<div class="seg" role="group" aria-label="Day of the week" style="margin-bottom:12px">${DAYS.map((d, i) => `<button class="${i + 1 === day ? 'on' : ''}" aria-pressed="${i + 1 === day}" data-act="planDay" data-d="${i + 1}">${d}</button>`).join('')}</div>`;
+  const t = S.cur.targets;
+  const targets = `<div class="card"><h3>Your targets</h3>${t
+    ? `<div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">${NUT.map(k => `<div class="note-box"><div class="mini">${NUT_LABEL[k]}</div><b>${t[k]}${k === 'calories' ? ' kcal' : ' g'}</b></div>`).join('')}</div>`
+    : '<p class="muted">Targets are not set yet.</p>'}</div>`;
+  let meals;
+  if (!pub) meals = '<p class="muted">Your meal plan is not published yet.</p>';
+  else if (!(pub[day] || []).length) meals = '<p class="muted">Nothing planned for this day.</p>';
+  else {
+    const list = pub[day];
+    const tot = sumNut(list.map(m => ({ calories: m.calories, protein: m.protein, carbs: m.carbs, fat: m.fat, fibre: m.fibre })));
+    meals = list.map(m => `<div class="meal"><div style="flex:1 1 200px"><b>${esc(m.label)}: ${esc(m.name)}</b><div class="mini">${esc(m.text)}</div>
+      <div class="mini">${m.calories} kcal · P ${m.protein}g · C ${m.carbs}g · F ${m.fat}g · Fibre ${m.fibre}g</div></div></div>`).join('')
+      + `<p class="mini" style="margin:10px 0 0"><b>Day total:</b> ${Math.round(tot.calories)} kcal · P ${Math.round(tot.protein)}g · C ${Math.round(tot.carbs)}g · F ${Math.round(tot.fat)}g · Fibre ${Math.round(tot.fibre)}g</p>`;
+  }
+  const sessions = planSessions(p);
+  let training;
+  if (sessions.length) {
+    training = sessions.map(x => `<div style="border-top:1px solid var(--line);padding:10px 0"><b>${DAYS_FULL[x.day - 1]}: ${esc(x.title)}</b>
+      ${x.exercises.map(e => `<div class="meal" style="padding:8px 0"><div style="flex:1 1 200px"><b>${esc(e.name)}</b> <span class="mini">${esc(e.planned)}</span></div>
+      <button class="btn-ghost btn-sm" data-act="howTo" data-name="${esc(e.name)}">How to do it</button></div>`).join('')}</div>`).join('');
+  } else if (p && p.plan && p.plan.training) {
+    training = `<pre style="white-space:pre-wrap;font-family:inherit;margin:0">${esc(p.plan.training)}</pre>`;
+  } else {
+    training = '<p class="muted">Your training plan is not published yet.</p>';
+  }
+  return `${seg}${targets}<div class="card"><h3>Meal plan</h3>${meals}</div><div class="card"><h3>Training plan</h3>${training}</div>`;
+}
+
+/* Progress: the demo's Progress tab on real data. Each plan is its own block. The current plan has the 7-day views. */
+const STEPS_COLOUR = '#2FA36B';
+const MACRO_OVER = { calories: '#B45309', protein: '#1E3A8A', carbs: '#4C1D95', fat: '#9F1239', fibre: '#155E75' };
+function unitVal(kg) { return S.unit === 'lb' ? kg * 2.20462 : kg; }
+function fmtSteps(n) { return Number(n).toLocaleString('en-AU'); }
+function fmtShortDate(s) { return pd(s).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }); }
+function sumNut(list) { const t = { calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 }; list.forEach(m => NUT.forEach(k => { t[k] += Number(m[k]) || 0; })); return t; }
+// One nutrient line, as the demo draws it: "x of y, z left" or "over".
+function nutRow(k, val, target) {
+  const over = !!target && val > target;
+  const unit = k === 'calories' ? 'kcal' : 'g';
+  const pct = target ? Math.min(100, Math.round(val / target * 100)) : 0;
+  const status = !target ? `${val} ${unit}` : over ? `${val} of ${target} ${unit}, <b>${val - target} ${unit} over</b>` : `${val} of ${target} ${unit}, ${target - val} ${unit} left`;
+  return `<div class="metric"><div class="top"><span><b style="color:${MACRO_BAR[k]}">${NUT_LABEL[k]}</b></span><span style="color:${over ? MACRO_OVER[k] : 'inherit'}">${status}</span></div>
+    ${target ? `<div class="bar"><span style="width:${pct}%;background:${over ? MACRO_OVER[k] : MACRO_BAR[k]}"></span></div>` : ''}</div>`;
+}
+function isCurrentRow(r) { return !!(S.cur && r.id === S.cur.id); }
+// Days counted for a plan: the current plan's last 7 days (from activation), or the whole of an earlier plan.
+function progressDays(r, current) {
+  const start = activatedDay(r) || r.start_date || null;
+  if (!start) return [];
+  const today = clientToday(r);
+  const out = [];
+  if (current) { for (let i = 0; i < 7; i++) { const d = addDays(today, -i); if (d >= start) out.push(d); } return out; }
+  const end = r.end_date && r.end_date < today ? r.end_date : today;
+  for (let d = start; d <= end && out.length < 400; d = addDays(d, 1)) out.push(d);
+  return out;
+}
+// Starting weight (from onboarding) first, then the weekly weigh-ins, oldest first.
+function weighPointsFor(r) {
+  const pts = [];
+  const startKg = r.onboarding && r.onboarding.weightKg;
+  if (startKg != null && startKg !== '') pts.push({ date: r.created_at ? ymdIn(new Date(r.created_at), zoneFor(r)) : (r.start_date || ''), kg: Number(startKg) });
+  S.weighIns.filter(w => w.client_id === r.id).sort((a, b) => a.weigh_date.localeCompare(b.weigh_date))
+    .forEach(w => pts.push({ date: w.weigh_date, kg: Number(w.kg) }));
+  return pts;
+}
+function weighTrend(pts) {
+  if (pts.length < 2) return '<p class="muted">Add a second weigh-in to see the trend line.</p>';
+  const W = 320, H = 150, P = 22;
+  const vals = pts.map(p => unitVal(p.kg));
+  const min = Math.min(...vals), max = Math.max(...vals), span = (max - min) || 1;
+  const xy = vals.map((v, i) => [P + i * (W - 2 * P) / (vals.length - 1), H - P - (v - min) / span * (H - 2 * P)]);
+  const path = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const dots = xy.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="#2D6A4F"/>`).join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weigh-in trend">
+    <line x1="${P}" y1="${H - P}" x2="${W - P}" y2="${H - P}" stroke="#e2e9e0"/>
+    <path d="${path}" fill="none" stroke="#52B788" stroke-width="3" stroke-linejoin="round"/>${dots}
+    <text x="${P}" y="${H - 4}" font-size="11" fill="#5b6b60">${esc(fmtShortDate(pts[0].date))}</text>
+    <text x="${W - P}" y="${H - 4}" font-size="11" fill="#5b6b60" text-anchor="end">${esc(fmtShortDate(pts[pts.length - 1].date))}</text>
+    <text x="${P}" y="12" font-size="11" fill="#5b6b60">High ${max.toFixed(1)} ${S.unit}</text>
+    <text x="${W - P}" y="12" font-size="11" fill="#5b6b60" text-anchor="end">Low ${min.toFixed(1)} ${S.unit}</text></svg>`;
+}
+function weightCardHtml(pts) {
+  const big = "font-family:'Bebas Neue',Impact,sans-serif;font-size:30px;line-height:1.1";
+  let stats = '<p class="muted">No weigh-ins yet.</p>';
+  if (pts.length) {
+    const first = pts[0].kg, last = pts[pts.length - 1].kg, prev = pts.length > 1 ? pts[pts.length - 2].kg : null;
+    const change = last - first, pct = first ? change / first * 100 : 0;
+    stats = `<div class="grid3">
+      <div class="note-box"><div class="mini">Latest weight</div><b style="${big}">${unitVal(last).toFixed(1)} ${S.unit}</b></div>
+      <div class="note-box"><div class="mini">Change since start</div><b class="${change <= 0 ? 'c-green' : 'c-red'}" style="${big}">${unitVal(change).toFixed(1)} ${S.unit} (${pct.toFixed(1)}%)</b></div>
+      <div class="note-box"><div class="mini">Change since last weigh-in</div><b style="${big}">${prev == null ? 'n/a' : unitVal(last - prev).toFixed(1) + ' ' + S.unit}</b></div></div>`;
+  }
+  return `<div class="card"><h3>Weight</h3><div style="margin-top:10px">${stats}</div>${weighTrend(pts)}</div>`;
+}
+function workoutSummary(w) {
+  if (!w.session || !Array.isArray(w.session.exercises)) return '';
+  return w.session.exercises.map(e => {
+    const sets = e.skipped ? 'skipped' : ((e.sets || []).map(st => (st.kg != null ? st.kg + ' kg x ' : '') + (st.reps != null ? st.reps : '-')).join(', ') || 'no sets');
+    return `<div class="mini">${esc(e.name)}: ${esc(sets)}</div>`;
+  }).join('');
+}
+function progressBlock(r, current) {
+  const days = progressDays(r, current);
+  const label = current ? 'Current plan' : 'Earlier plan';
+  const window_ = current ? 'last 7 days' : 'whole plan';
+  // Steps
+  const stepVals = S.steps.filter(x => x.client_id === r.id && days.includes(x.log_date)).map(x => Number(x.steps));
+  const stepAvg = stepVals.length ? Math.round(stepVals.reduce((a, b) => a + b, 0) / stepVals.length) : null;
+  const target = r.targets && r.targets.steps;
+  const stepsCard = `<div class="card"><h3>Steps</h3><div class="metric"><div class="top"><span>Average per day, ${window_}</span><span><b>${stepAvg == null ? 'Nothing logged yet' : fmtSteps(stepAvg) + ' steps'}</b></span></div>
+    ${target && stepAvg != null ? `<div class="bar"><span style="width:${Math.min(100, Math.round(stepAvg / target * 100))}%;background:${STEPS_COLOUR}"></span></div><p class="mini" style="margin:6px 0 0">Target ${fmtSteps(target)} steps a day, based on ${stepVals.length} logged day${stepVals.length === 1 ? '' : 's'}.</p>` : ''}</div></div>`;
+  // Meals: averages over the days with something logged
+  const byDay = {};
+  S.mealsAll.filter(m => m.client_id === r.id && days.includes(m.log_date)).forEach(m => { (byDay[m.log_date] = byDay[m.log_date] || []).push(m); });
+  const loggedDays = Object.keys(byDay);
+  let macroCard = '';
+  if (loggedDays.length) {
+    const totals = loggedDays.map(d => sumNut(byDay[d]));
+    macroCard = `<div class="card"><h3>Average per day, ${window_}</h3><p class="mini" style="margin-top:0">Based on ${loggedDays.length} logged day${loggedDays.length === 1 ? '' : 's'}.</p>
+      ${NUT.map(k => nutRow(k, Math.round(totals.reduce((a, t) => a + t[k], 0) / totals.length), r.targets ? r.targets[k] : null)).join('')}</div>`;
+  }
+  // Workouts in the last 7 days (current plan, not Basic)
+  let workouts = '';
+  if (current && r.tier !== 'basic') {
+    const list = S.workoutsAll.filter(w => w.client_id === r.id && days.includes(w.log_date)).sort((a, b) => (a.log_date < b.log_date ? 1 : -1));
+    workouts = `<div class="card"><h3>Workouts in the last 7 days</h3>${list.length ? list.map(w => `<div class="meal"><div style="flex:1 1 220px"><b>${esc(w.what)}</b>
+      <div class="mini">${esc(fmtDate(w.log_date))}${w.minutes ? ' · ' + w.minutes + ' min' : ''}${w.notes ? ' · ' + esc(w.notes) : ''}</div>${workoutSummary(w)}</div></div>`).join('') : '<p class="muted">No workouts in the last 7 days.</p>'}</div>`;
+  }
+  const title = r.start_date ? `${fmtDate(r.start_date)} to ${r.end_date ? fmtDate(r.end_date) : 'now'}` : 'Not started yet';
+  return `<section class="progress-block" aria-label="${label}">
+    <div class="eyebrow">${label} · ${esc(PLAN_NAMES[r.tier] || '')}</div>
+    <h2 style="font-size:18px;margin:4px 0 10px">${esc(title)}</h2>
+    ${weightCardHtml(weighPointsFor(r))}${stepsCard}${macroCard}${workouts}</section>`;
 }
 function progressHtml() {
-  const rows = S.rows.slice().sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
-  const blocks = rows.map(r => {
-    const w = S.weighIns.filter(x => x.client_id === r.id).sort((a, b) => a.weigh_date.localeCompare(b.weigh_date));
-    const st = S.steps.filter(x => x.client_id === r.id);
-    const avg = st.length ? Math.round(st.reduce((s, x) => s + x.steps, 0) / st.length) : null;
-    const isCurrent = S.cur && r.id === S.cur.id;
-    const latest = w.length ? w[w.length - 1].kg : null;
-    const first = w.length ? w[0].kg : null;
-    return `<section class="card" aria-label="${isCurrent ? 'Current plan' : 'Earlier plan'}">
-      <div class="eyebrow">${isCurrent ? 'Current plan' : 'Earlier plan'} · ${esc(PLAN_NAMES[r.tier] || '')}</div>
-      <h3>${r.start_date ? esc(fmtDate(r.start_date)) + ' to ' + esc(r.end_date ? fmtDate(r.end_date) : 'now') : 'Not started yet'}</h3>
-      <div class="grid2" style="margin-top:8px"><div class="note-box"><div class="mini">Latest weight</div><b>${latest == null ? 'No weigh-ins' : latest.toFixed(1) + ' kg'}</b>
-        ${first != null && latest != null ? `<div class="mini">${(latest - first) >= 0 ? '+' : ''}${(latest - first).toFixed(1)} kg since the first weigh-in</div>` : ''}</div>
-        <div class="note-box"><div class="mini">Steps, average</div><b>${avg == null ? 'Nothing logged' : avg.toLocaleString('en-AU')}</b></div></div>
-      ${w.length > 1 ? weighChart(w) : ''}
-    </section>`;
-  }).join('');
-  return `<p class="muted">Each 12-week plan is shown on its own, so earlier blocks stay separate from your current plan.</p>${blocks || '<p class="muted">No history yet.</p>'}`;
-}
-function weighChart(w) {
-  const W = 320, H = 110, pad2 = 14;
-  const kgs = w.map(x => x.kg), lo = Math.min(...kgs), hi = Math.max(...kgs), span = Math.max(0.5, hi - lo);
-  const pts = w.map((x, i) => [pad2 + i * (W - 2 * pad2) / Math.max(1, w.length - 1), H - pad2 - (x.kg - lo) / span * (H - 2 * pad2)]);
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight trend"><polyline fill="none" stroke="#2D6A4F" stroke-width="3" points="${pts.map(p => p.join(',')).join(' ')}"/>${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#2D6A4F"/>`).join('')}</svg>`;
+  const ordered = S.rows.slice().sort((a, b) => (isCurrentRow(b) - isCurrentRow(a)) || (b.start_date || '').localeCompare(a.start_date || ''));
+  const unitBtns = `<div class="seg" role="group" aria-label="Weight unit" style="margin:0"><button class="${S.unit !== 'lb' ? 'on' : ''}" aria-pressed="${S.unit !== 'lb'}" data-act="unit" data-u="kg">kg</button><button class="${S.unit === 'lb' ? 'on' : ''}" aria-pressed="${S.unit === 'lb'}" data-act="unit" data-u="lb">lb</button></div>`;
+  const notice = S.loadProblems && S.loadProblems.length ? `<div class="hl-red" style="margin-bottom:12px"><b>Part of your history could not be loaded</b> (${esc([...new Set(S.loadProblems)].join(', '))}). <button class="btn-ghost btn-sm" data-act="refreshProgress">Try again</button></div>` : '';
+  const blocks = ordered.map(r => progressBlock(r, isCurrentRow(r))).join('');
+  return `${notice}<div class="row" style="margin-bottom:10px"><p class="muted" style="margin:0">Each 12-week plan is shown on its own, so earlier blocks stay separate from your current plan.</p>${unitBtns}</div>${blocks || '<p class="muted">No history yet.</p>'}`;
 }
 function settingsHtml() {
   const r = S.cur;
@@ -1162,9 +1330,29 @@ async function insertLog(table, row) {
   if (error) throw error;
 }
 async function reloadToday() { await loadAll(); await loadDay(); render(); }
+// Progress reloads its data whenever the tab is opened (and on Try again).
+async function reloadProgress() {
+  try { await loadAll(); } catch (err) { toast(friendly(err)); }
+  if (S.tab === 'progress') render();
+}
 
 const actions = {
-  tab(el) { S.tab = el.dataset.tab; render(); },
+  planDay(el) { S.planDay = Number(el.dataset.d); render(); },
+  tab(el) { S.tab = el.dataset.tab; render(); if (S.tab === 'progress') reloadProgress(); },
+  unit(el) { S.unit = el.dataset.u === 'lb' ? 'lb' : 'kg'; render(); },
+  refreshProgress() { reloadProgress(); },
+  editMeal(el) { S.editId = el.dataset.id; render(); },
+  cancelMealEdit() { S.editId = null; render(); },
+  async saveMealEdit(el) {
+    requireWindow(S.day);
+    const v = id => document.getElementById(id).value;
+    const name = String(v('e-name')).trim();
+    if (!name) { toast('Give the meal a name.'); return; }
+    const n = k => Math.max(0, Math.round(Number(v('e-' + k)) || 0));
+    const { error } = await sb.from('coaching_meal_logs').update({ name: name.slice(0, 80), calories: n('calories'), protein: n('protein'), carbs: n('carbs'), fat: n('fat'), fibre: n('fibre'), edited: true }).eq('id', el.dataset.id);
+    if (error) throw error;
+    S.editId = null; await reloadToday(); toast('Meal changed.');
+  },
   startTracking() { S.basicTargets = null; S.day = clientToday(S.cur); loadDay().then(render); toast('Tracking started. Log your meals and steps on Today.'); },
   dayPrev() { if (canGoBack(S.cur, S.day)) { S.day = addDays(S.day, -1); S.wo = null; loadDay().then(render); } },
   dayNext() { if (S.day < clientToday(S.cur)) { S.day = addDays(S.day, 1); S.wo = null; loadDay().then(render); } },
@@ -1264,19 +1452,23 @@ const actions = {
     await reloadToday(); toast('Steps saved.');
   },
   async saveWeigh() {
-    requireWindow(S.day);
-    const kg = parseFloat(document.getElementById('wi-val').value);
-    if (!(kg > 0)) { toast('Enter your weight first.'); return; }
-    const existing = S.weighIns.find(w => w.week_start === weekStartOf(S.day));
+    const today = clientToday(S.cur);
+    requireWindow(today);
+    const entered = parseFloat(document.getElementById('wi-val').value);
+    if (!(entered > 0)) { toast('Enter your weight first.'); return; }
+    const kg = Math.round((S.unit === 'lb' ? entered / 2.20462 : entered) * 10) / 10;
+    const existing = S.weighIns.find(w => w.client_id === S.cur.id && w.week_start === weekStartOf(today));
     if (existing) {
-      const { error } = await sb.from('coaching_weigh_ins').update({ kg: Math.round(kg * 10) / 10 }).eq('id', existing.id);
+      const { error } = await sb.from('coaching_weigh_ins').update({ kg }).eq('id', existing.id);
       if (error) throw error;
     } else {
-      await insertLog('coaching_weigh_ins', { weigh_date: S.day, kg: Math.round(kg * 10) / 10 });
+      await insertLog('coaching_weigh_ins', { weigh_date: today, kg });
     }
     await reloadToday(); toast('Weigh-in saved.');
   },
   howTo(el) { openExercise(el.dataset.name); },
+  tzToggle() { S.tzOpen = !S.tzOpen; S.tzQuery = ''; render(); },
+  tzPick(el) { const d = draft(); d.timezone = el.dataset.label; d.tzIana = el.dataset.iana; saveDraft(d); S.tzOpen = false; render(); },
   closeSheet() { document.getElementById('sheetRoot').innerHTML = ''; },
   toggleMarketing() {
     if (S.marketing === null) return;
@@ -1336,38 +1528,38 @@ function findLibrary(name) {
 }
 function sheetHtml(title, inner) {
   return `<div class="sheet-back" data-act="closeSheet"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}">
-    <div class="row" style="align-items:flex-start"><h3>${esc(title)}</h3><button class="btn-ghost btn-sm" data-act="closeSheet">Close</button></div>${inner}</div>`;
+    <div class="row" style="align-items:flex-start"><div><div class="eyebrow">How to do it</div><h3>${esc(title)}</h3></div><button class="btn-ghost btn-sm" data-act="closeSheet">Close</button></div>${inner}</div>`;
 }
-function guideHtml(d) {
-  const list = arr => `<ol>${(arr || []).map(s => `<li>${esc(s)}</li>`).join('')}</ol>`;
-  const ul = arr => `<ul>${(arr || []).map(s => `<li>${esc(s)}</li>`).join('')}</ul>`;
-  return `<p><b>What it works:</b> ${esc(d.w || d.works)}</p><h4>How to do it</h4>${list(d.s || d.steps)}
-    ${(d.t || d.tips) ? `<h4>Form tips</h4>${ul(d.t || d.tips)}` : ''}
-    ${(d.m || d.mistakes) ? `<h4>Common mistakes</h4>${ul(d.m || d.mistakes)}` : ''}
-    ${(d.e || d.easier) ? `<h4>An easier version</h4><p>${esc(d.e || d.easier)}</p>` : ''}`;
+function guideHtml(d, name) {
+  const list = (arr, tag) => (arr && arr.length) ? `<${tag}>${arr.map(x => `<li>${esc(x)}</li>`).join('')}</${tag}>` : '<p class="mini">Not listed.</p>';
+  const title = name || d.n || d.name || '';
+  return `<h4>What it works</h4><p>${esc(d.w || d.works || 'Not listed.')}</p>
+    <h4>Step by step</h4>${list(d.s || d.steps, 'ol')}
+    <h4>Form tips</h4>${list(d.t || d.tips, 'ul')}
+    <h4>Common mistakes</h4>${list(d.m || d.mistakes, 'ul')}
+    <h4>Easier version</h4><p>${esc(d.e || d.easier || 'Not listed.')}</p>
+    <p style="margin-top:18px"><a class="btn btn-ghost" href="https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' how to do it')}" target="_blank" rel="noopener">Watch a video</a></p>`;
 }
 async function openExercise(name) {
   const lib = findLibrary(name);
-  if (lib) { document.getElementById('sheetRoot').innerHTML = sheetHtml(lib.n, guideHtml(lib)); return; }
+  if (lib) { document.getElementById('sheetRoot').innerHTML = sheetHtml(lib.n, guideHtml(lib, lib.n)); return; }
   document.getElementById('sheetRoot').innerHTML = sheetHtml(name, '<p class="muted">Writing the guide…</p>');
   try {
     const g = await callAi({ mode: 'exercise', name });
-    document.getElementById('sheetRoot').innerHTML = sheetHtml(g.name || name, guideHtml(g));
+    document.getElementById('sheetRoot').innerHTML = sheetHtml(g.name || name, '<div class="note-box mini" style="margin-bottom:10px">Written by Beast AI. Check it against what Stefan has told you.</div>' + guideHtml(g, g.name || name));
   } catch (err) {
-    document.getElementById('sheetRoot').innerHTML = sheetHtml(name, `<p>${esc(friendly(err))}</p><p class="muted">Ask Stefan at your next check-in for this one.</p>`);
+    const where = S.cur && S.cur.tier === 'beast' ? 'Ask Stefan on WhatsApp.' : 'Ask Stefan at your next check-in.';
+    document.getElementById('sheetRoot').innerHTML = sheetHtml(name, `<p>${esc(friendly(err))}</p><p class="muted">No guide for this one yet. ${where}</p>`);
   }
-}
-
-/* Basic: the date for the cities list. */
-function fillTzList() {
-  document.getElementById('tzList').innerHTML = TZ_CITIES.map(([city, zone]) => `<option value="${city}">${zone}</option>`).join('');
 }
 
 /* ==========================================================================
    Boot: sign in, claim the plan, load, show
    ========================================================================== */
+document.addEventListener('input', e => {
+  if (e.target && e.target.id === 'tz-q') { S.tzQuery = e.target.value; const box = document.getElementById('tzResults'); if (box) box.innerHTML = tzResultsHtml(S.tzQuery); }
+});
 async function boot() {
-  fillTzList();
   const { data: { session } } = await sb.auth.getSession();
   if (!session || !session.user) { window.location.replace('/dashboard?next=my-coach'); return; }
   S.session = session; S.user = session.user;

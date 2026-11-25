@@ -398,6 +398,66 @@ test('workouts: a plan session with sets and reps, and Other activity with blank
   await ctx.close();
 });
 
+test('progress: opening the tab loads the latest data, even when it was saved elsewhere', SKIP, async () => {
+  const backend = newBackend();
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  // Written from another device or session while this page was open
+  backend.steps.push({ client_id: 1, log_date: backend.today, steps: 6400 });
+  await page.click('button[data-act="tab"][data-tab="progress"]');
+  await page.waitForFunction(() => document.getElementById('app').textContent.includes('6,400'));
+  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
+  await ctx.close();
+});
+
+test('progress: a saved step count and a weigh-in show on Progress straight away, without a reload', SKIP, async () => {
+  const backend = newBackend();
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  await page.fill('#st-val', '8100');
+  await page.click('button[data-act="saveSteps"]');
+  await page.waitForFunction(() => document.getElementById('toast').textContent.includes('Steps saved'));
+  await page.click('button[data-act="tab"][data-tab="progress"]');
+  await page.waitForFunction(() => document.getElementById('app').textContent.includes('8,100'));
+  await page.click('button[data-act="tab"][data-tab="today"]');
+  await page.waitForSelector('#wi-val');
+  await page.fill('#wi-val', '84.6');
+  await page.click('button[data-act="saveWeigh"]');
+  await page.waitForFunction(() => document.getElementById('toast').textContent.includes('Weigh-in saved'));
+  await page.click('button[data-act="tab"][data-tab="progress"]');
+  await page.waitForFunction(() => document.getElementById('app').textContent.includes('84.6 kg'));
+  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
+  await ctx.close();
+});
+
+test('steps card: a target is shown clearly; with no target yet, the client is told Stefan will set it', SKIP, async () => {
+  const withTarget = newBackend();
+  let r = await open(withTarget);
+  await waitForApp(r.page);
+  assert.match(await txt(r.page, '#app'), /Target: 8,000 a day/);
+  await r.ctx.close();
+  const noTarget = newBackend({ row: { targets: { calories: 2000, protein: 150, carbs: 200, fat: 70, fibre: 28 } } });
+  r = await open(noTarget);
+  await waitForApp(r.page);
+  const text = await txt(r.page, '#app');
+  assert.match(text, /Stefan will set your steps target with your plan\./);
+  assert.doesNotMatch(text, /set by Stefan/, 'the old wording is gone');
+  await r.ctx.close();
+});
+
+test('meals: a logged meal can be edited on Today, and the change is saved', SKIP, async () => {
+  const backend = newBackend();
+  backend.meals.push({ id: 'm-edit', client_id: 1, log_date: backend.today, name: 'Toast', calories: 300, protein: 10, carbs: 40, fat: 5, fibre: 3, source: 'typed' });
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  await page.click('button[data-act="editMeal"][data-id="m-edit"]');
+  await page.fill('#e-calories', '420');
+  await page.click('button[data-act="saveMealEdit"]');
+  await page.waitForFunction(() => document.getElementById('toast').textContent.includes('Meal changed'));
+  assert.equal(backend.meals.find(m => m.id === 'm-edit').calories, 420);
+  await ctx.close();
+});
+
 test('steps: saving a day\'s count is one row per day, and saving again replaces it', SKIP, async () => {
   const backend = newBackend();
   const { ctx, page } = await open(backend);
@@ -484,7 +544,7 @@ test('a returning client: an earlier 12-week plan shows as its own block in Prog
   await waitForApp(page);
   await page.click('button[data-act="tab"][data-tab="progress"]');
   const sections = await page.$$eval('section[aria-label]', ss => ss.map(s => s.getAttribute('aria-label')));
-  assert.deepEqual(sections, ['Earlier plan', 'Current plan'], 'each plan is its own block, earlier first');
+  assert.deepEqual(sections, ['Current plan', 'Earlier plan'], 'each plan is its own block, current first');
   assert.match(await page.textContent('section[aria-label="Earlier plan"]'), /Core/);
   await ctx.close();
 });
@@ -556,12 +616,35 @@ test('onboarding: a coached client\'s answers are kept as they type, and the ste
   await page.fill('#f-heightCm', '182');
   await page.fill('#f-weight', '84');
   await page.fill('#f-whatsapp', '+61 400 000 009');
-  await page.fill('#f-timezone', 'Melbourne');
+  await page.click('button[data-act="tzPick"][data-iana="Australia/Melbourne"]');
   await page.click('button[data-act="obNext"]');
   assert.match(await txt(page, '#app'), /Step 2 of 6/);
   // Reload mid-way: the draft is still there
   await page.reload(); await waitForApp(page);
   assert.match(await txt(page, '#app'), /Step 2 of 6/, 'a page reload keeps the draft and the step');
+  await ctx.close();
+});
+
+test('time zone picker: nothing is chosen until the client picks; the phone zone is only suggested; search finds cities and any IANA zone', SKIP, async () => {
+  const backend = newBackend({ row: { tier: 'basic', status: 'awaiting_onboarding', activated_at: null, start_date: null, onboarding: {}, targets: null, whatsapp: null } });
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  // Suggestion from the phone's zone (the browser is set to Australia/Melbourne), not selected
+  await page.waitForSelector('text=Looks like you are in');
+  assert.match(await txt(page, '#app'), /Looks like you are in Melbourne\. Use this\?/);
+  assert.equal(await page.evaluate(() => (JSON.parse(localStorage.getItem(DRAFT_KEY())) || {}).tzIana || null), null, 'nothing saved yet');
+  // Search filters as you type
+  await page.click('button[data-act="tzToggle"]');
+  await page.fill('#tz-q', 'lisbon');
+  assert.equal(await page.locator('#tzResults button.tz-opt').count(), 1, 'one city matches Lisbon');
+  // A valid IANA zone that is not in the city list is still found
+  await page.fill('#tz-q', 'chatham');
+  assert.match(await txt(page, '#tzResults'), /Pacific\/Chatham/, 'any valid IANA zone can be searched');
+  await page.fill('#tz-q', 'lisbon');
+  await page.click('#tzResults button.tz-opt');
+  await page.waitForFunction(() => (JSON.parse(localStorage.getItem(DRAFT_KEY())) || {}).tzIana === 'Europe/Lisbon');
+  assert.match(await txt(page, '#app'), /Lisbon/);
+  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
   await ctx.close();
 });
 
@@ -573,7 +656,7 @@ test('onboarding: a Basic client fills the one-screen form and sees their target
   await page.check('input[name="f-sex"][value="Male"]');
   await page.fill('#f-heightCm', '182');
   await page.fill('#f-weight', '84');
-  await page.fill('#f-timezone', 'Melbourne');
+  await page.click('button[data-act="tzPick"][data-iana="Australia/Melbourne"]');
   await page.check('input[name="f-goalKind"][value="fatloss"]');
   await page.check('input[name="f-jobMult"][value="1.15"]');
   await page.fill('#f-stepsEveryday', '5000');
@@ -599,7 +682,7 @@ test('awaiting activation: "Stefan is building your plan"', SKIP, async () => {
   const backend = newBackend({ row: { status: 'awaiting_activation', activated_at: null } });
   const { ctx, page } = await open(backend);
   await waitForApp(page);
-  assert.match(await txt(page, 'h1'), /Stefan is building your plan/);
+  assert.match(await txt(page, '#app'), /Stefan is building your plan/);
   await ctx.close();
 });
 
@@ -638,7 +721,7 @@ test('onboarding: a coached client fills all six steps and sends the answers; th
   await page.fill('#f-heightCm', '182');
   await page.fill('#f-weight', '84');
   await page.fill('#f-whatsapp', '+61 400 000 009');
-  await page.fill('#f-timezone', 'Melbourne');
+  await page.click('button[data-act="tzPick"][data-iana="Australia/Melbourne"]');
   await page.click('button[data-act="obNext"]');
   // Step 2
   await page.fill('#f-goal', 'Get stronger and sleep better');
@@ -685,7 +768,7 @@ test('onboarding: a coached client fills all six steps and sends the answers; th
   assert.equal(sent.args.p_answers.weighInDay, 'Mon');
   assert.equal(sent.args.p_answers.agreeConsent, true);
   assert.equal(backend.clients[0].status, 'awaiting_activation');
-  assert.match(await txt(page, 'h1'), /Stefan is building your plan/);
+  assert.match(await txt(page, '#app'), /Stefan is building your plan/);
   await ctx.close();
 });
 

@@ -76,3 +76,24 @@ test('the coaching onboarding links each agreement to its page, and the link ope
   assert.ok(html.includes("obAgree(ob, 'agreeNotCoach'"), 'not-a-coach agreement');
   assert.ok(html.includes("obAgree(ob, 'agreeConsent'"), 'consent agreement');
 });
+
+test('coaching.html: every price is written in Australian dollars, with the AUD note near the plans', () => {
+  const html = read('coaching.html');
+  const t = text(html);
+  assert.match(t, /Prices in Australian dollars\. Your bank converts at checkout\./);
+  // A dollar amount must be followed by AUD (no bare prices), except the cents-free note "normally $37 AUD".
+  const bare = [...t.matchAll(/\$\d+(?:\.\d+)?(?![\d.])(?! AUD)/g)].map(m => m[0] + ' @ ' + t.slice(Math.max(0, m.index - 30), m.index + 12));
+  assert.deepEqual(bare, [], 'bare prices: ' + bare.join(' | '));
+  assert.match(t, /\$299 AUD for 12 weeks/);
+  assert.match(t, /\$2\.50 AUD a week/);
+  assert.match(t, /\$30 AUD billed every 12 weeks/);
+});
+
+test('The Beast: WhatsApp reply hours in Melbourne time, and overseas video calls are booked to suit both zones (sales page and terms)', () => {
+  const sales = text(read('coaching.html'));
+  const terms = text(read('coaching-terms.html'));
+  assert.match(sales, /Replies within 2 hours during Australian business hours, Melbourne time/);
+  assert.match(sales, /Overseas\? Video calls are booked at a time that suits both time zones/);
+  assert.match(terms, /reply within 2 hours during Australian business hours, Melbourne time/);
+  assert.match(terms, /If you are overseas, video calls are booked at a time that suits both your time zone and ours\./);
+});

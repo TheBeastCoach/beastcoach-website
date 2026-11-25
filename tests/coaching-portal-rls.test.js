@@ -511,3 +511,27 @@ test('4b: the Beast AI counter is per client and shared, and anon cannot reach i
   await expectError(as(db, 'anon', {}, () => db.query('select * from public.coach_ai_use(1, 40, 300)')), /permission denied/);
   await db.close();
 });
+
+// A fixed clock for the tests only: 10pm in London on 25 November 2026 (GMT), which is already 26 November in Melbourne.
+// The SQL files are read here and every now() is swapped for that moment, in the test's copy only. Nothing in the
+// production SQL changes, and no client can change the clock. This makes the London boundary tested every time.
+const FIXED_NOW = "'2026-11-25 22:00:00+00'::timestamptz";
+const atFixedClock = sql => sql.replace(/\bnow\(\)/g, FIXED_NOW);
+test('London at a fixed clock (10pm London, Melbourne already the next day): the verify script passes, and the zones really differ', async () => {
+  const db = new PGlite();
+  await db.exec(SHIM);
+  for (const f of ['supabase/coaching.sql', 'supabase/coaching-portal.sql', 'supabase/coaching-portal-4b.sql', 'supabase/coaching-portal-4b2.sql']) {
+    await db.exec(atFixedClock(read(f)));
+  }
+  await db.exec(fixtureSql());
+  const mel = await scalar(db, `select public.melbourne_today()::text as d`);
+  assert.equal(mel.d, '2026-11-26', 'at this clock Melbourne is on 26 November, so the test is not depending on the real time of day');
+  const results = await db.exec(atFixedClock(read('supabase/coaching-portal-verify.sql')));
+  const table = results.find(r => r.rows && r.rows.length && r.rows[0].check_name);
+  assert.ok(table, 'the script ends with a results table');
+  const failed = table.rows.filter(r => r.result !== 'PASS');
+  assert.deepEqual(failed.map(r => r.check_name + ': ' + r.detail), [], 'no FAIL rows at the fixed clock');
+  const london = table.rows.filter(r => /London/.test(r.check_name));
+  assert.ok(london.length >= 4, 'the London checks ran: ' + london.length);
+  await db.close();
+});
