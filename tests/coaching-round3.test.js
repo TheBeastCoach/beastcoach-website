@@ -17,7 +17,7 @@ catch (e) { pwError = 'playwright-core not found. See the instructions in docs/C
 const CHROME = process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const SKIP = pwError ? { skip: pwError } : {};
 
-// Monday 23 Nov 2026, 9am Melbourne (AEDT, UTC+11). Sam's next check-in is Thu 26 Nov at 6:30pm Melbourne.
+// Monday 23 Nov 2026, 9am Melbourne (AEDT, UTC+11). Sam's next check-in is two days after today (Wed 25 Nov) at 6:30pm Melbourne.
 const MON_9AM_MEL = new Date('2026-11-22T22:00:00Z');
 
 let browser, server, base;
@@ -72,7 +72,7 @@ test('Sam (Core) sees the next check-in on Today, with the time in Melbourne and
   const { ctx, page } = await openPage();
   await setClient(page, 'c_sam');
   assert.equal(await page.locator('#checkinCard').count(), 1, 'the card shows');
-  assert.equal(await toText(page, '#checkinCard h3'), 'Next check-in: Thu 26 Nov, 6:30pm');
+  assert.equal(await toText(page, '#checkinCard h3'), 'Next check-in: Wed 25 Nov, 6:30pm');
   assert.match(await toText(page, '#checkinCard'), /I'll contact you on WhatsApp at this time\./);
   assert.doesNotMatch(await toText(page, '#checkinCard'), /Melbourne time/, 'no second time when the client is in Melbourne');
   noErrors(page);
@@ -84,7 +84,7 @@ test('a client in another zone sees their own time, with the Melbourne time besi
   // Sam is moved to London for this test. 6:30pm in Melbourne is 7:30am in London, the same day.
   await page.evaluate(() => { clientById('c_sam').ob.timezone = 'London'; persist(); });
   await setClient(page, 'c_sam');
-  assert.equal(await toText(page, '#checkinCard h3'), 'Next check-in: Thu 26 Nov, 7:30am');
+  assert.equal(await toText(page, '#checkinCard h3'), 'Next check-in: Wed 25 Nov, 7:30am');
   assert.equal(await toText(page, '#checkinCard .mini'), '(Melbourne time 6:30pm)');
   noErrors(page);
   await ctx.close();
@@ -245,6 +245,23 @@ test('New client on Basic with Maintain: the daily calories equal the calculated
   assert.equal(result.goal, 'maintain');
   assert.equal(result.shown, result.maintenance, 'calories are exactly maintenance');
   assert.match(await page.textContent('.target-val'), /\d/);
+  noErrors(page);
+  await ctx.close();
+});
+
+// The seed is relative to today: move the clock on and Sam's dates move with it.
+test('seeded dates follow today: check-in two days ahead, the latest Monday weigh-ins, and a start 30 days back', SKIP, async () => {
+  // Monday 7 Dec 2026, 9am Melbourne
+  const { ctx, page } = await openPage({ time: new Date('2026-12-06T22:00:00Z') });
+  await setClient(page, 'c_sam');
+  assert.equal(await toText(page, '#checkinCard h3'), 'Next check-in: Wed 9 Dec, 6:30pm', 'two days after today');
+  const seeded = await page.evaluate(() => {
+    const c = clientById('c_sam');
+    return { start: c.startDate, weighIns: c.weighIns.map(w => w.date), checkin: c.checkins[0].date };
+  });
+  assert.equal(seeded.start, '2026-11-07', 'started 30 days before 7 Dec');
+  assert.deepEqual(seeded.weighIns, ['2026-11-09', '2026-11-16', '2026-11-23', '2026-11-30'], 'the four latest Mondays before today');
+  assert.equal(seeded.checkin, '2026-12-09');
   noErrors(page);
   await ctx.close();
 });

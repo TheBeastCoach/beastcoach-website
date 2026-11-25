@@ -212,7 +212,7 @@ body.shot #demoBar,body.shot .toast{display:none !important}
    Constants
    ========================================================================== */
 // Bumped with the customer records, so older saved demo data is replaced by the new seeds.
-const DB_KEY = 'bc_demo_v4';
+const DB_KEY = 'bc_demo_v5';
 const UI_KEY = 'bc_demo_ui2';
 const DEMO_KEY_NAME = 'bc_demo_key';
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -701,6 +701,16 @@ function weighsOn(start, dayName, kgs) {
   }
   return out.map((date, i) => ({ date, kg: kgs[i] }));
 }
+// Seeded weigh-ins counted back from today: the latest ones on the weigh-in day, oldest first in the result.
+function weighsBack(today, start, dayName, kgs) {
+  const days = [];
+  let d = addDays(today, -1);
+  while (d >= start && days.length < kgs.length) {
+    if (DAYS[dowNum(d) - 1] === dayName) days.push(d);
+    d = addDays(d, -1);
+  }
+  return days.reverse().map((date, i) => ({ date, kg: kgs[kgs.length - days.length + i] }));
+}
 // Seeded set and rep sessions: the last 7 days are 2.5 kg heavier on every other weighted exercise.
 function seedWorkouts(t, schedule) {
   const out = [];
@@ -768,7 +778,7 @@ function seedDb() {
   const sam = mkClient({
     id:'c_sam', name:'Sam Taylor', email:'sam@example.com', tier:'core', status:'active',
     paid:{ date: addDays(t, -30), amount: 299 }, createdAt: addDays(t, -30) + 'T09:00:00.000Z',
-    startDate: addDays(t, -28), healthFlag:false,
+    startDate: addDays(t, -30), healthFlag:false,
     ob: blankOb({
       age:'34', sex:'Male', heightUnit:'cm', heightCm:'182', weight:'84', weightUnit:'kg', weightKg:84, whatsapp:'+61 400 000 001', timezone:'Melbourne',
       goal:'Lose 6 kg and get back to lifting 3 days a week', timeframe:'3 months', goalWhy:'Trip in March and my knee is sick of the extra weight',
@@ -780,16 +790,16 @@ function seedDb() {
       experience:'Some', enjoys:'Lifting, cycling', hates:'Running', injuries:'Left knee gets sore on long walks',
       worked:'Tracking macros in an app for 6 weeks', didnt:'Cutting carbs completely', weighInDay:'Mon', weighInTime:'07:00',
       health:{ heart:'no', chest:'no', other:'no' }, healthClearance:false,
-      agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -28) + 'T18:00:00.000Z'
+      agreeTerms:true, agreeNotCoach:true, agreeConsent:true, submittedAt: addDays(t, -30) + 'T18:00:00.000Z'
     }),
-    weighIns: weighsOn(addDays(t, -28), 'Mon', [83.6, 83.1, 82.7, 82.2]),   // four Monday weigh-ins: a few weeks of Progress
-    checkins: [{ id: 'ci_sam_next', date: addDays(t, 3), time: '18:30', type: 'Check-in', status: 'scheduled' }],
+    weighIns: weighsBack(t, addDays(t, -30), 'Mon', [83.6, 83.1, 82.7, 82.2]),   // the four latest Monday weigh-ins, counting back from today
+    checkins: [{ id: 'ci_sam_next', date: addDays(t, 2), time: '18:30', type: 'Check-in', status: 'scheduled' }],   // two days from today, 6:30pm Melbourne
     workouts: seedWorkouts(t, SAM_SCHEDULE).concat([
       { id: uid(), date: addDays(t, -3), what:'Bike intervals', minutes: 30, notes:'4 x 3 min hard' }
     ]),
     steps: seedSteps(t, 6600),
     targets: { calories:2000, protein:140, carbs:200, fat:70, fibre:28, steps:8000 },
-    plan: { mealDraft: draftFromPlan(samPlan), mealPublished: samPlan, trainDraft: SAM_TRAIN, trainPublished: SAM_TRAIN, publishedAt: addDays(t, -28) + 'T12:00:00.000Z' },
+    plan: { mealDraft: draftFromPlan(samPlan), mealPublished: samPlan, trainDraft: SAM_TRAIN, trainPublished: SAM_TRAIN, publishedAt: addDays(t, -30) + 'T12:00:00.000Z' },
     logs: samLogs,
     notes: 'Keep the step count up. Skip heavy squats this week if the knee flares. Responds well to short voice notes.'
   });

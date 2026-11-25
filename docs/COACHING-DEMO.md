@@ -116,7 +116,7 @@ Steps (`OB_STEPS` in `coaching-demo.html`):
 
 ### Demo sample clients (`seedDb`)
 
-- Sam Taylor: Core, active since 26 Oct (week 5 of 12). Said yes to news. Four Monday weigh-ins, and one upcoming check-in on Thu 26 Nov at 6:30pm (Melbourne time).
+- Sam Taylor: Core, started 30 days ago (week 5 of 12). Said yes to news. Four weigh-ins on his Monday weigh-in day, counting back from today. One upcoming check-in, two days from today at 6:30pm (Melbourne time). All seeded dates are relative to today, so the demo never goes stale.
 - Mia Chen: Essential, awaiting activation.
 - Jordan Reid: The Beast, active.
 - Alex Lee: Basic, active.
