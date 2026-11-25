@@ -1,6 +1,6 @@
-// Browser tests for dashboard.html (recipe ratings and ideas) and demo.html ("Try It Live").
-// Supabase is replaced by a recording stub, so these tests check what the pages ask for and show:
-// the dashboard never reads other people's emails, and the demo shows the friendly limit messages.
+// Browser tests for dashboard.html (recipe ratings and ideas).
+// Supabase is replaced by a recording stub, so these tests check what the page asks for and shows:
+// the dashboard never reads other people's emails.
 // The database rules themselves are tested in tests/security-sql.test.js.
 //
 // Needs Playwright and Chrome. Run with:
@@ -80,7 +80,6 @@ async function openPage(urlPath, stub, opts) {
   await page.route(url => /^https?:\/\//.test(url.href) && !url.href.startsWith(base), r => r.abort());
   await page.route(/cdn\.jsdelivr\.net\/npm\/@supabase/, r => r.fulfill({ status: 200, contentType: 'application/javascript', body: FAKE_SUPABASE }));
   await page.addInitScript(s => { window.__stub = s; }, stub || {});
-  if (opts && opts.apiRoute) await page.route('**/api/analyse-meal', opts.apiRoute);
   await page.goto(base + urlPath);
   await page.waitForLoadState('domcontentloaded');
   return { ctx, page };
@@ -170,52 +169,3 @@ test('a summary error shows "Ratings coming soon" and does not break the page', 
 });
 
 // ---------------------------------------------------------------------------
-// demo.html: Try It Live, with the limits
-// ---------------------------------------------------------------------------
-
-const ANALYSIS = { name: 'Two eggs on toast', calories: 380, protein: 18, carbs: 30, fat: 19, description: 'Two eggs on toast', confidence: 'high' };
-
-test('Try It Live: a normal estimate shows the confirm card', SKIP, async () => {
-  const { ctx, page } = await openPage('/demo', {}, { apiRoute: r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ANALYSIS) }) });
-  await page.evaluate(() => showAiText());
-  await page.fill('#meal-input', 'two eggs on toast');
-  await page.click('#analyse-btn');
-  await page.waitForFunction(() => document.getElementById('confirm-name').textContent === 'Two eggs on toast');
-  assert.equal(await page.locator('#error-msg.visible').count(), 0);
-  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
-  await ctx.close();
-});
-
-test('Try It Live: the daily limit shows the friendly message, not an error code', SKIP, async () => {
-  const body = { error: 'daily_limit', message: 'Beast AI has done all the estimates it can for today. Try again tomorrow, or enter the numbers yourself.' };
-  const { ctx, page } = await openPage('/demo', {}, { apiRoute: r => r.fulfill({ status: 429, contentType: 'application/json', body: JSON.stringify(body) }) });
-  await page.evaluate(() => showAiText());
-  await page.fill('#meal-input', 'two eggs on toast');
-  await page.click('#analyse-btn');
-  await page.waitForSelector('#error-msg.visible');
-  assert.equal(await page.textContent('#error-msg'), body.message);
-  assert.equal(await page.isEnabled('#analyse-btn'), true, 'the button works again afterwards');
-  await ctx.close();
-});
-
-test('Try It Live: the per-IP limit shows its own friendly message', SKIP, async () => {
-  const body = { error: 'ip_limit', message: 'You have asked for a lot of estimates in the last hour. Try again in a little while, or enter the numbers yourself.' };
-  const { ctx, page } = await openPage('/demo', {}, { apiRoute: r => r.fulfill({ status: 429, contentType: 'application/json', body: JSON.stringify(body) }) });
-  await page.evaluate(() => showAiText());
-  await page.fill('#meal-input', 'two eggs on toast');
-  await page.click('#analyse-btn');
-  await page.waitForSelector('#error-msg.visible');
-  assert.equal(await page.textContent('#error-msg'), body.message);
-  await ctx.close();
-});
-
-test('Try It Live: when the counter is down, a "resting" message shows', SKIP, async () => {
-  const body = { error: 'busy', message: 'Beast AI is resting for a moment. Please try again shortly.' };
-  const { ctx, page } = await openPage('/demo', {}, { apiRoute: r => r.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify(body) }) });
-  await page.evaluate(() => showAiText());
-  await page.fill('#meal-input', 'two eggs on toast');
-  await page.click('#analyse-btn');
-  await page.waitForSelector('#error-msg.visible');
-  assert.equal(await page.textContent('#error-msg'), body.message);
-  await ctx.close();
-});

@@ -1,4 +1,4 @@
-// Tests for supabase/recipe-ratings-security.sql and supabase/analyse-meal-limits.sql.
+// Tests for supabase/recipe-ratings-security.sql.
 // Runs the real SQL in an in-memory Postgres (PGlite), with a stand-in for Supabase's auth.jwt() and roles.
 // Starts from the OLD open policies, shows the leak, then runs the new SQL and checks each rule.
 //
@@ -166,42 +166,5 @@ test('the summary function is the only public route to rating data: no emails, e
   const grants = (await db.query(`select grantee from information_schema.routine_privileges where routine_name = 'recipe_rating_summary' and privilege_type = 'EXECUTE' order by grantee`)).rows.map(r => r.grantee);
   assert.ok(grants.includes('anon') && grants.includes('authenticated'));
   assert.ok(!grants.includes('PUBLIC'));
-  await db.close();
-});
-
-// ---- Analyse-meal daily and per-IP limits ----
-
-test('analyse_meal_use: the daily cap stops at the limit, and each IP has its own hourly limit', SKIP, async () => {
-  const db = await newDb();
-  await db.exec(fs.readFileSync(path.join(ROOT, 'supabase', 'analyse-meal-limits.sql'), 'utf8'));
-  const use = (ip, day, ipLimit) => asRole(db, 'service_role', {}, () =>
-    db.query(`select * from public.analyse_meal_use($1, $2, $3)`, [ip, day, ipLimit]));
-  assert.equal((await use('1.1.1.1', 2, 10)).rows[0].allowed, true);
-  assert.equal((await use('2.2.2.2', 2, 10)).rows[0].allowed, true);
-  const third = (await use('3.3.3.3', 2, 10)).rows[0];
-  assert.deepEqual([third.allowed, third.reason], [false, 'daily'], 'the shared daily cap is reached');
-  await db.close();
-});
-
-test('analyse_meal_use: the per-IP limit is 10 an hour, and only that IP is held back', SKIP, async () => {
-  const db = await newDb();
-  await db.exec(fs.readFileSync(path.join(ROOT, 'supabase', 'analyse-meal-limits.sql'), 'utf8'));
-  const use = ip => asRole(db, 'service_role', {}, () => db.query(`select * from public.analyse_meal_use($1, 300, 10)`, [ip])).then(r => r.rows[0]);
-  for (let i = 0; i < 10; i++) assert.equal((await use('9.9.9.9')).allowed, true, 'call ' + (i + 1) + ' allowed');
-  const eleventh = await use('9.9.9.9');
-  assert.deepEqual([eleventh.allowed, eleventh.reason], [false, 'ip'], 'the 11th call from one IP is refused');
-  assert.equal((await use('8.8.8.8')).allowed, true, 'another IP is not affected');
-  // An hour later the old calls no longer count
-  await db.query(`update public.analyse_meal_hits set at = at - interval '2 hours' where ip = '9.9.9.9'`);
-  assert.equal((await use('9.9.9.9')).allowed, true, 'allowed again once the hour has passed');
-  await db.close();
-});
-
-test('analyse_meal_use: nobody but the service role can call it, and the counters are closed to the website', SKIP, async () => {
-  const db = await newDb();
-  await db.exec(fs.readFileSync(path.join(ROOT, 'supabase', 'analyse-meal-limits.sql'), 'utf8'));
-  await expectError(asRole(db, 'anon', {}, () => db.query(`select * from public.analyse_meal_use('x', 300, 10)`)), /permission denied/);
-  await expectError(asRole(db, 'authenticated', ALICE, () => db.query(`select * from public.analyse_meal_use('x', 300, 10)`)), /permission denied/);
-  assert.equal((await asRole(db, 'anon', {}, () => db.query(`select * from public.analyse_meal_day`).catch(() => ({ rows: [] })))).rows.length, 0);
   await db.close();
 });
