@@ -126,6 +126,19 @@ Do these in order. Use the SQL Editor (Dashboard, SQL Editor, New query).
    3. When they sign in, the dashboard calls `claim_coaching()` and their My Coach tile appears. They are linked to the row.
    4. A test client's plan stays `awaiting_onboarding` until they submit onboarding (Basic submits it straight to active). To move a coached plan on by hand for testing, for example to `active`, set `status`, `activated_at` and `start_date` in the Table Editor. Do not do this for a real client.
 
+## Run order (Supabase SQL Editor, in this order)
+
+1. `supabase/coaching.sql`, only if it has not been run before.
+2. `supabase/coaching-portal.sql`. Safe to run twice.
+3. `supabase/coaching-portal-verify.sql`. Read the results panel: one row per check, each marked PASS or FAIL.
+   - It works inside one transaction and ends with a rollback. It creates stub users, rows, logs and a customer record only while it runs, and leaves nothing behind.
+   - It acts as anon, two clients, a coach without MFA and a coach with MFA, and re-checks the rules from `tests/coaching-portal-rls.test.js`.
+   - Every check is recorded even if it errors (recorded as FAIL), so one failure does not stop the rest.
+   - It checks against counts taken during the run, not fixed numbers, so it is correct on the live project.
+   - Expect 28 rows, all PASS. If any row is FAIL, do not go on to step 4: send me the row's text.
+   - The stub users need the standard `auth.users` columns (`id`, `email`, `email_confirmed_at`). If the first row says FAIL on the setup check, paste me its detail.
+4. Add yourself as the coach, and add a test client, as described below.
+
 ## Login: the My Coach tile and `/my-coach`
 
 - After sign-in, the dashboard calls `claim_coaching()`. If it finds a plan, the **My Coach** tile appears. Nobody else sees it. If the call fails (for example before step 2 has been run), the tile stays hidden and the dashboard works normally.
@@ -150,3 +163,7 @@ Do these in order. Use the SQL Editor (Dashboard, SQL Editor, New query).
 - **Check-in rules** (one kick-off call for Essential) are not yet in the database. They are part of the next step, when the coach screens move onto this data.
 - **The coach's client list** must name its columns, not use `select *`, because of the notes column.
 - **Branch and main:** `coaching-portal` starts from `coaching-demo`, which does not yet have the security fixes that are on `main` (the dashboard ratings change). When this branch is merged into `main`, `dashboard.html` will need the two changes combined.
+
+## Open for 4b
+
+- **Full client history.** `my_client_id()` returns only the client's newest plan. A returning client therefore cannot see logs from an earlier 12-week plan, because those rows belong to a finished plan row. Decide in 4b whether clients see their full history across plans, and if so change `my_client_id()` or the policies that use it.

@@ -14,7 +14,7 @@
     });
     try {
       // Don't disturb the page while a Supabase auth link (password reset, email
-      // confirmation, magic link) is still being processed — a forced reload here
+      // confirmation, magic link) is still being processed, so a forced reload here
       // can race the auth exchange and burn the one-time token before it's used.
       if (/access_token=|refresh_token=|type=recovery|token_hash=|[?&]code=/.test(window.location.href)) { return; }
       fetch('/version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (data) {
@@ -39,7 +39,7 @@
     } catch (e) {}
   })();
   </script>
-<title>Dashboard — Beast Coach</title>
+<title>Dashboard | Beast Coach</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -1150,7 +1150,7 @@ resetForm.addEventListener("submit", async (e) => {
     showStatus(resetStatus, error.message || "Couldn't update your password.", true);
   } else {
     inPasswordRecovery = false;
-    showStatus(resetStatus, "Password updated — taking you to your dashboard.", false);
+    showStatus(resetStatus, "Password updated. Taking you to your dashboard.", false);
     setTimeout(() => enterPortal(data.user), 1200);
   }
 });
@@ -1271,7 +1271,7 @@ async function checkDisciplinePurchase(user) {
     if (data && data.length > 0) {
       tile.href = "/program";
       tile.querySelector("h3").textContent = "8-Step Discipline Program";
-      tile.querySelector("p").textContent = "Unlocked — open your program.";
+      tile.querySelector("p").textContent = "Unlocked. Open your program.";
       tile.style.borderColor = "var(--green)";
     }
   } catch (err) {
@@ -1360,11 +1360,11 @@ document.getElementById("calc-btn").addEventListener("click", () => {
   const maintenanceStr = `<strong>${Math.round(tdee)} kcal/day</strong>`;
   const targetStr = `<strong>${Math.round(targetCalories)} kcal/day</strong>`;
   if (g.delta < 0) {
-    explainer = `Your maintenance is ${maintenanceStr} — for ${g.label.toLowerCase()}, eat ${Math.abs(g.delta)} kcal less: ${targetStr}. Expect to lose roughly ${weeklyKg.toFixed(2)} kg a week.`;
+    explainer = `Your maintenance is ${maintenanceStr}. For ${g.label.toLowerCase()}, eat ${Math.abs(g.delta)} kcal less: ${targetStr}. Expect to lose roughly ${weeklyKg.toFixed(2)} kg a week.`;
   } else if (g.delta > 0) {
-    explainer = `Your maintenance is ${maintenanceStr} — for ${g.label.toLowerCase()}, eat ${g.delta} kcal more: ${targetStr}. Expect to gain roughly ${weeklyKg.toFixed(2)} kg a week.`;
+    explainer = `Your maintenance is ${maintenanceStr}. For ${g.label.toLowerCase()}, eat ${g.delta} kcal more: ${targetStr}. Expect to gain roughly ${weeklyKg.toFixed(2)} kg a week.`;
   } else {
-    explainer = `Your maintenance is ${maintenanceStr} — that's also your target for ${g.label.toLowerCase()}.`;
+    explainer = `Your maintenance is ${maintenanceStr}. That's also your target for ${g.label.toLowerCase()}.`;
   }
 
   document.getElementById("calc-explainer").innerHTML = explainer;
