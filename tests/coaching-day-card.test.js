@@ -134,3 +134,16 @@ test('dayLabel: Today and Yesterday in the client\'s own days', () => {
   assert.deepEqual(DayCard.dayLabel('2026-11-24', TODAY), { text: 'Tue 24 Nov', rel: 'Yesterday' });
   assert.equal(DayCard.dayLabel('2026-11-10', TODAY).rel, '');
 });
+
+test('lift badges: Up (green), Same (quiet) and Down (amber) on the exercise they are for, and none without a lift', () => {
+  const day = { date: TODAY, workouts: [{ what: 'A', session: { exercises: [
+    { name: 'Squat', sets: [{ kg: 62.5, reps: 8 }] }, { name: 'Bench press', sets: [{ kg: 60, reps: 8 }] }, { name: 'Row', sets: [{ kg: 40, reps: 8 }] }
+  ] } }] };
+  const lift = { Squat: { kind: 'up', text: 'Up +2.5 kg' }, 'Bench press': { kind: 'same', text: 'Same' }, Row: { kind: 'down', text: 'Down -2.5 kg' } };
+  const html = DayCard.render(day, { today: TODAY, lift, open: true });
+  assert.match(html, /dc-lift dc-lift-up">Up \+2\.5 kg</);
+  assert.match(html, /dc-lift dc-lift-same">Same</);
+  assert.match(html, /dc-lift dc-lift-down">Down -2\.5 kg</);
+  const none = DayCard.render(day, { today: TODAY, open: true });
+  assert.equal((none.match(/dc-lift/g) || []).length, 0, 'no badge without a lift');
+});

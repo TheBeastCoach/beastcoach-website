@@ -75,7 +75,7 @@ test('the spot counts update from the live counter: badges, the table, and Full 
   assert.equal(await page.textContent('[data-places="core"]'), '3 spots left');
   assert.equal(await page.textContent('[data-places="beast"]'), 'Full right now');
   assert.equal(await page.textContent('[data-left="beast"]'), 'Full');
-  assert.equal(await page.getAttribute('[data-cta="beast"]', 'href').then(h => h.startsWith('mailto:')), true);
+  assert.equal((await page.getAttribute('[data-cta="beast"]', 'data-waitlist')).startsWith('mailto:'), true, 'the full plan links to the waitlist');
   assert.match(await page.textContent('[data-cta="beast"]'), /Join the waitlist/);
   assert.deepEqual(page.errors, [], 'no console errors: ' + page.errors.join('; '));
   await ctx.close();

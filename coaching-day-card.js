@@ -39,7 +39,9 @@
     '.dc-quiet{font-size:14px;color:var(--muted,#3B4F43);padding:12px 16px;background:#fff;border:1px dashed var(--line,#D5E0D8);border-radius:14px;margin:0 0 10px}' +
     '.dc-week{margin:18px 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}' +
     '.dc-week h4{margin:0;font-family:"Bebas Neue","Arial Narrow",Impact,sans-serif;font-weight:400;font-size:22px;letter-spacing:.02em;color:var(--ink,#1B3022)}' +
-    '.dc-week p{margin:0;font-size:13px;color:var(--muted,#3B4F43)}';
+    '.dc-week p{margin:0;font-size:13px;color:var(--muted,#3B4F43)}' +
+    '.dc-lift{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:1px}' +
+    '.dc-lift-up{background:#D8F3E3;color:#1B6B43}.dc-lift-same{background:#EEF2EF;color:#4C6354}.dc-lift-down{background:#FFF4E0;color:#8a5300}';
 
   function injectCss() {
     if (typeof document === 'undefined' || document.getElementById('dc-css')) return;
@@ -88,12 +90,13 @@
     if (sameReps && sameKg) return sets.length + ' × ' + (reps[0] == null ? '-' : reps[0]) + (kgs[0] != null ? ' at ' + kgs[0] + ' kg' : '');
     return sets.map(function (s) { return (s.kg != null ? s.kg + ' kg × ' : '') + (s.reps == null ? '-' : s.reps); }).join(', ');
   }
-  function exercises(w, planned) {
+  function exercises(w, planned, lift) {
     var list = (w.session && w.session.exercises) || [];
     return list.map(function (e) {
       var plan = planned && planned[e.name] ? '<span class="dc-planned"> (planned ' + esc(planned[e.name]) + ')</span>' : '';
       var done = e.skipped ? '<span class="dc-planned">skipped</span>' : '<span>' + esc(setsText(e.sets)) + '</span>';
-      return '<div class="dc-ex"><b>' + esc(e.name) + '</b> ' + done + plan + '</div>';
+      var badge = lift && lift[e.name] ? '<span class="dc-lift dc-lift-' + lift[e.name].kind + '">' + esc(lift[e.name].text) + '</span>' : '';
+      return '<div class="dc-ex"><b>' + esc(e.name) + '</b> ' + done + badge + plan + '</div>';
     }).join('');
   }
   function mealRow(m) {
@@ -117,7 +120,7 @@
     }
     if (wos.length) {
       parts.push('<div class="dc-sec">Workouts</div>' + wos.map(function (w) {
-        if (w.session) return '<div class="dc-wo"><b>' + esc(w.what || 'Workout') + '</b>' + (w.added_late ? ' <span class="dc-tag dc-tag-warn">Added late</span>' : '') + exercises(w, opts.planned) + (w.notes ? '<div class="dc-planned">' + esc(w.notes) + '</div>' : '') + '</div>';
+        if (w.session) return '<div class="dc-wo"><b>' + esc(w.what || 'Workout') + '</b>' + (w.added_late ? ' <span class="dc-tag dc-tag-warn">Added late</span>' : '') + exercises(w, opts.planned, opts.lift) + (w.notes ? '<div class="dc-planned">' + esc(w.notes) + '</div>' : '') + '</div>';
         return '<div class="dc-wo"><b>Other activity</b>: ' + esc(w.what || '') + (w.minutes ? ' · ' + fmt(w.minutes) + ' min' : '') + (w.notes ? '<div class="dc-planned">' + esc(w.notes) + '</div>' : '') + '</div>';
       }).join(''));
     }

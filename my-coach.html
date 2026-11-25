@@ -486,6 +486,19 @@ async function loadCoachWhatsapp() {
   if (!error && typeof data === 'string') S.coachWa = data;
 }
 /* The signed-in client's own marketing setting, true or false (get_my_marketing_consent in the database). */
+// A returning client's checkout: the server checks they are signed in and finished, and sets the price.
+async function startCheckout(plan) {
+  const agree = document.getElementById('renewAgree');
+  if (!agree || !agree.checked) { toast('Tick the box to agree to the terms and the health information first.'); return; }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { toast('Please sign in again.'); return; }
+  const r = await fetch('/api/coaching-checkout', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token },
+    body: JSON.stringify({ plan, name: S.cur.name || '', email: session.user.email, agreeTerms: true, agreeHealth: true, news: false, renew: true }) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || !d.url) { toast(d.message || 'Could not start checkout. Please try again.'); return; }
+  window.location.href = d.url;
+}
 async function loadMarketing() {
   const { data, error } = await sb.rpc('get_my_marketing_consent');
   S.marketingError = !!error;
@@ -583,6 +596,19 @@ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ 
 /* ==========================================================================
    Status screens
    ========================================================================== */
+// Prices for renewal, in AUD cents. The server works out the real price and the 20% off; this text only shows it.
+const RENEW_CENTS = { essential: 11000, core: 29900, beast: 69900 };
+const RENEW_PERCENT = 20;
+function renewText(tier) { return '$' + ((RENEW_CENTS[tier] * (100 - RENEW_PERCENT)) / 10000).toFixed(2).replace(/\.00$/, '') + ' AUD'; }
+function finishedNoticeHtml(r) {
+  const tier = r.tier;
+  const renew = RENEW_CENTS[tier] ? `<button data-act="renewPlan">Renew ${esc(PLAN_NAMES[tier])} with ${RENEW_PERCENT}% off: ${esc(renewText(tier))}</button>` : '';
+  return `<div class="card" id="finishedCard"><h3>Your 12 weeks are finished</h3>
+    <p style="margin:8px 0 12px">Keep your place with ${RENEW_PERCENT}% off, or drop to Basic at $30 AUD every 12 weeks. Your history stays below.</p>
+    <label class="check" style="margin-bottom:12px"><input type="checkbox" id="renewAgree"><span>I agree to the <a href="/coaching-terms" target="_blank" rel="noopener">terms</a> and have read the <a href="/coaching-health" target="_blank" rel="noopener">health information</a>.</span></label>
+    <div class="row" style="justify-content:flex-start">${renew}<button class="btn-ghost" data-act="dropBasic">Drop to Basic</button></div>
+    <p class="mini" style="margin:10px 0 0">Your payment goes through Stripe. You will see the exact amount before you pay.</p></div>`;
+}
 function statusNotice() {
   const r = S.cur;
   if (r.status === 'awaiting_activation') {
@@ -590,9 +616,10 @@ function statusNotice() {
   }
   const msg = {
     paused: ['Your plan is paused', `Paused since ${r.paused_at ? fmtDate(ymdIn(new Date(r.paused_at), zoneFor(r))) : 'recently'}. Pause days used: ${Math.min(14, (r.pause_days_used || 0) + (r.paused_at ? Math.max(0, diffDays(ymdIn(new Date(r.paused_at), zoneFor(r)), clientToday(r))) : 0))} of 14. Stefan will resume you when you are ready.`],
-    finished: ['Your 12 weeks are finished', 'Renew with 20% off and keep your place, or drop to Basic for $30 AUD every 12 weeks. Stefan will email you the options. Your history is below.'],
+    finished: null,
     cancelled: ['This plan is cancelled', 'If you think this is a mistake, email info@beastcoach.fit. Your history is below.']
   }[r.status];
+  if (r.status === 'finished') return finishedNoticeHtml(r);
   return msg ? `<div class="card"><h3>${esc(msg[0])}</h3><p style="margin:8px 0 0">${esc(msg[1])}</p></div>` : '';
 }
 
@@ -1271,7 +1298,8 @@ function progressHtml() {
 function settingsHtml() {
   const r = S.cur;
   const on = S.marketing === true;
-  return `<div class="card"><h3>Marketing emails: ${S.marketing === null ? 'Unknown' : (on ? 'On' : 'Off')}</h3>
+  const basicCard = S.cur && S.cur.tier === 'basic' ? '<div class="card"><h3>Your Basic plan</h3><p class="mini" style="margin-top:0">Update your card, see your receipts, or cancel. Cancelling keeps your plan until the paid period ends.</p><button data-act="manageBasic">Manage or cancel Basic</button></div>' : '';
+  return `${basicCard}<div class="card"><h3>Marketing emails: ${S.marketing === null ? 'Unknown' : (on ? 'On' : 'Off')}</h3>
       <p class="muted">News and offers from Beast Coach by email. You can change this any time, and each email has an unsubscribe link.</p>
       ${S.marketingError ? '<p class="mini" style="margin:0 0 8px;color:#B42318">Could not load your setting. Please try again.</p>' : ''}
       <div class="row" style="justify-content:flex-start"><button data-act="toggleMarketing" ${S.marketing === null ? 'disabled' : ''}>${on ? 'Turn marketing emails off' : 'Turn marketing emails on'}</button></div></div>
@@ -1391,6 +1419,15 @@ async function reloadProgress() {
 
 const actions = {
   planDay(el) { S.planDay = Number(el.dataset.d); render(); },
+  renewPlan() { return startCheckout(S.cur.tier); },
+  dropBasic() { return startCheckout('basic'); },
+  async manageBasic() {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch('/api/coaching-billing', { method: 'POST', headers: { Authorization: 'Bearer ' + (session ? session.access_token : '') } });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.url) { toast(d.message || 'Could not open billing right now.'); return; }
+    window.location.href = d.url;
+  },
   tab(el) { S.tab = el.dataset.tab; render(); if (S.tab === 'progress') reloadProgress(); },
   unit(el) { S.unit = el.dataset.u === 'lb' ? 'lb' : 'kg'; render(); },
   refreshProgress() { reloadProgress(); },
@@ -1616,6 +1653,7 @@ async function boot() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session || !session.user) { window.location.replace('/dashboard?next=my-coach'); return; }
   S.session = session; S.user = session.user;
+  if (new URLSearchParams(window.location.search).get('paid')) setTimeout(() => toast('Thank you. Your plan is being set up, and it appears here within a minute.'), 400);
   try {
     await sb.rpc('claim_coaching');
   } catch (e) { /* the claim is also done on the dashboard; a failure here is not fatal */ }

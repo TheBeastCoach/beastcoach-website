@@ -1030,6 +1030,91 @@ exception when others then
   perform pg_temp.verify_record('plan drafts: anon cannot read a draft', false, 'error: ' || sqlerrm);
 end $$;
 
+-- 9c. Payments (4d): clients cannot read the processed events, the rate limits, the settings or any Stripe id; the
+-- server functions run for the service role only; a full plan is refused at payment time; a repeated session is not
+-- created twice; a refund cancels the plan and notes the customer. ---------------------------------------------
+do $$
+declare ev_seen int := -1; rl_seen int := -1; set_seen int := -1; sid_refused boolean := false; anon_refused boolean := false;
+begin
+  perform pg_temp.verify_as('authenticated', 'A', 'aal2');
+  begin select count(*) into ev_seen from public.coaching_processed_events; exception when others then ev_seen := 0; end;
+  begin select count(*) into rl_seen from public.coaching_rate_limits; exception when others then rl_seen := 0; end;
+  begin select count(*) into set_seen from public.coaching_settings; exception when others then set_seen := 0; end;
+  begin perform (select stripe_customer_id from public.coaching_clients where user_id = (select id from verify_ids where name = 'A') limit 1); exception when others then sid_refused := true; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('payments: a client cannot read processed events, rate limits, settings or Stripe ids',
+    ev_seen = 0 and rl_seen = 0 and set_seen = 0 and sid_refused,
+    'events ' || ev_seen || ', limits ' || rl_seen || ', settings ' || set_seen || ', Stripe id refused ' || sid_refused);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('payments: a client cannot read processed events, rate limits, settings or Stripe ids', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare refused boolean := false;
+begin
+  perform pg_temp.verify_as('anon', 'anon');
+  begin
+    perform public.coaching_create_from_purchase('cs_anon', 'anon@verify.invalid', 'Anon', 'core', 29900, 'aud', false, 'x', null, null, null, current_date);
+  exception when others then refused := true; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('payments: anon cannot create a client from a checkout', refused, '');
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('payments: anon cannot create a client from a checkout', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare r1 jsonb; r2 jsonb; n_rows int; full_r jsonb; full_rows int; lim_before int; p_ok boolean; f_ok boolean;
+begin
+  -- The Beast is set to exactly the places taken, so the next payment finds no place free.
+  select count(*) into lim_before from public.coaching_clients where tier = 'beast' and status in ('awaiting_onboarding', 'awaiting_activation', 'active', 'paused');
+  update public.coaching_capacity set place_limit = lim_before where tier = 'beast';
+  perform pg_temp.verify_as('service_role', 'anon');
+  full_r := public.coaching_create_from_purchase('cs_verify_full', 'verify-full-pay@verify.invalid', 'Verify Full Pay', 'beast', 69900, 'aud', false, 'x', 'pi_verify_full', null, null, current_date);
+  perform pg_temp.verify_reset();
+  select count(*) into full_rows from public.coaching_clients where email = 'verify-full-pay@verify.invalid';
+  f_ok := (full_r ->> 'ok') = 'false' and (full_r ->> 'reason') = 'full' and full_rows = 0;
+  update public.coaching_capacity set place_limit = 100 where tier = 'beast';
+  perform pg_temp.verify_record('payments: a full plan at payment time is refused, and no client row is made', f_ok,
+    'result ' || coalesce(full_r::text, 'none') || ', rows ' || full_rows);
+  update public.coaching_capacity set place_limit = 4 where tier = 'beast';
+exception when others then
+  perform pg_temp.verify_reset();
+  update public.coaching_capacity set place_limit = 4 where tier = 'beast';
+  perform pg_temp.verify_record('payments: a full plan at payment time is refused', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare r1 jsonb; r2 jsonb; n_rows int; ev1 text; ev2 text; ev3 text; rf jsonb; cust_refunded timestamptz; cli_status text; lim_hit1 boolean; lim_hit2 boolean; lim_hit3 boolean;
+begin
+  perform pg_temp.verify_as('service_role', 'anon');
+  r1 := public.coaching_create_from_purchase('cs_verify_pay_1', 'verify-pay@verify.invalid', 'Verify Pay', 'essential', 11000, 'aud', true, 'Send me news', 'pi_verify_1', 'cus_verify', null, current_date);
+  r2 := public.coaching_create_from_purchase('cs_verify_pay_1', 'verify-pay@verify.invalid', 'Verify Pay', 'essential', 11000, 'aud', true, 'Send me news', 'pi_verify_1', 'cus_verify', null, current_date);
+  ev1 := public.coaching_begin_event('evt_verify_1', 'checkout.session.completed');
+  perform public.coaching_finish_event('evt_verify_1');
+  ev2 := public.coaching_begin_event('evt_verify_1', 'checkout.session.completed');
+  lim_hit1 := public.coaching_rate_hit('verify:limit', 2, 3600);
+  lim_hit2 := public.coaching_rate_hit('verify:limit', 2, 3600);
+  lim_hit3 := public.coaching_rate_hit('verify:limit', 2, 3600);
+  rf := public.coaching_apply_refund('pi_verify_1', true, 'Refunded in full, verify');
+  perform pg_temp.verify_reset();
+  select count(*) into n_rows from public.coaching_clients where email = 'verify-pay@verify.invalid';
+  select refunded_at into cust_refunded from public.coaching_customers where stripe_session_id = 'cs_verify_pay_1';
+  select status into cli_status from public.coaching_clients where stripe_session_id = 'cs_verify_pay_1';
+  perform pg_temp.verify_record('payments: a repeated session makes one client, and a repeated event is handled once',
+    (r1 ->> 'ok') = 'true' and (r2 ->> 'repeat') = 'true' and n_rows = 1 and ev1 = 'run' and ev2 = 'done',
+    'rows ' || n_rows || ', first ' || ev1 || ', again ' || ev2);
+  perform pg_temp.verify_record('payments: the rate limit stops the third hit in the window',
+    lim_hit1 and lim_hit2 and not lim_hit3, 'hits allowed: ' || lim_hit1 || ',' || lim_hit2 || ', third ' || lim_hit3);
+  perform pg_temp.verify_record('payments: a full refund notes the customer and cancels the plan',
+    (rf ->> 'cancelled') = 'true' and cust_refunded is not null and cli_status = 'cancelled',
+    'cancelled ' || coalesce(rf ->> 'cancelled', 'none') || ', noted ' || (cust_refunded is not null) || ', status ' || coalesce(cli_status, 'none'));
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('payments: session, event, limit and refund rules', false, 'error: ' || sqlerrm);
+end $$;
+
 -- 8. Delete: B removes their own data; B's customer row stays; A's data is untouched. Runs last. ---
 do $$
 declare r jsonb; b_left int; a_left int; cust_left int;

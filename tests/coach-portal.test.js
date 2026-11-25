@@ -649,6 +649,8 @@ test('logs: newest first, grouped by week; the last 7 days open, older days coll
   // Today's numbers and the workout sets, as the cards show them.
   assert.match(await txt(page, '#logsCard'), /7,400/);
   assert.match(await txt(page, '#logsCard'), /62\.5 kg × 8, 62\.5 kg × 7/);
+  // The lift badge: Squat's top weight went from 60 kg (three days before) to 62.5 kg today.
+  assert.match(await txt(page, '#logsCard'), /Up \+2\.5 kg/);
   assert.match(await txt(page, '#logsCard'), /Logged before activation \(baseline\)/);
   assert.equal(page.errors.length, 0, page.errors.join('; '));
   await ctx.close();

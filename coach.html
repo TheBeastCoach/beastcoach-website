@@ -436,8 +436,8 @@ async function loadAll() {
   const since = addDays(todayMel(), -30);
   const logs = (await q(sb.from('coaching_meal_logs').select('client_id,log_date').gte('log_date', since).order('log_date', { ascending: false }))) || [];
   C.lastLog = {}; logs.forEach(l => { if (!C.lastLog[l.client_id] || l.log_date > C.lastLog[l.client_id]) C.lastLog[l.client_id] = l.log_date; });
-  const st = (await q(sb.from('coaching_settings').select('coach_whatsapp').limit(1))) || [];
-  C.settings = st[0] || { coach_whatsapp: '' };
+  const st = (await q(sb.from('coaching_settings').select('coach_whatsapp,gst_registered,abn').limit(1))) || [];
+  C.settings = st[0] || { coach_whatsapp: '', gst_registered: false, abn: '' };
   await loadFactors();
 }
 async function loadFactors() {
@@ -1078,6 +1078,29 @@ function plannedOn(plan, date) {
   planSessionsOf(plan).filter(s => s.day === dow).forEach(s => s.exercises.forEach(e => { out[e.name] = e.sets + ' × ' + e.reps; }));
   return out;
 }
+// The change in top weight for each exercise on this day, against the last time it was logged before.
+// Up (green), Same (quiet), Down (amber). Only on the coach's side. Bodyweight sets (no kg) get no badge.
+function topKg(e) {
+  if (!e || e.skipped || !e.sets) return null;
+  const kgs = e.sets.map(s => s.kg).filter(k => k != null);
+  return kgs.length ? Math.max(...kgs) : null;
+}
+function liftFor(day, workouts, allWorkouts) {
+  const out = {};
+  workouts.forEach(w => ((w.session && w.session.exercises) || []).forEach(e => {
+    const now = topKg(e);
+    if (now == null) return;
+    const prior = allWorkouts.filter(x => x.session && x.log_date < day).sort((a, b) => (a.log_date < b.log_date ? 1 : -1));
+    let before = null;
+    for (const x of prior) { const ex = (x.session.exercises || []).find(y => y.name === e.name); const k = topKg(ex); if (k != null) { before = k; break; } }
+    if (before == null) return;
+    const diff = Math.round((now - before) * 10) / 10;
+    if (diff > 0) out[e.name] = { kind: 'up', text: 'Up +' + diff + ' kg' };
+    else if (diff < 0) out[e.name] = { kind: 'down', text: 'Down ' + diff + ' kg' };
+    else out[e.name] = { kind: 'same', text: 'Same' };
+  }));
+  return out;
+}
 // Logs, newest first, grouped by week. The last 7 days are open; older days are collapsed to header and summary.
 function logsHtml(c) {
   const start = c.activated_at ? ymdIn(new Date(c.activated_at), zoneOf(c)) : null;
@@ -1102,7 +1125,7 @@ function logsHtml(c) {
   const body = groups.map(g => {
     const avg = DayCard.weekAverages(g.items.map(x => dayData(x.d)));
     return DayCard.weekHeading('Week ' + g.week + ' of ' + WEEKS, avg) +
-      g.items.map(x => DayCard.render(dayData(x.d), { today, targets, open: x.i < 7, planned: plannedOn(plan, x.d) })).join('');
+      g.items.map(x => DayCard.render(dayData(x.d), { today, targets, open: x.i < 7, planned: plannedOn(plan, x.d), lift: liftFor(x.d, C.d.workouts.filter(w => w.log_date === x.d), C.d.workouts) })).join('');
   }).join('');
   const before = C.d.meals.filter(m => !start || m.log_date < start);
   const baseline = before.length ? `<details class="baseline"><summary>Logged before activation (baseline) <span class="mini" style="font-weight:400">${before.length} meal${before.length === 1 ? '' : 's'}, not part of the plan</span></summary>
@@ -1220,7 +1243,15 @@ function settingsHtml() {
   const conf = C.confirm ? `<div class="hl-amber" id="confirmBox" role="alertdialog" style="margin:12px 0"><p style="margin:0 0 10px"><b>${esc(C.confirm.text)}</b></p>
       <div class="row" style="justify-content:flex-start"><button class="btn-danger" data-act="confirmYes">${esc(C.confirm.yes)}</button><button class="btn-ghost" data-act="confirmNo">Not now</button></div></div>` : '';
   const backup = C.backup ? `<div class="note-box" id="backupCard" style="margin-top:12px">${qrBlock(C.backup)}${codeFormHtml('backup')}</div>` : '';
+  const gst = !!(C.settings && C.settings.gst_registered);
+  const abn = (C.settings && C.settings.abn) || '';
   return `<section class="hero"><h1>Settings</h1></section>
+    <div class="card" id="receiptsCard"><h3>Receipts and GST</h3>
+      <p class="mini" style="margin-top:0">Not registered for GST yet, so receipts say "No GST has been charged." When you register, switch this on and add your ABN. Receipts become tax invoices with GST included (1/11 of the price). Nothing else changes.</p>
+      <label class="check"><input type="checkbox" id="gstBox" ${gst ? 'checked' : ''}><span>I am registered for GST</span></label>
+      <div class="field" style="margin-top:10px;max-width:320px"><label for="abnBox">ABN (11 digits)</label><input id="abnBox" inputmode="numeric" value="${esc(abn)}" placeholder="12 345 678 901"></div>
+      <button data-act="saveReceipts">Save receipt settings</button>
+    </div>
     <div class="card"><h3>Your WhatsApp number</h3>
       <p class="mini" style="margin-top:0">The Message Stefan on WhatsApp button uses it. Only clients on an active or paused The Beast plan can get it, from the database. It is never in the website's code.</p>
       <div class="row" style="flex-wrap:nowrap;justify-content:flex-start"><input id="waNumber" type="tel" inputmode="tel" value="${esc(wa)}" placeholder="+61 400 000 000" style="max-width:260px"><button data-act="saveWhatsapp">Save</button></div></div>
@@ -1497,6 +1528,15 @@ ACT.saveWhatsapp = async () => {
   if (v && !/^\+?[0-9 ]{6,20}$/.test(v)) { toast('Enter the number with digits only, for example +61 400 000 000.'); return; }
   await q(sb.from('coaching_settings').upsert({ id: true, coach_whatsapp: v || null, updated_at: new Date().toISOString() }, { onConflict: 'id' }));
   C.settings = { coach_whatsapp: v }; render(); toast('WhatsApp number saved.');
+};
+ACT.saveReceipts = async () => {
+  const gst = document.getElementById('gstBox').checked;
+  const abn = document.getElementById('abnBox').value.replace(/\s+/g, '');
+  if (gst && !/^[0-9]{11}$/.test(abn)) { toast('Enter your 11-digit ABN before you turn GST on.'); return; }
+  if (abn && !/^[0-9]{11}$/.test(abn)) { toast('An ABN is 11 digits.'); return; }
+  await q(sb.from('coaching_settings').upsert({ id: true, gst_registered: gst, abn: abn || null, updated_at: new Date().toISOString() }, { onConflict: 'id' }));
+  C.settings = Object.assign({}, C.settings, { gst_registered: gst, abn: abn }); render();
+  toast(gst ? 'Receipts are tax invoices now, with GST included.' : 'Receipts say "No GST has been charged."');
 };
 ACT.addBackup = () => startEnrol(true);
 ACT.askRemoveFactor = el => {

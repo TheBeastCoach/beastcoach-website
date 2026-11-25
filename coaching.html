@@ -204,7 +204,7 @@ img{max-width:100%}
 <li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>Weekly weigh-ins and your weight trend</span></li>
 </ul>
 <p class="best"><b>Best for:</b> starting on your own, or keeping going after your 12 weeks of coaching.</p>
-<a class="cta ghost" href="mailto:info@beastcoach.fit?subject=Beast%20Coach%20Basic">Start Basic</a>
+<button type="button" class="cta ghost" data-buy="basic">Start Basic</button>
 </div>
 
 <div class="plan">
@@ -221,7 +221,7 @@ img{max-width:100%}
 <li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>Kick-off video call on WhatsApp, at the start</span></li>
 </ul>
 <p class="best"><b>Best for:</b> self-motivated people who mainly need the right plan.</p>
-<a class="cta ghost" data-cta="essential" href="mailto:info@beastcoach.fit?subject=Beast%20Coach%20Essential">Get Essential</a>
+<button type="button" class="cta ghost" data-cta="essential" data-buy="essential">Get Essential</button>
 </div>
 
 <div class="plan feat">
@@ -241,7 +241,7 @@ img{max-width:100%}
 <li><svg width="20" height="20" style="color:#2D6A4F"><use href="#i-tick"/></svg><span>The Discipline Path included</span></li>
 </ul>
 <p class="best"><b>Best for:</b> most people. The plan plus the accountability that makes it stick.</p>
-<a class="cta" data-cta="core" href="mailto:info@beastcoach.fit?subject=Beast%20Core">Get Core</a>
+<button type="button" class="cta" data-cta="core" data-buy="core">Get Core</button>
 </div>
 
 <div class="plan dark">
@@ -260,7 +260,7 @@ img{max-width:100%}
 <li><svg width="20" height="20" style="color:#52B788"><use href="#i-tick"/></svg><span>Live technique sessions on video</span></li>
 </ul>
 <p class="best"><b>Best for:</b> close, high-touch coaching and quick changes when life gets in the way.</p>
-<a class="cta" data-cta="beast" href="mailto:info@beastcoach.fit?subject=The%20Beast%20coaching">Apply for a place</a>
+<button type="button" class="cta" data-cta="beast" data-buy="beast">Get The Beast</button>
 </div>
 
 </div>
@@ -485,7 +485,7 @@ img{max-width:100%}
           if (cell) cell.textContent = 'Full';
           if (cta) {
             cta.textContent = 'Join the waitlist';
-            cta.href = 'mailto:info@beastcoach.fit?subject=' + encodeURIComponent(NAMES[row.tier] + ' waitlist');
+            cta.setAttribute('data-waitlist', 'mailto:info@beastcoach.fit?subject=' + encodeURIComponent(NAMES[row.tier] + ' waitlist'));
           }
         } else {
           var txt = (left === 1 ? 'Only 1 spot left' : left + ' spots left');
@@ -495,6 +495,110 @@ img{max-width:100%}
       });
     })
     .catch(function () {});
+})();
+</script>
+
+<style>
+.buy-modal{position:fixed;inset:0;background:rgba(27,48,34,.55);display:flex;align-items:flex-end;justify-content:center;z-index:200;padding:0}
+@media(min-width:640px){.buy-modal{align-items:center;padding:20px}}
+.buy-modal[hidden]{display:none}
+.buy-box{background:#fff;color:#1B3022;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:24px 22px 22px;box-sizing:border-box}
+@media(min-width:640px){.buy-box{border-radius:22px}}
+.buy-box h2{font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;font-weight:400;font-size:34px;line-height:1;margin:0 0 6px}
+.buy-box label{display:block;font-weight:700;font-size:15px;margin:12px 0 6px}
+.buy-box input[type=text],.buy-box input[type=email]{width:100%;min-height:48px;font:inherit;font-size:16px;border:1px solid #C5D3C8;border-radius:12px;padding:10px 12px;box-sizing:border-box}
+.buy-box .tick{display:flex;gap:10px;align-items:flex-start;font-size:15px;margin:12px 0;line-height:1.45}
+.buy-box .tick input{width:20px;height:20px;margin-top:2px;flex:0 0 auto}
+.buy-box .err{color:#b42318;font-size:14px;min-height:20px;margin:6px 0}
+.buy-box .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.buy-box button{font:inherit;font-weight:800;border:0;border-radius:14px;padding:14px 18px;min-height:48px;cursor:pointer}
+.buy-box .go{background:#F59E0B;color:#1B1200;flex:1 1 220px}
+.buy-box .back{background:transparent;color:#1B3022;border:2px solid #1B3022}
+.buy-box .price{font-weight:800;font-size:18px;margin:0 0 4px}
+.buy-box .mini{font-size:14px;color:#3B4F43;margin:0 0 6px}
+</style>
+<div class="buy-modal" id="buyModal" hidden role="dialog" aria-modal="true" aria-labelledby="buyTitle">
+  <div class="buy-box">
+    <div id="buyStep">
+      <h2 id="buyTitle">Your details</h2>
+      <p class="price" id="buyPrice"></p>
+      <p class="mini">Prices in Australian dollars. Your bank converts at checkout.</p>
+      <form id="buyForm" novalidate>
+        <label for="buyName">Your name</label>
+        <input type="text" id="buyName" name="name" autocomplete="name" maxlength="80" required>
+        <label for="buyEmail">Email</label>
+        <input type="email" id="buyEmail" name="email" autocomplete="email" maxlength="254" required>
+        <p class="mini">Use the email you will sign in with at beastcoach.fit/dashboard.</p>
+        <label class="tick"><input type="checkbox" id="buyTerms" required><span>I agree to the <a href="/coaching-terms" target="_blank" rel="noopener">terms</a>.</span></label>
+        <label class="tick"><input type="checkbox" id="buyHealth" required><span>I have read the <a href="/coaching-health" target="_blank" rel="noopener">health information</a>.</span></label>
+        <label class="tick"><input type="checkbox" id="buyNews"><span>Send me news and offers by email. Optional. You can unsubscribe any time.</span></label>
+        <p class="err" id="buyErr" role="alert"></p>
+        <div class="row">
+          <button type="submit" class="go" id="buyGo">Continue to payment</button>
+          <button type="button" class="back" id="buyBack">Back</button>
+        </div>
+      </form>
+    </div>
+    <div id="buyFull" hidden>
+      <h2>That plan is full</h2>
+      <p class="mini" id="buyFullMsg"></p>
+      <div class="row">
+        <a class="cta" id="buyWait" href="mailto:info@beastcoach.fit?subject=Waitlist">Join the waitlist</a>
+        <button type="button" class="back" id="buyFullBack">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var PRICES = { basic: '$2.50 AUD a week ($30 AUD billed every 12 weeks)', essential: '$110 AUD for 12 weeks', core: '$299 AUD for 12 weeks', beast: '$699 AUD for 12 weeks' };
+  var NAMES = { basic: 'Basic', essential: 'Essential', core: 'Core', beast: 'The Beast' };
+  var modal = document.getElementById('buyModal'), form = document.getElementById('buyForm'), plan = null, lastFocus = null;
+  function show(id) { ['buyStep', 'buyFull'].forEach(function (x) { document.getElementById(x).hidden = x !== id; }); }
+  function open(p) {
+    plan = p; lastFocus = document.activeElement;
+    document.getElementById('buyTitle').textContent = NAMES[p];
+    document.getElementById('buyPrice').textContent = NAMES[p] + ': ' + PRICES[p];
+    document.getElementById('buyErr').textContent = '';
+    show('buyStep'); modal.hidden = false;
+    document.getElementById('buyName').focus();
+  }
+  function close() { modal.hidden = true; if (lastFocus) lastFocus.focus(); }
+  document.querySelectorAll('[data-buy]').forEach(function (b) { b.addEventListener('click', function () {
+    if (b.hasAttribute('data-waitlist')) { window.location.href = b.getAttribute('data-waitlist'); return; }   // full: straight to the waitlist
+    open(b.getAttribute('data-buy'));
+  }); });
+  document.getElementById('buyBack').addEventListener('click', close);
+  document.getElementById('buyFullBack').addEventListener('click', close);
+  modal.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var err = document.getElementById('buyErr'), go = document.getElementById('buyGo');
+    var name = document.getElementById('buyName').value.trim(), email = document.getElementById('buyEmail').value.trim();
+    if (name.length < 2) { err.textContent = 'Enter your name.'; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Enter a valid email.'; return; }
+    if (!document.getElementById('buyTerms').checked) { err.textContent = 'Please agree to the terms to continue.'; return; }
+    if (!document.getElementById('buyHealth').checked) { err.textContent = 'Please confirm you have read the health information.'; return; }
+    err.textContent = ''; go.disabled = true; go.textContent = 'Taking you to payment...';
+    fetch('/api/coaching-checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: plan, name: name, email: email, agreeTerms: true, agreeHealth: true, news: document.getElementById('buyNews').checked }) })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
+      .then(function (x) {
+        if (x.ok && x.d.url) { window.location.href = x.d.url; return; }
+        go.disabled = false; go.textContent = 'Continue to payment';
+        if (x.status === 409) {
+          document.getElementById('buyFullMsg').textContent = x.d.message;
+          document.getElementById('buyWait').href = 'mailto:info@beastcoach.fit?subject=' + encodeURIComponent('Waitlist: ' + NAMES[plan]);
+          show('buyFull'); return;
+        }
+        err.textContent = x.d.message || 'Something went wrong. Please try again.';
+      })
+      .catch(function () { go.disabled = false; go.textContent = 'Continue to payment'; err.textContent = 'Could not reach checkout. Please try again.'; });
+  });
+  if (new URLSearchParams(window.location.search).get('checkout') === 'cancelled') {
+    var note = document.createElement('p'); note.className = 'muted'; note.style.cssText = 'text-align:center;margin:12px 0';
+    note.textContent = 'Checkout was cancelled. Nothing has been charged.'; document.getElementById('plans').before(note);
+  }
 })();
 </script>
 </body>

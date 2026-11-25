@@ -300,6 +300,62 @@ What the tests cannot prove: Supabase's real MFA (the page is tested against a f
 - **Overwrite bug, root cause:** the old editor used one text box for the whole day as the source of truth. Calculate replaced every meal of that day with whatever was in the box, so a new meal typed in the box wiped the rows already calculated. Now each row carries its own foods and numbers, and no action reads the other rows.
 - **Verify:** 68 checks, including that a client and a coach without MFA cannot read or write a draft, and anon cannot read one.
 
+## Step 4d: payments and emails
+
+- **Run `supabase/coaching-portal-4d.sql`** after 4c2. Safe to run twice. It adds the processed-events table (so a resent webhook is never handled twice), the rate-limit table, the Stripe ids on clients and customers, the GST and ABN settings, and the server-only functions for creating a client from a paid checkout and for refunds. Clients cannot read any of it.
+- **The sales page** plan buttons open a short step: name, email, both agreements required (terms and health information), and an optional news box, unticked. Then the server creates the Stripe Checkout session. A full plan shows the waitlist view, with no payment page.
+- **Checkout** (`api/coaching-checkout.js`): the price is set on the server, in AUD. Capacity is checked before the session is made. Rate limit: 20 starts an hour per IP, counted in the database. Renewal (20% off) and Drop to Basic need the signed-in user's token; the discount applies only to a finished client, and the email is the verified one.
+- **Webhook** (`api/coaching-webhook.js`): a separate endpoint from the Discipline Path's, with its own secret. That is deliberate: a bug here cannot break course purchases, and the two can be switched off separately. Every event is recorded first. A resent event that finished is skipped. A failed event is not marked done, so Stripe retries it, and each step is safe to repeat.
+  - Paid plan: creates the client and the customer (with the news choice and its wording), sends the welcome and the receipt. Core and The Beast also write the Discipline Path purchase, keyed by email, in the course's own shape.
+  - Full at payment time: refunds the payment in full, and sends the "that plan just filled" email.
+  - Basic: a renewal extends the plan 84 days; a failed payment emails the card update; a cancellation (at the end of the paid period) finishes the plan.
+  - A refund: a full refund cancels the plan and notes the customer, so the place frees up. A partial refund is only noted.
+- **Basic management**: My Coach, Settings, Manage or cancel opens the Stripe Billing Portal for the signed-in client's own Basic plan (`api/coaching-billing.js`).
+- **Emails** (`api/_email.js`, Resend): six transactional messages only (welcome, receipt, spot filled, Basic renewed, Basic payment failed, Basic cancelled). The receipt says "No GST has been charged." until you switch GST on in the coach's Settings. Then it becomes a tax invoice with GST at 1/11 of the price and your ABN.
+- **Lift badges** on the coach's Logs: Up (green), Same, or Down (amber), against the last time the exercise was logged. The client never sees them.
+
+### Run order (Supabase SQL Editor, in this order)
+
+1. `supabase/coaching.sql`, `supabase/coaching-portal.sql`, `supabase/coaching-portal-4b.sql`, `supabase/coaching-portal-4b2.sql`, `supabase/coaching-portal-4c.sql`, `supabase/coaching-portal-4c2.sql` (all already run on the live project).
+2. `supabase/coaching-portal-4d.sql` (4d). Safe to run twice. **Run it before the coaching-portal preview takes payments.**
+3. `supabase/coaching-portal-verify.sql`. Every row should say PASS (74 checks). It rolls back, so it leaves nothing behind.
+
+### Environment variables
+
+| Name | Preview | Production | What it is |
+|---|---|---|---|
+| `STRIPE_SECRET_KEY` | `sk_test_...` (test) | `sk_live_...` (live), later | Stripe secret key. **Never put a live key in Preview.** |
+| `STRIPE_COACHING_WEBHOOK_SECRET` | the signing secret of the TEST coaching webhook | the LIVE coaching webhook's secret, later | Checks Stripe's signature on coaching webhooks. |
+| `RESEND_API_KEY` | the Resend key | the same Resend key | Sends the transactional emails. See docs/EMAIL-SETUP.md. |
+| `SITE_URL` | the preview's address | `https://www.beastcoach.fit` (or leave unset) | Where Stripe sends people back after checkout, and the links in emails. |
+| `SUPABASE_SERVICE_ROLE_KEY` | already set for the Discipline Path | already set | Used by the server only. Never in the browser. |
+
+The Discipline Path's own `STRIPE_WEBHOOK_SECRET` is unchanged, and is not used by the coaching webhook.
+
+For the test setup and the test cards, see docs/STRIPE-TEST-SETUP.md. For Resend and Supabase email, see docs/EMAIL-SETUP.md.
+
+### Things to check in the Stripe dashboard (test mode first)
+
+- **Billing portal:** Basic's Manage or cancel needs the customer portal turned on: Settings, then Billing, then Customer portal. Turn it on in test mode, and allow cancellation.
+- **Refunds:** a refund from the dashboard sends `charge.refunded`, which cancels the plan (full refunds only).
+
+### Decisions and what I was unsure about
+
+- **Separate coaching webhook.** The Discipline Path's webhook is left exactly as it was, so a coaching change cannot break course purchases.
+- **Rate limit is in the database,** not in memory, because Vercel runs many instances and each would have its own memory.
+- **A checkout for an email that already has an open plan** is refunded automatically, with no email, and an error is logged. You may want a note sent to the client; I did not write that.
+- **Basic refunds:** a full refund on a Basic subscription does not cancel the plan automatically. Cancel it in the Stripe dashboard too.
+- **Renewal price:** the 20% is calculated on the server from the plan price. The price shown in My Coach is only text.
+- **Email delivery** depends on the DNS setup in docs/EMAIL-SETUP.md. Nothing is sent until `RESEND_API_KEY` is set.
+
+### Tests added in 4d
+
+- `tests/coaching-payments.test.js` (28 tests): checkout refuses a full plan, needs both agreements, is rate limited, takes the server price in AUD, the Basic subscription, the 20% renewal discount for the verified finished client only, and Drop to Basic. Webhook: rejects a bad signature, refuses an old signature, skips a resent event, creates the right rows, refunds when full at payment time, unlocks the Discipline Path only for Core and The Beast, Basic renewal, failure and cancellation, refunds (full and partial), and a failure part way is retried. Emails: both GST modes, the sender and reply-to, transactional kinds only.
+- `tests/coaching-checkout-page.test.js` (5 browser tests): the sales page step, both agreements, the waitlist view, the redirect, and the cancelled note.
+- `tests/coaching-day-card.test.js`: the lift badges (Up, Same, Down).
+- `tests/coach-portal.test.js`: the lift badge on the coach's Logs.
+- `supabase/coaching-portal-verify.sql`: 74 checks, including the 6 payment checks (clients cannot read processed events, rate limits, settings or Stripe ids; anon cannot create a client; a full plan at payment time is refused; a repeated session makes one client; a repeated event is handled once; the rate limit holds; a refund cancels and notes).
+
 ## Open after 4c
 
 - **Payments into the portal:** Stripe purchases still need to create the client and customer rows automatically (today: Add a client by hand).
