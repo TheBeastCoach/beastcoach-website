@@ -199,6 +199,9 @@ body.shot #demoBar,body.shot .toast{display:none !important}
 .badge-await{font-size:12px}
 .client-time{color:var(--green)}
 #confirmBox .btn-ghost{background:#fff}
+.meal-row{border:1px solid var(--line);border-radius:14px;padding:12px;margin:0 0 10px;background:#fff}
+.plan-status{line-height:1.6}
+.copy-days{border-top:1px solid var(--line);margin-top:10px;padding-top:4px}
 </style>
 </head>
 <body>
@@ -330,7 +333,7 @@ const C = {
   clients: [], capacity: [], customers: [], currentPlans: {}, lastLog: {}, settings: null,
   filter: { status: '', tier: '', q: '' }, custFilter: { q: '', product: '', status: '', ok: '' },
   d: null, confirm: null, ciEditId: null, planDay: 1, planInputsOpen: true, addResult: null, startDate: null,
-  noteState: '', backup: null
+  noteState: '', backup: null, dr: null, drFor: null, saveState: null
 };
 
 /* ==========================================================================
@@ -401,6 +404,7 @@ async function submitCode(mode) {
   return enterApp();
 }
 async function signOut(reason) {
+  try { await flushSave(); } catch (e) { /* the draft is kept; sign-out continues */ }
   try { await sb.auth.signOut(); } catch (e) { /* signed out locally anyway */ }
   try { sessionStorage.clear(); } catch (e) {}
   Object.assign(C, { screen: 'signin', user: null, enrol: null, backup: null, d: null, clients: [], customers: [], page: 'clients', clientId: null, confirm: null,
@@ -451,9 +455,17 @@ async function loadDetail(id) {
     d.checkins = (await q(sb.from('coaching_checkins').select('id,client_id,type,scheduled_at,status').eq('client_id', id).order('scheduled_at', { ascending: true }))) || [];
     const n = (await q(sb.from('coaching_notes').select('client_id,body').eq('client_id', id))) || [];
     d.note = n[0] ? n[0].body : '';
-    d.plans = (await q(sb.from('coaching_plans').select('client_id,version,is_current,plan,created_at').eq('client_id', id).order('version', { ascending: false }))) || [];
+      d.plans = (await q(sb.from('coaching_plans').select('client_id,version,is_current,plan,created_at').eq('client_id', id).order('version', { ascending: false }))) || [];
+    const dr = (await q(sb.from('coaching_plan_drafts').select('client_id,draft').eq('client_id', id))) || [];
+    d.draft = dr[0] ? dr[0].draft : null;
   }
   C.d = d;
+  // The draft is the coach's work in progress. It is read from the database only when this client is first opened
+  // in this session, so a save that is still in flight is never overwritten by an older read.
+  if (C.drFor !== String(id)) {
+    C.dr = d.draft && Object.keys(d.draft).length ? normDraft(d.draft) : draftFromPlan(publishedPlan(c || { id }));
+    C.drFor = String(id); C.saveState = null;
+  }
 }
 async function refreshClient() {
   C.clients = (await q(sb.from('coaching_clients').select(CLIENT_COLS).order('created_at', { ascending: false }))) || [];
@@ -710,6 +722,14 @@ function tzText(c) {
   const zone = validZone(c.time_zone);
   return zone ? `${esc(ob.timezone || zone)} (${esc(zone)})` : `${esc(ob.timezone || 'Not given')} <span class="tz-flag">Not recognised: ${esc(MELB)} is used</span>`;
 }
+// Protein powder, as the client answered it. Clients who answered before the question existed show "Not asked".
+function proteinText(c) {
+  const ob = c.onboarding || {};
+  if (ob.proteinPowder === 'yes') return 'Yes' + (ob.proteinBrand ? ': ' + ob.proteinBrand : ' (no brand given)');
+  if (ob.proteinPowder === 'no') return 'No';
+  if (ob.proteinPowder === 'open') return 'Open to it';
+  return 'Not asked';
+}
 function healthAnswers(c) {
   const ob = c.onboarding || {}, h = ob.health || {};
   const out = [];
@@ -733,6 +753,7 @@ function overviewHtml(c) {
     <dt>Week</dt><dd>${esc(weekLabel(c))}</dd>
     <dt>End date</dt><dd>${esc(c.end_date ? fmtDate(c.end_date) : 'Not started')}</dd>
     ${['core', 'beast'].includes(c.tier) ? `<dt>Pause days used</dt><dd id="pauseDays">${pauseDaysNow(c)} of ${PAUSE_MAX}</dd>` : ''}
+    <dt>Protein powder</dt><dd>${esc(proteinText(c))}</dd>
     <dt>Health</dt><dd>${esc(flag)}</dd></dl>`;
   const healthBox = c.health_flag ? `<div class="${c.health_cleared_at ? 'note-box' : 'hl-red'}" id="healthBox" style="margin-bottom:12px">
       <b>${c.health_cleared_at ? 'Health flag, cleared' : 'Health flag'}</b>
@@ -788,7 +809,7 @@ function onboardingAnswersHtml(c) {
   const rows = [
     ['Age', ob.age], ['Sex', ob.sex], ['Height', ob.heightCm ? ob.heightCm + ' cm' : ''],
     ['Weight', ob.weightKg != null ? ob.weightKg + ' kg (' + (Math.round(ob.weightKg * 2.20462 * 10) / 10) + ' lb)' : ''],
-    ['WhatsApp', ob.whatsapp], ['Time zone', tzText(c), true],
+    ['WhatsApp', ob.whatsapp], ['Time zone', tzText(c), true], ['Protein powder', proteinText(c)],
     ['Goal', ob.goal || ob.goalKind], ['Timeframe', ob.timeframe], ['Why now', ob.goalWhy],
     ['Job', ob.job || ob.jobMult], ['Activity', ob.activity],
     ['Everyday steps (not counting planned walks)', ob.stepsEveryday], ['Realistic daily steps target', ob.stepsRealistic],
@@ -860,35 +881,69 @@ function previewText(date, time, zone) {
 }
 
 /* ---------------------------------------------------------------- plan inputs and plan editor */
-function draftKey(c) { return 'bc_coach_draft_' + c.id; }
-function emptyDraft() { const meals = {}; for (let d = 1; d <= 7; d++) meals[d] = { lines: '', meals: [] }; return { meals, training: '' }; }
+/* Plan drafts. The coach edits a DRAFT (coaching_plan_drafts, coach-only). The client sees only what is published.
+   Each meal row is its own row, with its own Calculate button. Nothing is shared between rows. */
+function emptyRow(n) { return { label: 'Meal ' + n, text: '', calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 }; }
+function emptyDraft() { const meals = {}; for (let d = 1; d <= 7; d++) meals[d] = []; return { meals, training: '' }; }
+function normDraft(dr) {
+  const out = emptyDraft();
+  out.training = String((dr && dr.training) || '').slice(0, 5000);
+  for (let d = 1; d <= 7; d++) {
+    const list = (dr && dr.meals && (dr.meals[d] || dr.meals[String(d)])) || [];
+    out.meals[d] = list.map(m => ({ label: String(m.label || 'Meal').slice(0, 40), text: String(m.text || m.name || '').slice(0, 300),
+      calories: clampNum(m.calories, 5000), protein: clampNum(m.protein, 500), carbs: clampNum(m.carbs, 800), fat: clampNum(m.fat, 400), fibre: clampNum(m.fibre, 200) }));
+  }
+  return out;
+}
+// The published plan, read back into draft shape.
 function draftFromPlan(plan) {
   const dr = emptyDraft();
-  if (plan && plan.meals) for (let d = 1; d <= 7; d++) {
-    const list = plan.meals[d] || plan.meals[String(d)] || [];
-    dr.meals[d] = { meals: list.map(m => ({ label: m.label || 'Meal', text: m.text || m.name || '', calories: m.calories || 0, protein: m.protein || 0, carbs: m.carbs || 0, fat: m.fat || 0, fibre: m.fibre || 0 })),
-                    lines: list.map(m => (m.label || 'Meal') + ': ' + (m.text || m.name || '')).join('\n') };
-  }
+  if (plan && plan.meals) for (let d = 1; d <= 7; d++) dr.meals[d] = (plan.meals[d] || plan.meals[String(d)] || []).map(m => ({ label: m.label || 'Meal', text: m.text || m.name || '', calories: m.calories || 0, protein: m.protein || 0, carbs: m.carbs || 0, fat: m.fat || 0, fibre: m.fibre || 0 }));
   dr.training = (plan && plan.training) || '';
-  return dr;
+  return normDraft(dr);
 }
-function getDraft(c) {
-  try { const s = localStorage.getItem(draftKey(c)); if (s) return JSON.parse(s); } catch (e) {}
-  const cur = C.currentPlans[c.id];
-  return draftFromPlan(cur && cur.plan);
-}
-function saveDraft(c, dr) { try { localStorage.setItem(draftKey(c), JSON.stringify(dr)); } catch (e) {} }
 // The plan JSON the client portal reads: { meals: { 1..7: [ {label, name, text, calories, protein, carbs, fat, fibre} ] }, training }
 function planFromDraft(dr) {
   const meals = {};
-  for (let d = 1; d <= 7; d++) meals[d] = (dr.meals[d].meals || []).map(m => ({ label: String(m.label || 'Meal').slice(0, 40), name: String(m.text || '').slice(0, 80),
-    text: String(m.text || '').slice(0, 300), calories: clampNum(m.calories, 5000), protein: clampNum(m.protein, 500), carbs: clampNum(m.carbs, 800), fat: clampNum(m.fat, 400), fibre: clampNum(m.fibre, 200) }));
-  return { meals, training: String(dr.training || '') };
+  const norm = normDraft(dr);
+  for (let d = 1; d <= 7; d++) meals[d] = norm.meals[d].map(m => ({ label: m.label, name: m.text.slice(0, 80), text: m.text,
+    calories: m.calories, protein: m.protein, carbs: m.carbs, fat: m.fat, fibre: m.fibre }));
+  return { meals, training: String((dr && dr.training) || '') };
 }
-function planChanged(c, dr) {
+function publishedPlan(c) { const cur = C.currentPlans[c.id]; return cur ? cur.plan : null; }
+function planChanged(c) {
+  return JSON.stringify(planFromDraft(C.dr)) !== JSON.stringify(planFromDraft(draftFromPlan(publishedPlan(c))));
+}
+function planStatusHtml(c) {
   const cur = C.currentPlans[c.id];
-  return JSON.stringify(planFromDraft(dr)) !== JSON.stringify(planFromDraft(draftFromPlan(cur && cur.plan)));
+  const diff = planChanged(c);
+  const saved = C.saveState === 'saving' ? '<span class="mini">Saving...</span>'
+    : C.saveState === 'saved' ? '<span class="mini">Draft saved</span>'
+    : C.saveState === 'error' ? '<span class="c-red">Draft not saved. Check your connection, then keep editing.</span>' : '';
+  const pub = diff ? '<b class="c-amber">Unpublished changes</b>'
+    : cur ? `<b class="c-green">Published</b> <span class="mini">version ${cur.version}, ${esc(fmtDate(ymdIn(new Date(cur.created_at), MELB)))}</span>`
+    : '<span class="mini">Nothing published yet</span>';
+  return `<div id="planStatus" class="plan-status">${pub}${saved ? ' · ' + saved : ''}</div>`;
 }
+function updatePlanStatus() {
+  const el = document.getElementById('planStatus');
+  const c = clientById(C.clientId);
+  if (el && c) el.outerHTML = planStatusHtml(c);
+}
+function dayTotalsHtml(c, day) {
+  const t = c.targets;
+  const sum = sumNut(day.meals);
+  return `<div class="meal-row" id="dayTotals"><b>Day total</b><div class="grid5" style="margin-top:8px">${NUT.map(k => {
+    const tn = t && t[k] != null ? tone(k, sum[k], t[k]) : '';
+    return `<div><div class="mini">${NUT_LABEL[k]}</div><b class="${TONE_TEXT[tn]}">${Math.round(sum[k])}</b>${t && t[k] != null ? '<span class="mini"> of ' + t[k] + '</span>' : ''}</div>`;
+  }).join('')}</div></div>`;
+}
+function updateDayTotals() {
+  const el = document.getElementById('dayTotals');
+  const c = clientById(C.clientId);
+  if (el && c) el.outerHTML = dayTotalsHtml(c, { meals: C.dr.meals[C.planDay] });
+}
+
 function planInputsHtml(c) {
   const ob = c.onboarding || {};
   const open = C.planInputsOpen !== false;
@@ -902,6 +957,7 @@ function planInputsHtml(c) {
   }).join('') + (splitList(ob.likedOther).length ? `<div class="mini" style="margin-top:6px">Other foods they like</div><div>${chipList(splitList(ob.likedOther))}</div>` : '');
   const sec = (title, body) => `<div class="pi-sec"><h4>${title}</h4>${body}</div>`;
   const list = v => Array.isArray(v) ? v : [];
+  const protein = sec('Protein powder', `<p>${esc(proteinText(c))}</p>`);
   return `<section class="plan-inputs">${head}<div class="pi-grid">
     ${sec('Goal and body', `<p><b>${esc(ob.goal || '-')}</b></p>
       <p class="mini">Timeframe: ${esc(ob.timeframe || '-')}. Why now: ${esc(ob.goalWhy || '-')}</p>
@@ -910,6 +966,7 @@ function planInputsHtml(c) {
       <p><span class="mini">Everyday steps (not counting planned walks)</span><br><b>${esc(ob.stepsEveryday || '-')}</b></p>
       <p><span class="mini">Realistic target (including planned walks)</span><br><b>${esc(ob.stepsRealistic || '-')}</b></p>`)}
     ${sec('Food they like', likedHtml || '<p class="mini">None given</p>')}
+    ${protein}
     ${sec('Food to avoid', `<p class="mini">Will not eat</p><div style="margin-bottom:8px">${chipList(splitList(ob.avoid))}</div>
       <p class="mini">Allergies or intolerances</p>${ob.allergies ? `<div class="hl-red" style="margin:8px 0">${chipList(splitList(ob.allergies))}</div>` : '<p class="mini">No allergies given</p>'}
       <p class="mini">Currently eats ${esc(ob.mealsPerDay || '-')}. Cooking time ${esc(ob.cookTime || '-')}, cooked by ${esc(ob.whoCooks || '-')}. Eats out ${esc(ob.eatsOut || '0')} times and drinks ${esc(ob.alcohol || '0')} a week.</p>`)}
@@ -922,9 +979,8 @@ function planInputsHtml(c) {
   </div></section>`;
 }
 function planEditorHtml(c) {
-  const dr = getDraft(c);
   const d = C.planDay;
-  const day = dr.meals[d];
+  const rows = C.dr.meals[d];
   const t = c.targets;
   const targetsCard = `<div class="card"><h3>Daily targets</h3>
     <div class="grid5">${NUT.map(k => `<div class="field" style="margin:0"><label for="t-${k}">${NUT_LABEL[k]}${k === 'calories' ? ' (kcal)' : ' (g)'}</label>
@@ -932,43 +988,41 @@ function planEditorHtml(c) {
     <div class="field" style="max-width:260px;margin-top:12px"><label for="t-steps">Steps a day</label>
       <input id="t-steps" type="number" min="0" inputmode="numeric" value="${t && t.steps != null ? t.steps : ''}" data-ch="target" data-k="steps"></div>
     <p class="mini">Targets show to the client straight away.</p></div>`;
-  const dayBtns = DAYS.map((x, i) => `<button class="tab ${d === i + 1 ? 'on' : ''} ${dr.meals[i + 1].meals.length ? 'dot' : ''}" data-act="pDay" data-d="${i + 1}">${x}</button>`).join('');
-  const sum = sumNut(day.meals);
-  const rows = day.meals.map((m, i) => `<tr>
-      <td style="min-width:120px"><input value="${esc(m.label)}" data-ch="row" data-i="${i}" data-f="label" aria-label="Label"></td>
-      <td style="min-width:220px"><input value="${esc(m.text)}" data-ch="row" data-i="${i}" data-f="text" aria-label="Foods"></td>
-      ${NUT.map(k => `<td class="num"><input type="number" min="0" inputmode="numeric" value="${m[k]}" data-ch="row" data-i="${i}" data-f="${k}" aria-label="${NUT_LABEL[k]}"></td>`).join('')}
-      <td><button class="btn-danger btn-sm" data-act="delRow" data-i="${i}">Remove</button></td></tr>`).join('');
-  const totalRow = day.meals.length ? `<tr><td colspan="2"><b>Day total</b></td>${NUT.map(k => {
-      const tn = t ? tone(k, sum[k], t[k]) : '';
-      return `<td class="num ${TONE_TEXT[tn]}"><b>${Math.round(sum[k])}</b>${t && t[k] != null ? '<div class="mini">of ' + t[k] + '</div>' : ''}</td>`;
-    }).join('')}<td></td></tr>` : '';
-  const copyOpts = DAYS.map((x, i) => i + 1).filter(n => n !== d).map(n => `<option value="${n}">${DAYS_FULL[n - 1]}</option>`).join('');
-  const cur = C.currentPlans[c.id];
-  const status = planChanged(c, dr) ? '<b class="c-amber" id="planStatus">Changes not published yet</b>'
-    : cur ? `<span class="mini" id="planStatus">Published ${esc(fmtDate(ymdIn(new Date(cur.created_at), MELB)))} (version ${cur.version})</span>` : '<span class="mini" id="planStatus">Nothing published yet</span>';
+  const dayBtns = DAYS.map((x, i) => `<button class="tab ${d === i + 1 ? 'on' : ''} ${C.dr.meals[i + 1].length ? 'dot' : ''}" data-act="pDay" data-d="${i + 1}">${x}</button>`).join('');
+  const rowsHtml = rows.map((m, i) => `<div class="meal-row" data-row="${i}">
+      <div class="grid2">
+        <div class="field" style="margin:0"><label for="r${i}-label">Meal</label><input id="r${i}-label" data-inp="row" data-i="${i}" data-f="label" value="${esc(m.label)}"></div>
+        <div class="field" style="margin:0"><label for="r${i}-text">Foods with amounts</label><input id="r${i}-text" data-inp="row" data-i="${i}" data-f="text" value="${esc(m.text)}" placeholder="e.g. 60g oats, 150g Greek yoghurt"></div>
+      </div>
+      <div class="grid5" style="margin-top:10px">${NUT.map(k => `<div class="field" style="margin:0"><label for="r${i}-${k}">${NUT_LABEL[k]}</label>
+        <input id="r${i}-${k}" type="number" min="0" inputmode="numeric" value="${m[k]}" data-inp="row" data-i="${i}" data-f="${k}"></div>`).join('')}</div>
+      <div class="row" style="justify-content:flex-start;margin-top:10px">
+        <button class="btn-sm" data-act="calcRow" data-i="${i}">Calculate with Beast AI</button>
+        <button class="btn-ghost btn-sm" data-act="moveRow" data-i="${i}" data-dir="-1" ${i === 0 ? 'disabled' : ''}>Move up</button>
+        <button class="btn-ghost btn-sm" data-act="moveRow" data-i="${i}" data-dir="1" ${i === rows.length - 1 ? 'disabled' : ''}>Move down</button>
+        <button class="btn-danger btn-sm" data-act="delRow" data-i="${i}">Delete</button></div></div>`).join('');
+  const others = DAYS.map((x, i) => i + 1).filter(n => n !== d);
+  const copy = rows.length ? `<div class="copy-days"><p class="mini" style="margin:12px 0 6px">Copy this day's meals to:</p>
+      <div class="chips">${others.map(n => `<label class="chip"><input type="checkbox" data-copy-day="${n}">${DAYS[n - 1]}</label>`).join('')}</div>
+      <button class="btn-ghost" data-act="copyDay" style="margin-top:8px">Copy this day</button></div>` : '';
+  const conf = C.confirm ? `<div class="hl-amber" id="confirmBox" role="alertdialog" style="margin:12px 0"><p style="margin:0 0 10px"><b>${esc(C.confirm.text)}</b></p>
+      <div class="row" style="justify-content:flex-start"><button class="${C.confirm.danger ? 'btn-danger' : ''}" data-act="confirmYes">${esc(C.confirm.yes)}</button><button class="btn-ghost" data-act="confirmNo">Not now</button></div></div>` : '';
   return `${planInputsHtml(c)}
     <div>${targetsCard}
       <div class="card"><h3>Meal plan</h3>
         <div class="day-row">${dayBtns}</div>
-        <div class="field"><label for="dayLines">${DAYS_FULL[d - 1]}: one meal per line, "Label: foods with amounts"</label>
-          <textarea id="dayLines" data-inp="dayLines" placeholder="Breakfast: 60g oats, 150g Greek yoghurt, 1 banana&#10;Lunch: 150g chicken, 150g rice, broccoli">${esc(day.lines)}</textarea></div>
-        <div class="row" style="justify-content:flex-start">
-          <button data-act="calcDay">Calculate with Beast AI</button>
-          <button class="btn-ghost" data-act="addRow">Add a row</button></div>
-        <div class="table-wrap" style="margin-top:12px"><table>
-          <thead><tr><th>Label</th><th>Foods</th>${NUT.map(k => `<th>${macroChip(k)}</th>`).join('')}<th></th></tr></thead>
-          <tbody id="mealRows">${rows}${totalRow}</tbody></table></div>
-        ${day.meals.length ? `<div class="row" style="margin-top:12px;justify-content:flex-start">
-          <label for="copyTo" class="sr">Copy this day to</label>
-          <select id="copyTo" style="width:auto;min-width:200px"><option value="all">All other days</option>${copyOpts}</select>
-          <button class="btn-ghost" data-act="copyDay">Copy this day</button></div>` : ''}</div>
+        <p class="mini" style="margin-top:0">${esc(DAYS_FULL[d - 1])}. Each meal is its own row. Calculate fills only that row.</p>
+        ${rowsHtml || '<p class="muted">No meals for this day yet. Add a meal.</p>'}
+        <button class="btn-ghost" data-act="addRow" style="margin-top:4px">Add a meal</button>
+        ${copy}${conf}
+        <div id="dayTotals-wrap">${dayTotalsHtml(c, { meals: rows })}</div>
+      </div>
       <div class="card"><h3>Training plan</h3>
         <p class="mini" style="margin-top:0">One day per line, then its exercises: "Mon: Full body A", then "- Squat 3x8".</p>
-        <textarea id="trainDraft" data-inp="trainDraft" style="min-height:150px" placeholder="Mon: Full body A&#10;- Squat 3x8&#10;- Push-up 3x10">${esc(dr.training)}</textarea>
+        <textarea id="trainDraft" data-inp="train" style="min-height:150px" placeholder="Mon: Full body A&#10;- Squat 3x8&#10;- Push-up 3x10">${esc(C.dr.training)}</textarea>
         <div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn-ghost" data-act="trainStart">Start from their training days</button></div></div>
-      <div class="card"><div class="row"><div>${status}</div><button data-act="publish">Approve and publish</button></div>
-        <p class="mini" style="margin:8px 0 0">Publishes the meal plan and training plan to the client as a new version. Older versions are kept.</p></div>
+      <div class="card"><div class="row"><div>${planStatusHtml(c)}</div><button data-act="publish">Publish plan</button></div>
+        <p class="mini" style="margin:8px 0 0">Your draft is saved as you type. Only Publish plan shows it to the client. Older versions are kept.</p></div>
     </div>`;
 }
 
@@ -1162,6 +1216,7 @@ const ACT = {}, CH = {}, INP = {};
 ACT.signOut = () => signOut('');
 ACT.coachPage = el => { C.page = el.dataset.p; C.clientId = null; C.confirm = null; C.backup = null; render(); };
 ACT.openClient = async el => {
+  await flushSave();
   C.page = 'client'; C.clientId = el.dataset.id; C.tab = 'overview'; C.confirm = null; C.ciEditId = null; C.planDay = 1; C.startDate = null; C.d = null; C.noteState = '';
   render();
   await loadDetail(C.clientId); render();
@@ -1194,7 +1249,7 @@ ACT.askTier = () => {
 ACT.askDelete = () => {
   const c = clientById(C.clientId);
   C.confirm = { text: `Delete ${c.name || c.email} and all their coaching data (plans, logs, check-ins, notes)? Their customer record is kept. This cannot be undone.`, yes: 'Yes, delete', danger: true,
-    run: async () => { await q(sb.from('coaching_clients').delete().eq('id', c.id)); try { localStorage.removeItem(draftKey(c)); } catch (e) {} C.page = 'clients'; C.clientId = null; await loadAll(); toast('Client deleted.'); } };
+    run: async () => { await q(sb.from('coaching_clients').delete().eq('id', c.id)); C.page = 'clients'; C.clientId = null; await loadAll(); toast('Client deleted.'); } };
   render();
 };
 CH.cleared = async el => {
@@ -1249,77 +1304,122 @@ ACT.askCancelCheckin = el => {
 };
 
 /* plan editor */
-ACT.togglePlanInputs = () => { C.planInputsOpen = !(C.planInputsOpen !== false); render(); };
-ACT.pDay = el => { C.planDay = Number(el.dataset.d); render(); };
+// The draft saves in the database as you type, and is flushed before a client switch, a sign-out or when the tab is hidden.
+let pendingSave = null, saveTimer = null, saveQueue = Promise.resolve();
+function scheduleSave(c) {
+  pendingSave = { client_id: Number(c.id), draft: JSON.parse(JSON.stringify(C.dr)), updated_at: new Date().toISOString() };
+  C.saveState = 'saving';
+  clearTimeout(saveTimer); saveTimer = setTimeout(flushSave, 600);
+  updatePlanStatus();
+}
+function flushSave() {
+  clearTimeout(saveTimer);
+  const job = pendingSave;
+  if (!job) return saveQueue;
+  pendingSave = null;
+  saveQueue = saveQueue.then(async () => {
+    try { await q(sb.from('coaching_plan_drafts').upsert(job, { onConflict: 'client_id' })); C.saveState = 'saved'; }
+    catch (err) { C.saveState = 'error'; toast(friendly(err)); }
+    if (C.clientId && String(job.client_id) === String(C.clientId)) updatePlanStatus();
+  });
+  return saveQueue;
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushSave(); });
+// One Beast AI estimate for a list of meal lines. The server reads the client's protein answer itself.
+async function aiDay(lines, clientId) {
+  const { data: { session } } = await sb.auth.getSession();
+  const r = await fetch('/api/coach-ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (session ? session.access_token : '') },
+    body: JSON.stringify({ mode: 'day', text: lines.join('\n').slice(0, 2000), clientId: Number(clientId) }) });
+  let data = {}; try { data = await r.json(); } catch (e) {}
+  if (!r.ok || data.error) { const err = new Error(data.message || 'Beast AI could not answer that. Type the numbers in yourself.'); err.code = data.error || 'try_again'; throw err; }
+  if (!Array.isArray(data.meals) || data.meals.length !== lines.length) throw Object.assign(new Error('Beast AI returned a different number of meals. Check the numbers by hand.'), { code: 'try_again' });
+  return data.meals;
+}
+ACT.pDay = el => { C.planDay = Number(el.dataset.d); C.confirm = null; render(); };
 CH.target = async el => {
   const c = clientById(C.clientId);
   const targets = Object.assign({ calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 }, c.targets || {});
   targets[el.dataset.k] = el.value === '' ? null : clampNum(el.value, el.dataset.k === 'steps' ? 60000 : 5000);
   await updateClient(c, { targets }, 'Targets saved.');
 };
-function parseLines(text) {
-  return text.split('\n').map(s => s.trim()).filter(Boolean).map((line, i) => {
-    const idx = line.indexOf(':');
-    if (idx > 0) return { label: line.slice(0, idx).trim().slice(0, 40), text: line.slice(idx + 1).trim().slice(0, 300) };
-    return { label: 'Meal ' + (i + 1), text: line.slice(0, 300) };
-  });
-}
-INP.dayLines = el => { const c = clientById(C.clientId); const dr = getDraft(c); dr.meals[C.planDay].lines = el.value; saveDraft(c, dr); };
-INP.trainDraft = el => { const c = clientById(C.clientId); const dr = getDraft(c); dr.training = el.value; saveDraft(c, dr); const st = document.getElementById('planStatus'); if (st && planChanged(c, dr)) { st.className = 'c-amber'; st.innerHTML = '<b>Changes not published yet</b>'; } };
-ACT.calcDay = async () => {
-  const c = clientById(C.clientId); const dr = getDraft(c); const d = C.planDay;
-  const text = (document.getElementById('dayLines') || {}).value || dr.meals[d].lines;
-  const lines = text.split('\n').map(s => s.trim()).filter(Boolean);
-  if (!lines.length) { toast('Type the meals first, one per line.'); return; }
-  dr.meals[d].lines = text; saveDraft(c, dr);
-  toast('Calculating...');
+// Typing in a row: the draft changes and the totals update in place (no re-render, so the keyboard stays put).
+INP.row = el => {
+  const c = clientById(C.clientId); if (!c) return;
+  const row = C.dr.meals[C.planDay][Number(el.dataset.i)]; if (!row) return;
+  const f = el.dataset.f;
+  if (f === 'label') row.label = el.value.slice(0, 40);
+  else if (f === 'text') row.text = el.value.slice(0, 300);
+  else row[f] = clampNum(el.value, f === 'calories' ? 5000 : 800);
+  scheduleSave(c); updateDayTotals();
+};
+INP.train = el => { const c = clientById(C.clientId); if (!c) return; C.dr.training = el.value.slice(0, 5000); scheduleSave(c); };
+// Calculate fills ONLY this row. The other rows are not read or changed.
+ACT.calcRow = async el => {
+  const c = clientById(C.clientId);
+  const i = Number(el.dataset.i), d = C.planDay;
+  const row = C.dr.meals[d][i];
+  if (!row) return;
+  const foods = String(row.text || '').trim();
+  if (!foods) { toast('Type the foods with amounts first.'); return; }
+  toast('Calculating this meal...');
   try {
-    const { data: { session } } = await sb.auth.getSession();
-    const r = await fetch('/api/coach-ai', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (session ? session.access_token : '') },
-      body: JSON.stringify({ mode: 'day', text: lines.join('\n').slice(0, 2000) }) });
-    let data = {}; try { data = await r.json(); } catch (e) {}
-    if (!r.ok || data.error) { const err = new Error(data.message || 'Beast AI could not answer that. Type the numbers in yourself.'); err.code = data.error || 'try_again'; throw err; }
-    if (!Array.isArray(data.meals) || data.meals.length !== lines.length) throw Object.assign(new Error('Beast AI returned a different number of meals. Check the numbers by hand.'), { code: 'try_again' });
-    dr.meals[d].meals = data.meals.map((m, i) => { const p = parseLines(lines[i])[0]; return { label: String(m.label || p.label).slice(0, 40), text: String(m.text || p.text).slice(0, 300),
-      calories: clampNum(m.calories, 5000), protein: clampNum(m.protein, 500), carbs: clampNum(m.carbs, 800), fat: clampNum(m.fat, 400), fibre: clampNum(m.fibre, 200) }; });
-    saveDraft(c, dr); render(); toast('Numbers calculated. Check them before you publish.');
+    const [m] = await aiDay([`${row.label}: ${foods}`], c.id);
+    const target = C.dr.meals[d][i];
+    if (!target) return;
+    Object.assign(target, { calories: clampNum(m.calories, 5000), protein: clampNum(m.protein, 500), carbs: clampNum(m.carbs, 800), fat: clampNum(m.fat, 400), fibre: clampNum(m.fibre, 200) });
+    scheduleSave(c); render(); toast('Numbers calculated for this meal. Check them before you publish.');
   } catch (err) {
-    dr.meals[d].meals = parseLines(lines.join('\n')).map(p => ({ label: p.label, text: p.text, calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 }));
-    saveDraft(c, dr); render(); toast(friendly(err) || 'Beast AI could not answer. Type the numbers in yourself.');
+    toast(friendly(err) || 'Beast AI could not answer. Type the numbers in yourself.');
   }
 };
-ACT.addRow = () => { const c = clientById(C.clientId); const dr = getDraft(c); dr.meals[C.planDay].meals.push({ label: 'Meal', text: '', calories: 0, protein: 0, carbs: 0, fat: 0, fibre: 0 }); saveDraft(c, dr); render(); };
-ACT.delRow = el => { const c = clientById(C.clientId); const dr = getDraft(c); dr.meals[C.planDay].meals.splice(Number(el.dataset.i), 1); saveDraft(c, dr); render(); };
-CH.row = el => {
-  const c = clientById(C.clientId); const dr = getDraft(c); const day = dr.meals[C.planDay];
-  const m = day.meals[Number(el.dataset.i)]; if (!m) return;
-  const f = el.dataset.f;
-  if (f === 'label' || f === 'text') m[f] = el.value.slice(0, f === 'label' ? 40 : 300);
-  else m[f] = clampNum(el.value, f === 'calories' ? 5000 : 800);
-  day.lines = day.meals.map(x => x.label + ': ' + x.text).join('\n');
-  saveDraft(c, dr); render();
+ACT.addRow = () => {
+  const c = clientById(C.clientId); const rows = C.dr.meals[C.planDay];
+  rows.push(emptyRow(rows.length + 1));
+  scheduleSave(c); render();
+};
+ACT.moveRow = el => {
+  const c = clientById(C.clientId); const rows = C.dr.meals[C.planDay];
+  const i = Number(el.dataset.i), j = i + Number(el.dataset.dir);
+  if (j < 0 || j >= rows.length) return;
+  [rows[i], rows[j]] = [rows[j], rows[i]];
+  scheduleSave(c); render();
+};
+ACT.delRow = el => {
+  const c = clientById(C.clientId); const rows = C.dr.meals[C.planDay];
+  const i = Number(el.dataset.i); const r = rows[i]; if (!r) return;
+  const doIt = () => { C.dr.meals[C.planDay].splice(i, 1); scheduleSave(c); render(); };
+  if (r.text || r.calories || r.protein) {
+    C.confirm = { text: `Delete "${r.label}"? Its foods and numbers go too.`, yes: 'Yes, delete', danger: true, run: async () => doIt() };
+    return render();
+  }
+  doIt();
 };
 ACT.copyDay = () => {
-  const c = clientById(C.clientId); const dr = getDraft(c); const from = C.planDay;
-  const to = document.getElementById('copyTo').value;
-  const targets = to === 'all' ? [1, 2, 3, 4, 5, 6, 7].filter(n => n !== from) : [Number(to)];
-  targets.forEach(n => { dr.meals[n] = JSON.parse(JSON.stringify(dr.meals[from])); });
-  saveDraft(c, dr); render(); toast(targets.length > 1 ? 'Copied to every other day.' : 'Copied to ' + DAYS_FULL[targets[0] - 1] + '.');
+  const c = clientById(C.clientId); const from = C.planDay;
+  const to = [...document.querySelectorAll('[data-copy-day]:checked')].map(x => Number(x.dataset.copyDay));
+  if (!to.length) { toast('Tick the days to copy to.'); return; }
+  const doCopy = () => { to.forEach(n => { C.dr.meals[n] = JSON.parse(JSON.stringify(C.dr.meals[from])); }); scheduleSave(c); render(); toast('Copied to ' + to.map(n => DAYS_FULL[n - 1]).join(', ') + '.'); };
+  const busy = to.filter(n => C.dr.meals[n].length);
+  if (busy.length) {
+    C.confirm = { text: `Replace the meals on ${busy.map(n => DAYS_FULL[n - 1]).join(', ')}? They already have meals.`, yes: 'Yes, copy and replace', danger: true, run: async () => doCopy() };
+    return render();
+  }
+  doCopy();
 };
 ACT.trainStart = () => {
-  const c = clientById(C.clientId); const dr = getDraft(c);
+  const c = clientById(C.clientId);
   const days = ((c.onboarding || {}).trainingDays || []).filter(d => DAYS.includes(String(d).slice(0, 3)));
   if (!days.length) { toast('They did not choose training days.'); return; }
-  dr.training = days.map((d, i) => `${String(d).slice(0, 3)}: Session ${String.fromCharCode(65 + i)}\n- Exercise 3x10`).join('\n');
-  saveDraft(c, dr); render();
+  C.dr.training = days.map((d, i) => `${String(d).slice(0, 3)}: Session ${String.fromCharCode(65 + i)}\n- Exercise 3x10`).join('\n');
+  scheduleSave(c); render();
 };
 ACT.publish = async () => {
-  const c = clientById(C.clientId); const dr = getDraft(c);
-  const plan = planFromDraft(dr);
+  const c = clientById(C.clientId);
+  await flushSave();
+  const plan = planFromDraft(C.dr);
   if (!hasPlanMeals(plan) && !plan.training.trim()) { toast('Add some meals or a training plan first.'); return; }
   const data = await q(sb.rpc('coach_publish_plan', { p_client_id: c.id, p_plan: plan }));
   if (!data || !data.ok) { toast((data && data.error) || 'Could not publish.'); return; }
-  try { localStorage.removeItem(draftKey(c)); } catch (e) {}
   await loadAll(); await loadDetail(c.id); render();
   toast(`Published as version ${data.version}. The client sees it now.`);
 };

@@ -602,7 +602,7 @@ const DRAFT_KEY = () => 'bc_onboard_' + (S.user ? S.user.id : 'anon');
 function draft() {
   let d = {};
   try { d = JSON.parse(localStorage.getItem(DRAFT_KEY()) || '{}'); } catch (e) { d = {}; }
-  return Object.assign({ step: 1, heightUnit: 'cm', weightUnit: 'kg', timezone: '', likedFoods: [], health: {}, equipment: [], trainingDays: [], weighInDay: 'Mon', weighInTime: '07:00', goalKind: '', jobMult: '', trainingIntensity: '', agreeTerms: false, agreeNotCoach: false, agreeConsent: false }, d);
+  return Object.assign({ step: 1, heightUnit: 'cm', weightUnit: 'kg', timezone: '', proteinPowder: '', proteinBrand: '', likedFoods: [], health: {}, equipment: [], trainingDays: [], weighInDay: 'Mon', weighInTime: '07:00', goalKind: '', jobMult: '', trainingIntensity: '', agreeTerms: false, agreeNotCoach: false, agreeConsent: false }, d);
 }
 function saveDraft(d) { try { localStorage.setItem(DRAFT_KEY(), JSON.stringify(d)); } catch (e) {} }
 function fld(d, k, label, type, ph, extra, hint) {
@@ -614,6 +614,12 @@ function radios(d, k, label, opts, hint) {
   return `<div class="field"><label>${label}</label>${hint ? `<p class="mini" style="margin:0 0 8px">${hint}</p>` : ''}
     <div class="chips">${opts.map(o => `<label class="chip"><input type="radio" name="f-${k}" value="${esc(o)}" data-f="${k}" ${d[k] === o ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>
     <div class="err" id="err-${k}"></div></div>`;
+}
+// Protein powder: required (yes, no, or open to it). The brand and flavour box only shows for Yes.
+const PROTEIN_CHOICES = [['yes', 'Yes'], ['no', 'No'], ['open', 'Open to it']];
+function proteinField(d) {
+  return `${radiosMap(d, 'proteinPowder', 'Do you use protein powder?', PROTEIN_CHOICES)}
+    ${d.proteinPowder === 'yes' ? `<div class="field"><label for="f-proteinBrand">Which brand and flavour? (optional)</label><input id="f-proteinBrand" data-f="proteinBrand" maxlength="80" value="${esc(d.proteinBrand)}" placeholder="e.g. Brand X, vanilla"></div>` : ''}`;
 }
 function radiosMap(d, k, label, pairs) {
   return `<div class="field"><label>${label}</label><div class="chips">${pairs.map(([v, l]) => `<label class="chip"><input type="radio" name="f-${k}" value="${esc(v)}" data-f="${k}" ${d[k] === v ? 'checked' : ''}>${esc(l)}</label>`).join('')}</div><div class="err" id="err-${k}"></div></div>`;
@@ -699,6 +705,7 @@ function sixStepHtml() {
         ${Object.keys(FOOD_GROUPS).map(g => `<div style="margin-bottom:14px"><label>${g}</label>${checks(d, 'likedFoods', FOOD_GROUPS[g])}</div>`).join('')}
         <div class="field"><label for="f-likedOther">Other foods you like</label><input id="f-likedOther" data-f="likedOther" value="${esc(d.likedOther)}">
           <p class="hint">Separate each food with a comma, e.g. halloumi, chickpeas, lentils</p></div>
+        ${proteinField(d)}
         <div class="err" id="err-likedFoods"></div></div>`,
     () => `<div class="card"><h3>Food to avoid</h3><div class="grid2">
         <div class="field"><label for="f-avoid">Foods you will not eat</label><textarea id="f-avoid" data-f="avoid">${esc(d.avoid)}</textarea>
@@ -774,6 +781,7 @@ function basicFormHtml() {
         ${radiosMap(d, 'jobMult', 'Job activity', BASIC_JOBS)}${stepsFields(d)}</div>
       <div class="card"><h3>Training</h3>${fld(d, 'trainingSessions', 'Training sessions a week', 'number', 'e.g. 3', 'min="0" max="14" inputmode="numeric"')}
         ${radiosMap(d, 'trainingIntensity', 'How hard are they?', BASIC_INTENSITY)}</div>
+      <div class="card"><h3>Protein powder</h3>${proteinField(d)}</div>
       <div class="card"><h3>Weekly weigh-in</h3><div class="grid2">${selectField(d, 'weighInDay', 'Weigh-in day', DAYS)}
         <div class="field"><label for="f-weighInTime">Weigh-in time</label><select id="f-weighInTime" data-f="weighInTime">${WEIGH_TIMES.map(t => `<option value="${t}" ${d.weighInTime === t ? 'selected' : ''}>${fmtTimeP(t)}</option>`).join('')}</select><p class="hint">Same day, same time each week, after the toilet and before eating or drinking.</p></div></div></div>
       <div class="card"><h3>Agreements</h3>
@@ -798,6 +806,7 @@ function obErrors(d, step, tier) {
     Object.assign(e, stepsErrs(d));
     if (!(n(d.trainingSessions) >= 0 && n(d.trainingSessions) <= 14) || d.trainingSessions === '') e.trainingSessions = 'Enter how many sessions a week (0 if none).';
     if (!BASIC_INTENSITY.some(([v]) => v === d.trainingIntensity)) e.trainingIntensity = OB_CHOOSE;
+    if (!PROTEIN_CHOICES.some(([v]) => v === d.proteinPowder)) e.proteinPowder = 'Choose yes, no, or open to it.';
     if (!validZone(d.tzIana)) e.timezone = 'Choose your time zone or city.';
     if (!d.agreeNotCoach) e.agreeNotCoach = 'Please confirm you understand this is general guidance.';
     if (!d.agreeTerms) e.agreeTerms = 'Please agree to the terms and billing.';
@@ -819,6 +828,7 @@ function obErrors(d, step, tier) {
   if (step === 3) {
     const liked = (d.likedFoods || []).length + String(d.likedOther || '').split(',').map(x => x.trim()).filter(Boolean).length;
     if (liked < 3) e.likedFoods = 'Tick at least 3 foods you like.';
+    if (!PROTEIN_CHOICES.some(([v]) => v === d.proteinPowder)) e.proteinPowder = 'Choose yes, no, or open to it.';
   }
   if (step === 4) {
     if (!DIETS.includes(d.diet)) e.diet = 'Choose one. Pick No restrictions if none applies.';
@@ -870,7 +880,8 @@ function answersFrom(d, tier) {
   const weightKg = d.weightUnit === 'kg' ? parseFloat(d.weight) : parseFloat(d.weight) / 2.20462;
   const base = { timezone: String(d.timezone || '').trim(), timeZoneIana: validZone(d.tzIana) || MELB, age: parseFloat(d.age), sex: d.sex, heightCm: Math.round(heightCm * 10) / 10,
     weightKg: Math.round(weightKg * 10) / 10, stepsEveryday: parseFloat(d.stepsEveryday), stepsRealistic: parseFloat(d.stepsRealistic),
-    weighInDay: d.weighInDay || 'Mon', weighInTime: d.weighInTime || '07:00', agreeTerms: !!d.agreeTerms, agreeNotCoach: !!d.agreeNotCoach };
+    weighInDay: d.weighInDay || 'Mon', weighInTime: d.weighInTime || '07:00', agreeTerms: !!d.agreeTerms, agreeNotCoach: !!d.agreeNotCoach,
+    proteinPowder: d.proteinPowder || '', proteinBrand: d.proteinPowder === 'yes' ? String(d.proteinBrand || '').trim().slice(0, 80) : '' };
   if (tier === 'basic') {
     return Object.assign(base, { goalKind: d.goalKind, jobMult: d.jobMult, trainingSessions: parseFloat(d.trainingSessions), trainingIntensity: d.trainingIntensity, whatsapp: d.whatsapp || '' });
   }
@@ -1276,7 +1287,7 @@ function onboardField(el) {
   const d = draft();
   if (el.type === 'checkbox' && !el.dataset.group) d[el.dataset.f] = el.checked;
   else if (el.type === 'radio' || el.tagName === 'SELECT' || el.type !== 'checkbox') d[el.dataset.f] = el.value;
-  if (el.dataset.f === 'heightUnit') { saveDraft(d); render(); return; }
+  if (el.dataset.f === 'heightUnit' || el.dataset.f === 'proteinPowder') { saveDraft(d); render(); return; }
   saveDraft(d);
 }
 document.addEventListener('input', (e) => {

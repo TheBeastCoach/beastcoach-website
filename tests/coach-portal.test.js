@@ -149,7 +149,7 @@ function seed(over) {
       { id: 1, user_id: 'u1', email: 'hana@example.com', name: 'Hana Health', tier: 'core', status: 'awaiting_activation', start_date: today, activated_at: null, end_date: null,
         time_zone: 'Australia/Melbourne', whatsapp: '+61 400 000 001', created_at: daysAgoIso(2), health_flag: true, health_cleared_at: null, pause_days_used: 0,
         targets: { calories: 2100, protein: 160, carbs: 210, fat: 70, fibre: 30, steps: 9000 },
-        onboarding: { timezone: 'Melbourne', health: { heart: 'yes', chest: 'no', other: 'no' }, healthClearance: true, likedFoods: ['Chicken', 'Rice', 'Banana'], likedOther: 'halloumi, chickpeas',
+        onboarding: { timezone: 'Melbourne', proteinPowder: 'yes', proteinBrand: 'Brand X vanilla', health: { heart: 'yes', chest: 'no', other: 'no' }, healthClearance: true, likedFoods: ['Chicken', 'Rice', 'Banana'], likedOther: 'halloumi, chickpeas',
           avoid: 'mushrooms, olives', allergies: 'peanuts', trainingDays: ['Mon', 'Wed', 'Fri'], equipment: ['Dumbbells'], goal: 'Lose fat', weighInDay: 'Mon', weighInTime: '07:00', weightKg: 82 } },
       { id: 2, user_id: 'u2', email: 'erin@example.com', name: 'Erin Essential', tier: 'essential', status: 'active', start_date: act10, activated_at: act10 + 'T09:00:00+11:00', end_date: addDaysStr(act10, 84),
         time_zone: 'Australia/Melbourne', created_at: daysAgoIso(12), health_flag: false, pause_days_used: 0, targets: null, onboarding: { weighInDay: 'Mon' } },
@@ -218,7 +218,7 @@ async function open(stub, opts) {
     const body = JSON.parse(r.request().postData() || '{}');
     page.aiCalls.push({ body, auth: r.request().headers().authorization });
     const lines = String(body.text || '').split('\n').filter(Boolean);
-    r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ meals: lines.map((l, i) => ({ label: l.split(':')[0], text: (l.split(':')[1] || '').trim(), calories: 420 + i, protein: 30, carbs: 50, fat: 12, fibre: 6 })) }) });
+    r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ meals: lines.map((l, i) => ({ label: l.split(':')[0], text: (l.split(':')[1] || '').trim(), calories: 100 + l.length, protein: 30, carbs: 50, fat: 12, fibre: 6 })) }) });
   });
   await page.addInitScript(s => { window.__stub = s; }, stub);
   await page.goto(base + '/coach');
@@ -447,29 +447,170 @@ test('check-ins: Essential with a kick-off call cannot book another; a London cl
   await ctx.close();
 });
 
-test('plan editor: Calculate with Beast AI fills the day, and Approve and publish saves a new version in the plan shape the client reads', SKIP, async () => {
+// Read the meal rows currently on screen.
+const rowsOnScreen = page => page.$$eval('.meal-row[data-row]', els => els.map(el => ({
+  label: el.querySelector('input[data-f="label"]').value,
+  text: el.querySelector('input[data-f="text"]').value,
+  calories: Number(el.querySelector('input[data-f="calories"]').value)
+})));
+const savedDraft = page => page.evaluate(() => (window.__stub.db.coaching_plan_drafts || [])[0]);
+
+test('plan editor: calculate row one, add row two, calculate row two: row one is unchanged (the overwrite bug)', SKIP, async () => {
   const { ctx, page } = await open(SIGNED_IN_AAL2());
   await openClient(page, 'Cole Core');
   await tab(page, 'Targets and plan');
-  assert.match(await txt(page, '.plan-inputs'), /Plan inputs/);
-  await page.fill('#dayLines', 'Breakfast: 60g oats, 1 banana\nLunch: 150g chicken, 150g rice');
-  await page.click('button[data-act="calcDay"]');
-  await page.waitForFunction(() => document.querySelectorAll('#mealRows tr').length === 3);
-  assert.equal(page.aiCalls.length, 1);
-  assert.equal(page.aiCalls[0].body.mode, 'day');
-  assert.equal(page.aiCalls[0].auth, 'Bearer token-aal2', 'the coach\'s own aal2 token');
-  await page.fill('#trainDraft', 'Mon: Full body A\n- Squat 3x8');
+  await page.click('button[data-act="addRow"]');   // the day starts empty: add the first meal
+  await page.fill('#r0-text', '60g oats, 1 banana');
+  await page.click('button[data-act="calcRow"][data-i="0"]');
+  await page.waitForFunction(() => document.querySelector('#r0-calories').value !== '0');
+  await page.click('button[data-act="addRow"]');
+  await page.fill('#r1-label', 'Lunch');
+  await page.fill('#r1-text', '150g chicken, 150g rice');
+  await page.click('button[data-act="calcRow"][data-i="1"]');
+  await page.waitForFunction(() => document.querySelector('#r1-calories').value !== '0');
+  const rows = await rowsOnScreen(page);
+  assert.equal(rows.length, 2, 'two rows');
+  assert.equal(rows[0].label, 'Meal 1', 'row one keeps its label');
+  assert.equal(rows[0].text, '60g oats, 1 banana', 'row one keeps its foods');
+  assert.equal(rows[0].calories, 100 + 'Meal 1: 60g oats, 1 banana'.length, 'row one keeps its numbers');
+  assert.equal(rows[1].calories, 100 + 'Lunch: 150g chicken, 150g rice'.length, 'row two got its own numbers');
+  assert.equal(page.aiCalls.length, 2, 'each calculate sent one meal line');
+  assert.equal(page.aiCalls[1].body.text, 'Lunch: 150g chicken, 150g rice', 'row two\'s call carries only row two');
+  await ctx.close();
+});
+
+test('plan editor: a new meal typed in a fresh row never deletes the calculated rows above it', SKIP, async () => {
+  const { ctx, page } = await open(SIGNED_IN_AAL2());
+  await openClient(page, 'Cole Core');
+  await tab(page, 'Targets and plan');
+  await page.click('button[data-act="addRow"]');   // the day starts empty: add the first meal
+  await page.fill('#r0-text', 'toast');
+  await page.click('button[data-act="calcRow"][data-i="0"]');
+  await page.waitForFunction(() => document.querySelector('#r0-calories').value !== '0');
+  await page.click('button[data-act="addRow"]');
+  await page.click('button[data-act="addRow"]');
+  assert.equal((await rowsOnScreen(page)).length, 3, 'add row always appends');
+  assert.equal((await rowsOnScreen(page))[0].text, 'toast', 'existing rows are untouched by add');
+  await ctx.close();
+});
+
+test('plan editor: the draft is saved in the database as you type, survives a reload, and shows Draft saved', SKIP, async () => {
+  const r1 = await open(SIGNED_IN_AAL2());
+  let page = r1.page;
+  await openClient(page, 'Cole Core');
+  await tab(page, 'Targets and plan');
+  await page.click('button[data-act="addRow"]');   // the day starts empty: add the first meal
+  await page.fill('#r0-text', 'Oats and berries');
+  await page.fill('#r0-label', 'Breakfast');
+  await page.waitForFunction(() => /Draft saved/.test(document.getElementById('planStatus').textContent));
+  assert.match(await txt(page, '#planStatus'), /Unpublished changes/);
+  const saved = await savedDraft(page);
+  assert.ok(saved, 'the draft is in coaching_plan_drafts');
+  assert.equal(saved.client_id, 3);
+  assert.equal(saved.draft.meals['1'][0].text, 'Oats and berries');
+  // "Reload": a new page with the same database
+  const db = await page.evaluate(() => JSON.parse(JSON.stringify(window.__stub)));
+  await r1.ctx.close();
+  const r2 = await open(db);
+  page = r2.page;
+  await page.waitForSelector('#clientRows');
+  await openClient(page, 'Cole Core');
+  await tab(page, 'Targets and plan');
+  assert.equal(await page.inputValue('#r0-text'), 'Oats and berries', 'the draft comes back after a reload');
+  assert.equal(await page.inputValue('#r0-label'), 'Breakfast');
+  assert.equal(await page.evaluate(() => localStorage.length), 0, 'nothing is kept only in the browser');
+  await r2.ctx.close();
+});
+
+test('plan editor: the client never sees a draft; Publish plan makes the plan visible, as a new version', SKIP, async () => {
+  const { ctx, page } = await open(SIGNED_IN_AAL2());
+  await openClient(page, 'Cole Core');
+  await tab(page, 'Targets and plan');
+  await page.click('button[data-act="addRow"]');   // the day starts empty: add the first meal
+  await page.fill('#r0-text', 'Oats');
+  await page.fill('#r0-calories', '400');
+  await page.dispatchEvent('#r0-calories', 'input');
+  assert.match(await txt(page, '#planStatus'), /Unpublished changes/, 'a change is not published');
+  const before = await page.evaluate(() => window.__stub.db.coaching_plans.filter(p => p.client_id === 3).length);
   await page.click('button[data-act="publish"]');
-  await page.waitForFunction(() => window.__calls.some(c => c.name === 'coach_publish_plan'));
-  const call = (await calls(page)).find(c => c.name === 'coach_publish_plan');
-  assert.equal(call.args.p_client_id, 3);
-  const mon = call.args.p_plan.meals['1'];
-  assert.equal(mon.length, 2);
-  assert.deepEqual(Object.keys(mon[0]).sort(), ['calories', 'carbs', 'fat', 'fibre', 'label', 'name', 'protein', 'text']);
-  assert.equal(mon[0].label, 'Breakfast');
-  assert.equal(mon[0].calories, 420);
-  assert.equal(call.args.p_plan.training, 'Mon: Full body A\n- Squat 3x8');
   await page.waitForFunction(() => /version 1/.test(document.getElementById('planStatus').textContent));
+  const after = await page.evaluate(() => window.__stub.db.coaching_plans.filter(p => p.client_id === 3));
+  assert.equal(after.length, before + 1, 'a new version is added');
+  const current = after.find(p => p.is_current);
+  assert.equal(current.version, 1, 'the first publish is version 1 (this client had no plan before)');
+  assert.equal(current.plan.meals['1'][0].text, 'Oats', 'the published meal is in the shape the client reads');
+  assert.equal(after.filter(p => p.is_current).length, 1, 'one current plan');
+  assert.match(await txt(page, '#planStatus'), /Published/);
+  await ctx.close();
+});
+
+test('plan editor: copy this day to chosen days; copying over days that already have meals asks first', SKIP, async () => {
+  const { ctx, page } = await open(SIGNED_IN_AAL2());
+  await openClient(page, 'Cole Core');
+  await tab(page, 'Targets and plan');
+  await page.click('button[data-act="addRow"]');   // the day starts empty: add the first meal
+  await page.fill('#r0-text', 'Oats');
+  await page.click('button[data-act="addRow"]');
+  await page.fill('#r1-text', 'Chicken');
+  await page.click('button[data-act="pDay"][data-d="1"]');
+  await page.check('input[data-copy-day="2"]');
+  await page.check('input[data-copy-day="3"]');
+  await page.click('button[data-act="copyDay"]');
+  await page.waitForFunction(() => /Draft saved/.test(document.getElementById('planStatus').textContent));
+  const tueThu = await page.evaluate(() => ({ tue: window.__stub.db.coaching_plan_drafts[0].draft.meals['2'].length, wed: window.__stub.db.coaching_plan_drafts[0].draft.meals['3'].length }));
+  assert.deepEqual(tueThu, { tue: 2, wed: 2 }, 'copied to Tuesday and Wednesday');
+  // Copy again to Tuesday, which now has meals: a confirm step first
+  await page.click('button[data-act="pDay"][data-d="1"]');
+  await page.check('input[data-copy-day="2"]');
+  await page.click('button[data-act="copyDay"]');
+  await page.waitForSelector('#confirmBox');
+  assert.match(await txt(page, '#confirmBox'), /Replace the meals on Tuesday/);
+  await page.click('button[data-act="confirmNo"]');
+  assert.equal(await page.evaluate(() => window.__stub.db.coaching_plan_drafts[0].draft.meals['2'].length), 2, 'Not now changes nothing');
+  await page.check('input[data-copy-day="2"]');   // Not now re-draws the page, so the tick is set again
+  await page.click('button[data-act="copyDay"]');
+  await page.click('button[data-act="confirmYes"]');
+  await page.waitForFunction(() => window.__stub.db.coaching_plan_drafts[0].draft.meals['2'].length === 2);
+  await ctx.close();
+});
+
+test('plan editor: each row can be moved up and down, and deleted with a confirm when it has foods', SKIP, async () => {
+  const { ctx, page } = await open(SIGNED_IN_AAL2());
+  await openClient(page, 'Cole Core');
+  await tab(page, 'Targets and plan');
+  await page.click('button[data-act="addRow"]');   // the day starts empty: add the first meal
+  await page.fill('#r0-text', 'A');
+  await page.click('button[data-act="addRow"]');
+  await page.fill('#r1-text', 'B');
+  await page.click('button[data-act="moveRow"][data-i="1"][data-dir="-1"]');
+  assert.deepEqual((await rowsOnScreen(page)).map(r => r.text), ['B', 'A']);
+  await page.click('button[data-act="delRow"][data-i="0"]');
+  await page.click('button[data-act="confirmYes"]');
+  assert.deepEqual((await rowsOnScreen(page)).map(r => r.text), ['A']);
+  await ctx.close();
+});
+
+test('plan editor: the day totals change straight away when a row changes, and the keyboard stays put', SKIP, async () => {
+  const { ctx, page } = await open(SIGNED_IN_AAL2());
+  await openClient(page, 'Cole Core');
+  await tab(page, 'Targets and plan');
+  await page.click('button[data-act="addRow"]');   // the day starts empty: add the first meal
+  await page.fill('#r0-calories', '650');
+  await page.dispatchEvent('#r0-calories', 'input');
+  assert.match(await txt(page, '#dayTotals'), /650/);
+  assert.equal(await page.evaluate(() => document.activeElement && document.activeElement.id), 'r0-calories', 'focus did not move');
+  await ctx.close();
+});
+
+test('protein powder: the coach sees the answer on the Overview; a client who never answered shows "Not asked"', SKIP, async () => {
+  const { ctx, page } = await open(SIGNED_IN_AAL2());
+  await openClient(page, 'Hana Health');
+  assert.match(await txt(page, '#app'), /Protein powder\s*Yes: Brand X vanilla/);
+  await page.click('button[data-act="backClients"]');
+  await openClient(page, 'Cole Core');
+  assert.match(await txt(page, '#app'), /Protein powder\s*Not asked/);
+  await tab(page, 'Targets and plan');
+  assert.match(await txt(page, '.plan-inputs'), /Protein powder/, 'the Plan inputs panel has it too');
   await ctx.close();
 });
 

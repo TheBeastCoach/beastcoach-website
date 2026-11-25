@@ -667,6 +667,8 @@ test('onboarding: a Basic client fills the one-screen form and sees their target
   await page.fill('#f-stepsRealistic', '9000');
   await page.fill('#f-trainingSessions', '3');
   await page.check('input[name="f-trainingIntensity"][value="350"]');
+  await page.check('input[name="f-proteinPowder"][value="yes"]');
+  await page.fill('#f-proteinBrand', 'Brand X vanilla');
   await page.check('input[data-f="agreeNotCoach"]');
   await page.check('input[data-f="agreeTerms"]');
   await page.click('button[data-act="basicSubmit"]');
@@ -679,6 +681,9 @@ test('onboarding: a Basic client fills the one-screen form and sees their target
   await page.waitForFunction(() => document.getElementById('toast').textContent.includes('Tracking started'));
   await page.waitForSelector('#addMealCard');
   assert.deepEqual(await page.$$eval('#addMealCard .seg button', bs => bs.map(b => b.textContent.trim())), ['Describe it'], 'Basic opens on Describe it');
+  const proteinSent = backend.rpc.find(r => r.name === 'submit_onboarding');
+  assert.equal(proteinSent.args.p_answers.proteinPowder, 'yes', 'the protein answer is sent');
+  assert.equal(proteinSent.args.p_answers.proteinBrand, 'Brand X vanilla', 'and the brand and flavour');
   await ctx.close();
 });
 
@@ -738,6 +743,7 @@ test('onboarding: a coached client fills all six steps and sends the answers; th
   // Step 3
   for (const f of ['Chicken', 'Rice', 'Broccoli']) await page.check(`input[data-group="likedFoods"][value="${f}"]`);
   await page.fill('#f-likedOther', 'halloumi, chickpeas, lentils');
+  await page.check('input[name="f-proteinPowder"][value="no"]');
   await page.click('button[data-act="obNext"]');
   // Step 4
   await page.fill('#f-avoid', 'mushrooms, olives');
@@ -803,5 +809,40 @@ test('a paused client sees the date paused and "Pause days used N of 14", as in 
   assert.match(text, /Paused since /);
   assert.match(text, /Pause days used: 8 of 14\./, 'the 5 used before plus the 3 days of this pause');
   assert.match(text, /Stefan will resume you when you are ready\./);
+  await ctx.close();
+});
+
+test('protein powder: required on the six-step food step; the brand box only shows for Yes', SKIP, async () => {
+  const backend = newBackend({ row: { status: 'awaiting_onboarding', activated_at: null, start_date: null, onboarding: {}, targets: null } });
+  const { ctx, page } = await open(backend);
+  await waitForApp(page);
+  // Step 1
+  await page.fill('#f-age', '34');
+  await page.selectOption('#f-sex', 'Male');
+  await page.fill('#f-heightCm', '182');
+  await page.fill('#f-weight', '84');
+  await page.fill('#f-whatsapp', '+61 400 000 009');
+  await page.click('button[data-act="tzPick"][data-iana="Australia/Melbourne"]');
+  await page.click('button[data-act="obNext"]');
+  // Step 2
+  await page.fill('#f-goal', 'Get stronger and sleep better');
+  await page.check('input[name="f-timeframe"][value="3 months"]');
+  await page.fill('#f-job', 'Teacher');
+  await page.selectOption('#f-activity', 'Mixed');
+  await page.fill('#f-stepsEveryday', '4000');
+  await page.fill('#f-stepsRealistic', '8000');
+  await page.click('button[data-act="obNext"]');
+  // Step 3: the food step
+  for (const f of ['Chicken', 'Rice', 'Broccoli']) await page.check(`input[data-group="likedFoods"][value="${f}"]`);
+  assert.equal(await page.locator('#f-proteinBrand').count(), 0, 'no brand box before an answer');
+  await page.click('button[data-act="obNext"]');
+  assert.match(await txt(page, '#err-proteinPowder'), /Choose yes, no, or open to it\./, 'the question is required');
+  await page.check('input[name="f-proteinPowder"][value="open"]');
+  assert.equal(await page.locator('#f-proteinBrand').count(), 0, 'no brand box for "Open to it"');
+  await page.check('input[name="f-proteinPowder"][value="no"]');
+  assert.equal(await page.locator('#f-proteinBrand').count(), 0, 'no brand box for "No"');
+  await page.check('input[name="f-proteinPowder"][value="yes"]');
+  assert.equal(await page.locator('#f-proteinBrand').count(), 1, 'the optional brand box shows for "Yes"');
+  await page.fill('#f-proteinBrand', 'Brand X, vanilla');
   await ctx.close();
 });

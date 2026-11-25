@@ -186,8 +186,8 @@ test('GET is refused', async () => {
 });
 
 test('the friendly limit messages are plain English', () => {
-  assert.doesNotMatch(limitMessage('client').message, /—|–/);
-  assert.doesNotMatch(limitMessage('shared').message, /—|–/);
+  assert.doesNotMatch(limitMessage('client').message, /-|-/);
+  assert.doesNotMatch(limitMessage('shared').message, /-|-/);
 });
 
 // The coach: a token whose payload says aal2 (signed in with an authenticator code).
@@ -196,7 +196,7 @@ const COACH_TOKEN = b64url({ alg: 'HS256' }) + '.' + b64url({ sub: 'coach-1', aa
 const AAL1_TOKEN = b64url({ alg: 'HS256' }) + '.' + b64url({ sub: 'coach-1', aal: 'aal1' }) + '.sig';
 const DAY_AI = () => jsonResponse(200, { content: [{ text: JSON.stringify({ meals: [
   { calories: 420, protein: 25, carbs: 55, fat: 10, fibre: 8 }, { calories: 610, protein: 45, carbs: 60, fat: 18, fibre: 6 }] }) }] });
-const coachReq = (token, body) => req({ headers: { authorization: 'Bearer ' + token }, body: body || { mode: 'day', text: 'Breakfast: 60g oats, 1 banana\nLunch: 150g chicken, 150g rice' } });
+const coachReq = (token, body) => req({ headers: { authorization: 'Bearer ' + token }, body: body || { mode: 'day', clientId: 7, text: 'Breakfast: 60g oats, 1 banana\nLunch: 150g chicken, 150g rice' } });
 
 test('coach (in coaching_admins, aal2): the meal plan builder returns numbers per line, counted on the coach\'s own limit of 200', async () => {
   const calls = mockFetch({ admins: () => jsonResponse(200, [{ user_id: 'user-1' }]), ai: DAY_AI });
@@ -208,7 +208,7 @@ test('coach (in coaching_admins, aal2): the meal plan builder returns numbers pe
   const counter = calls.find(c => c.url.includes('/rpc/coach_ai_use_coach'));
   assert.deepEqual(counter.body, { p_limit: 200 });
   assert.equal(calls.filter(c => /\/rpc\/coach_ai_use$/.test(c.url)).length, 0, 'the client and shared counters are not touched');
-  assert.equal(called(calls, '/rest/v1/coaching_clients'), 0, 'no client plan lookup');
+  assert.equal(called(calls, 'status=eq.active'), 0, 'no client plan lookup (the client\'s own active plan is not used)');
   const adminCall = calls.find(c => c.url.includes('/rest/v1/coaching_admins'));
   assert.equal(adminCall.headers.Authorization, 'Bearer ' + COACH_TOKEN, 'the admin list is read with the coach\'s own token');
 });
@@ -255,4 +255,71 @@ test('tokenAal reads the assurance level, and a broken token gives null', () => 
   assert.equal(tokenAal(COACH_TOKEN), 'aal2');
   assert.equal(tokenAal(AAL1_TOKEN), 'aal1');
   assert.equal(tokenAal('not-a-jwt'), null);
+});
+
+// Protein powder: the instruction the model gets depends on the client's own onboarding answer, read from the database.
+const sysOf = calls => (calls.find(c => c.url.includes('api.anthropic.com')) || {}).body.system;
+const onboardingRoute = ob => () => jsonResponse(200, [{ id: 7, onboarding: ob }]);
+
+test('client Describe it: "no" tells the model never to suggest protein powder', async () => {
+  const calls = mockFetch({ plan: onboardingRoute({ proteinPowder: 'no' }) });
+  const res = makeRes();
+  await handler(req(), res);
+  assert.equal(res.statusCode, 200);
+  assert.match(sysOf(calls), /does not use it\. Never suggest or include protein powder/);
+});
+
+test('client: "yes" with a brand tells the model to use that brand and flavour', async () => {
+  const calls = mockFetch({ plan: onboardingRoute({ proteinPowder: 'yes', proteinBrand: 'Brand X vanilla' }) });
+  const res = makeRes();
+  await handler(req(), res);
+  assert.match(sysOf(calls), /uses the brand and flavour "Brand X vanilla"/);
+});
+
+test('client: "open" lets the model suggest protein powder', async () => {
+  const calls = mockFetch({ plan: onboardingRoute({ proteinPowder: 'open' }) });
+  const res = makeRes();
+  await handler(req(), res);
+  assert.match(sysOf(calls), /open to it\. You may suggest protein powder/);
+});
+
+test('a client who never answered (Not asked) is treated as "no": never suggested', async () => {
+  const calls = mockFetch({ plan: onboardingRoute({}) });
+  await handler(req(), makeRes());
+  assert.match(sysOf(calls), /does not use it\. Never suggest/);
+});
+
+test('the protein answer comes from the database, not the request: a body that claims otherwise is ignored', async () => {
+  const calls = mockFetch({ plan: onboardingRoute({ proteinPowder: 'no' }) });
+  await handler(req({ body: { mode: 'log', text: 'two eggs', protein: { answer: 'open' }, proteinPowder: 'open' } }), makeRes());
+  assert.match(sysOf(calls), /does not use it/);
+  assert.doesNotMatch(sysOf(calls), /open to it/);
+});
+
+test('coach Calculate: the prompt uses THIS client\'s protein answer, read with the coach token', async () => {
+  const calls = mockFetch({ admins: () => jsonResponse(200, [{ user_id: 'user-1' }]), plan: onboardingRoute({ proteinPowder: 'open' }), ai: DAY_AI });
+  const res = makeRes();
+  await handler(coachReq(COACH_TOKEN, { mode: 'day', clientId: 7, text: 'Breakfast: oats\nLunch: rice' }), res);
+  assert.equal(res.statusCode, 200);
+  assert.match(sysOf(calls), /open to it\. You may suggest protein powder/);
+  const read = calls.find(c => c.url.includes('/rest/v1/coaching_clients') && c.url.includes('select=onboarding'));
+  assert.equal(read.headers.Authorization, 'Bearer ' + COACH_TOKEN, 'the client row is read with the coach\'s token, through row level security');
+});
+
+test('coach Calculate: a client id is required (400 bad_client), and no AI call is made without one', async () => {
+  const calls = mockFetch({ admins: () => jsonResponse(200, [{ user_id: 'user-1' }]), ai: DAY_AI });
+  const res = makeRes();
+  await handler(coachReq(COACH_TOKEN, { mode: 'day', text: 'Lunch: rice' }), res);
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.body.error, 'bad_client');
+  assert.equal(called(calls, 'api.anthropic.com'), 0);
+});
+
+test('the protein rule for each answer, and nothing at all for the demo (no answer given)', () => {
+  const { proteinRule } = require(path.join(__dirname, '..', 'api', 'demo-ai.js'))._core;
+  assert.equal(proteinRule(undefined), '', 'the demo adds nothing');
+  assert.match(proteinRule({ answer: 'no' }), /Never suggest or include protein powder/);
+  assert.match(proteinRule({ answer: 'open' }), /You may suggest protein powder/);
+  assert.match(proteinRule({ answer: 'yes', brand: 'Brand X' }), /"Brand X"/);
+  assert.match(proteinRule({ answer: null }), /Never suggest/);
 });

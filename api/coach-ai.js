@@ -78,8 +78,15 @@ async function coachDay(req, res, token, user, anthropicKey, serviceKey) {
     return send(res, 503, BUSY);
   }
   if (!ok) return send(res, 403, { error: 'coach_only', message: 'The meal plan builder is for the coach, signed in with an authenticator code.' });
+  const cid = Number((req.body || {}).clientId);
+  if (!Number.isInteger(cid) || cid < 1) return send(res, 400, { error: 'bad_client' });
   const parsed = readInput(req.body || {});
   if (parsed.error) return send(res, parsed.status, { error: parsed.error });
+  try {
+    parsed.input.protein = await proteinFor(token, cid);
+  } catch (e) {
+    return send(res, 503, BUSY);
+  }
   let limit;
   try {
     limit = await useCoachLimit(serviceKey);
@@ -96,14 +103,32 @@ async function coachDay(req, res, token, user, anthropicKey, serviceKey) {
   }
 }
 
-// The id of this user's active coaching plan, read with THEIR token, so row level security applies. Or null.
-async function activePlanId(token) {
-  const r = await fetch(SUPABASE_URL + '/rest/v1/coaching_clients?select=id&status=eq.active&limit=1', {
+// The client's protein powder answer from their onboarding, read with the caller's own token (row level
+// security applies). { answer, brand } or null when not asked.
+function proteinOf(onboarding) {
+  const ob = onboarding && typeof onboarding === 'object' ? onboarding : {};
+  if (!['yes', 'no', 'open'].includes(ob.proteinPowder)) return { answer: null };
+  return { answer: ob.proteinPowder, brand: ob.proteinPowder === 'yes' ? String(ob.proteinBrand || '') : '' };
+}
+
+// The id and protein answer of this user's active coaching plan, read with THEIR token. Or null.
+async function activePlan(token) {
+  const r = await fetch(SUPABASE_URL + '/rest/v1/coaching_clients?select=id,onboarding&status=eq.active&limit=1', {
     headers: { apikey: PUBLISHABLE_KEY, Authorization: 'Bearer ' + token }
   });
   if (!r.ok) return null;
   const rows = await r.json();
-  return Array.isArray(rows) && rows[0] ? rows[0].id : null;
+  return Array.isArray(rows) && rows[0] ? { id: rows[0].id, protein: proteinOf(rows[0].onboarding) } : null;
+}
+
+// A client's protein answer, read with the COACH's token (the coach can read every client, with MFA).
+async function proteinFor(token, clientId) {
+  const r = await fetch(SUPABASE_URL + '/rest/v1/coaching_clients?select=onboarding&id=eq.' + encodeURIComponent(String(clientId)) + '&limit=1', {
+    headers: { apikey: PUBLISHABLE_KEY, Authorization: 'Bearer ' + token }
+  });
+  if (!r.ok) throw new Error('client read ' + r.status);
+  const rows = await r.json();
+  return proteinOf(Array.isArray(rows) && rows[0] ? rows[0].onboarding : null);
 }
 
 // Counts this call against the client and the shared day total. { allowed, reason } or throws.
@@ -140,7 +165,7 @@ module.exports = async function handler(req, res) {
   if (!m) return send(res, 401, { error: 'sign_in', message: SIGN_IN });
   const token = m[1];
 
-  let user = null, clientId = null;
+  let user = null, plan = null;
   try {
     user = await userFromToken(token);
   } catch (e) {
@@ -152,15 +177,17 @@ module.exports = async function handler(req, res) {
   if (req.body && req.body.mode === 'day') return coachDay(req, res, token, user, anthropicKey, serviceKey);
 
   try {
-    clientId = await activePlanId(token);
+    plan = await activePlan(token);
   } catch (e) {
     return send(res, 503, BUSY);
   }
-  if (!clientId) return send(res, 403, { error: 'no_active_plan', message: 'Beast AI is part of an active coaching plan.' });
+  if (!plan) return send(res, 403, { error: 'no_active_plan', message: 'Beast AI is part of an active coaching plan.' });
+  const clientId = plan.id;
 
   const parsed = readInput(req.body || {});
   if (parsed.error) return send(res, parsed.status, { error: parsed.error });
   const input = parsed.input;
+  input.protein = plan.protein;
   if (!CLIENT_MODES.includes(input.mode)) return send(res, 400, { error: 'bad_mode' });
 
   let limit;
@@ -183,4 +210,4 @@ module.exports = async function handler(req, res) {
   }
 };
 
-module.exports._test = { userFromToken, activePlanId, useLimit, limitMessage, tokenAal, isCoach, useCoachLimit, CLIENT_LIMIT, SHARED_LIMIT, COACH_LIMIT };
+module.exports._test = { userFromToken, activePlan, proteinOf, useLimit, limitMessage, tokenAal, isCoach, useCoachLimit, CLIENT_LIMIT, SHARED_LIMIT, COACH_LIMIT };

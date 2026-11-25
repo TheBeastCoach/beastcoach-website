@@ -1,4 +1,4 @@
--- Coaching portal: verification (run AFTER every coaching-portal SQL file, up to and including coaching-portal-4c.sql).
+-- Coaching portal: verification (run AFTER every coaching-portal SQL file, up to and including coaching-portal-4c2.sql).
 -- Run in Supabase: Dashboard -> SQL Editor -> New query -> paste this whole file -> Run.
 --
 -- What it does:
@@ -948,6 +948,86 @@ begin
 exception when others then
   perform pg_temp.verify_reset();
   perform pg_temp.verify_record('publish plan', false, 'error: ' || sqlerrm);
+end $$;
+
+-- 9b. Plan drafts (4c2): a draft is coach-only. A client, a coach without MFA, and anon cannot read or write one. ----
+-- The draft is written as the database owner first, so each check has something to look at and something to not change.
+do $$
+declare a_id bigint; seen_a int := -1; wrote_a boolean := false; still_a text;
+begin
+  a_id := pg_temp.verify_open_id('verify-a@verify.invalid');
+  insert into public.coaching_plan_drafts (client_id, draft) values (a_id, '{"meals": {"1": []}, "training": "Verify private draft"}'::jsonb)
+    on conflict (client_id) do update set draft = excluded.draft;
+  perform pg_temp.verify_as('authenticated', 'A', 'aal2');
+  begin select count(*) into seen_a from public.coaching_plan_drafts; exception when others then seen_a := 0; end;
+  begin
+    insert into public.coaching_plan_drafts (client_id, draft) values (a_id, '{"training": "changed by client"}'::jsonb)
+      on conflict (client_id) do update set draft = excluded.draft;
+    wrote_a := true;
+  exception when others then wrote_a := false; end;
+  perform pg_temp.verify_reset();
+  select draft ->> 'training' into still_a from public.coaching_plan_drafts where client_id = a_id;
+  perform pg_temp.verify_record('plan drafts: a client cannot read or write a draft',
+    seen_a = 0 and not wrote_a and still_a = 'Verify private draft',
+    'rows seen ' || seen_a || ', write allowed ' || wrote_a || ', draft still: ' || coalesce(still_a, 'none'));
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('plan drafts: a client cannot read or write a draft', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare a_id bigint; seen_c int := -1; upd_c int := -1; wrote_c boolean := false; still_c text;
+begin
+  a_id := pg_temp.verify_open_id('verify-a@verify.invalid');
+  perform pg_temp.verify_as('authenticated', 'C', 'aal1');
+  begin select count(*) into seen_c from public.coaching_plan_drafts; exception when others then seen_c := 0; end;
+  begin
+    update public.coaching_plan_drafts set draft = '{"training": "changed by coach without MFA"}'::jsonb where client_id = a_id;
+    get diagnostics upd_c = row_count;
+  exception when others then upd_c := 0; end;
+  begin
+    insert into public.coaching_plan_drafts (client_id, draft) values (a_id, '{"training": "coach aal1 insert"}'::jsonb)
+      on conflict (client_id) do update set draft = excluded.draft;
+    wrote_c := true;
+  exception when others then wrote_c := false; end;
+  perform pg_temp.verify_reset();
+  select draft ->> 'training' into still_c from public.coaching_plan_drafts where client_id = a_id;
+  perform pg_temp.verify_record('plan drafts: a coach with MFA not yet on (aal1) cannot read or write a draft',
+    seen_c = 0 and upd_c = 0 and not wrote_c and still_c = 'Verify private draft',
+    'rows seen ' || seen_c || ', rows changed ' || upd_c || ', write allowed ' || wrote_c || ', draft still: ' || coalesce(still_c, 'none'));
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('plan drafts: a coach with MFA not yet on (aal1) cannot read or write a draft', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare a_id bigint; seen_c int := 0; upd_c int := 0; saved_text text;
+begin
+  a_id := pg_temp.verify_open_id('verify-a@verify.invalid');
+  perform pg_temp.verify_as('authenticated', 'C', 'aal2');
+  select count(*) into seen_c from public.coaching_plan_drafts where client_id = a_id;
+  update public.coaching_plan_drafts set draft = jsonb_set(draft, '{training}', '"Verify saved by the coach"') where client_id = a_id;
+  get diagnostics upd_c = row_count;
+  perform pg_temp.verify_reset();
+  select draft ->> 'training' into saved_text from public.coaching_plan_drafts where client_id = a_id;
+  perform pg_temp.verify_record('plan drafts: a coach with MFA (aal2) can read and save a draft',
+    seen_c = 1 and upd_c = 1 and saved_text = 'Verify saved by the coach',
+    'rows seen ' || seen_c || ', saved ' || upd_c);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('plan drafts: a coach with MFA (aal2) can read and save a draft', false, 'error: ' || sqlerrm);
+end $$;
+
+do $$
+declare seen_anon int := -1;
+begin
+  perform pg_temp.verify_as('anon', 'anon');
+  begin select count(*) into seen_anon from public.coaching_plan_drafts; exception when others then seen_anon := 0; end;
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('plan drafts: anon cannot read a draft', seen_anon = 0, 'rows seen: ' || seen_anon);
+exception when others then
+  perform pg_temp.verify_reset();
+  perform pg_temp.verify_record('plan drafts: anon cannot read a draft', false, 'error: ' || sqlerrm);
 end $$;
 
 -- 8. Delete: B removes their own data; B's customer row stays; A's data is untouched. Runs last. ---

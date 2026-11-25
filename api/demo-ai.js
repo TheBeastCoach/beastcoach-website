@@ -18,6 +18,19 @@ const MODEL = 'claude-haiku-4-5-20251001';
 const MEAL_TYPES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 const EFFORTS = ['5 minutes', '15 minutes', "I'll properly cook"];
 
+// The client's answer on protein powder, added to the meal prompts. Undefined (the demo) adds nothing.
+// A missing answer (clients who joined before the question) is treated as "no": never suggest it.
+function proteinRule(p) {
+  if (!p) return '';
+  if (p.answer === 'yes') {
+    const brand = String(p.brand || '').replace(/[\r\n"]/g, ' ').trim().slice(0, 80);
+    return '\nProtein powder: this person uses ' + (brand ? 'the brand and flavour "' + brand + '"' : 'protein powder') +
+      '. Use that brand and flavour when protein powder fits the meal, and say so in the note. Never add it to a meal the person did not name.';
+  }
+  if (p.answer === 'open') return '\nProtein powder: this person is open to it. You may suggest protein powder when it fits the meal. Never add it to a meal the person did not name.';
+  return '\nProtein powder: this person does not use it. Never suggest or include protein powder, and do not add it to a meal the person did not name.';
+}
+
 const LOG_PROMPT = `You are a careful nutritionist for Beast Coach. The person describes what they ate.
 Return ONLY valid JSON in exactly this shape:
 {"name":"short meal name, max 40 chars","calories":0,"protein":0,"carbs":0,"fat":0,"fibre":0,"items":[{"name":"item","grams":0,"calories":0}],"note":"one short sentence","confidence":"high|medium|low"}
@@ -195,7 +208,7 @@ function readInput(body) {
 }
 
 async function runLog(anthropicKey, input, res) {
-  const r = await ask(anthropicKey, LOG_PROMPT, [{ role: 'user', content: input.text }], 500);
+  const r = await ask(anthropicKey, LOG_PROMPT + proteinRule(input.protein), [{ role: 'user', content: input.text }], 500);
   if (r.parsed.error) return send(res, 422, { error: 'not_food' });
   const c = cleanLog(r.parsed);
   return send(res, 200, {
@@ -209,7 +222,7 @@ async function runDay(anthropicKey, input, res) {
   const messages = [{ role: 'user', content: numbered }];
   let meals = null;
   for (let attempt = 0; attempt < 2 && !meals; attempt++) {
-    const r = await ask(anthropicKey, DAY_PROMPT, messages, 1200);
+    const r = await ask(anthropicKey, DAY_PROMPT + proteinRule(input.protein), messages, 1200);
     const list = Array.isArray(r.parsed.meals) ? r.parsed.meals : [];
     if (list.length === input.lines.length) {
       meals = list.map((m, i) => Object.assign(parseDayLine(input.lines[i], i), nutrition(m)));
@@ -256,7 +269,7 @@ async function runCreate(anthropicKey, input, res) {
   const messages = [{ role: 'user', content: createText(input, t) }];
   let best = null;
   for (let attempt = 0; attempt < 2; attempt++) {
-    const r = await ask(anthropicKey, CREATE_PROMPT, messages, 1400);
+    const r = await ask(anthropicKey, CREATE_PROMPT + proteinRule(input.protein), messages, 1400);
     if (r.parsed.error) return send(res, 422, { error: 'not_food' });
     const all = cleanCreate(r.parsed).meals;
     const bad = [];
@@ -312,6 +325,6 @@ module.exports = async function handler(req, res) {
   }
 };
 
-module.exports._test = { readInput, parseDayLine, cleanTargets, createText, keyMatches, DAILY_LIMIT, MAX_DAY_LINES, EXERCISE_PROMPT };
+module.exports._test = { readInput, proteinRule, parseDayLine, cleanTargets, createText, keyMatches, DAILY_LIMIT, MAX_DAY_LINES, EXERCISE_PROMPT };
 // The mode runners, shared with api/coach-ai.js (the real clients' Beast AI endpoint). Same prompts and checks.
-module.exports._core = { readInput, runLog, runDay, runFridge, runExercise, runCreate, send };
+module.exports._core = { readInput, proteinRule, runLog, runDay, runFridge, runExercise, runCreate, send };

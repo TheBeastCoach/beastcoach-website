@@ -248,7 +248,8 @@ Agreement pages: reviewed by Stefan's attorney. Australian Consumer Law refund w
 
 1. `supabase/coaching.sql`, `supabase/coaching-portal.sql`, `supabase/coaching-portal-4b.sql`, `supabase/coaching-portal-4b2.sql` (all already run on the live project).
 2. `supabase/coaching-portal-4c.sql` (4c). Safe to run twice. **Run it before this branch's pages go live:** My Coach now reads `paused_at` and `pause_days_used`, which 4c adds.
-3. `supabase/coaching-portal-verify.sql`. Every row should say PASS (64 checks). It rolls back, so it leaves nothing behind.
+3. `supabase/coaching-portal-4c2.sql` (4c2). Safe to run twice. Plan drafts and protein powder.
+4. `supabase/coaching-portal-verify.sql`. Every row should say PASS (68 checks). It rolls back, so it leaves nothing behind.
 
 No new environment variables. `/api/coach-ai` uses the same `ANTHROPIC_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` as before.
 
@@ -289,6 +290,15 @@ No new environment variables. `/api/coach-ai` uses the same `ANTHROPIC_API_KEY` 
 - `supabase/coaching-portal-verify.sql`: now 64 checks.
 
 What the tests cannot prove: Supabase's real MFA (the page is tested against a fake of supabase-js). Before launch, sign in at `/coach` on the preview with your real account and authenticator, add a backup, activate a test client, publish a plan and schedule a check-in.
+
+## Step 4c2: plan drafts, protein powder, and the overwrite fix
+
+- **Run `supabase/coaching-portal-4c2.sql`** after 4c. Safe to run twice.
+- **Plan drafts** are saved in `coaching_plan_drafts` as the coach types (coach only, MFA). Clients cannot read them. "Publish plan" is the only way the client sees a plan; it makes a new version and keeps the old ones. The status line reads Draft saved, Unpublished changes, or Published (version N).
+- **Meal rows** are fixed rows. Each row has its own Calculate with Beast AI button, which fills only that row. Add a meal appends an empty row; rows can be moved up or down or deleted (with a confirm when they have foods). Copy this day to copies all meals of one day to the days ticked, with a confirm before replacing days that already have meals.
+- **Protein powder** is asked in onboarding (six-step food step, and the Basic form): Yes, No, or Open to it (required), and an optional brand and flavour for Yes. The coach sees it on the Overview and in Plan inputs ("Not asked" for older clients). Beast AI reads the answer from the database, never from the request, and the prompts tell the model what to do: never suggest it for No (or Not asked), it may suggest it for Open to it, and use the brand for Yes.
+- **Overwrite bug, root cause:** the old editor used one text box for the whole day as the source of truth. Calculate replaced every meal of that day with whatever was in the box, so a new meal typed in the box wiped the rows already calculated. Now each row carries its own foods and numbers, and no action reads the other rows.
+- **Verify:** 68 checks, including that a client and a coach without MFA cannot read or write a draft, and anon cannot read one.
 
 ## Open after 4c
 
