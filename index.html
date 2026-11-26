@@ -116,14 +116,20 @@ img{max-width:100%}
 /* Inside your coaching portal: phone frames, a swipe strip on phones, a grid on desktop */
 .portal-strip{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:6px 20px 14px;scroll-padding:0 20px;scrollbar-width:none}
 .portal-strip::-webkit-scrollbar{display:none}
-.portal-item{flex:0 0 min(74vw,290px);scroll-snap-align:center;margin:0;display:flex;flex-direction:column;align-items:center;gap:14px}
-.phone{width:100%;background:#0A1A12;border-radius:40px;padding:10px;box-shadow:0 22px 44px rgba(27,48,34,.26)}
-.phone img{display:block;width:100%;height:auto;aspect-ratio:390/844;border-radius:30px;object-fit:cover;object-position:top}
+.portal-item{flex:0 0 min(74vw,300px);scroll-snap-align:center;margin:0;display:flex;flex-direction:column;align-items:center;gap:14px}
+.phone{box-sizing:border-box;width:100%;background:#0A1A12;border-radius:40px;padding:10px;box-shadow:0 22px 44px rgba(27,48,34,.26)}
+.phone img{display:block;width:100%;height:auto;border-radius:30px;object-fit:contain}
 .portal-cap{margin:0;font-size:16px;font-weight:700;line-height:1.35;color:#1B3022;text-align:center}
+@media (min-width:600px) and (max-width:899px){
+  .portal-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:36px 24px;overflow:visible;scroll-snap-type:none;padding:0}
+  .portal-item{flex:none;width:100%}
+  .phone{max-width:300px;margin:0 auto}
+  .portal-cap{font-size:18px}
+}
 @media (min-width:900px){
   .portal-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:44px 32px;overflow:visible;scroll-snap-type:none;padding:0}
   .portal-item{flex:none;width:100%}
-  .phone{max-width:260px;margin:0 auto}
+  .phone{max-width:300px;margin:0 auto}
   .portal-cap{font-size:18px}
 }
 /* Tablet widths: the comparison table fits the card instead of scrolling sideways */
@@ -145,6 +151,7 @@ body{padding-top:64px}
 .site-nav-links a{color:rgba(255,255,255,0.8);text-decoration:none;font-size:14px;font-weight:500}
 .site-nav-links a:hover,.site-nav-links a[aria-current]{color:#fff}
 .site-nav-cta{background:#52B788 !important;color:#fff !important;padding:8px 18px;border-radius:24px;font-weight:700 !important}
+#plans{scroll-margin-top:72px}
 .site-nav-toggle{display:none;background:none;border:none;color:#fff;font-size:24px;cursor:pointer}
 .site-nav-mobile{display:none;flex-direction:column;padding:16px 24px;border-top:1px solid rgba(255,255,255,0.1);background:rgba(27,46,36,0.98)}
 .site-nav-mobile.active{display:flex}
@@ -166,10 +173,10 @@ body{padding-top:64px}
 <nav class="site-nav">
   <div class="site-nav-inner">
     <a href="/" class="site-nav-logo">BEAST<span>COACH</span></a>
-    <div class="site-nav-links"><a href="/" aria-current="page">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="/app#features">Features</a><a href="about.html">Our Story</a><a href="privacy.html">Privacy</a><a href="/app#early-access" class="site-nav-cta">Get Early Access</a></div>
+    <div class="site-nav-links"><a href="/" aria-current="page">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="#plans" class="site-nav-cta">See plans</a></div>
     <button class="site-nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleSiteMenu(this)">&#9776;</button>
   </div>
-  <div class="site-nav-mobile" id="siteMenu"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="/app#features">Features</a><a href="about.html">Our Story</a><a href="privacy.html">Privacy</a><a href="/app#early-access">Get Early Access</a></div>
+  <div class="site-nav-mobile" id="siteMenu"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="#plans">See plans</a></div>
 </nav>
 <script>function toggleSiteMenu(b){var m=document.getElementById("siteMenu");var o=m.classList.toggle("active");b.setAttribute("aria-expanded",o?"true":"false");}</script>
 
@@ -390,11 +397,11 @@ body{padding-top:64px}
 </div>
 <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:stretch">
 <div style="flex:1 1 320px;min-width:0;background:#2D6A4F;border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:22px">
-<img src="/coach-img/portal/meal-builder.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Meal Builder in the portal: fridge items and what is left for the day" style="width:100%;max-width:270px;aspect-ratio:390/844;object-fit:cover;object-position:top;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
+<img src="/coach-img/portal/meal-builder.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Meal Builder in the portal: fridge items and what is left for the day" style="width:100%;max-width:280px;height:auto;object-fit:contain;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
 <div style="display:flex;flex-direction:column;gap:8px"><div class="disp" style="font-size:34px;line-height:1">Meal Builder</div><p style="margin:0;font-size:17px;line-height:1.55;color:#E3F4E9">Tell Beast AI what is in your fridge or snap a photo, set your calories and macros, and get a meal designed for you.</p></div>
 </div>
 <div style="flex:1 1 320px;min-width:0;background:#244A37;border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:22px">
-<img src="/coach-img/portal/add-meal.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Add a meal in the portal: meals from your plan, ready to log" style="width:100%;max-width:270px;aspect-ratio:390/844;object-fit:cover;object-position:top;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
+<img src="/coach-img/portal/add-meal.jpg" width="390" height="844" loading="lazy" decoding="async" alt="Add a meal in the portal: meals from your plan, ready to log" style="width:100%;max-width:280px;height:auto;object-fit:contain;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
 <div style="display:flex;flex-direction:column;gap:8px"><div class="disp" style="font-size:34px;line-height:1">Add a meal</div><p style="margin:0;font-size:17px;line-height:1.55;color:#D5E6DB">Type "150g chicken breast, no oil, with 150g cooked brown rice" and get calories and macros back. One tap adds it to your day.</p></div>
 </div>
 </div>

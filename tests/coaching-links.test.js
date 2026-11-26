@@ -99,3 +99,33 @@ test('no page still links to /coaching or to index.html (the old homepage file)'
 test('the coaching checkout returns to the homepage, not /coaching', () => {
   assert.match(read('api/coaching-checkout.js'), /cancel_url: site \+ '\/\?checkout=cancelled#plans'/);
 });
+
+// ---------------------------------------------------------------------------
+// Homepage polish: the menu shows only the five main items and a See plans button; the portal screenshots are
+// never cropped (no object-fit: cover, and the frames are at most 300px wide).
+// ---------------------------------------------------------------------------
+test('the homepage menu: Work With Me, The App, Discipline Path, Recipes, Dashboard, and a green See plans button (no Get Early Access)', () => {
+  const html = read('index.html');
+  const desktop = html.match(/<div class="site-nav-links">([\s\S]*?)<\/div>/)[1];
+  const mobile = html.match(/<div class="site-nav-mobile" id="siteMenu">([\s\S]*?)<\/div>/)[1];
+  for (const menu of [desktop, mobile]) {
+    const labels = [...menu.matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map(m => m[1]);
+    assert.deepEqual(labels, ['Work With Me', 'The App', 'Discipline Path', 'Recipes', 'Dashboard', 'See plans']);
+    assert.doesNotMatch(menu, /Features|Our Story|Privacy|Get Early Access/);
+  }
+  assert.match(desktop, /<a href="#plans" class="site-nav-cta">See plans<\/a>/);
+  assert.match(html, /#plans\{scroll-margin-top:72px\}/, 'the fixed menu does not cover the plans heading');
+});
+
+test('the portal screenshots show in full: no object-fit cover, and the frames are at most 300px wide', () => {
+  const html = read('index.html');
+  // The portal screenshots (and the frames they sit in) are never cropped. The founder photo is a portrait, not a screenshot.
+  const shots = [...html.matchAll(/<img [^>]*coach-img\/portal\/[^>]*>/g)].map(m => m[0]);
+  assert.equal(shots.length, 8, 'the eight portal screenshots are on the page');
+  shots.forEach(t => assert.doesNotMatch(t, /object-fit:\s*cover/, 'not cropped: ' + t.slice(0, 80)));
+  assert.doesNotMatch(html.match(/\.phone img\{[^}]*\}/)[0], /cover/);
+  assert.match(html, /\.phone img\{display:block;width:100%;height:auto;border-radius:30px;object-fit:contain\}/);
+  assert.match(html, /\.phone\{box-sizing:border-box;width:100%/);
+  assert.match(html, /\.portal-item\{flex:0 0 min\(74vw,300px\)/);
+  assert.match(html, /@media \(min-width:900px\)\{[\s\S]*?\.phone\{max-width:300px;margin:0 auto\}/);
+});
