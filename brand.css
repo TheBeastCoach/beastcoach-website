@@ -81,3 +81,30 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .site-nav-mobile.active { display: flex; }
 .site-nav-mobile a { color: var(--ink-soft); text-decoration: none; padding: 12px 0; font-size: 15px; font-weight: 600; border-bottom: 1px solid var(--line); min-height: 44px; box-sizing: border-box; }
 @media (max-width: 900px) { .site-nav-links { display: none; } .site-nav-toggle { display: block; } }
+
+/* Page layout: every public page sits below the fixed header */
+body { padding-top: 64px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
+.section { padding: 88px 0; }
+.section--alt { background: var(--ground-alt); }
+.h-display { font-family: var(--display); font-weight: 800; text-transform: uppercase; line-height: .92; color: var(--ink); margin: 0; }
+.lede { font-size: 18px; line-height: 1.55; color: var(--ink-soft); margin: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 28px 24px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 32px 28px; }
+.muted { color: var(--muted); }
+a.text-link { color: var(--lime); font-weight: 600; }
+input:not([type=checkbox]):not([type=radio]):not([type=file]), select, textarea {
+  font: inherit; font-size: 16px; color: var(--ink); background: var(--ground);
+  border: 1px solid var(--line-strong); border-radius: 12px; padding: 12px 14px; min-height: 48px; box-sizing: border-box;
+}
+input::placeholder, textarea::placeholder { color: var(--muted); }
+input:not([type=checkbox]):not([type=radio]):focus, select:focus, textarea:focus { outline: 2px solid var(--lime); outline-offset: 1px; }
+@media (max-width: 759px) { .section { padding: 64px 0; } }
+
+/* Shared footer (docs/site-chrome/footer.html) */
+.site-footer { background: var(--ground); border-top: 1px solid var(--line); padding: 40px 24px 48px; }
+.site-footer-inner { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.site-footer-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.site-footer-links a { color: var(--ink-soft); text-decoration: none; font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; min-height: 44px; }
+.site-footer-links a:hover { color: var(--lime); }
+.site-footer-note { margin: 0; font-size: 15px; color: var(--muted); }

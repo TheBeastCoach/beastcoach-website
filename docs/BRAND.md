@@ -82,3 +82,14 @@ Wordmark beside it: "BEAST COACH" in Big Shoulders Display 900, with "COACH" in 
 
 Body text at least 4.5:1 on its background. Display text 24px and up at least 3:1. The lightest text is `--muted`.
 Check with `tests/brand.test.js` before shipping a page.
+
+## Site header, footer and page layout (every public page)
+
+- Header: copy `docs/site-chrome/header.html` to the top of `<body>`. Ring logo, BEAST COACH wordmark, menu (Work With Me, The App, Discipline Path, Recipes, Dashboard), lime pill on the right, hamburger under 900px. Homepage pill says "See plans"; other pages say "Work With Me" and link to `/`.
+- Footer: copy `docs/site-chrome/footer.html` before `</body>`. Dark ground, muted text, links to Terms, Privacy and Coaching terms.
+- Remove any old page-specific header or footer. Every page matches.
+- Every page loads `/brand.css` and the Big Shoulders Display and Hanken Grotesk fonts (see Type). No Bebas Neue, no Manrope, no old greens (#1B3022, #F59E0B, #C5D3C8, #b42318, #1B1200, #FF7A1A).
+- Layout classes in brand.css: `.wrap` (1200px max, 24px side padding), `.section` (88px vertical), `.card` (20px radius), `.panel` (28px radius), `.h-display`, `.lede`, `.muted`.
+- Body copy is at least 15px. Eyebrows (12px) and small footnotes are the only exceptions.
+- Buttons are pills, at least 44px tall (the brand buttons are 52px).
+- Forms: native inputs use the shared input style in brand.css (ground background, line-strong border, 48px tall).

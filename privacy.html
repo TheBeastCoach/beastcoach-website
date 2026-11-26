@@ -39,137 +39,131 @@
     } catch (e) {}
   })();
   </script>
-  <title>Privacy Policy — Beast Coach</title>
+  <title>Privacy Policy: Beast Coach</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/brand.css">
+  <style>
+    h1, h2, h3, p, ul, blockquote, figure { margin: 0; }
+    .legal { padding: 56px 0 88px; }
+    .prose { max-width: 760px; }
+    .legal h1 { font-size: clamp(56px, 9vw, 96px); line-height: .88; }
+    .updated { font-size: 15px; color: var(--muted); margin-top: 16px; margin-bottom: 36px; }
+    .prose h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: clamp(28px, 4vw, 36px); line-height: .95; color: var(--ink); margin: 48px 0 14px; }
+    .prose h3 { font-size: 18px; font-weight: 700; color: var(--ink); margin: 28px 0 8px; }
+    .prose p, .prose li { font-size: 16px; line-height: 1.7; color: var(--ink-soft); }
+    .prose p { margin-bottom: 14px; }
+    .prose ul { margin: 0 0 18px; padding-left: 22px; }
+    .prose li { margin-bottom: 8px; }
+    .prose strong { color: var(--ink); }
+    .prose a { color: var(--lime); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 44px; }
+    .prose a:hover { color: var(--ink); }
+  </style>
 </head>
 <body>
-
-  <nav class="nav">
-    <div class="nav-inner">
-      <a href="/" class="nav-logo">BEAST<span>COACH</span></a>
-      <div class="nav-links"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="/app#features">Features</a><a href="about.html">Our Story</a><a href="privacy.html">Privacy</a><a href="/app#early-access" class="nav-cta">Get Early Access</a></div>
-      <button class="nav-hamburger" onclick="toggleMenu()">&#9776;</button>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-hdr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-hdr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+      <div class="site-nav-links"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="/" class="site-nav-cta">Work With Me</a></div>
+      <button class="site-nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="siteMenu" onclick="toggleSiteMenu(this)">&#9776;</button>
     </div>
-    <div class="nav-mobile" id="mobileMenu"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="/app#features">Features</a><a href="about.html">Our Story</a><a href="privacy.html">Privacy</a><a href="/app#early-access">Get Early Access</a></div>
+    <div class="site-nav-mobile" id="siteMenu"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a></div>
   </nav>
+  <script>function toggleSiteMenu(b){var m=document.getElementById("siteMenu");var o=m.classList.toggle("active");b.setAttribute("aria-expanded",o?"true":"false");}</script>
 
-  <section class="page-hero">
-    <div class="container">
-      <h1>Privacy Policy</h1>
-      <p>Last updated: May 2025</p>
-    </div>
-  </section>
+  <main class="legal">
+    <div class="wrap">
+      <div class="prose privacy-content">
+        <h1 class="h-display">Privacy Policy</h1>
+        <p class="updated">Last updated: May 2025</p>
 
-  <div class="container">
-    <div class="privacy-content">
+        <h2>1. Introduction</h2>
+        <p>Beast Coach ("we", "our", or "us") is committed to protecting your personal information. This Privacy Policy explains how we collect, use, store and protect your data when you use the Beast Coach mobile application and website (beastcoach.fit).</p>
+        <p>By using Beast Coach, you agree to the collection and use of information as described in this policy.</p>
 
-      <h2>1. Introduction</h2>
-      <p>Beast Coach ("we", "our", or "us") is committed to protecting your personal information. This Privacy Policy explains how we collect, use, store and protect your data when you use the Beast Coach mobile application and website (beastcoach.fit).</p>
-      <p>By using Beast Coach, you agree to the collection and use of information as described in this policy.</p>
+        <h2>2. Information We Collect</h2>
+        <p>We collect the following types of information:</p>
+        <ul>
+          <li><strong>Account information:</strong> email address and password (encrypted) when you create an account</li>
+          <li><strong>Profile information:</strong> name, age, biological sex, height, weight, fitness goals, activity level and dietary preferences</li>
+          <li><strong>Health and fitness data:</strong> workout logs, nutrition logs, step counts, water intake, calorie targets and macro data</li>
+          <li><strong>Cycle data:</strong> last period date and cycle length (female users who opt in only)</li>
+          <li><strong>Pantry and shopping data:</strong> pantry items, shopping list items and food preferences</li>
+          <li><strong>Partner connection data:</strong> partner connection codes and linked account references</li>
+          <li><strong>Challenge data:</strong> challenge participation, progress logs and leaderboard data</li>
+          <li><strong>Usage data:</strong> app interactions, screen views and feature usage for product improvement</li>
+        </ul>
 
-      <h2>2. Information We Collect</h2>
-      <p>We collect the following types of information:</p>
-      <ul>
-        <li><strong>Account information:</strong> email address and password (encrypted) when you create an account</li>
-        <li><strong>Profile information:</strong> name, age, biological sex, height, weight, fitness goals, activity level and dietary preferences</li>
-        <li><strong>Health and fitness data:</strong> workout logs, nutrition logs, step counts, water intake, calorie targets and macro data</li>
-        <li><strong>Cycle data:</strong> last period date and cycle length (female users who opt in only)</li>
-        <li><strong>Pantry and shopping data:</strong> pantry items, shopping list items and food preferences</li>
-        <li><strong>Partner connection data:</strong> partner connection codes and linked account references</li>
-        <li><strong>Challenge data:</strong> challenge participation, progress logs and leaderboard data</li>
-        <li><strong>Usage data:</strong> app interactions, screen views and feature usage for product improvement</li>
-      </ul>
+        <h2>3. How We Use Your Information</h2>
+        <p>We use your information to:</p>
+        <ul>
+          <li>Generate personalised workout and meal plans</li>
+          <li>Track and display your fitness progress</li>
+          <li>Power AI-assisted meal logging and pantry management</li>
+          <li>Enable partner connection and cycle sharing features</li>
+          <li>Display leaderboards and challenge progress</li>
+          <li>Send notifications relevant to your fitness goals (if enabled)</li>
+          <li>Improve the Beast Coach product and user experience</li>
+        </ul>
 
-      <h2>3. How We Use Your Information</h2>
-      <p>We use your information to:</p>
-      <ul>
-        <li>Generate personalised workout and meal plans</li>
-        <li>Track and display your fitness progress</li>
-        <li>Power AI-assisted meal logging and pantry management</li>
-        <li>Enable partner connection and cycle sharing features</li>
-        <li>Display leaderboards and challenge progress</li>
-        <li>Send notifications relevant to your fitness goals (if enabled)</li>
-        <li>Improve the Beast Coach product and user experience</li>
-      </ul>
+        <h2>4. Data Storage</h2>
+        <p>All data is stored securely using Supabase, a trusted cloud database provider with enterprise-grade security. Your data is stored on servers located in Australia and the United States.</p>
+        <p>We implement row-level security on all database tables, meaning your data can only be accessed by you and accounts you have explicitly authorised (such as a connected partner).</p>
 
-      <h2>4. Data Storage</h2>
-      <p>All data is stored securely using Supabase, a trusted cloud database provider with enterprise-grade security. Your data is stored on servers located in Australia and the United States.</p>
-      <p>We implement row-level security on all database tables, meaning your data can only be accessed by you and accounts you have explicitly authorised (such as a connected partner).</p>
+        <h2>5. AI Processing</h2>
+        <p>Beast Coach uses Anthropic's Claude AI to power meal logging, plan generation and coaching features. When you use AI features, the relevant input (such as a meal description) is sent to Anthropic's API for processing. We do not send personally identifiable information unnecessarily. Anthropic's data handling is governed by their own privacy policy.</p>
 
-      <h2>5. AI Processing</h2>
-      <p>Beast Coach uses Anthropic's Claude AI to power meal logging, plan generation and coaching features. When you use AI features, the relevant input (such as a meal description) is sent to Anthropic's API for processing. We do not send personally identifiable information unnecessarily. Anthropic's data handling is governed by their own privacy policy.</p>
+        <h2>6. Partner Data Sharing</h2>
+        <p>When you connect with a partner using a Beast Coach connection code:</p>
+        <ul>
+          <li>Your partner can see your current cycle phase and day number (females who share only)</li>
+          <li>Your partner cannot see your full health profile, weight, nutrition logs or workout history</li>
+          <li>You can revoke partner access at any time from your settings</li>
+          <li>Shopping lists shared with partners are visible to all connected partners</li>
+        </ul>
 
-      <h2>6. Partner Data Sharing</h2>
-      <p>When you connect with a partner using a Beast Coach connection code:</p>
-      <ul>
-        <li>Your partner can see your current cycle phase and day number (females who share only)</li>
-        <li>Your partner cannot see your full health profile, weight, nutrition logs or workout history</li>
-        <li>You can revoke partner access at any time from your settings</li>
-        <li>Shopping lists shared with partners are visible to all connected partners</li>
-      </ul>
+        <h2>7. Data We Do Not Sell</h2>
+        <p>We do not sell, rent or trade your personal information to any third party for marketing purposes. Your health and fitness data is yours. We use it only to provide the Beast Coach service to you.</p>
 
-      <h2>7. Data We Do Not Sell</h2>
-      <p>We do not sell, rent or trade your personal information to any third party for marketing purposes. Your health and fitness data is yours. We use it only to provide the Beast Coach service to you.</p>
+        <h2>8. Data Retention</h2>
+        <p>We retain your data for as long as your account is active. If you delete your account, all associated personal data is permanently deleted from our systems within 30 days. Anonymised, aggregated usage data may be retained for product analytics.</p>
 
-      <h2>8. Data Retention</h2>
-      <p>We retain your data for as long as your account is active. If you delete your account, all associated personal data is permanently deleted from our systems within 30 days. Anonymised, aggregated usage data may be retained for product analytics.</p>
+        <h2>9. Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+          <li>Access the personal data we hold about you</li>
+          <li>Correct inaccurate data</li>
+          <li>Delete your account and all associated data</li>
+          <li>Export your data in a portable format</li>
+          <li>Withdraw consent for optional data processing</li>
+        </ul>
+        <p>To exercise any of these rights, contact us at privacy@beastcoach.fit</p>
 
-      <h2>9. Your Rights</h2>
-      <p>You have the right to:</p>
-      <ul>
-        <li>Access the personal data we hold about you</li>
-        <li>Correct inaccurate data</li>
-        <li>Delete your account and all associated data</li>
-        <li>Export your data in a portable format</li>
-        <li>Withdraw consent for optional data processing</li>
-      </ul>
-      <p>To exercise any of these rights, contact us at privacy@beastcoach.fit</p>
+        <h2>10. Children's Privacy</h2>
+        <p>Beast Coach is not intended for use by anyone under the age of 16. We do not knowingly collect personal information from children under 16. If you believe a child has provided us with personal information, please contact us and we will delete it promptly.</p>
 
-      <h2>10. Children's Privacy</h2>
-      <p>Beast Coach is not intended for use by anyone under the age of 16. We do not knowingly collect personal information from children under 16. If you believe a child has provided us with personal information, please contact us and we will delete it promptly.</p>
+        <h2>11. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. We will notify you of significant changes via the app or email. Continued use of Beast Coach after changes constitutes acceptance of the updated policy.</p>
 
-      <h2>11. Changes to This Policy</h2>
-      <p>We may update this Privacy Policy from time to time. We will notify you of significant changes via the app or email. Continued use of Beast Coach after changes constitutes acceptance of the updated policy.</p>
-
-      <h2>12. Contact Us</h2>
-      <p>If you have any questions about this Privacy Policy or how we handle your data, please contact us at:</p>
-      <p><strong>Email:</strong> privacy@beastcoach.fit<br/>
-      <strong>Website:</strong> beastcoach.fit</p>
-
-    </div>
-  </div>
-
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <div class="footer-logo">BEAST<span>COACH</span></div>
-          <p>We all have a beast in us.</p>
-        </div>
-        <div class="footer-links">
-          <a href="features.html">Features</a>
-          <a href="about.html">Our Story</a>
-          <a href="privacy.html">Privacy Policy</a>
-        </div>
-        <div class="footer-legal">
-          <p>© 2025 Beast Coach. All rights reserved.</p>
-          <p>Coming to iOS and Android — July/August 2025</p>
-        </div>
+        <h2>12. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy or how we handle your data, please contact us at:</p>
+        <p><strong>Email:</strong> privacy@beastcoach.fit<br/>
+        <strong>Website:</strong> beastcoach.fit</p>
       </div>
     </div>
-  </footer>
+  </main>
 
-  <script>
-    function toggleMenu() {
-      document.getElementById('mobileMenu').classList.toggle('active');
-    }
-  </script>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-ftr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-ftr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+      <nav class="site-footer-links" aria-label="Legal"><a href="/terms">Terms</a><a href="/privacy-policy">Privacy</a><a href="/coaching-terms">Coaching terms</a></nav>
+      <p class="site-footer-note">Beast Coach online coaching. General fitness and nutrition guidance, not medical advice.</p>
+    </div>
+  </footer>
 </body>
 </html>

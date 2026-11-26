@@ -7,72 +7,111 @@
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/brand.css">
 <style>
-body{margin:0;background:#F4F7F2;font-family:'Manrope',system-ui,sans-serif;color:#1B3022;line-height:1.6}
-a{color:#2D6A4F}a:hover{color:#1B3022}
-.wrap{max-width:760px;margin:0 auto;padding:24px 20px 56px}
-h1{font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;font-weight:400;font-size:44px;letter-spacing:.02em;margin:0 0 6px;line-height:1.05}
-h2{font-size:20px;margin:28px 0 8px}
-p,li{font-size:16px}
-ul{padding-left:22px}
-.muted{color:#4c6354;font-size:14px}
-.back{display:inline-block;margin-bottom:18px;font-weight:700}
-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #D5E0D8;border-radius:12px;overflow:hidden;font-size:15px;margin:8px 0}
-th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #E3EBE5;vertical-align:top}
-th{background:#EEF5F0}
+h1, h2, h3, p, ul, blockquote, figure { margin: 0; }
+.legal { padding: 56px 0 88px; }
+.back { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; color: var(--lime); text-decoration: none; margin-bottom: 12px; }
+.back:hover { color: var(--ink); }
+.prose { max-width: 760px; }
+.legal h1 { font-size: clamp(56px, 9vw, 96px); line-height: .88; }
+.muted { font-size: 15px; color: var(--muted); margin-top: 16px; margin-bottom: 36px; }
+.prose h2 { font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: clamp(28px, 4vw, 36px); line-height: .95; color: var(--ink); margin: 48px 0 14px; }
+.prose p, .prose li { font-size: 16px; line-height: 1.7; color: var(--ink-soft); }
+.prose p { margin-bottom: 14px; }
+.prose ul { margin: 0 0 18px; padding-left: 22px; }
+.prose li { margin-bottom: 8px; }
+.prose strong, .prose b { color: var(--ink); }
+.prose a { color: var(--lime); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 44px; }
+.prose a:hover { color: var(--ink); }
+.plan-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; font-size: 15px; color: var(--ink-soft); margin: 8px 0 16px; }
+.plan-table th, .plan-table td { text-align: left; padding: 16px 18px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.55; }
+.plan-table th { background: var(--surface-raised); color: var(--lime); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.plan-table td:first-child { font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; color: var(--ink); }
+.plan-table tbody tr:last-child td { border-bottom: 0; }
+@media (max-width: 759px) {
+  .plan-table thead { display: none; }
+  .plan-table, .plan-table tbody, .plan-table tr, .plan-table td { display: block; width: 100%; box-sizing: border-box; }
+  .plan-table tr { padding: 18px 18px 8px; border-bottom: 1px solid var(--line); }
+  .plan-table tbody tr:last-child { border-bottom: 0; }
+  .plan-table td { padding: 0 0 10px; border: 0; }
+  .plan-table td:first-child { margin-bottom: 8px; }
+}
 </style>
 </head>
 <body>
-<main class="wrap">
-  <a class="back" href="/">‹ Back to Work With Me</a>
-  <h1>Coaching terms</h1>
-  <p class="muted">Last updated 25 November 2026. All prices are in Australian dollars (AUD).</p>
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-hdr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-hdr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+      <div class="site-nav-links"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="/" class="site-nav-cta">Work With Me</a></div>
+      <button class="site-nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="siteMenu" onclick="toggleSiteMenu(this)">&#9776;</button>
+    </div>
+    <div class="site-nav-mobile" id="siteMenu"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a></div>
+  </nav>
+  <script>function toggleSiteMenu(b){var m=document.getElementById("siteMenu");var o=m.classList.toggle("active");b.setAttribute("aria-expanded",o?"true":"false");}</script>
 
-  <h2>What each plan includes</h2>
-  <table>
-    <thead><tr><th>Plan</th><th>Price and billing</th><th>What you get</th></tr></thead>
-    <tbody>
-      <tr><td>Basic</td><td>$2.50 a week, billed as $30 every 12 weeks</td><td>You run it yourself. Beast AI meal logging, daily steps, your weekly weigh-in and daily targets. No coach, no plans, no calls.</td></tr>
-      <tr><td>Essential</td><td>$110 for 12 weeks, paid up front</td><td>One personalised meal and training plan for 12 weeks, with one kick-off video call on WhatsApp at the start.</td></tr>
-      <tr><td>Core</td><td>$299 for 12 weeks, paid up front</td><td>Everything in Essential, plus your logged meals reviewed each week, a weekly WhatsApp check-in, two extra video calls at weeks 4 and 8, plans updated at weeks 4 and 8, form checks on WhatsApp, and The Discipline Path.</td></tr>
-      <tr><td>The Beast</td><td>$699 for 12 weeks, paid up front</td><td>Everything in Core, plus a weekly 1:1 WhatsApp video call, direct WhatsApp access, live technique sessions on video, and plan changes whenever you need them.</td></tr>
-    </tbody>
-  </table>
-  <p>The Discipline Path is included with Core and The Beast. It is normally $37.</p>
+  <main class="legal">
+    <div class="wrap">
+      <a class="back" href="/">‹ Back to Work With Me</a>
+      <div class="prose">
+        <h1 class="h-display">Coaching terms</h1>
+        <p class="muted">Last updated 25 November 2026. All prices are in Australian dollars (AUD).</p>
 
-  <h2>Paying</h2>
-  <ul>
-    <li>Coaching plans (Essential, Core and The Beast) are paid up front for 12 weeks.</li>
-    <li>Basic is billed as $30 every 12 weeks.</li>
-    <li>Beast AI gives estimates, not lab measurements.</li>
-  </ul>
+        <h2>What each plan includes</h2>
+        <table class="plan-table">
+          <thead><tr><th>Plan</th><th>Price and billing</th><th>What you get</th></tr></thead>
+          <tbody>
+            <tr><td>Basic</td><td>$2.50 a week, billed as $30 every 12 weeks</td><td>You run it yourself. Beast AI meal logging, daily steps, your weekly weigh-in and daily targets. No coach, no plans, no calls.</td></tr>
+            <tr><td>Essential</td><td>$110 for 12 weeks, paid up front</td><td>One personalised meal and training plan for 12 weeks, with one kick-off video call on WhatsApp at the start.</td></tr>
+            <tr><td>Core</td><td>$299 for 12 weeks, paid up front</td><td>Everything in Essential, plus your logged meals reviewed each week, a weekly WhatsApp check-in, two extra video calls at weeks 4 and 8, plans updated at weeks 4 and 8, form checks on WhatsApp, and The Discipline Path.</td></tr>
+            <tr><td>The Beast</td><td>$699 for 12 weeks, paid up front</td><td>Everything in Core, plus a weekly 1:1 WhatsApp video call, direct WhatsApp access, live technique sessions on video, and plan changes whenever you need them.</td></tr>
+          </tbody>
+        </table>
+        <p>The Discipline Path is included with Core and The Beast. It is normally $37.</p>
 
-  <h2>Refunds</h2>
-  <ul>
-    <li>You get a full refund if you ask before your plan starts.</li>
-    <li>Once your plan has been delivered, we do not give refunds for it, except where the Australian Consumer Law gives you a right to one.</li>
-    <li>Nothing in these terms limits your rights under the Australian Consumer Law.</li>
-  </ul>
+        <h2>Paying</h2>
+        <ul>
+          <li>Coaching plans (Essential, Core and The Beast) are paid up front for 12 weeks.</li>
+          <li>Basic is billed as $30 every 12 weeks.</li>
+          <li>Beast AI gives estimates, not lab measurements.</li>
+        </ul>
 
-  <h2>Pausing</h2>
-  <ul>
-    <li>Core and The Beast can be paused for up to 2 weeks in total during the 12 weeks.</li>
-    <li>Essential cannot be paused.</li>
-  </ul>
+        <h2>Refunds</h2>
+        <ul>
+          <li>You get a full refund if you ask before your plan starts.</li>
+          <li>Once your plan has been delivered, we do not give refunds for it, except where the Australian Consumer Law gives you a right to one.</li>
+          <li>Nothing in these terms limits your rights under the Australian Consumer Law.</li>
+        </ul>
 
-  <h2>WhatsApp reply hours (The Beast)</h2>
-  <p>For The Beast, direct WhatsApp messages get a reply within 2 hours during Australian business hours, Melbourne time.</p>
-  <p>If you are overseas, video calls are booked at a time that suits both your time zone and ours.</p>
+        <h2>Pausing</h2>
+        <ul>
+          <li>Core and The Beast can be paused for up to 2 weeks in total during the 12 weeks.</li>
+          <li>Essential cannot be paused.</li>
+        </ul>
 
-  <h2>After your 12 weeks</h2>
-  <ul>
-    <li>Two weeks before your plan ends, you can renew at 20% off and keep your place.</li>
-    <li>Or drop to Basic for $30 every 12 weeks ($2.50 a week) and keep logging on your own. Your targets are kept.</li>
-  </ul>
+        <h2>WhatsApp reply hours (The Beast)</h2>
+        <p>For The Beast, direct WhatsApp messages get a reply within 2 hours during Australian business hours, Melbourne time.</p>
+        <p>If you are overseas, video calls are booked at a time that suits both your time zone and ours.</p>
 
-  <h2>Who we are</h2>
-  <p>Beast Coach is run by Stefan. Questions about these terms: <a href="mailto:info@beastcoach.fit">info@beastcoach.fit</a>.</p>
-</main>
+        <h2>After your 12 weeks</h2>
+        <ul>
+          <li>Two weeks before your plan ends, you can renew at 20% off and keep your place.</li>
+          <li>Or drop to Basic for $30 every 12 weeks ($2.50 a week) and keep logging on your own. Your targets are kept.</li>
+        </ul>
+
+        <h2>Who we are</h2>
+        <p>Beast Coach is run by Stefan. Questions about these terms: <a href="mailto:info@beastcoach.fit">info@beastcoach.fit</a>.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-ftr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-ftr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+      <nav class="site-footer-links" aria-label="Legal"><a href="/terms">Terms</a><a href="/privacy-policy">Privacy</a><a href="/coaching-terms">Coaching terms</a></nav>
+      <p class="site-footer-note">Beast Coach online coaching. General fitness and nutrition guidance, not medical advice.</p>
+    </div>
+  </footer>
 </body>
 </html>

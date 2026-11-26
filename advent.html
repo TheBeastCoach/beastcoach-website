@@ -48,85 +48,79 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/brand.css">
 <style>
-  :root {
-    --green: #2D6A4F; --green-light: #52B788; --green-dark: #1B3022;
-    --off-white: #F7F9F8; --text: #1B2E24; --muted: #707973;
-    --border: #E4E8E6; --white: #FFFFFF; --footer-bg: #111A14;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); line-height: 1.6; overflow-x: hidden; }
-  a { color: inherit; }
-  .nav { position: sticky; top: 0; z-index: 100; background: rgba(27,46,36,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.08); }
-  .nav-inner { max-width: 1000px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
-  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--white); text-decoration: none; }
-  .nav-logo span { color: var(--green-light); }
-  .nav-cta { background: var(--green); color: var(--white); font-weight: 700; font-size: 13px; padding: 10px 18px; border-radius: 10px; text-decoration: none; white-space: nowrap; }
-  .nav-cta:hover { background: var(--green-light); }
-  main { max-width: 560px; margin: 0 auto; padding: 40px 24px 80px; }
-  h1 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 44px; letter-spacing: 1px; color: var(--green-dark); line-height: 1.05; margin-bottom: 10px; }
-  .lede { color: var(--muted); font-size: 16px; margin-bottom: 22px; }
-  .how { list-style: none; display: grid; gap: 8px; margin-bottom: 22px; font-size: 14px; font-weight: 600; color: #4a5750; }
-  .how li::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green-light); margin-right: 10px; }
-  .demo { box-sizing: border-box; width: 100%; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 12px 18px; border-radius: 16px; background: #d9f0e3; cursor: pointer; border: 2px dashed var(--green-light); font-family: 'Manrope', sans-serif; text-align: left; margin-bottom: 16px; color: var(--green-dark); }
-  .demo .t { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; line-height: 1.1; display: block; }
-  .demo .s { font-size: 12px; font-weight: 600; color: #2D5240; display: block; }
-  .demo .go { flex: none; font-size: 13px; font-weight: 800; color: #fff; background: var(--green); border-radius: 32px; padding: 10px 16px; }
-  .grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
-  .door { box-sizing: border-box; aspect-ratio: 1/1; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; padding: 0; min-width: 0; min-height: 44px; font-family: 'Manrope', sans-serif; background: var(--border); color: #5f6862; border: 1.5px solid var(--border); }
-  .door:hover { border-color: var(--green-light); }
-  .door .n { font-family: 'Bebas Neue', sans-serif; font-size: 26px; line-height: 1; letter-spacing: .5px; }
-  .note { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
-  .cta { display: block; text-align: center; background: var(--green); color: var(--white); font-weight: 800; font-size: 15px; padding: 15px 24px; border-radius: 32px; text-decoration: none; }
-  .cta:hover { background: var(--green-light); }
-  .scrim { position: fixed; inset: 0; background: rgba(17,26,20,0.6); display: none; align-items: center; justify-content: center; padding: 24px; z-index: 200; }
+  /* Advent page only. Tokens and shared classes come from /brand.css. */
+  .adv { max-width: 600px; margin-left: auto; margin-right: auto; }
+  .adv h1 { font-size: clamp(42px, 9vw, 64px); margin-bottom: 16px; }
+  .adv .lede { margin-bottom: 24px; }
+  .how { list-style: none; display: grid; gap: 10px; margin: 0 0 28px; padding: 0; font-size: 15px; color: var(--ink-soft); }
+  .how li { display: flex; gap: 12px; align-items: flex-start; }
+  .how li::before { content: ""; flex: none; width: 8px; height: 8px; margin-top: 8px; border-radius: 50%; background: var(--lime); }
+
+  .demo { box-sizing: border-box; width: 100%; min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 14px 14px 20px; border-radius: 20px; background: var(--surface); border: 1px dashed var(--line-strong); cursor: pointer; font: inherit; text-align: left; color: var(--ink-soft); margin-bottom: 20px; }
+  .demo:hover { border-color: var(--lime); }
+  .demo .t { display: block; font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1; text-transform: uppercase; color: var(--ink); }
+  .demo .s { display: block; font-size: 15px; color: var(--muted); margin-top: 6px; }
+  .demo .go { flex: none; display: inline-flex; align-items: center; min-height: 44px; font-size: 16px; font-weight: 700; color: var(--on-accent); background: var(--lime); border-radius: 999px; padding: 10px 20px; }
+
+  .grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .door { box-sizing: border-box; aspect-ratio: 1 / 1; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 0; min-width: 0; min-height: 44px; font: inherit; background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
+  .door:hover { border-color: var(--lime); }
+  .door .n { font-family: var(--display); font-weight: 800; font-size: 28px; line-height: 1; color: var(--ink); }
+  .note { font-size: 14px; color: var(--muted); margin: 0 0 24px; }
+  .cta { width: 100%; }
+
+  .scrim { position: fixed; inset: 0; background: rgba(11, 12, 10, .82); display: none; align-items: center; justify-content: center; padding: 24px; z-index: 200; }
   .scrim.open { display: flex; }
-  .modal { background: var(--white); border-radius: 18px; padding: 26px 22px 22px; max-width: 380px; width: 100%; display: flex; flex-direction: column; gap: 12px; }
-  .modal h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 32px; letter-spacing: .5px; line-height: 1.05; color: var(--green-dark); }
-  .modal p { font-size: 14px; color: #4a5750; }
-  .modal .login { font-size: 13px; text-align: center; color: var(--muted); }
-  .modal .login a { color: var(--green); font-weight: 700; }
-  .modal .later { background: none; border: none; font-family: 'Manrope', sans-serif; font-size: 13px; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 6px; }
-  button:focus-visible, a:focus-visible { outline: 3px solid var(--green-light); outline-offset: 2px; }
-  footer { background: var(--footer-bg); color: rgba(255,255,255,0.7); text-align: center; padding: 28px 24px; font-size: 13px; }
-  footer a { color: var(--green-light); text-decoration: none; }
-  @media (max-width: 480px) { h1 { font-size: 36px; } }
+  .modal { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 28px 24px 22px; max-width: 400px; width: 100%; display: flex; flex-direction: column; gap: 14px; }
+  .modal h2 { font-family: var(--display); font-weight: 800; font-size: 32px; line-height: .92; text-transform: uppercase; color: var(--ink); margin: 0; }
+  .modal p { font-size: 15px; color: var(--ink-soft); margin: 0; }
+  .modal .login { text-align: center; color: var(--muted); }
+  .modal .login a { color: var(--lime); font-weight: 700; }
+  .modal .later { background: none; border: none; font: inherit; font-size: 15px; color: var(--muted); text-decoration: underline; cursor: pointer; min-height: 44px; }
 </style>
 </head>
 <body>
-<nav class="nav">
-  <div class="nav-inner">
-    <a class="nav-logo" href="/">BEAST<span>COACH</span></a>
-    <a class="nav-cta" href="/dashboard#advent">Sign up free</a>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-hdr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-hdr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+    <div class="site-nav-links"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="/" class="site-nav-cta">Work With Me</a></div>
+    <button class="site-nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="siteMenu" onclick="toggleSiteMenu(this)">&#9776;</button>
   </div>
+  <div class="site-nav-mobile" id="siteMenu"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a></div>
 </nav>
-<main>
-  <h1>25 Day Advent Health Calendar</h1>
-  <p class="lede">One small task a day, 1 to 25 December. Free.</p>
-  <ul class="how">
-    <li>A new door opens each day. Open it to see your task.</li>
-    <li>Tick it when you have done it.</li>
-    <li>Miss a day? You can still open it later.</li>
-  </ul>
+<script>function toggleSiteMenu(b){var m=document.getElementById("siteMenu");var o=m.classList.toggle("active");b.setAttribute("aria-expanded",o?"true":"false");}</script>
 
-  <button type="button" class="demo" id="demo" aria-label="Try the demo door"><span><span class="t">Try a demo door</span><span class="s">See how it works. It doesn&rsquo;t count toward your 25.</span></span><span class="go">Open</span></button>
+<main class="section">
+  <div class="wrap adv">
+    <h1 class="h-display">25 Day <span class="text-gradient">Advent</span> Health Calendar</h1>
+    <p class="lede">One small task a day, 1 to 25 December. Free.</p>
+    <ul class="how">
+      <li>A new door opens each day. Open it to see your task.</li>
+      <li>Tick it when you have done it.</li>
+      <li>Miss a day? You can still open it later.</li>
+    </ul>
 
-  <div class="grid" id="grid"></div>
-  <p class="note">Doors open on their day, in Melbourne time.</p>
-  <a class="cta" href="/dashboard#advent">Create your free account</a>
+    <button type="button" class="demo" id="demo" aria-label="Try the demo door"><span><span class="t">Try a demo door</span><span class="s">See how it works. It doesn&rsquo;t count toward your 25.</span></span><span class="go">Open</span></button>
+
+    <div class="grid" id="grid"></div>
+    <p class="note">Doors open on their day, in Melbourne time.</p>
+    <a class="cta btn-primary" href="/dashboard#advent">Create your free account</a>
+  </div>
 </main>
 
 <div class="scrim" id="scrim">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
     <h2 id="m-title">Create a free account to open your door</h2>
     <p>It takes a minute. You get the demo door straight away, then a new door every day from 1 December.</p>
-    <a class="cta" id="m-go" href="/dashboard#advent">Create free account</a>
+    <a class="cta btn-primary" id="m-go" href="/dashboard#advent">Create free account</a>
     <p class="login">Already have an account? <a href="/dashboard#advent">Log in</a></p>
     <button type="button" class="later" id="m-close">Not now</button>
   </div>
 </div>
-<footer><a href="/app">beastcoach.fit</a></footer>
+
 <script>
 (function () {
   var grid = document.getElementById("grid"), scrim = document.getElementById("scrim"), last = null;
@@ -145,7 +139,8 @@
     signedIn = !!(t && (t.refresh_token || (t.currentSession && t.currentSession.refresh_token)));
   } catch (e) {}
   if (signedIn) {
-    document.querySelector(".nav-cta").textContent = "Open my calendar";
+    var navCta = document.querySelector(".nav-cta");
+    if (navCta) navCta.textContent = "Open my calendar";
     document.querySelector("main .cta").textContent = "Open my calendar";
   }
   function open(e) {
@@ -160,5 +155,12 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
 })();
 </script>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-ftr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-ftr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+    <nav class="site-footer-links" aria-label="Legal"><a href="/terms">Terms</a><a href="/privacy-policy">Privacy</a><a href="/coaching-terms">Coaching terms</a></nav>
+    <p class="site-footer-note">Beast Coach online coaching. General fitness and nutrition guidance, not medical advice.</p>
+  </div>
+</footer>
 </body>
 </html>

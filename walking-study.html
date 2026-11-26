@@ -48,101 +48,94 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/brand.css">
 <style>
-  :root {
-    --green: #2D6A4F; --green-light: #52B788; --green-dark: #1B3022;
-    --off-white: #F7F9F8; --text: #1B2E24; --muted: #707973;
-    --border: #E4E8E6; --white: #FFFFFF; --footer-bg: #111A14; --err: #E24B4A;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Manrope', sans-serif; color: var(--text); background: var(--white); line-height: 1.6; overflow-x: hidden; }
-  a { color: inherit; }
+  /* Walking study page only. Tokens and shared classes come from /brand.css. */
+  .walk-col { max-width: 680px; margin-left: auto; margin-right: auto; }
+  .walk h1 { font-size: clamp(48px, 8vw, 72px); line-height: .92; margin-bottom: 16px; }
+  .walk .lede { margin-bottom: 32px; }
+  .walk .card, .walk .panel { margin-bottom: 20px; }
+  .walk h3 { font-family: var(--display); font-weight: 800; font-size: 28px; line-height: .95; text-transform: uppercase; color: var(--ink); margin-bottom: 10px; }
+  .walk .card p { font-size: 16px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 4px; }
+  .study-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 8px; font-size: 15px; font-weight: 700; color: var(--lime); }
 
-  .nav { position: sticky; top: 0; z-index: 100; background: rgba(27,46,36,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.08); }
-  .nav-inner { max-width: 1000px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
-  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--white); text-decoration: none; }
-  .nav-logo span { color: var(--green-light); }
-  .nav-cta { background: var(--green); color: var(--white); font-weight: 700; font-size: 13px; padding: 10px 18px; border-radius: 10px; text-decoration: none; white-space: nowrap; }
-  .nav-cta:hover { background: var(--green-light); }
+  .formula { background: var(--surface-raised); }
+  .formula .eq { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 6vw, 40px); line-height: 1; text-transform: uppercase; color: var(--ink); margin: 8px 0 14px; }
+  .formula p { font-size: 15px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 6px; }
 
-  main { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
-
-  main { max-width: 680px; margin: 0 auto; padding: 40px 24px 80px; }
-  h1 { font-family: 'Bebas Neue', sans-serif; font-size: 44px; letter-spacing: 1px; color: var(--green-dark); line-height: 1.05; margin-bottom: 10px; }
-  .lede { color: var(--muted); font-size: 16px; margin-bottom: 28px; }
-  .card { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 18px; padding: 24px; margin-bottom: 20px; }
-  .card h3, .formula-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 8px; }
-  .card p { color: var(--muted); font-size: 14px; margin-bottom: 4px; }
-  .study-link { display: inline-block; margin-top: 10px; font-weight: 700; color: var(--green); font-size: 14px; }
-  .formula-card { background: var(--green-dark); color: var(--white); border-radius: 18px; padding: 24px; margin-bottom: 20px; }
-  .formula-card .eq { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px,6vw,30px); letter-spacing: 1px; line-height: 1.25; margin: 6px 0 12px; color: var(--green-light); }
-  .formula-card p { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 6px; }
-  .locked { position: relative; }
+  .locked { position: relative; overflow: hidden; }
   .locked .blur { filter: blur(5px); pointer-events: none; user-select: none; }
-  .locked .lock-over { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; gap: 10px; }
-  .locked .lock-over p { color: var(--text); font-weight: 700; font-size: 15px; max-width: 300px; }
-  .btn-primary { display: inline-block; background: var(--green); color: var(--white); font-weight: 700; font-size: 14px; padding: 13px 24px; border-radius: 10px; text-decoration: none; }
-  .btn-primary:hover { background: var(--green-light); }
+  .locked .lock-over { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; gap: 14px; background: rgba(20, 21, 17, .9); }
+  .locked .lock-over p { color: var(--ink); font-weight: 700; font-size: 16px; line-height: 1.45; max-width: 300px; margin: 0; }
   .wk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
-  .field { background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; font-weight: 700; }
+  .field { background: var(--ground); border: 1px solid var(--line-strong); border-radius: 12px; padding: 12px; font-weight: 700; color: var(--ink); }
   .field small { display: block; font-weight: 600; font-size: 12px; color: var(--muted); }
-  .wk-result { background: var(--green); color: var(--white); border-radius: 14px; padding: 18px 20px; margin-top: 14px; }
-  .wk-result .big { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 1px; line-height: 1; }
+  .wk-result { background: var(--surface-raised); border: 1px solid var(--line); border-radius: 20px; padding: 18px 20px; margin-top: 14px; }
+  .wk-result .big { font-family: var(--display); font-weight: 800; font-size: 56px; line-height: .9; text-transform: uppercase; color: var(--ink); }
   .wk-result .big small { font-size: 22px; margin-left: 6px; }
-  .wk-result .rng { font-size: 14px; opacity: .9; }
-  footer { background: var(--footer-bg); color: rgba(255,255,255,0.7); text-align: center; padding: 28px 24px; font-size: 13px; }
-  footer a { color: var(--green-light); text-decoration: none; }
-  @media (max-width: 480px) { h1 { font-size: 36px; } }
+  .wk-result .rng { font-size: 15px; color: var(--muted); }
 </style>
 </head>
 <body>
-<nav class="nav">
-  <div class="nav-inner">
-    <a class="nav-logo" href="/">BEAST<span>COACH</span></a>
-    <a class="nav-cta" href="/dashboard#study">Sign up free</a>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-hdr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-hdr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+    <div class="site-nav-links"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="/" class="site-nav-cta">Work With Me</a></div>
+    <button class="site-nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="siteMenu" onclick="toggleSiteMenu(this)">&#9776;</button>
   </div>
+  <div class="site-nav-mobile" id="siteMenu"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a></div>
 </nav>
-<main>
-  <h1>The Walking Study</h1>
-  <p class="lede">Weyand et al. 2010 measured what it costs the body to walk. It found that cost per kilo is set mostly by how tall you are.</p>
+<script>function toggleSiteMenu(b){var m=document.getElementById("siteMenu");var o=m.classList.toggle("active");b.setAttribute("aria-expanded",o?"true":"false");}</script>
 
-  <div class="card">
-    <h3>The study</h3>
-    <p>48 people aged 5 to 32 walked on a flat treadmill at six speeds while their energy use was measured. The researchers subtracted resting burn, so the result is the cost of walking itself. Walking a distance equal to your height costs about 0.94 calories per kilo of body weight, whoever you are.</p>
-    <a class="study-link" href="https://journals.biologists.com/jeb/article/213/23/3972/10061/The-mass-specific-energy-cost-of-human-walking-is" target="_blank" rel="noopener">Read the study (Journal of Experimental Biology) &rarr;</a>
-  </div>
+<main class="section">
+  <div class="wrap walk walk-col">
+    <h1 class="h-display">The Walking Study</h1>
+    <p class="lede">Weyand et al. 2010 measured what it costs the body to walk. It found that cost per kilo is set mostly by how tall you are.</p>
 
-  <div class="formula-card">
-    <h3>The formula</h3>
-    <div class="eq">kcal = 0.94 &times; weight (kg) &times; distance &divide; height</div>
-    <p>Distance and height in the same unit. Result is calories above resting.</p>
-    <p>Example: 70 kg, 175 cm, 5 km is about 190 kcal.</p>
-  </div>
+    <div class="card">
+      <h3>The study</h3>
+      <p>48 people aged 5 to 32 walked on a flat treadmill at six speeds while their energy use was measured. The researchers subtracted resting burn, so the result is the cost of walking itself. Walking a distance equal to your height costs about 0.94 calories per kilo of body weight, whoever you are.</p>
+      <a class="study-link" href="https://journals.biologists.com/jeb/article/213/23/3972/10061/The-mass-specific-energy-cost-of-human-walking-is" target="_blank" rel="noopener">Read the study (Journal of Experimental Biology) &rarr;</a>
+    </div>
 
-  <div class="card locked">
-    <div class="blur" aria-hidden="true">
-      <h3>What I built</h3>
-      <p>A walking calorie estimate based on that formula, shown as a range.</p>
-      <div class="wk-row">
-        <div class="field"><small>Weight (kg)</small>70</div>
-        <div class="field"><small>Height (cm)</small>175</div>
+    <div class="panel formula">
+      <h3>The formula</h3>
+      <div class="eq">kcal = 0.94 &times; weight (kg) &times; distance &divide; height</div>
+      <p>Distance and height in the same unit. Result is calories above resting.</p>
+      <p>Example: 70 kg, 175 cm, 5 km is about 190 kcal.</p>
+    </div>
+
+    <div class="card locked">
+      <div class="blur" aria-hidden="true">
+        <h3>What I built</h3>
+        <p>A walking calorie estimate based on that formula, shown as a range.</p>
+        <div class="wk-row">
+          <div class="field"><small>Weight (kg)</small>70</div>
+          <div class="field"><small>Height (cm)</small>175</div>
+        </div>
+        <div class="field"><small>Distance (km)</small>5</div>
+        <div class="wk-result"><div class="big">188<small>kcal</small></div><div class="rng">Likely range 160 to 216 kcal</div></div>
       </div>
-      <div class="field"><small>Distance (km)</small>5</div>
-      <div class="wk-result"><div class="big">188<small>kcal</small></div><div class="rng">Likely range 160 to 216 kcal</div></div>
+      <div class="lock-over">
+        <p>&#128274; Create a free account to use the calculator.</p>
+        <a class="btn-primary" href="/dashboard#study">Sign up free</a>
+      </div>
     </div>
-    <div class="lock-over">
-      <p>&#128274; Create a free account to use the calculator.</p>
-      <a class="btn-primary" href="/dashboard#study">Sign up free</a>
-    </div>
-  </div>
 
-  <div class="card">
-    <h3>Read this before you trust it</h3>
-    <p>It counts walking only, not the calories you would burn sitting still, so it reads lower than most watches. The study covered ages 5 to 32 on flat, firm ground, so hills, soft ground, heavy loads and running are not covered.</p>
+    <div class="card">
+      <h3>Read this before you trust it</h3>
+      <p>It counts walking only, not the calories you would burn sitting still, so it reads lower than most watches. The study covered ages 5 to 32 on flat, firm ground, so hills, soft ground, heavy loads and running are not covered.</p>
+    </div>
   </div>
 </main>
-<footer><a href="/app">beastcoach.fit</a></footer>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-ftr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-ftr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+    <nav class="site-footer-links" aria-label="Legal"><a href="/terms">Terms</a><a href="/privacy-policy">Privacy</a><a href="/coaching-terms">Coaching terms</a></nav>
+    <p class="site-footer-note">Beast Coach online coaching. General fitness and nutrition guidance, not medical advice.</p>
+  </div>
+</footer>
 </body>
 </html>

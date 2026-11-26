@@ -73,3 +73,38 @@ test('homepage loads the brand fonts and no longer uses Bebas Neue or Manrope', 
   assert.match(html, /family=Hanken\+Grotesk:wght@400;500;600;700/, 'Hanken Grotesk 400, 500, 600, 700 loaded');
   assert.match(html, /<link rel="stylesheet" href="\/brand\.css"/, 'homepage links brand.css');
 });
+
+// Every public page restyled in the whole-site rebrand. Round 2 pages (dashboard, my-coach, coach, coaching-demo,
+// program, program-classic, discipline-path) are not listed yet.
+const PUBLIC_PAGES = ['index.html', 'app.html', 'about.html', 'features.html', 'recipes.html', 'advent.html',
+  'challenge.html', 'beast-challenge.html', '30-day-challenge.html', 'walking-study.html', 'calculator.html',
+  'terms.html', 'privacy.html', 'privacy-policy.html', 'coaching-terms.html', 'coaching-health.html', 'coaching-privacy.html'];
+const OLD_COLOURS = ['#1B3022', '#F59E0B', '#C5D3C8', '#b42318', '#1B1200', '#FF7A1A'];
+
+// Visible text only: drop scripts, styles and tags.
+function visibleText(src) {
+  return src.replace(/<script\b[\s\S]*?<\/script>/gi, ' ').replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ');
+}
+
+for (const page of PUBLIC_PAGES) {
+  test(page + ': brand fonts and CSS, no Bebas Neue, Manrope or old colours, shared header and footer', () => {
+    const src = fs.readFileSync(path.join(ROOT, page), 'utf8');
+    assert.doesNotMatch(src, /Bebas/i, 'no Bebas Neue');
+    assert.doesNotMatch(src, /Manrope/i, 'no Manrope');
+    for (const c of OLD_COLOURS) assert.equal(src.toUpperCase().includes(c.toUpperCase()), false, 'old colour ' + c);
+    assert.match(src, /family=Big\+Shoulders\+Display:wght@700;800;900/, 'Big Shoulders loaded');
+    assert.match(src, /family=Hanken\+Grotesk:wght@400;500;600;700/, 'Hanken Grotesk loaded');
+    assert.match(src, /<link rel="stylesheet" href="\/brand\.css"/, 'brand.css linked');
+    assert.equal((src.match(/class="site-nav"/g) || []).length, 1, 'one shared header');
+    assert.match(src, /class="site-nav-cta"/, 'lime pill in the header');
+    assert.equal((src.match(/<footer class="site-footer"/g) || []).length, 1, 'one shared footer');
+    assert.match(src, /<a href="\/terms">Terms<\/a>/, 'footer links to terms');
+    assert.match(src, /<a href="\/privacy-policy">Privacy<\/a>/, 'footer links to privacy');
+  });
+
+  test(page + ': no em dashes or en dashes in visible copy', () => {
+    const src = fs.readFileSync(path.join(ROOT, page), 'utf8');
+    assert.doesNotMatch(visibleText(src), /[—–]/, 'no em or en dash in copy');
+  });
+}
