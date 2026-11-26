@@ -291,6 +291,48 @@
   .dp-promo p { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 16px; }
   .dp-promo a.btn-primary { background: var(--green-light); }
   .dp-promo a.btn-primary:hover { background: var(--white); color: var(--green-dark); }
+  /* ---------- 25 Day Advent Health Calendar ---------- */
+  .adv-prog { background: var(--green-dark); border-radius: 16px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  .adv-prog .big { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 1px; line-height: 1; color: var(--green-light); }
+  .adv-prog .big span { font-size: 22px; color: #cfe3d8; }
+  .adv-prog .sub { font-size: 12px; font-weight: 600; color: #cfe3d8; }
+  .adv-ring { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none; }
+  .adv-ring div { width: 48px; height: 48px; border-radius: 50%; background: var(--green-dark); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #fff; letter-spacing: .5px; }
+  .adv-demo { box-sizing: border-box; width: 100%; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 12px 18px; border-radius: 16px; background: #d9f0e3; cursor: pointer; border: 2px dashed var(--green-light); font-family: 'Manrope', sans-serif; text-align: left; margin-bottom: 16px; color: var(--green-dark); }
+  .adv-demo.sel { border: 2px solid var(--green); }
+  .adv-demo .t { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; line-height: 1.1; display: block; }
+  .adv-demo .s { font-size: 12px; font-weight: 600; color: #2D5240; display: block; }
+  .adv-demo .go { flex: none; font-size: 13px; font-weight: 800; color: #fff; background: var(--green); border-radius: 32px; padding: 10px 16px; }
+  .adv-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .adv-door { box-sizing: border-box; aspect-ratio: 1/1; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; padding: 0; min-width: 0; min-height: 44px; font-family: 'Manrope', sans-serif; }
+  .adv-door .n { font-family: 'Bebas Neue', sans-serif; font-size: 26px; line-height: 1; letter-spacing: .5px; }
+  .adv-door .tag { font-size: 9px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; }
+  .adv-door.done { background: var(--green); color: #fff; border: 1.5px solid var(--green); }
+  .adv-door.today { background: var(--green-dark); color: var(--green-light); border: 1.5px solid var(--green-dark); }
+  .adv-door.planned { background: #fff; color: var(--green); border: 2px solid var(--green-light); }
+  .adv-door.missed { background: var(--off-white); color: #5f6862; border: 1.5px dashed #9aa39d; }
+  .adv-door.locked { background: var(--border); color: #5f6862; border: 1.5px solid var(--border); }
+  .adv-door.sel { box-shadow: 0 0 0 3px var(--green-light); }
+  .adv-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 11px; font-weight: 600; color: #4a5750; margin-bottom: 18px; }
+  .adv-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; vertical-align: -2px; margin-right: 5px; }
+  .adv-card { background: #fff; border: 1.5px solid var(--border); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .adv-card .head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .adv-card .date { font-size: 11px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green); }
+  .adv-card .badge { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; border-radius: 20px; padding: 4px 10px; background: var(--border); color: #4a5750; }
+  .adv-card .badge.done { background: var(--green); color: #fff; }
+  .adv-card .badge.today { background: var(--green-dark); color: var(--green-light); }
+  .adv-card .badge.planned, .adv-card .badge.demo { background: #d9f0e3; color: var(--green-dark); }
+  .adv-card h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 34px; letter-spacing: .5px; line-height: 1.08; color: var(--text); }
+  .adv-card h2.muted { color: var(--muted); }
+  .adv-card p { font-size: 14px; line-height: 1.55; color: #4a5750; }
+  .adv-card p.note { font-size: 13px; font-weight: 700; color: var(--green); }
+  .adv-card p.miss { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .adv-card .join { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 32px; background: var(--green); color: #fff; font-weight: 800; font-size: 15px; text-decoration: none; }
+  .adv-tick { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--off-white); cursor: pointer; font-size: 15px; font-weight: 700; }
+  .adv-tick.on { background: #d9f0e3; border-color: var(--green); }
+  .adv-tick input { width: 22px; height: 22px; accent-color: var(--green); margin: 0; flex: none; }
+  .adv-ticks { display: flex; flex-direction: column; gap: 10px; }
+  .adv-msg { font-size: 13px; color: var(--err); margin-top: 10px; min-height: 18px; }
 </style>
 </head>
 <body>
@@ -316,7 +358,7 @@
     <p class="page-sub">Create a free account and get access to all my freebies &mdash; plus anything new I add.</p>
     <ul class="freebies-list">
       <li>Join the free 30-day Beast Challenge</li>
-      <li>Log your 30-Day Challenge entries</li>
+      <li>Open a new health challenge every day in the 25 Day Advent Health Calendar</li>
       <li>Calculate your BMI, calories &amp; macros</li>
       <li>Browse the recipe library</li>
       <li>Early access to the app beta</li>
@@ -383,7 +425,7 @@
     <div class="tile-grid">
       <a class="tile" href="/beast-challenge" style="border-color:var(--green)"><h3>Beast Challenge</h3><p>New &middot; Free 30 days: log your steps and walk a real city-to-city journey.</p></a>
       <a class="tile" id="disciplineTile" href="/discipline-path"><h3>8-Step Discipline Program</h3><p>View the program and get started.</p></a>
-      <a class="tile" href="/challenge"><h3>30-Day Challenge</h3><p>Log today's entry and see your progress.</p></a>
+      <a class="tile" id="advTile" data-nav="advent" style="border-color:var(--green)"><h3>25 Day Advent Health Calendar</h3><p>New &middot; One small challenge a day, 1 to 25 December. Try the demo door now.</p></a>
       <a class="tile" data-nav="calculator"><h3>BMI &amp; Macro Calculator</h3><p>Your calories, macros, and BMI.</p></a>
       <a class="tile" data-nav="recipes"><h3>Recipes</h3><p>Healthy alternatives from social media.</p></a>
       <a class="tile" data-nav="study"><h3>The Walking Study</h3><p>The research behind my walking calorie estimate.</p></a>
@@ -402,6 +444,15 @@
       </div>
       <p class="form-msg form-msg--err" id="donate-msg"></p>
     </div>
+  </section>
+
+  <!-- ===================== 25 DAY ADVENT HEALTH CALENDAR ===================== -->
+  <section class="view" id="view-advent">
+    <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
+    <h1 class="page-title">25 Day Advent Health Calendar</h1>
+    <p class="page-sub">One small challenge a day until Christmas. Each door opens on its day. Miss one? You can still open it later.</p>
+    <div id="adv-body"><p class="page-sub">Loading&hellip;</p></div>
+    <p class="adv-msg" id="adv-msg" role="status"></p>
   </section>
 
   <!-- ===================== CALCULATOR (embedded) ===================== -->
@@ -1059,6 +1110,7 @@ const forgotStatus = document.getElementById("forgot-status");
 const resetForm = document.getElementById("reset-form");
 const resetStatus = document.getElementById("reset-status");
 let inPasswordRecovery = false;
+let advUser = null;
 
 function showStatus(el, msg, isError) {
   el.textContent = msg;
@@ -1154,14 +1206,136 @@ resetForm.addEventListener("submit", async (e) => {
 function enterPortal(user) {
   const name = user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : user.email;
   document.getElementById("dash-greeting").textContent = "Welcome back, " + name;
+  advUser = user;
   showView("dashboard");
   const hash = window.location.hash.replace("#", "");
-  if (hash === "calculator" || hash === "shop" || hash === "recipes" || hash === "study") {
+  if (hash === "calculator" || hash === "shop" || hash === "recipes" || hash === "study" || hash === "advent") {
     showView(hash);
+    if (hash === "advent") loadAdvent();
   }
   checkDisciplinePurchase(user);
   checkDonation(user);
 }
+
+/* ---------- 25 Day Advent Health Calendar ---------- */
+const ADV_WHEN = ["Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"];
+let adv = null;            // { today, demo, days:[{day,text,why}] } from /api/advent
+let advSel = null;         // 0 = demo door
+let advProg = { p: {}, d: {} };   // saved on the account (user_metadata.advent)
+let advDemo = { p: false, d: false };   // demo ticks are never saved or counted
+const advDate = (n) => ADV_WHEN[(n - 1) % 7] + " " + n + " Dec";
+const advMsg = document.getElementById("adv-msg");
+
+document.getElementById("advTile").addEventListener("click", () => { loadAdvent(); });
+
+async function loadAdvent() {
+  const body = document.getElementById("adv-body");
+  advMsg.textContent = "";
+  const meta = advUser && advUser.user_metadata && advUser.user_metadata.advent;
+  advProg = { p: Object.assign({}, meta && meta.p), d: Object.assign({}, meta && meta.d) };
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const asOf = new URLSearchParams(window.location.search).get("asOf");
+    const r = await fetch("/api/advent" + (asOf ? "?asOf=" + encodeURIComponent(asOf) : ""), {
+      headers: { Authorization: "Bearer " + (session ? session.access_token : "") }, cache: "no-store"
+    });
+    if (!r.ok) throw new Error("status " + r.status);
+    adv = await r.json();
+  } catch (e) {
+    body.innerHTML = '<p class="page-sub">Couldn’t load the calendar. Check your connection and try again.</p>';
+    return;
+  }
+  if (advSel === null || advSel > adv.today) advSel = adv.today >= 1 ? adv.today : 0;
+  renderAdvent();
+}
+
+function advStatus(n) {
+  if (n > adv.today) return "locked";
+  if (advProg.d[n]) return "done";
+  if (n === adv.today) return advProg.p[n] ? "planned" : "today";
+  return "missed";
+}
+
+function renderAdvent() {
+  const body = document.getElementById("adv-body");
+  const today = adv.today, shown = Math.min(today, 25);
+  const LABEL = { done: "Done", today: "Today", planned: "Planned", missed: "Missed", locked: "" };
+  let done = 0;
+  for (let n = 1; n <= shown; n++) if (advProg.d[n]) done++;
+  const pct = Math.round(done / 25 * 100);
+  let streak = 0;
+  for (let n = shown; n >= 1; n--) { if (advProg.d[n]) streak++; else if (n === shown) continue; else break; }
+  const sub = today < 1 ? "Opens 1 December. Try the demo door below." : (streak > 1 ? streak + " days in a row" : "Do today’s door to start a run");
+
+  let h = '<div class="adv-prog"><div><div class="big">' + done + ' <span>of ' + (today < 1 ? 25 : shown) + ' done</span></div><div class="sub">' + sub + '</div></div>' +
+    '<div class="adv-ring" style="background:conic-gradient(#52B788 ' + pct + '%, #2f4a3a 0)"><div>' + pct + '%</div></div></div>';
+
+  h += '<button type="button" class="adv-demo' + (advSel === 0 ? " sel" : "") + '" data-door="0" aria-label="Demo door, try it now"><span><span class="t">Try a demo door</span><span class="s">See how it works. It doesn’t count toward your 25.</span></span><span class="go">Open</span></button>';
+
+  h += '<div class="adv-grid">';
+  for (let n = 1; n <= 25; n++) {
+    const st = advStatus(n);
+    const lock = st === "locked" ? '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' : '<span class="tag">' + LABEL[st] + '</span>';
+    h += '<button type="button" class="adv-door ' + st + (n === advSel ? " sel" : "") + '" data-door="' + n + '" aria-label="December ' + n + ', ' + (st === "locked" ? "locked" : LABEL[st].toLowerCase()) + '"><span class="n">' + n + '</span>' + lock + '</button>';
+  }
+  h += '</div>';
+  h += '<div class="adv-legend"><span><i style="background:#2D6A4F"></i>Done</span><span><i style="background:#fff;border:2px solid #52B788"></i>Planned</span><span><i style="border:2px dashed #9aa39d"></i>Missed</span><span><i style="background:#E4E8E6"></i>Locked</span></div>';
+
+  // opened door
+  let card;
+  if (advSel === 0) {
+    card = advCard("Demo door", "demo", "Demo", adv.demo.text, adv.demo.why, advDemo.p || advDemo.d, advDemo.d, { demo: true });
+  } else {
+    const st = advStatus(advSel);
+    if (st === "locked") {
+      card = '<div class="adv-card"><div class="head"><div class="date">' + advDate(advSel) + '</div><div class="badge">Locked</div></div><h2 class="muted">Not yet</h2><p>This door opens on ' + advDate(advSel) + '. Come back then and it’s yours.</p></div>';
+    } else {
+      const it = adv.days.find((x) => x.day === advSel);
+      card = advCard(advDate(advSel), st, LABEL[st], it.text, it.why, !!(advProg.p[advSel] || advProg.d[advSel]), !!advProg.d[advSel], { missed: st === "missed", join: advSel === 2 });
+    }
+  }
+  body.innerHTML = h + card;
+}
+
+function advCard(date, cls, badge, text, why, planned, done, o) {
+  return '<div class="adv-card"><div class="head"><div class="date">' + escapeHtml(date) + '</div><div class="badge ' + cls + '">' + escapeHtml(badge) + '</div></div>' +
+    '<h2>' + escapeHtml(text) + '</h2><p>' + escapeHtml(why) + '</p>' +
+    (o.missed ? '<p class="miss">You missed this one. You can still do it today.</p>' : '') +
+    (o.demo ? '<p class="note">This is a demo. Tick the boxes to see how it works. It won’t count toward your 25.</p>' : '') +
+    (o.join ? '<a class="join" href="/beast-challenge">Join the Beast Challenge, free</a>' : '') +
+    '<div class="adv-ticks"><label class="adv-tick' + (planned ? " on" : "") + '"><input type="checkbox" data-tick="plan"' + (planned ? " checked" : "") + '><span>I’m going to do it</span></label>' +
+    '<label class="adv-tick' + (done ? " on" : "") + '"><input type="checkbox" data-tick="done"' + (done ? " checked" : "") + '><span>I’ve done it</span></label></div></div>';
+}
+
+async function advSave() {
+  advMsg.textContent = "";
+  const { data, error } = await sb.auth.updateUser({ data: { advent: advProg } });
+  if (error) { advMsg.textContent = "Couldn’t save that. Check your connection and tick it again."; return; }
+  if (data && data.user) advUser = data.user;
+}
+
+document.getElementById("view-advent").addEventListener("click", (e) => {
+  const door = e.target.closest("[data-door]");
+  if (!door || !adv) return;
+  advSel = Number(door.getAttribute("data-door"));
+  renderAdvent();
+});
+document.getElementById("view-advent").addEventListener("change", (e) => {
+  const t = e.target.getAttribute && e.target.getAttribute("data-tick");
+  if (!t || !adv) return;
+  const on = e.target.checked;
+  if (advSel === 0) {
+    if (t === "plan") { advDemo.p = on; if (!on) advDemo.d = false; }
+    else { advDemo.d = on; if (on) advDemo.p = true; }
+    renderAdvent();
+    return;
+  }
+  if (advSel > adv.today) return;
+  if (t === "plan") { if (on) advProg.p[advSel] = true; else { delete advProg.p[advSel]; delete advProg.d[advSel]; } }
+  else { if (on) { advProg.d[advSel] = true; advProg.p[advSel] = true; } else delete advProg.d[advSel]; }
+  renderAdvent();
+  advSave();
+});
 
 /* ---------- Donation ---------- */
 const donateCard = document.getElementById("donate-card");
