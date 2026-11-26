@@ -362,7 +362,7 @@
   <!-- ===================== AUTH ===================== -->
   <section class="view visible" id="view-auth">
     <h1 class="page-title">Your Dashboard</h1>
-    <p class="page-sub">Create a free account and get access to all my freebies &mdash; plus anything new I add.</p>
+    <p class="page-sub">Create a free account and get access to all my freebies, plus anything new I add.</p>
     <ul class="freebies-list">
       <li>Join the free 30-day Beast Challenge</li>
       <li>Open a new door every day in the 25 Day Advent Health Calendar</li>
@@ -438,7 +438,7 @@
       <a class="tile" data-nav="recipes"><h3>Recipes</h3><p>Healthy alternatives from social media.</p></a>
       <a class="tile" data-nav="study"><h3>The Walking Study</h3><p>The research behind my walking calorie estimate.</p></a>
       <a class="tile" data-nav="shop"><h3>Shop</h3><p>Coming soon.</p></a>
-      <a class="tile" href="/#early-access"><h3>App Beta</h3><p>Get free lifetime access, early.</p></a>
+      <a class="tile coach-tile" id="hireCoachTile" href="/coaching" style="display:none"><h3>Hire me as your personal coach</h3><p>4 options available</p></a>
     </div>
     <div class="donate-card" id="donate-card">
       <div class="donate-row">
@@ -485,9 +485,9 @@
 
       <label class="field-label">Daily activity (job / lifestyle, no training)</label>
       <select class="form-input" id="calc-activity">
-        <option value="1.15">Desk job &mdash; mostly sitting</option>
-        <option value="1.25" selected>On your feet sometimes &mdash; teaching, service, errands</option>
-        <option value="1.35">Physically demanding job &mdash; trades, labour, delivery</option>
+        <option value="1.15">Desk job, mostly sitting</option>
+        <option value="1.25" selected>On your feet sometimes: teaching, service, errands</option>
+        <option value="1.35">Physically demanding job: trades, labour, delivery</option>
       </select>
 
       <div class="row2">
@@ -578,7 +578,7 @@
   <section class="view" id="view-shop">
     <button class="back-link" data-nav="dashboard">&larr; Back to dashboard</button>
     <h1 class="page-title">Shop</h1>
-    <div class="card"><p>Nothing here yet &mdash; merch and products are coming soon. Check back later.</p></div>
+    <div class="card"><p>Nothing here yet. Merch and products are coming soon. Check back later.</p></div>
   </section>
   <!-- ===================== RECIPES ===================== -->
   <section class="view" id="view-recipes">
@@ -713,7 +713,7 @@
 </main>
 
 <footer class="site">
-  <div class="container"><p>Beast Coach &mdash; Dashboard</p></div>
+  <div class="container"><p>Beast Coach: Dashboard</p></div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1239,19 +1239,23 @@ function enterPortal(user) {
   checkCoaching();
 }
 
-/* ---------- My Coach tile (coaching portal) ----------
-   claim_coaching() links a coaching plan to this signed-in user by their confirmed email. The tile only
-   shows when it finds one. If the call fails (for example before the database step has run), the tile
-   stays hidden and the rest of the dashboard works as normal. */
+/* ---------- Coaching tiles ----------
+   claim_coaching() links a coaching plan to this signed-in user by their confirmed email. A client with a plan sees
+   My Coach, and never the hire tile. Everyone else signed in sees the hire tile. If the check fails, the hire tile
+   shows, and the rest of the dashboard works as normal. */
 async function checkCoaching() {
-  const tile = document.getElementById("myCoachTile");
-  if (!tile || !sb) return;
+  const mine = document.getElementById("myCoachTile"), hire = document.getElementById("hireCoachTile");
+  if (!mine || !hire || !sb) return;
+  const showFor = (linked) => {
+    mine.style.display = linked ? "" : "none";
+    hire.style.display = linked ? "none" : "";
+  };
   try {
     const { data, error } = await sb.rpc("claim_coaching");
-    if (error) { tile.style.display = "none"; return; }
-    tile.style.display = data && data.linked ? "" : "none";
+    if (error) { showFor(false); return; }
+    showFor(!!(data && data.linked));
   } catch (err) {
-    tile.style.display = "none";
+    showFor(false);
   }
 }
 

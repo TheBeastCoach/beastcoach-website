@@ -141,3 +141,46 @@ test('dashboard: a signed-in visitor who came from /my-coach is sent straight ba
   assert.ok(page.url().endsWith('/my-coach'));
   await ctx.close();
 });
+
+// ---------------------------------------------------------------------------
+// The hire tile: shown to signed-in users without a coaching plan, never with a plan, and shown if the check fails.
+// ---------------------------------------------------------------------------
+
+test('dashboard: a signed-in user with no coaching plan sees the hire tile (dark green, the 4 options) and not My Coach', SKIP, async () => {
+  const { ctx, page } = await openPage('/dashboard', { session: SIGNED_IN, claim: { linked: false, reason: 'no_plan_for_this_email' } });
+  await page.waitForFunction(() => document.getElementById('hireCoachTile').style.display !== 'none');
+  assert.equal(await page.getAttribute('#hireCoachTile', 'href'), '/coaching');
+  const hire = await page.textContent('#hireCoachTile');
+  assert.match(hire, /Hire me as your personal coach/);
+  assert.match(hire, /4 options available/);
+  assert.equal(await page.evaluate(() => getComputedStyle(document.getElementById('hireCoachTile')).backgroundColor), 'rgb(45, 106, 79)', 'the same dark green as My Coach');
+  assert.equal(await page.evaluate(() => document.getElementById('myCoachTile').style.display), 'none');
+  // Set SHOT_DIR to save the tiles as a screenshot (to check the layout by eye).
+  if (process.env.SHOT_DIR) await page.screenshot({ path: path.join(process.env.SHOT_DIR, 'dashboard-hire-tile.png'), fullPage: true });
+  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
+  await ctx.close();
+});
+
+test('dashboard: a client with a plan sees My Coach, and never the hire tile', SKIP, async () => {
+  const { ctx, page } = await openPage('/dashboard', { session: SIGNED_IN, claim: { linked: true, status: 'active', tier: 'core' } });
+  await page.waitForFunction(() => document.getElementById('myCoachTile').style.display !== 'none');
+  assert.equal(await page.evaluate(() => document.getElementById('hireCoachTile').style.display), 'none');
+  await ctx.close();
+});
+
+test('dashboard: if the coaching check fails, the hire tile shows and the dashboard still works', SKIP, async () => {
+  const { ctx, page } = await openPage('/dashboard', { session: SIGNED_IN, claimError: { message: 'function not found' } });
+  await page.waitForFunction(() => window.__calls && window.__calls.some(c => c.name === 'claim_coaching'));
+  await page.waitForFunction(() => document.getElementById('hireCoachTile').style.display !== 'none');
+  assert.equal(await page.evaluate(() => document.getElementById('myCoachTile').style.display), 'none');
+  await page.waitForFunction(() => /Welcome back/.test(document.getElementById('dash-greeting').textContent));
+  assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
+  await ctx.close();
+});
+
+test('dashboard: the App Beta tile is gone', SKIP, async () => {
+  const { ctx, page } = await openPage('/dashboard', { session: SIGNED_IN, claim: { linked: false } });
+  await page.waitForFunction(() => document.getElementById('hireCoachTile').style.display !== 'none');
+  assert.equal(await page.evaluate(() => document.body.textContent.includes('App Beta')), false, 'the App Beta tile is not on the page');
+  await ctx.close();
+});
