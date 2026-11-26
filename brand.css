@@ -12,9 +12,9 @@
   --muted: #A3A69A;
   --lime: #C6F432;
   --amber: #FFC21F;
-  --orange: #FF7A1A;
+  --orange: #FF8A2A;
   --on-accent: #0B0C0A;
-  --brand-gradient: linear-gradient(90deg, #C6F432 0%, #FFC21F 55%, #FF7A1A 100%);
+  --brand-gradient: linear-gradient(90deg, #C6F432 0%, #FFC21F 55%, #FF8A2A 100%);
   --display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
   --body: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
 }
@@ -45,8 +45,8 @@ a:hover { color: var(--ink); }
 .btn-primary:hover { background: #D6F76A; color: var(--on-accent); }
 .btn-outline { background: transparent; color: var(--ink); border-color: var(--line-strong); }
 .btn-outline:hover { border-color: var(--lime); color: var(--lime); }
-.btn-beast { background: transparent; color: var(--orange); border-color: var(--orange); }
-.btn-beast:hover { background: var(--orange); color: var(--on-accent); }
+.btn-beast { background: var(--orange); color: var(--on-accent); border-color: var(--orange); }
+.btn-beast:hover { background: #FF9D4D; border-color: #FF9D4D; color: var(--on-accent); }
 button.btn-primary, button.btn-outline, button.btn-beast { font: inherit; font-weight: 700; }
 button:disabled { opacity: .5; cursor: not-allowed; }
 

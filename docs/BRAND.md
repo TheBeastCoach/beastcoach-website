@@ -17,14 +17,14 @@ Every page restyle follows these rules. The tokens live in `brand.css` at the si
 | `--muted` | #A3A69A | secondary text (the lightest text allowed) |
 | `--lime` | #C6F432 | primary action: primary buttons, "Most popular", ticks |
 | `--amber` | #FFC21F | spots-left counts |
-| `--orange` | #FF7A1A | The Beast tier, and real urgency only (4 or fewer spots) |
+| `--orange` | #FF8A2A | The Beast tier, and real urgency only (4 or fewer spots) |
 | `--on-accent` | #0B0C0A | text on lime, amber or orange fills. Never white text on those. |
 
 Focus ring: 2px solid `--lime`, 2px offset, on every interactive element.
 
 ## Gradient
 
-`--brand-gradient: linear-gradient(90deg, #C6F432 0%, #FFC21F 55%, #FF7A1A 100%)`
+`--brand-gradient: linear-gradient(90deg, #C6F432 0%, #FFC21F 55%, #FF8A2A 100%)`
 
 Use it ONLY for:
 - the logo,
@@ -50,12 +50,26 @@ Never on backgrounds, buttons, body text, or in more than about three places on 
 - No drop shadows. Depth comes from `--surface` on `--ground` plus 1px `--line` borders.
 - Content max width 1200px, side padding 24px, sections padded about 88px top and bottom.
 
+## Buttons
+
+All buttons are pills, at least 52px tall, 16px 700 text, same padding and width rules.
+- Primary: solid lime fill, `--on-accent` text. Main actions.
+- Outline: transparent, 2px `--line-strong` border, ink text. Secondary actions.
+- The Beast: solid orange (`--orange`) fill, `--on-accent` text, 2px orange border. The top tier only.
+
+## Table and body text sizes
+
+- Body text is 16px on desktop and at least 15px on mobile. Only eyebrows (12px) and small footnotes go smaller.
+- Comparison table: feature names and cell values at least 15px mobile, 16px desktop. Rows have about 14px padding top and bottom.
+- Plan names in table headers: Big Shoulders Display, about 24px. Prices under them: at least 15px.
+- Section labels inside the table (The basics, Your plan, Coaching): eyebrows.
+
 ## Logo
 
 An open ring (a "C") with a dot in the gap, inline SVG, viewBox `0 0 100 100`:
 - path `M83.83 37.69 A36 36 0 1 1 56.25 14.55`, fill none, stroke-width 14, round caps,
-- stroke is a `linearGradient` (userSpaceOnUse, x1 12 y1 88 x2 88 y2 12): #C6F432 at 0, #FFC21F at 0.55, #FF7A1A at 1,
-- a circle at cx 73.14 cy 22.42 r 7, fill #FF7A1A.
+- stroke is a `linearGradient` (userSpaceOnUse, x1 12 y1 88 x2 88 y2 12): #C6F432 at 0, #FFC21F at 0.55, #FF8A2A at 1,
+- a circle at cx 73.14 cy 22.42 r 7, fill #FF8A2A.
 
 Give every SVG instance its own gradient id (for example `logo-hdr`, `logo-ftr`, `logo-hero`).
 Wordmark beside it: "BEAST COACH" in Big Shoulders Display 900, with "COACH" in the gradient.
