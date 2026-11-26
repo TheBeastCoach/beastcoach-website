@@ -1122,6 +1122,7 @@ const resetForm = document.getElementById("reset-form");
 const resetStatus = document.getElementById("reset-status");
 let inPasswordRecovery = false;
 let advUser = null;
+let portalUserId = null;   // who is already inside the portal, so repeated auth events do not reset the screen
 
 function showStatus(el, msg, isError) {
   el.textContent = msg;
@@ -1172,6 +1173,7 @@ signinForm.addEventListener("submit", async (e) => {
 });
 
 signoutBtn.addEventListener("click", async () => {
+  portalUserId = null;
   await sb.auth.signOut();
   window.location.reload();
 });
@@ -1220,6 +1222,11 @@ function enterPortal(user) {
     window.location.replace("/my-coach");
     return;
   }
+  // Supabase repeats auth events (tab focus, token refresh, saving your ticks). Same person already in: keep them where they are.
+  const firstEntry = portalUserId !== user.id;
+  portalUserId = user.id;
+  advUser = user;
+  if (!firstEntry) return;
   const name = user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : user.email;
   document.getElementById("dash-greeting").textContent = "Welcome back, " + name;
   advUser = user;
