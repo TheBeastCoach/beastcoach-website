@@ -50,87 +50,101 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/brand.css">
 <style>
-body{margin:0;background:#F4F7F2;font-family:'Manrope',system-ui,sans-serif;color:#1B3022}
-a{color:#2D6A4F}a:hover{color:#1B3022}
-.disp{font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;font-weight:400;letter-spacing:.02em;margin:0}
-.cta{display:inline-flex;align-items:center;justify-content:center;background:#F59E0B;color:#1B1200;font-weight:800;font-size:18px;text-decoration:none;border-radius:14px;padding:18px 28px;min-height:56px;box-sizing:border-box;text-align:center}
-.cta:hover{background:#FFB62E;color:#1B1200}
-.cta:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #52B788;outline-offset:3px}
-details{border-top:1px solid #D5E0D8}
-details:last-child{border-bottom:1px solid #D5E0D8}
-summary{cursor:pointer;font-weight:800;font-size:18px;padding:20px 40px 20px 0;list-style:none;position:relative}
+img{max-width:100%}
+.disp{font-family:var(--display);font-weight:800;text-transform:uppercase;line-height:.92;color:var(--ink);margin:0}
+.cta{display:inline-flex;align-items:center;justify-content:center;background:var(--lime);color:var(--on-accent);border:2px solid var(--lime);font-family:var(--body);font-weight:700;font-size:16px;text-decoration:none;border-radius:999px;padding:14px 26px;min-height:52px;box-sizing:border-box;text-align:center;cursor:pointer;transition:background .15s,border-color .15s}
+.cta:hover{background:#D6F76A;border-color:#D6F76A;color:var(--on-accent)}
+.cta:disabled{opacity:.5;cursor:not-allowed}
+details{border-top:1px solid var(--line)}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700;font-size:18px;color:var(--ink);padding:20px 40px 20px 0;list-style:none;position:relative;min-height:44px;box-sizing:border-box}
 summary::-webkit-details-marker{display:none}
-summary::after{content:"+";position:absolute;right:4px;top:14px;font-size:30px;font-weight:500;color:#2D6A4F}
+summary::after{content:"+";position:absolute;right:4px;top:14px;font-size:30px;font-weight:500;color:var(--lime)}
 details[open] summary::after{content:"\2212"}
-details p{margin:0 0 20px;font-size:17px;line-height:1.6;color:#3B4F43;max-width:62ch}
+details p{margin:0 0 20px;font-size:17px;line-height:1.6;color:var(--ink-soft);max-width:62ch}
+.dp-card{background:var(--surface);border:1px solid var(--line);border-radius:20px}
+.dp-step{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:10px}
+.dp-step p{margin:0;font-size:16px;line-height:1.55;color:var(--ink-soft)}
+.dp-stepnum{display:flex;justify-content:space-between;align-items:center}
+.dp-stepnum .disp{font-size:44px;line-height:1;color:var(--lime)}
+.dp-tag{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.dp-tick{display:flex;gap:12px;color:var(--ink-soft)}
+.dp-tick svg{flex:none;margin-top:2px;color:var(--lime)}
+.dp-tick--no svg{color:var(--muted)}
+.dp-figure img{width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid var(--line-strong);border-radius:28px;display:block}
+.dp-figure figcaption{font-size:16px;line-height:1.45;text-align:center;color:var(--ink-soft)}
+.dp-figure figcaption b{color:var(--ink)}
+.dp-cta-note{margin:0;font-size:15px;line-height:1.55;color:var(--muted);max-width:46ch}
 .sticky{display:none}
 @media (max-width:759px){.sticky{display:flex}}
-
 html{scroll-behavior:smooth}
-img{max-width:100%}
 </style>
 </head>
 <body>
 <div style="display:flex;flex-direction:column;min-height:100%">
 
-<!-- top bar -->
-<header style="background:#1B3022;color:#fff">
-<div style="max-width:1120px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px">
-<div class="disp" style="font-size:26px;letter-spacing:.1em">BEAST<span style="color:#52B788">COACH</span></div>
-<a href="#buy" style="color:#fff;font-weight:700;font-size:15px;text-decoration:underline;text-underline-offset:4px">Get The Discipline Path</a>
-</div>
-</header>
+<!-- shared header -->
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-hdr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-hdr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+    <div class="site-nav-links"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a><a href="/" class="site-nav-cta">Work With Me</a></div>
+    <button class="site-nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="siteMenu" onclick="toggleSiteMenu(this)">&#9776;</button>
+  </div>
+  <div class="site-nav-mobile" id="siteMenu"><a href="/">Work With Me</a><a href="/app">The App</a><a href="/discipline-path">Discipline Path</a><a href="/recipes">Recipes</a><a href="/dashboard">Dashboard</a></div>
+</nav>
+<script>function toggleSiteMenu(b){var m=document.getElementById("siteMenu");var o=m.classList.toggle("active");b.setAttribute("aria-expanded",o?"true":"false");}</script>
 
 <!-- hero -->
-<section style="background:#1B3022;color:#fff;padding:48px 20px 72px">
+<section style="padding:48px 20px 72px">
 <div style="max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;gap:40px;align-items:center">
 <div style="flex:1 1 440px;min-width:0;display:flex;flex-direction:column;gap:22px">
-<div style="font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#8FD3B0">An 8-step system. Self-paced. Lifetime access.</div>
-<h1 class="disp" style="font-size:clamp(52px,8vw,92px);line-height:.95;text-wrap:balance">You don't have a willpower problem. You have a trust problem.</h1>
-<p style="margin:0;font-size:20px;line-height:1.55;color:#D5E6DB;max-width:52ch">Before any meal plan or training plan comes the foundation: discipline. This program was built using the psychology of breaking habits into small steps, one at a time, so every plan after it gets easier to stick to.</p>
+<div class="eyebrow">An 8-step system. Self-paced. Lifetime access.</div>
+<h1 class="disp" style="font-size:clamp(52px,8vw,92px);line-height:.95;text-wrap:balance">You don't have a willpower problem. You have a <span class="text-gradient">trust problem.</span></h1>
+<p style="margin:0;font-size:20px;line-height:1.55;color:var(--ink-soft);max-width:52ch">Before any meal plan or training plan comes the foundation: discipline. This program was built using the psychology of breaking habits into small steps, one at a time, so every plan after it gets easier to stick to.</p>
 <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:6px">
 <a class="cta" href="#buy" style="width:100%;max-width:420px">Start The Discipline Path. AUD $37</a>
-<div style="display:flex;gap:14px;align-items:center;background:rgba(245,158,11,.14);border:2px solid #F59E0B;border-radius:16px;padding:14px 18px;width:100%;max-width:420px;box-sizing:border-box">
-<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
-<div><div class="disp" style="font-size:28px;line-height:1;color:#FFC24D">No-nonsense refund</div><div style="font-size:16px;font-weight:700;color:#fff;margin-top:4px">Not for you? Full refund within 48 hours.</div></div>
+<div class="dp-card" style="display:flex;gap:14px;align-items:center;padding:14px 18px;width:100%;max-width:420px;box-sizing:border-box">
+<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+<div><div class="disp" style="font-size:28px;line-height:1;color:var(--ink)">No-nonsense refund</div><div style="font-size:16px;font-weight:700;color:var(--ink);margin-top:4px">Not for you? Full refund within 48 hours.</div></div>
 </div>
-<p style="margin:0;font-size:17px;line-height:1.55;color:#D5E6DB;max-width:52ch;margin-bottom:4px">This program is packed with 20 years of my mistakes. How not to do it. It costs less than a family-size takeaway meal, so you have nothing to lose. If you truly want to do this, I guarantee you, you will learn something that will change your life, maybe even save your life.</p>
-<div style="font-size:15px;color:#B9D3C2">One-time purchase. Instant access. No subscription.</div>
+<p style="margin:0;font-size:17px;line-height:1.55;color:var(--ink-soft);max-width:52ch;margin-bottom:4px">This program is packed with 20 years of my mistakes. How not to do it. It costs less than a family-size takeaway meal, so you have nothing to lose. If you truly want to do this, I guarantee you, you will learn something that will change your life, maybe even save your life.</p>
+<div style="font-size:15px;color:var(--muted)">One-time purchase. Instant access. No subscription.</div>
 </div>
 </div>
 <div style="flex:1 1 360px;min-width:0">
-<img src="/dp-img/dp-hero.jpg" alt="The Discipline Path: a stone trail climbing toward a sunrise" style="width:100%;height:auto;display:block;border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.4)">
+<img src="/dp-img/dp-hero.jpg" alt="The Discipline Path: a stone trail climbing toward a sunrise" style="width:100%;height:auto;display:block;border-radius:20px">
 </div>
 </div>
 </section>
 
 <!-- proof strip -->
-<section style="background:#fff;border-bottom:1px solid #DDE6DF">
+<section style="background:var(--ground-alt);border-bottom:1px solid var(--line)">
 <div style="max-width:1120px;margin:0 auto;padding:28px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px">
-<div><div class="disp" style="font-size:56px;line-height:1;color:#2D6A4F">8 steps</div><div style="font-size:16px;color:#3B4F43;margin-top:4px">each one asks you to actually do something</div></div>
-<div><div class="disp" style="font-size:56px;line-height:1;color:#2D6A4F">Beast AI</div><div style="font-size:16px;color:#3B4F43;margin-top:4px">free for life, up to 20 uses a day</div></div>
-<div><div class="disp" style="font-size:56px;line-height:1;color:#2D6A4F">$37</div><div style="font-size:16px;color:#3B4F43;margin-top:4px">once, AUD. No subscription</div></div>
+<div><div class="disp" style="font-size:56px;line-height:1;color:var(--lime)">8 steps</div><div style="font-size:16px;color:var(--ink-soft);margin-top:4px">each one asks you to actually do something</div></div>
+<div><div class="disp" style="font-size:56px;line-height:1;color:var(--lime)">Beast AI</div><div style="font-size:16px;color:var(--ink-soft);margin-top:4px">free for life, up to 20 uses a day</div></div>
+<div><div class="disp" style="font-size:56px;line-height:1;color:var(--lime)">$37</div><div style="font-size:16px;color:var(--ink-soft);margin-top:4px">once, AUD. No subscription</div></div>
 </div>
 </section>
 
 <!-- beast ai hero -->
-<section style="background:#1B3022;color:#fff;padding:88px 20px">
+<section style="background:var(--ground-alt);padding:88px 20px">
 <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:44px">
 <div style="display:flex;flex-direction:column;gap:14px;max-width:760px">
-<div style="font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#8FD3B0">Free for life. Included with your purchase.</div>
+<div class="eyebrow">Free for life. Included with your purchase.</div>
 <h2 class="disp" style="font-size:clamp(44px,6.5vw,80px);line-height:.98;text-wrap:balance">Photo your fridge. Get a meal.</h2>
-<p style="margin:0;font-size:20px;line-height:1.55;color:#D5E6DB;max-width:56ch">Take a photo of what you have in the fridge or on the bench and Beast AI builds a meal around your targets, using my plan and experience. A great tool for healthy meals you would not have thought of. Ate already? Log it and get calories and protein.</p>
+<p style="margin:0;font-size:20px;line-height:1.55;color:var(--ink-soft);max-width:56ch">Take a photo of what you have in the fridge or on the bench and Beast AI builds a meal around your targets, using my plan and experience. A great tool for healthy meals you would not have thought of. Ate already? Log it and get calories and protein.</p>
 </div>
 <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:stretch">
-<div style="flex:1 1 320px;min-width:0;background:#2D6A4F;border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:22px;align-items:stretch">
-<img src="/dp-img/sales-creator.jpg" alt="Beast AI Meal Creator: a fridge photo with eight items recognised" style="width:100%;max-width:270px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
-<div style="flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:8px"><div class="disp" style="font-size:34px;line-height:1">Meal generator</div><p style="margin:0;font-size:17px;line-height:1.55;color:#E3F4E9">Photo the fridge or pantry. Get a meal from what is there, sized to your targets.</p></div>
+<div class="dp-card" style="flex:1 1 320px;min-width:0;padding:28px;display:flex;flex-direction:column;gap:22px;align-items:stretch">
+<img src="/dp-img/sales-creator.jpg" alt="Beast AI Meal Creator: a fridge photo with eight items recognised" style="width:100%;max-width:270px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid var(--ground);border-radius:30px;display:block;margin:0 auto">
+<div style="flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:8px"><div class="disp" style="font-size:34px;line-height:1">Meal generator</div><p style="margin:0;font-size:17px;line-height:1.55;color:var(--ink-soft)">Photo the fridge or pantry. Get a meal from what is there, sized to your targets.</p></div>
 </div>
-<div style="flex:1 1 320px;min-width:0;background:#244A37;border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:22px;align-items:stretch">
-<img src="/dp-img/sales-estimate.jpg" alt="Beast AI Meal Log: a plate photo turned into a calorie and protein estimate" style="width:100%;max-width:270px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #0A1A12;border-radius:30px;display:block;margin:0 auto;box-shadow:0 18px 40px rgba(0,0,0,.35)">
-<div style="flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:8px"><div class="disp" style="font-size:34px;line-height:1">Meal estimator</div><p style="margin:0;font-size:17px;line-height:1.55;color:#D5E6DB">Photo or describe what you ate. Get calories and protein back. Estimates, not lab measurements.</p></div>
+<div class="dp-card" style="flex:1 1 320px;min-width:0;padding:28px;display:flex;flex-direction:column;gap:22px;align-items:stretch">
+<img src="/dp-img/sales-estimate.jpg" alt="Beast AI Meal Log: a plate photo turned into a calorie and protein estimate" style="width:100%;max-width:270px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid var(--ground);border-radius:30px;display:block;margin:0 auto">
+<div style="flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:8px"><div class="disp" style="font-size:34px;line-height:1">Meal estimator</div><p style="margin:0;font-size:17px;line-height:1.55;color:var(--ink-soft)">Photo or describe what you ate. Get calories and protein back. Estimates, not lab measurements.</p></div>
 </div>
 </div>
 </div>
@@ -144,79 +158,79 @@ img{max-width:100%}
 </div>
 <div style="flex:1 1 440px;min-width:0;display:flex;flex-direction:column;gap:18px">
 <h2 class="disp" style="font-size:clamp(40px,5.5vw,64px);line-height:1;text-wrap:balance">Starting was never the hard part.</h2>
-<p style="margin:0;font-size:19px;line-height:1.65;color:#2A3D32">The plan was never the problem. Nothing was holding you to it except motivation, and motivation does not last.</p>
-<div style="background:#fff;border:1px solid #D5E0D8;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px">
-<div style="font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#2D6A4F">Does any of this sound like you?</div>
+<p style="margin:0;font-size:19px;line-height:1.65;color:var(--ink-soft)">The plan was never the problem. Nothing was holding you to it except motivation, and motivation does not last.</p>
+<div class="dp-card" style="padding:24px;display:flex;flex-direction:column;gap:14px">
+<div class="eyebrow">Does any of this sound like you?</div>
 <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font-size:18px;line-height:1.45">
-<li style="display:flex;gap:12px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>I have dieted before and the scale did not move, so why would this time be different?</span></li>
-<li style="display:flex;gap:12px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>I open the fridge and there is nothing there, and making something filling that fits my diet feels like too much.</span></li>
-<li style="display:flex;gap:12px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>I start strong on Monday and by Thursday it is already slipping.</span></li>
-<li style="display:flex;gap:12px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>Every time I quit, I trust myself a little less.</span></li>
+<li class="dp-tick"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>I have dieted before and the scale did not move, so why would this time be different?</span></li>
+<li class="dp-tick"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>I open the fridge and there is nothing there, and making something filling that fits my diet feels like too much.</span></li>
+<li class="dp-tick"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>I start strong on Monday and by Thursday it is already slipping.</span></li>
+<li class="dp-tick"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>Every time I quit, I trust myself a little less.</span></li>
 </ul>
 </div>
-<p style="margin:0;font-size:19px;line-height:1.65;color:#2A3D32">I lost 70kg and I have the skin to show for it. What changed was not the diet. I built a Beast Engine, reprogrammed my taste buds and changed my relationship with food. Habits I never thought I would have.</p>
-<p style="margin:0;font-size:19px;line-height:1.65;font-weight:700">That is what this teaches. Not a diet. A new identity.</p>
-<p style="margin:0;font-size:19px;line-height:1.65;color:#2A3D32">And today I live a very normal life, just maintaining but never going back.</p>
+<p style="margin:0;font-size:19px;line-height:1.65;color:var(--ink-soft)">I lost 70kg and I have the skin to show for it. What changed was not the diet. I built a Beast Engine, reprogrammed my taste buds and changed my relationship with food. Habits I never thought I would have.</p>
+<p style="margin:0;font-size:19px;line-height:1.65;font-weight:700;color:var(--ink)">That is what this teaches. Not a diet. A new identity.</p>
+<p style="margin:0;font-size:19px;line-height:1.65;color:var(--ink-soft)">And today I live a very normal life, just maintaining but never going back.</p>
 </div>
 </div>
 </section>
 
 <!-- the 8 steps -->
-<section style="background:#fff;padding:80px 20px">
+<section style="background:var(--ground-alt);padding:80px 20px">
 <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:36px">
 <div style="display:flex;flex-direction:column;gap:12px;max-width:720px">
-<div style="font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#2D6A4F">So how do I do this myself?</div>
+<div class="eyebrow">So how do I do this myself?</div>
 <h2 class="disp" style="font-size:clamp(40px,5.5vw,64px);line-height:1;text-wrap:balance">Eight steps, done in order.</h2>
-<p style="margin:0;font-size:18px;line-height:1.6;color:#3B4F43">Each step builds on the one before it.</p>
+<p style="margin:0;font-size:18px;line-height:1.6;color:var(--ink-soft)">Each step builds on the one before it.</p>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
 
-<div style="background:#1B3022;color:#fff;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px">
-<div style="display:flex;justify-content:space-between;align-items:center"><div class="disp" style="font-size:44px;line-height:1;color:#52B788">1</div><div style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#F59E0B">30 days</div></div>
+<div class="dp-step">
+<div class="dp-stepnum"><div class="disp">1</div><div class="dp-tag">30 days</div></div>
 <div class="disp" style="font-size:30px;line-height:1">Identity Reset</div>
-<p style="margin:0;font-size:16px;line-height:1.55;color:#D5E6DB">One small habit a day for 30 days. Proof you can trust yourself.</p>
+<p>One small habit a day for 30 days. Proof you can trust yourself.</p>
 </div>
 
-<div style="background:#1B3022;color:#fff;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px">
-<div style="display:flex;justify-content:space-between;align-items:center"><div class="disp" style="font-size:44px;line-height:1;color:#52B788">2</div><div style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#F59E0B">5 days</div></div>
+<div class="dp-step">
+<div class="dp-stepnum"><div class="disp">2</div><div class="dp-tag">5 days</div></div>
 <div class="disp" style="font-size:30px;line-height:1">Environment Reset</div>
-<p style="margin:0;font-size:16px;line-height:1.55;color:#D5E6DB">Shape your environment so you decide ahead of time how you will respond. Built for real homes.</p>
+<p>Shape your environment so you decide ahead of time how you will respond. Built for real homes.</p>
 </div>
 
-<div style="background:#1B3022;color:#fff;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px">
-<div style="display:flex;justify-content:space-between;align-items:center"><div class="disp" style="font-size:44px;line-height:1;color:#52B788">3</div><div style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#F59E0B">7 days</div></div>
+<div class="dp-step">
+<div class="dp-stepnum"><div class="disp">3</div><div class="dp-tag">7 days</div></div>
 <div class="disp" style="font-size:30px;line-height:1">Social Playbook</div>
-<p style="margin:0;font-size:16px;line-height:1.55;color:#D5E6DB">Preparing you to handle family, friends and social situations before you get to them, and how to manage them when you are in it.</p>
+<p>Preparing you to handle family, friends and social situations before you get to them, and how to manage them when you are in it.</p>
 </div>
 
-<div style="background:#F4F7F2;border:1px solid #D5E0D8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px">
-<div style="display:flex;justify-content:space-between;align-items:center"><div class="disp" style="font-size:44px;line-height:1;color:#2D6A4F">4</div><div style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#2D6A4F">12 weeks</div></div>
+<div class="dp-step">
+<div class="dp-stepnum"><div class="disp">4</div><div class="dp-tag">12 weeks</div></div>
 <div class="disp" style="font-size:30px;line-height:1">Reprogramming Your Taste Buds</div>
-<p style="margin:0;font-size:16px;line-height:1.55;color:#3B4F43">Why food starts to taste different in a deficit, and how this changes your relationship with food.</p>
+<p>Why food starts to taste different in a deficit, and how this changes your relationship with food.</p>
 </div>
 
-<div style="background:#F4F7F2;border:1px solid #D5E0D8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px">
-<div style="display:flex;justify-content:space-between;align-items:center"><div class="disp" style="font-size:44px;line-height:1;color:#2D6A4F">5</div><div style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#2D6A4F">1 to 3 days</div></div>
+<div class="dp-step">
+<div class="dp-stepnum"><div class="disp">5</div><div class="dp-tag">1 to 3 days</div></div>
 <div class="disp" style="font-size:30px;line-height:1">Routine Build</div>
-<p style="margin:0;font-size:16px;line-height:1.55;color:#3B4F43">Discipline is structure. Once the steps above are in place, building a routine is simple.</p>
+<p>Discipline is structure. Once the steps above are in place, building a routine is simple.</p>
 </div>
 
-<div style="background:#F4F7F2;border:1px solid #D5E0D8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px">
-<div style="display:flex;justify-content:space-between;align-items:center"><div class="disp" style="font-size:44px;line-height:1;color:#2D6A4F">6</div><div style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#2D6A4F">1 day</div></div>
+<div class="dp-step">
+<div class="dp-stepnum"><div class="disp">6</div><div class="dp-tag">1 day</div></div>
 <div class="disp" style="font-size:30px;line-height:1">Reset Protocol</div>
-<p style="margin:0;font-size:16px;line-height:1.55;color:#3B4F43">Rules for a bad day or a bump in the road. I help you decide before you slip up, so it never turns into a lost week.</p>
+<p>Rules for a bad day or a bump in the road. I help you decide before you slip up, so it never turns into a lost week.</p>
 </div>
 
-<div style="background:#F4F7F2;border:1px solid #D5E0D8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px">
-<div style="display:flex;justify-content:space-between;align-items:center"><div class="disp" style="font-size:44px;line-height:1;color:#2D6A4F">7</div><div style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#2D6A4F">1 to 3 days</div></div>
+<div class="dp-step">
+<div class="dp-stepnum"><div class="disp">7</div><div class="dp-tag">1 to 3 days</div></div>
 <div class="disp" style="font-size:30px;line-height:1">Workout Plan</div>
-<p style="margin:0;font-size:16px;line-height:1.55;color:#3B4F43">This is not about training, but we help you build one around your life. Gym or home, 30 to 90 minutes.</p>
+<p>This is not about training, but we help you build one around your life. Gym or home, 30 to 90 minutes.</p>
 </div>
 
-<div style="background:#F4F7F2;border:1px solid #D5E0D8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px">
-<div style="display:flex;justify-content:space-between;align-items:center"><div class="disp" style="font-size:44px;line-height:1;color:#2D6A4F">8</div><div style="font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#2D6A4F">Ongoing</div></div>
+<div class="dp-step">
+<div class="dp-stepnum"><div class="disp">8</div><div class="dp-tag">Ongoing</div></div>
 <div class="disp" style="font-size:30px;line-height:1">Full System</div>
-<p style="margin:0;font-size:16px;line-height:1.55;color:#3B4F43">I would be proud of what you are building. Print out your results, so it is something you look at and actually follow through on along the way.</p>
+<p>I would be proud of what you are building. Print out your results, so it is something you look at and actually follow through on along the way.</p>
 </div>
 
 </div>
@@ -227,65 +241,65 @@ img{max-width:100%}
 <section style="padding:80px 20px">
 <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:36px">
 <div style="display:flex;flex-direction:column;gap:12px;max-width:720px">
-<div style="font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#2D6A4F">Inside the program</div>
+<div class="eyebrow">Inside the program</div>
 <h2 class="disp" style="font-size:clamp(40px,5.5vw,64px);line-height:1;text-wrap:balance">Not a book you read once. A system you build.</h2>
-<p style="margin:0;font-size:18px;line-height:1.6;color:#3B4F43">This is not something you just read. It is an interactive system we build together. Every step asks you to do something.</p>
+<p style="margin:0;font-size:18px;line-height:1.6;color:var(--ink-soft)">This is not something you just read. It is an interactive system we build together. Every step asks you to do something.</p>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px 20px;justify-items:center">
-<figure style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
-<img src="/dp-img/sales-overview.jpg" alt="The Discipline Path program overview listing all eight steps" style="width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #1B3022;border-radius:28px;display:block;box-shadow:0 14px 30px rgba(27,48,34,.22)">
-<figcaption style="font-size:16px;line-height:1.45;text-align:center"><b>Program overview.</b> Your steps in one place.</figcaption>
+<figure class="dp-figure" style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
+<img src="/dp-img/sales-overview.jpg" alt="The Discipline Path program overview listing all eight steps">
+<figcaption><b>Program overview.</b> Your steps in one place.</figcaption>
 </figure>
-<figure style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
-<img src="/dp-img/sales-identity.jpg" alt="The Identity Reset step in the Discipline Path, step 1 of 8" style="width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #1B3022;border-radius:28px;display:block;box-shadow:0 14px 30px rgba(27,48,34,.22)">
-<figcaption style="font-size:16px;line-height:1.45;text-align:center"><b>Identity Reset.</b> Your 30-day habit log.</figcaption>
+<figure class="dp-figure" style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
+<img src="/dp-img/sales-identity.jpg" alt="The Identity Reset step in the Discipline Path, step 1 of 8">
+<figcaption><b>Identity Reset.</b> Your 30-day habit log.</figcaption>
 </figure>
-<figure style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
-<img src="/dp-img/sales-environment.jpg" alt="Environment Reset in the Discipline Path, choosing a room to work through" style="width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #1B3022;border-radius:28px;display:block;box-shadow:0 14px 30px rgba(27,48,34,.22)">
-<figcaption style="font-size:16px;line-height:1.45;text-align:center"><b>Environment Reset.</b> Go room by room.</figcaption>
+<figure class="dp-figure" style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
+<img src="/dp-img/sales-environment.jpg" alt="Environment Reset in the Discipline Path, choosing a room to work through">
+<figcaption><b>Environment Reset.</b> Go room by room.</figcaption>
 </figure>
-<figure style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
-<img src="/dp-img/sales-social.jpg" alt="Social Playbook in the Discipline Path, a list of situations to plan for" style="width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #1B3022;border-radius:28px;display:block;box-shadow:0 14px 30px rgba(27,48,34,.22)">
-<figcaption style="font-size:16px;line-height:1.45;text-align:center"><b>Social Playbook.</b> Decide the plan before the party.</figcaption>
+<figure class="dp-figure" style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
+<img src="/dp-img/sales-social.jpg" alt="Social Playbook in the Discipline Path, a list of situations to plan for">
+<figcaption><b>Social Playbook.</b> Decide the plan before the party.</figcaption>
 </figure>
-<figure style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
-<img src="/dp-img/sales-taste.jpg" alt="Reprogramming Your Taste Buds, step 4 of 8" style="width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #1B3022;border-radius:28px;display:block;box-shadow:0 14px 30px rgba(27,48,34,.22)">
-<figcaption style="font-size:16px;line-height:1.45;text-align:center"><b>Taste Buds.</b> Why food tastes different.</figcaption>
+<figure class="dp-figure" style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
+<img src="/dp-img/sales-taste.jpg" alt="Reprogramming Your Taste Buds, step 4 of 8">
+<figcaption><b>Taste Buds.</b> Why food tastes different.</figcaption>
 </figure>
-<figure style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
-<img src="/dp-img/sales-routine.jpg" alt="Routine Build in the Discipline Path, a draft weekly schedule" style="width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #1B3022;border-radius:28px;display:block;box-shadow:0 14px 30px rgba(27,48,34,.22)">
-<figcaption style="font-size:16px;line-height:1.45;text-align:center"><b>Routine Build.</b> A week you can fall into.</figcaption>
+<figure class="dp-figure" style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
+<img src="/dp-img/sales-routine.jpg" alt="Routine Build in the Discipline Path, a draft weekly schedule">
+<figcaption><b>Routine Build.</b> A week you can fall into.</figcaption>
 </figure>
-<figure style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
-<img src="/dp-img/sales-bd.jpg" alt="Reset Protocol, step 6 of 8" style="width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #1B3022;border-radius:28px;display:block;box-shadow:0 14px 30px rgba(27,48,34,.22)">
-<figcaption style="font-size:16px;line-height:1.45;text-align:center"><b>Reset Protocol.</b> Your rule for a bad day.</figcaption>
+<figure class="dp-figure" style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
+<img src="/dp-img/sales-bd.jpg" alt="Reset Protocol, step 6 of 8">
+<figcaption><b>Reset Protocol.</b> Your rule for a bad day.</figcaption>
 </figure>
-<figure style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
-<img src="/dp-img/sales-workout.jpg" alt="Workout Plan in the Discipline Path, the questions that build your plan" style="width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #1B3022;border-radius:28px;display:block;box-shadow:0 14px 30px rgba(27,48,34,.22)">
-<figcaption style="font-size:16px;line-height:1.45;text-align:center"><b>Workout Plan.</b> Built around your training days.</figcaption>
+<figure class="dp-figure" style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
+<img src="/dp-img/sales-workout.jpg" alt="Workout Plan in the Discipline Path, the questions that build your plan">
+<figcaption><b>Workout Plan.</b> Built around your training days.</figcaption>
 </figure>
-<figure style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
-<img src="/dp-img/sales-fridge.jpg" alt="The fridge card in the Discipline Path, showing what treats cost in steps" style="width:100%;max-width:230px;aspect-ratio:720/1063;object-fit:cover;object-position:top;border:5px solid #1B3022;border-radius:28px;display:block;box-shadow:0 14px 30px rgba(27,48,34,.22)">
-<figcaption style="font-size:16px;line-height:1.45;text-align:center"><b>The fridge card.</b> What a treat really costs.</figcaption>
+<figure class="dp-figure" style="margin:0;display:flex;flex-direction:column;gap:12px;align-items:center">
+<img src="/dp-img/sales-fridge.jpg" alt="The fridge card in the Discipline Path, showing what treats cost in steps">
+<figcaption><b>The fridge card.</b> What a treat really costs.</figcaption>
 </figure>
 </div>
 </div>
 </section>
 
 <!-- also included -->
-<section style="background:#1B3022;color:#fff;padding:80px 20px">
+<section style="background:var(--ground-alt);padding:80px 20px">
 <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:36px">
 <div style="display:flex;flex-direction:column;gap:12px;max-width:720px">
-<div style="font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#8FD3B0">Also included</div>
+<div class="eyebrow">Also included</div>
 <h2 class="disp" style="font-size:clamp(40px,5.5vw,64px);line-height:1;text-wrap:balance">The rest of the toolkit.</h2>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
-<div style="background:#244A37;border-radius:16px;padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Your personal targets</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:#D5E6DB">Calories and macros from your own numbers.</p></div>
-<div style="background:#244A37;border-radius:16px;padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Meal Plan Ideas</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:#D5E6DB">Build meals around the foods you pick. Save your favourites.</p></div>
-<div style="background:#244A37;border-radius:16px;padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Original recipes</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:#D5E6DB">Simple meals I actually eat, with full macros. New ones added free.</p></div>
-<div style="background:#244A37;border-radius:16px;padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Workout Plan</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:#D5E6DB">Built from your answers, for gym or home.</p></div>
-<div style="background:#244A37;border-radius:16px;padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Education library</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:#D5E6DB">The fat-loss myths that can get you stuck or send you the wrong way, and nutrition in plain English.</p></div>
-<div style="background:#244A37;border-radius:16px;padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">The psychology</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:#D5E6DB">Why starting feels impossible and why one slip becomes a lost month.</p></div>
+<div class="dp-card" style="padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Your personal targets</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:var(--ink-soft)">Calories and macros from your own numbers.</p></div>
+<div class="dp-card" style="padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Meal Plan Ideas</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:var(--ink-soft)">Build meals around the foods you pick. Save your favourites.</p></div>
+<div class="dp-card" style="padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Original recipes</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:var(--ink-soft)">Simple meals I actually eat, with full macros. New ones added free.</p></div>
+<div class="dp-card" style="padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Workout Plan</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:var(--ink-soft)">Built from your answers, for gym or home.</p></div>
+<div class="dp-card" style="padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">Education library</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:var(--ink-soft)">The fat-loss myths that can get you stuck or send you the wrong way, and nutrition in plain English.</p></div>
+<div class="dp-card" style="padding:22px"><div class="disp" style="font-size:28px;line-height:1.05">The psychology</div><p style="margin:8px 0 0;font-size:16px;line-height:1.55;color:var(--ink-soft)">Why starting feels impossible and why one slip becomes a lost month.</p></div>
 </div>
 </div>
 </section>
@@ -295,22 +309,22 @@ img{max-width:100%}
 <div style="max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:36px">
 <h2 class="disp" style="font-size:clamp(40px,5.5vw,64px);line-height:1;text-wrap:balance">Is this for you?</h2>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
-<div style="background:#fff;border:2px solid #2D6A4F;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:14px">
-<div class="disp" style="font-size:32px;color:#2D6A4F">This is for you if</div>
+<div class="dp-card" style="padding:28px;display:flex;flex-direction:column;gap:14px">
+<div class="disp" style="font-size:32px;color:var(--ink)">This is for you if</div>
 <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font-size:17px;line-height:1.5">
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You have lost weight before and gained it back, more than once</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You know the basics of nutrition and training. That was never the problem</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You do not know where to start, or you have a complicated living situation</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You are tired of starting over every Monday</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You want structure and accountability you build once and actually follow</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You have lost weight before and gained it back, more than once</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You know the basics of nutrition and training. That was never the problem</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You do not know where to start, or you have a complicated living situation</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You are tired of starting over every Monday</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>You want structure and accountability you build once and actually follow</span></li>
 </ul>
 </div>
-<div style="background:#fff;border:1px solid #D5E0D8;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:14px">
-<div class="disp" style="font-size:32px;color:#6B4200">Probably not for you if</div>
+<div class="dp-card" style="padding:28px;display:flex;flex-direction:column;gap:14px">
+<div class="disp" style="font-size:32px;color:var(--muted)">Probably not for you if</div>
 <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font-size:17px;line-height:1.5">
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B4200" stroke-width="3" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M6 6l12 12M18 6L6 18"/></svg><span>You want a dedicated coach or a program with no self-reflection</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B4200" stroke-width="3" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M6 6l12 12M18 6L6 18"/></svg><span>You want a quick fix before an event in the next few weeks</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6B4200" stroke-width="3" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M6 6l12 12M18 6L6 18"/></svg><span>You have a diagnosed eating disorder or a medical condition that needs a doctor's guidance first</span></li>
+<li class="dp-tick dp-tick--no"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M6 6l12 12M18 6L6 18"/></svg><span>You want a dedicated coach or a program with no self-reflection</span></li>
+<li class="dp-tick dp-tick--no"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M6 6l12 12M18 6L6 18"/></svg><span>You want a quick fix before an event in the next few weeks</span></li>
+<li class="dp-tick dp-tick--no"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M6 6l12 12M18 6L6 18"/></svg><span>You have a diagnosed eating disorder or a medical condition that needs a doctor's guidance first</span></li>
 </ul>
 </div>
 </div>
@@ -318,26 +332,26 @@ img{max-width:100%}
 </section>
 
 <!-- price -->
-<section id="buy" style="background:#1B3022;padding:80px 20px">
-<div style="max-width:620px;margin:0 auto;background:#fff;border-radius:24px;padding:40px 28px;display:flex;flex-direction:column;gap:20px;align-items:center;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35)">
-<div style="font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#2D6A4F">The complete system</div>
+<section id="buy" style="background:var(--ground-alt);padding:80px 20px">
+<div class="plan-card plan-card--highlight" style="max-width:620px;margin:0 auto;padding:40px 28px;display:flex;flex-direction:column;gap:20px;align-items:center;text-align:center">
+<div class="eyebrow">The complete system</div>
 <h2 class="disp" style="font-size:clamp(44px,7vw,64px);line-height:1">The Discipline Path</h2>
-<div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:20px;font-weight:800;color:#3B4F43">AUD</span><span class="disp" style="font-size:96px;line-height:.9;color:#1B3022">$37</span></div>
+<div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:20px;font-weight:800;color:var(--ink-soft)">AUD</span><span class="disp" style="font-size:96px;line-height:.9;color:var(--ink)">$37</span></div>
 <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:17px;text-align:left;align-self:stretch;max-width:420px;margin-inline:auto">
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>The 8-step discipline system</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>Your personal calorie and macro targets</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>Meal Plan Ideas, original recipes and a Workout Plan</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>Beast AI meal generator and estimator, free for life (up to 20 uses a day)</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>The Education library</span></li>
-<li style="display:flex;gap:12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>Lifetime access and free recipe updates</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>The 8-step discipline system</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>Your personal calorie and macro targets</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>Meal Plan Ideas, original recipes and a Workout Plan</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>Beast AI meal generator and estimator, free for life (up to 20 uses a day)</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>The Education library</span></li>
+<li class="dp-tick"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 12l5 5 9-10"/></svg><span>Lifetime access and free recipe updates</span></li>
 </ul>
-<button id="dp-checkout-btn" class="cta" type="button" style="width:100%;max-width:420px;border:0;cursor:pointer;font-family:inherit">Get Instant Access</button>
-<p id="dp-checkout-error" role="alert" style="display:none;margin:0;font-size:14px;color:#8a1f1f"></p>
-<div style="display:flex;gap:14px;align-items:center;background:#FFF1CC;border:2px solid #F59E0B;border-radius:16px;padding:16px 18px;width:100%;max-width:420px;box-sizing:border-box;text-align:left">
-<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#6B4200" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
-<div><div class="disp" style="font-size:28px;line-height:1;color:#4A2C00">No-nonsense refund</div><div style="font-size:16px;font-weight:700;color:#4A2C00;margin-top:4px">Not for you? Full refund within 48 hours.</div></div>
+<button id="dp-checkout-btn" class="cta" type="button" style="width:100%;max-width:420px">Get Instant Access</button>
+<p id="dp-checkout-error" class="error-text" role="alert" style="display:none;margin:0;font-size:15px"></p>
+<div class="dp-card" style="display:flex;gap:14px;align-items:center;padding:16px 18px;width:100%;max-width:420px;box-sizing:border-box;text-align:left;background:var(--surface-raised)">
+<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+<div><div class="disp" style="font-size:28px;line-height:1;color:var(--ink)">No-nonsense refund</div><div style="font-size:16px;font-weight:700;color:var(--ink);margin-top:4px">Not for you? Full refund within 48 hours.</div></div>
 </div>
-<p style="margin:0;font-size:14px;line-height:1.55;color:#4A5E52;max-width:46ch">Private. Your answers save to your account. Have a discount code? Enter it at checkout.</p>
+<p class="dp-cta-note">Private. Your answers save to your account. Have a discount code? Enter it at checkout.</p>
 </div>
 </section>
 
@@ -358,24 +372,34 @@ img{max-width:100%}
 </section>
 
 <!-- final cta -->
-<section style="background:#2D6A4F;color:#fff;padding:72px 20px;text-align:center">
+<section style="background:var(--ground-alt);border-top:1px solid var(--line);padding:72px 20px;text-align:center">
 <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:24px;align-items:center">
 <h2 class="disp" style="font-size:clamp(40px,6vw,68px);line-height:1;text-wrap:balance">You don't need a better plan. You need proof you can trust yourself.</h2>
 <a class="cta" href="#buy" style="width:100%;max-width:420px">Start The Discipline Path. AUD $37</a>
 </div>
 </section>
 
-<footer style="background:#1B3022;color:#B9D3C2;padding:32px 20px 96px">
-<div style="max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;font-size:14px">
-<div class="disp" style="font-size:24px;letter-spacing:.1em;color:#fff">BEAST<span style="color:#52B788">COACH</span></div>
-<div>The Discipline Path, a Beast Coach program. General information, not medical advice.</div>
-</div>
+<p style="margin:0;padding:0 20px 24px;text-align:center;font-size:15px;color:var(--muted)">The Discipline Path, a Beast Coach program. General information, not medical advice.</p>
+
+<!-- shared footer -->
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-ftr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-ftr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+    <nav class="site-footer-links" aria-label="Legal"><a href="/terms">Terms</a><a href="/privacy-policy">Privacy</a><a href="/coaching-terms">Coaching terms</a></nav>
+    <div class="site-footer-social">
+      <a href="https://www.instagram.com/beast.health.app" aria-label="Beast Coach on Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.25" fill="currentColor"/></svg></a>
+      <a href="https://www.tiktok.com/@beast_health_app" aria-label="Beast Coach on TikTok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M16.6 3h-3.3v12.6a2.7 2.7 0 1 1-2.7-2.7c.2 0 .4 0 .6.1V9.6a6 6 0 1 0 5.4 6V8.9a7.6 7.6 0 0 0 4.4 1.4V7a4.4 4.4 0 0 1-4.4-4z" fill="currentColor"/></svg></a>
+    </div>
+    <p class="site-footer-note">© 2026 Beast Coach</p>
+    <p class="site-footer-note">Online coaching. General fitness and nutrition guidance, not medical advice.</p>
+
+  </div>
 </footer>
 
 <!-- mobile sticky buy bar -->
-<div class="sticky" style="position:sticky;bottom:0;z-index:5;background:#1B3022;border-top:1px solid #2D6A4F;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));align-items:center;justify-content:space-between;gap:12px;margin-top:-80px">
-<div style="color:#fff;font-weight:800;font-size:16px">AUD $37 <span style="font-weight:500;color:#B9D3C2">one time</span></div>
-<a class="cta" href="#buy" style="padding:12px 20px;min-height:48px;font-size:16px">Get access</a>
+<div class="sticky" style="position:sticky;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));align-items:center;justify-content:space-between;gap:12px;margin-top:-80px">
+<div style="color:var(--ink);font-weight:800;font-size:16px">AUD $37 <span style="font-weight:500;color:var(--muted)">one time</span></div>
+<a class="cta" href="#buy" style="padding:12px 20px;min-height:52px;font-size:16px">Get access</a>
 </div>
 
 </div>

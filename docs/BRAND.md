@@ -93,3 +93,22 @@ Check with `tests/brand.test.js` before shipping a page.
 - Body copy is at least 15px. Eyebrows (12px) and small footnotes are the only exceptions.
 - Buttons are pills, at least 44px tall (the brand buttons are 52px).
 - Forms: native inputs use the shared input style in brand.css (ground background, line-strong border, 48px tall).
+
+## Errors
+
+- Error colour: `--error` (#FF5C5C). It is used only for a small "!" icon in front of an error message and for the 1px border of a field in error (`.field-error`).
+- Error text itself is ink (`--ink`), never coloured.
+- Orange is never used for errors. Orange means The Beast and real urgency (4 or fewer spots).
+- Shared pattern in brand.css: `.error-text`, or the `.form-msg--err`, `.msg` and `.buy-box .err` messages, all get the icon automatically. Empty messages show nothing.
+
+## Logged-in side (portal, coach page, dashboard, programs)
+
+- Header: logged-in pages use a simpler bar: the ring logo and BEAST COACH wordmark, a back or menu link, and the page's own Sign out button. Pages that are mostly public (discipline-path, program pages) keep the shared header and footer.
+- Tabs: `.tabs` and `.tab`. The active tab has an ink label and a 3px lime underline (`aria-selected="true"` or `.is-active`).
+- Tags: `.tag-pill` (line border, surface-raised), `.tag-pill--lime` for the one thing to notice.
+- Progress bars: `.progress` with `.progress__fill` in lime when on target. Add `.is-off` (amber) when well over or under.
+- Tiles: `.tile` is a surface card with a 1px line. `.tile--feature` is the dark surface with the 2px brand gradient border, used for "Hire me as your personal coach" and "My Coach". Its label uses `.tile-label` (lime).
+- Inputs: raised surface (`.portal-field`), 1px line-strong border, lime focus ring.
+- Day cards: `.card` with the same rules as other cards.
+- Buttons: the three brand buttons, always pills, at least 44px tall.
+- Errors: see the Errors section above. Never orange.

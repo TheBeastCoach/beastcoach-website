@@ -7,7 +7,6 @@
 - `features.html` — Full feature list
 - `about.html` — Founder story and mission
 - `privacy.html` — Privacy policy
-- `styles.css` — All styles
 
 ## Images to add
 Replace these placeholder image files with your actual photos:

@@ -4,44 +4,46 @@
    Collapsed days are native <details>, so they open on tap with no script. */
 (function (root) {
   var CSS = '' +
-    '.dc{background:#fff;border:1px solid var(--line,#D5E0D8);border-radius:18px;margin:0 0 10px;overflow:hidden}' +
-    '.dc>summary{list-style:none;cursor:pointer;padding:14px 16px 12px}' +
+    '.dc{background:var(--surface,#141511);border:1px solid var(--line,#26281F);border-radius:20px;margin:0 0 12px;overflow:hidden}' +
+    '.dc>summary{list-style:none;cursor:pointer;padding:16px 18px 14px;min-height:44px}' +
     '.dc>summary::-webkit-details-marker{display:none}' +
     '.dc-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}' +
-    '.dc-date{font-family:"Bebas Neue","Arial Narrow",Impact,sans-serif;font-size:24px;letter-spacing:.02em;line-height:1.1;color:var(--ink,#1B3022)}' +
-    '.dc-tag-day{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--green,#2D6A4F)}' +
-    '.dc-strip{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}' +
+    '.dc-date{font-family:var(--display,"Big Shoulders Display",Impact,sans-serif);font-weight:800;text-transform:uppercase;font-size:28px;letter-spacing:0;line-height:1;color:var(--ink,#F4F5EE)}' +
+    '.dc-tag-day{font-family:var(--body,"Hanken Grotesk",system-ui,sans-serif);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--lime,#C6F432)}' +
+    '.dc-strip{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}' +
     '@media(min-width:560px){.dc-strip{grid-template-columns:repeat(2,1fr)}}' +
     '.dc-m{min-width:0}' +
-    '.dc-m-top{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted,#3B4F43)}' +
-    '.dc-m-top b{color:var(--ink,#1B3022);font-weight:800}' +
-    '.dc-bar{height:6px;border-radius:99px;background:#E6EEE9;overflow:hidden;margin-top:5px}' +
-    '.dc-bar span{display:block;height:100%;border-radius:99px}' +
-    '.dc-ok{color:var(--green,#2D6A4F)}.dc-ok .dc-bar span{background:#2D6A4F}' +
-    '.dc-off{color:#8a5300}.dc-off .dc-bar span{background:#F59E0B}' +
-    '.dc-body{border-top:1px solid #EEF3EF;padding:6px 16px 14px}' +
-    '.dc-sec{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--green,#2D6A4F);margin:12px 0 4px}' +
-    '.dc-meal{border-bottom:1px solid #EEF3EF}.dc-meal:last-child{border-bottom:0}' +
-    '.dc-meal>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0}' +
+    '.dc-m-top{display:flex;justify-content:space-between;gap:8px;font-size:15px;color:var(--muted,#A3A69A);flex-wrap:wrap}' +
+    '.dc-m-top b{color:var(--ink,#F4F5EE);font-weight:700}' +
+    '.dc-bar{height:8px;border-radius:999px;background:var(--surface-raised,#17180F);overflow:hidden;margin-top:6px}' +
+    '.dc-bar span{display:block;height:100%;border-radius:999px;background:var(--lime,#C6F432)}' +
+    '.dc-off .dc-bar span{background:var(--amber,#FFC21F)}' +
+    '.dc-body{border-top:1px solid var(--line,#26281F);padding:6px 18px 16px}' +
+    '.dc-sec{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--lime,#C6F432);margin:14px 0 4px}' +
+    '.dc-meal{border-bottom:1px solid var(--line,#26281F)}.dc-meal:last-child{border-bottom:0}' +
+    '.dc-meal>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:12px 0;min-height:44px}' +
     '.dc-meal>summary::-webkit-details-marker{display:none}' +
-    '.dc-meal-name{font-weight:800;color:var(--ink,#1B3022);min-width:0;overflow-wrap:anywhere}' +
-    '.dc-time{font-size:12px;color:var(--muted,#3B4F43);font-weight:600;margin-right:6px}' +
-    '.dc-kcal{font-weight:800;text-align:right;white-space:nowrap}' +
-    '.dc-macros{grid-column:1/-1;font-size:12px;color:var(--muted,#3B4F43)}' +
+    '.dc-meal-name{font-weight:700;color:var(--ink,#F4F5EE);min-width:0;overflow-wrap:anywhere}' +
+    '.dc-time{font-size:15px;color:var(--muted,#A3A69A);font-weight:600;margin-right:6px}' +
+    '.dc-kcal{font-weight:700;color:var(--ink,#F4F5EE);text-align:right;white-space:nowrap}' +
+    '.dc-macros{grid-column:1/-1;font-size:15px;color:var(--muted,#A3A69A)}' +
     '.dc-tags{display:flex;flex-wrap:wrap;gap:6px;grid-column:1/-1}' +
-    '.dc-tag{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;background:#EEF6F1;color:var(--green,#2D6A4F);white-space:nowrap}' +
-    '.dc-tag-warn{background:#FFF4E0;color:#8a5300}' +
-    '.dc-desc{font-size:14px;color:var(--ink,#1B3022);padding:0 0 12px;white-space:pre-line;overflow-wrap:anywhere}' +
-    '.dc-ex{padding:6px 0;border-bottom:1px solid #EEF3EF}.dc-ex:last-child{border-bottom:0}' +
-    '.dc-ex b{font-weight:800}.dc-planned{font-size:12px;color:var(--muted,#3B4F43)}' +
-    '.dc-wo{padding:8px 0;border-bottom:1px solid #EEF3EF}.dc-wo:last-child{border-bottom:0}' +
-    '.dc-none{font-size:14px;color:var(--muted,#3B4F43);margin:8px 0 2px}' +
-    '.dc-quiet{font-size:14px;color:var(--muted,#3B4F43);padding:12px 16px;background:#fff;border:1px dashed var(--line,#D5E0D8);border-radius:14px;margin:0 0 10px}' +
-    '.dc-week{margin:18px 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}' +
-    '.dc-week h4{margin:0;font-family:"Bebas Neue","Arial Narrow",Impact,sans-serif;font-weight:400;font-size:22px;letter-spacing:.02em;color:var(--ink,#1B3022)}' +
-    '.dc-week p{margin:0;font-size:13px;color:var(--muted,#3B4F43)}' +
-    '.dc-lift{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:1px}' +
-    '.dc-lift-up{background:#D8F3E3;color:#1B6B43}.dc-lift-same{background:#EEF2EF;color:#4C6354}.dc-lift-down{background:#FFF4E0;color:#8a5300}';
+    '.dc-tag{font-size:15px;font-weight:600;border-radius:999px;padding:3px 12px;border:1px solid var(--line-strong,#3A3D30);background:var(--surface-raised,#17180F);color:var(--ink-soft,#C7C9BE);white-space:nowrap}' +
+    '.dc-tag-warn{border-color:var(--amber,#FFC21F);color:var(--ink,#F4F5EE)}' +
+    '.dc-desc{font-size:15px;color:var(--ink,#F4F5EE);padding:0 0 12px;white-space:pre-line;overflow-wrap:anywhere}' +
+    '.dc-ex{padding:8px 0;border-bottom:1px solid var(--line,#26281F)}.dc-ex:last-child{border-bottom:0}' +
+    '.dc-ex b{font-weight:700;color:var(--ink,#F4F5EE)}.dc-planned{font-size:15px;color:var(--muted,#A3A69A)}' +
+    '.dc-wo{padding:10px 0;border-bottom:1px solid var(--line,#26281F)}.dc-wo:last-child{border-bottom:0}' +
+    '.dc-none{font-size:15px;color:var(--muted,#A3A69A);margin:8px 0 2px}' +
+    '.dc-quiet{font-size:15px;color:var(--muted,#A3A69A);padding:14px 18px;background:var(--surface,#141511);border:1px dashed var(--line-strong,#3A3D30);border-radius:20px;margin:0 0 12px}' +
+    '.dc-quiet b{color:var(--ink,#F4F5EE)}' +
+    '.dc-week{margin:20px 0 10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}' +
+    '.dc-week h4{margin:0;font-family:var(--display,"Big Shoulders Display",Impact,sans-serif);font-weight:800;text-transform:uppercase;font-size:26px;line-height:1;letter-spacing:0;color:var(--ink,#F4F5EE)}' +
+    '.dc-week p{margin:0;font-size:15px;color:var(--muted,#A3A69A)}' +
+    '.dc-lift{display:inline-block;font-size:15px;font-weight:700;border-radius:999px;padding:2px 10px;margin-left:6px;vertical-align:1px;border:1px solid var(--line-strong,#3A3D30);color:var(--ink-soft,#C7C9BE)}' +
+    '.dc-lift-up{background:var(--lime,#C6F432);border-color:var(--lime,#C6F432);color:var(--on-accent,#0B0C0A)}' +
+    '.dc-lift-same{background:var(--surface-raised,#17180F);color:var(--ink-soft,#C7C9BE)}' +
+    '.dc-lift-down{border-color:var(--amber,#FFC21F);color:var(--ink,#F4F5EE)}';
 
   function injectCss() {
     if (typeof document === 'undefined' || document.getElementById('dc-css')) return;

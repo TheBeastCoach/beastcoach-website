@@ -8,120 +8,151 @@
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/brand.css">
 <style>
-:root{--ink:#1B3022;--green:#2D6A4F;--mint:#52B788;--bg:#F4F7F2;--amber:#F59E0B;--amber-hover:#FFB62E;--muted:#3B4F43;--line:#D5E0D8;--red:#b42318;--amber-text:#8a5300}
-*{box-sizing:border-box}
-body{margin:0;font-family:'Manrope',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5}
-h1,h2,h3,h4{font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;font-weight:400;letter-spacing:.02em;margin:0;color:var(--ink)}
-h1{font-size:clamp(44px,12vw,72px);line-height:.95}h3{font-size:28px;line-height:1.05}h4{font-size:22px}
-p{margin:0 0 10px}
-a{color:var(--green)}a:hover{color:var(--ink)}
-:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
-.wrap{max-width:620px;margin:0 auto;padding:14px 16px 56px}
-.muted{color:var(--muted);font-size:14px}
-.mini{font-size:14px;color:var(--muted)}
-.eyebrow{font-weight:800;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--green)}
-.hero{background:var(--ink);color:#fff;border-radius:22px;padding:22px 20px;margin-bottom:14px}
-.hero h1{color:#fff;font-size:clamp(40px,10vw,60px)}.hero .muted{color:#D5E6DB}.hero .eyebrow{color:#8FD3B0}
-.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
-.card h3{margin-bottom:10px}
-.note-box{background:#EEF5F0;border-radius:14px;padding:12px 14px;font-size:15px;margin-bottom:10px}
-.hl-amber{background:#fff6e0;border-left:4px solid var(--amber);padding:9px 12px;border-radius:10px;margin-bottom:10px}
-.hl-red{background:#fdecea;border-left:4px solid var(--red);padding:9px 12px;border-radius:10px;margin-bottom:10px}
-.banner{background:#FFF6E0;border:2px solid var(--amber);color:#4a2c00;border-radius:14px;padding:12px 14px;margin-bottom:14px;font-weight:700}
-select,input,textarea{font:inherit;color:var(--ink);background:#fff;border:1px solid #C5D3C8;border-radius:12px;padding:10px 12px;width:100%;max-width:100%}
-textarea{min-height:84px;resize:vertical}
-input[type=checkbox],input[type=radio]{width:auto;margin:0;accent-color:var(--green)}
-label{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
-.field{margin-bottom:12px}
+/* Client portal. Tokens and the logged-in classes come from /brand.css (docs/BRAND.md, "Logged-in side"). */
+body{margin:0;padding-top:0;background:var(--ground);color:var(--ink-soft);font-family:var(--body);font-size:16px;line-height:1.5}
+h1,h2,h3,h4{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:0;color:var(--ink);margin:0;line-height:.92}
+h1{font-size:clamp(40px,11vw,56px)}
+h3{font-size:26px;line-height:1;margin-bottom:12px}
+h4{font-family:var(--body);font-weight:700;text-transform:none;font-size:18px;line-height:1.3;margin:18px 0 6px}
+p{margin:0 0 10px;overflow-wrap:anywhere}
+a{color:var(--lime)}a:hover{color:var(--ink)}
+:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px 64px;box-sizing:border-box}
+.muted{color:var(--muted);font-size:15px}
+.mini{font-size:15px;color:var(--muted);overflow-wrap:anywhere}
+.eyebrow{font-family:var(--body);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--lime);margin:0 0 8px}
+.lede{font-size:15px;margin:0 0 12px;color:var(--ink-soft)}
+/* Header: the ring logo and wordmark, and the page's own Sign out button */
+.top-bar{background:var(--ground);border-bottom:1px solid var(--line)}
+.top-bar-inner{max-width:760px;margin:0 auto;padding:0 24px;min-height:64px;display:flex;justify-content:space-between;align-items:center;gap:12px;box-sizing:border-box}
+#signOutBtn{min-height:44px;padding:10px 18px;font-size:15px}
+.wrap>main{padding-top:24px}
+/* Buttons: pills, 44px and taller. Primary is lime, ghost and danger are outline. */
+button,.btn{font-family:var(--body);font-size:16px;font-weight:700;line-height:1.2;min-height:52px;padding:14px 26px;border:2px solid var(--lime);border-radius:999px;background:var(--lime);color:var(--on-accent);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;text-align:center;white-space:normal;cursor:pointer;box-sizing:border-box;max-width:100%}
+button:hover:not(:disabled),.btn:hover{filter:brightness(1.06)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost,.btn-danger{background:transparent;color:var(--ink);border:2px solid var(--line-strong)}
+.btn-ghost:hover,.btn-danger:hover{background:transparent;color:var(--lime);border-color:var(--lime);filter:none}
+.btn-sm{min-height:44px;padding:10px 18px;font-size:15px}
+.btn-block{width:100%}
+/* Form fields: raised surface, line-strong border, lime focus ring */
+input:not([type=checkbox]):not([type=radio]):not([type=file]),select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface-raised);border:1px solid var(--line-strong);border-radius:12px;padding:12px 14px;width:100%;max-width:100%;min-height:48px;box-sizing:border-box}
+textarea{min-height:96px;resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
+input:not([type=checkbox]):not([type=radio]):not([type=file]):focus,select:focus,textarea:focus{outline:2px solid var(--lime);outline-offset:1px;border-color:var(--lime)}
+input[type=checkbox],input[type=radio]{width:20px;height:20px;margin:0;accent-color:#C6F432;flex:none}
+label{display:block;font-family:var(--body);font-weight:700;font-size:15px;color:var(--ink);margin-bottom:8px}
+.field{margin-bottom:14px}
+.field-error,.invalid{border-color:var(--error)!important}
 .grid2{display:grid;gap:12px;grid-template-columns:1fr 1fr}
 .grid3{display:grid;gap:12px;grid-template-columns:repeat(3,1fr)}
 @media(max-width:420px){.grid2,.grid3{grid-template-columns:1fr}}
-.err{color:var(--red);font-size:13px;margin-top:4px;min-height:0}
+/* Errors: the text stays ink, with a small error-coloured "!" in front. Never orange or red text. */
+.err,.ob-msg,.msg,.error-text{color:var(--ink);font-size:15px;margin-top:6px}
 .err:empty{display:none}
-.invalid{border-color:var(--red)!important;box-shadow:0 0 0 2px #fbd4cf}
+.err:not(:empty)::before,.ob-msg:not(:empty)::before,.msg:not(:empty)::before,.error-text::before{content:"!";display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--error);color:var(--ground);font:800 13px/18px var(--body);text-align:center;margin-right:8px;vertical-align:1px}
+.ob-msg{font-weight:700;margin:4px 0 12px}
+.ob-msg:empty{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid #C5D3C8;border-radius:999px;padding:7px 12px;background:#fff;cursor:pointer;font-size:14px;font-weight:600;margin:0}
-.chip:has(input:checked){background:#d8f3e3;border-color:var(--mint)}
-.check{display:flex;gap:10px;align-items:flex-start;font-weight:600;margin:0 0 10px;cursor:pointer}
-.check input{margin-top:4px}
-.hint{font-size:13px;color:var(--muted);margin:4px 0 0}
-button,.btn{font:inherit;font-weight:800;border:0;border-radius:14px;padding:13px 18px;min-height:48px;cursor:pointer;background:var(--amber);color:#1B1200;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;text-align:center}
-button:hover{background:var(--amber-hover)}
-button:disabled{opacity:.45;cursor:not-allowed}
-.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--ink);color:#fff}
-.btn-ghost{background:#fff;color:var(--ink);border:1px solid #C5D3C8}.btn-ghost:hover{background:#F4F7F2}
-.btn-danger{background:#fff;color:var(--red);border:1px solid #f0c4c0}.btn-danger:hover{background:#fdecea}
-.btn-sm{padding:7px 12px;min-height:36px;font-size:14px;border-radius:10px}
-.btn-block{width:100%}
-.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.stack>*+*{margin-top:10px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.tab{background:#fff;color:var(--ink);border:1px solid #C5D3C8;padding:9px 14px;border-radius:999px;min-height:40px;font-size:15px}
-.tab:hover{background:#F4F7F2}
-.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);background:#EEF5F0;border-radius:14px;padding:4px;margin-bottom:12px}
-.seg.one{grid-template-columns:1fr}
-.seg button{background:transparent;color:var(--ink);font-size:14px;font-weight:700;padding:9px 6px;min-height:42px;border-radius:11px;white-space:normal;line-height:1.15}
-.seg button:hover{background:#fff}
-.seg button.on{background:var(--ink);color:#fff}
-.add-card{border:2px solid var(--mint)}
-.lede{font-size:15px;margin:0 0 12px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;border:2px solid var(--line-strong);border-radius:999px;padding:8px 16px;background:var(--surface-raised);cursor:pointer;font-size:15px;font-weight:600;color:var(--ink);margin:0}
+.chip:has(input:checked){border-color:var(--lime);color:var(--ink)}
+.check{display:flex;gap:12px;align-items:flex-start;font-weight:600;font-size:15px;color:var(--ink-soft);margin:0 0 10px;cursor:pointer;min-height:44px}
+.check input{margin-top:3px}
+.hint{font-size:15px;color:var(--muted);margin:6px 0 0}
+/* Cards and panels: surface, 1px line, 20px radius (panels 28px). No drop shadows. */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 20px;margin-bottom:14px}
+.card h3{margin-bottom:12px}
+.checkin-card,.add-card{border:2px solid var(--lime)}
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:26px 22px;margin-bottom:14px}
+.hero .muted{color:var(--muted)}
+.hero .progress{margin-top:16px}
+.note-box{background:var(--surface-raised);border:1px solid var(--line);border-radius:20px;padding:14px 16px;font-size:15px;color:var(--ink-soft);margin-bottom:10px}
+.hl-amber{background:var(--surface-raised);border:1px solid var(--line);border-left:4px solid var(--amber);padding:14px 16px;border-radius:20px;margin-bottom:10px;color:var(--ink-soft)}
+.hl-red{background:var(--surface-raised);border:1px solid var(--line-strong);padding:14px 16px;border-radius:20px;margin-bottom:10px;color:var(--ink)}
+.hl-red::before{content:"!";display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--error);color:var(--ground);font:800 13px/18px var(--body);text-align:center;margin-right:8px;vertical-align:1px}
+.ro-note{background:var(--surface-raised);border:1px solid var(--line);border-radius:20px;padding:14px 16px;font-size:15px;color:var(--ink-soft);margin-bottom:12px}
+/* Tabs: lime underline on the active tab */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:0 0 18px;overflow-x:auto}
+.tab{flex:1 1 auto;min-height:48px;padding:0 8px;background:none;border:0;border-bottom:3px solid transparent;border-radius:0;margin-bottom:-1px;color:var(--muted);font:700 15px/1 var(--body);white-space:nowrap;cursor:pointer;filter:none}
+.tab:hover{color:var(--ink);filter:none}
+.tab.on,.tab.is-active,.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--lime)}
+/* Segmented choices (the same look as the tabs' pills, one row) */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--surface-raised);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:12px}
+.seg.one{grid-auto-columns:1fr}
+.seg button{background:transparent;border:0;color:var(--ink-soft);font-size:15px;font-weight:700;padding:8px 6px;min-height:44px;border-radius:999px;white-space:normal;line-height:1.15}
+.seg button:hover{background:var(--surface);color:var(--ink);filter:none}
+.seg button.on{background:var(--ink);color:var(--on-accent)}
+.add-card .seg{margin-top:4px}
+/* Tags and status pills */
+.pill,.late{display:inline-flex;align-items:center;min-height:32px;padding:4px 14px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface-raised);color:var(--ink-soft);font-size:15px;font-weight:700;line-height:1.1}
+.pill.grey{color:var(--ink-soft)}
+.pill.amber{border-color:var(--amber);color:var(--ink)}
+.late{margin-left:8px;border-color:var(--amber);color:var(--ink);min-height:28px;padding:2px 12px}
+/* Progress bars: lime on target, amber (is-off) when well over or under */
+.progress,.bar{height:10px;border-radius:999px;background:var(--surface-raised);overflow:hidden;margin-top:10px}
+.progress__fill,.progress>span,.bar>span{display:block;height:100%;border-radius:999px;background:var(--lime)}
+.progress__fill.is-off,.progress>span.is-off,.bar>span.is-off{background:var(--amber)}
+.metric{margin-bottom:14px}
+.metric .top{display:flex;justify-content:space-between;gap:8px;font-size:15px;margin-bottom:4px;flex-wrap:wrap;color:var(--ink-soft)}
+.metric .top b{color:var(--ink)}
+.c-green{color:var(--lime)}
+.c-red{color:var(--amber)}
+.c-amber{color:var(--amber)}
+.big-num{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:32px;line-height:1;color:var(--ink);display:inline-block}
+.big-num.c-green{color:var(--lime)}
+.big-num.c-red{color:var(--amber)}
+.kcal{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:28px;line-height:1;white-space:nowrap;color:var(--ink)}
+.target-val{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:40px;line-height:1;white-space:nowrap;color:var(--ink)}
+.target-val small{font-family:var(--body);font-size:16px;font-weight:700;text-transform:none;color:var(--muted)}
+.target-row{display:flex;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);align-items:center}
+.target-row:last-child{border-bottom:0}
+.target-row b{color:var(--ink)}
 .meal{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start;flex-wrap:wrap}
 .meal:last-child{border-bottom:0}
-.kcal{font-family:'Bebas Neue',Impact,sans-serif;font-size:26px;line-height:1;white-space:nowrap}
-.bar{height:10px;background:#E3EBE4;border-radius:99px;overflow:hidden}
-.bar>span{display:block;height:100%;border-radius:99px;background:var(--mint)}
-.metric{margin-bottom:12px}
-.metric .top{display:flex;justify-content:space-between;gap:8px;font-size:15px;margin-bottom:5px;flex-wrap:wrap}
-.c-green{color:#1b7a46}.c-red{color:var(--red)}.c-amber{color:var(--amber-text)}
-.late{display:inline-block;background:#eef1f4;color:#3b4a57;border-radius:6px;padding:1px 7px;font-size:12px;font-weight:700;margin-left:6px}
-.checkin-card{border:2px solid var(--mint)}
+.meal b{color:var(--ink)}
+.block-title{font-family:var(--body);font-size:18px;font-weight:700;text-transform:none;letter-spacing:0;color:var(--ink);margin:4px 0 10px}
 .wo-set{display:grid;grid-template-columns:40px 1fr 1fr auto;gap:8px;align-items:center;margin-top:6px}
 .wo-set input{padding:8px 10px}
-.wo-head{font-size:12px;text-transform:uppercase;letter-spacing:.06em}
-.pill{display:inline-block;border-radius:999px;padding:4px 11px;font-size:12px;font-weight:800;background:#d8f3e3;color:#1b5e3a}
-.pill.grey{background:#eef1f4;color:#3b4a57}
-.pill.amber{background:#fff3d6;color:#8a5a00}
-.ro-note{background:#EEF1F4;border-radius:14px;padding:12px 14px;font-size:15px;margin-bottom:12px}
-.target-row{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}
-.target-row:last-child{border-bottom:0}
-.target-val{font-family:'Bebas Neue',Impact,sans-serif;font-size:36px;line-height:1;white-space:nowrap}
-.target-val small{font-size:16px}
-.tz-flag{font-size:13px;color:var(--amber-text);background:#fff6e0;border-radius:8px;padding:4px 9px}
-.sheet-back{position:fixed;inset:0;background:rgba(15,28,20,.55);z-index:95}
-.sheet{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:20px 20px 28px;z-index:96}
-@media(min-width:700px){.sheet{left:50%;transform:translateX(-50%);width:560px;bottom:24px;border-radius:22px}}
-.sheet h4{margin:16px 0 6px}
-.sheet p,.sheet li{font-size:16px}
-.sheet ol,.sheet ul{padding-left:22px;margin:0}
-.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:13px 18px;border-radius:14px;z-index:99;display:none;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.2)}
-.toast.show{display:block}
-.ob-msg{color:var(--red);font-weight:700;margin:4px 0 12px}
-.ob-msg:empty{display:none}
-.ob-nav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:6px 0 18px}
-@media(max-width:699px){.ob-nav{flex-direction:column-reverse}.ob-nav button{width:100%}}
-.progress{height:10px;background:#E3EBE4;border-radius:99px;overflow:hidden;margin-top:12px}
-.progress span{display:block;height:100%;background:var(--amber);border-radius:99px}
-.chart{width:100%;height:auto;display:block;margin:8px 0}
-.top-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.logo{font-family:'Bebas Neue',Impact,sans-serif;font-size:22px;letter-spacing:.1em;color:var(--ink);text-decoration:none}
-.logo span{color:var(--mint)}
-.tz-btn{display:block;width:100%;text-align:left;min-height:48px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;font:inherit;color:var(--ink,#1B3022);cursor:pointer}
-.tz-panel{margin-top:8px;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+.wo-head{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--lime)}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.stack>*+*{margin-top:10px}
+.tz-btn{display:block;width:100%;text-align:left;min-height:48px;padding:12px 14px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface-raised);font:inherit;font-size:16px;color:var(--ink);cursor:pointer}
+.tz-panel{margin-top:8px;border:1px solid var(--line);border-radius:20px;padding:12px;background:var(--surface-raised)}
 .tz-panel input[type=search]{width:100%;min-height:44px;font-size:16px;box-sizing:border-box}
 .tz-results{max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-top:8px}
-.tz-group{font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:14px 0 4px;color:#4c6354}
-.tz-opt{display:block;width:100%;text-align:left;min-height:44px;padding:10px 8px;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;color:inherit;cursor:pointer}
+.tz-group{font-family:var(--body);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--lime);margin:16px 0 4px}
+.tz-opt{display:block;width:100%;text-align:left;min-height:44px;padding:10px 8px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;font:inherit;font-size:16px;color:var(--ink);cursor:pointer}
+.tz-opt:hover{color:var(--lime);background:none;filter:none}
+details>summary{cursor:pointer;font-weight:700;color:var(--ink);min-height:44px;display:flex;align-items:center}
+/* Charts */
+.chart{width:100%;height:auto;display:block;margin:10px 0}
+.chart text{fill:var(--muted);font-family:var(--body)}
+.chart line{stroke:var(--line)}
+/* Toast and the exercise sheet */
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--surface-raised);color:var(--ink);border:1px solid var(--line-strong);padding:14px 20px;border-radius:20px;z-index:99;display:none;max-width:92vw;font-size:15px;font-weight:600;text-align:center}
+.toast.show{display:block}
+.sheet-back{position:fixed;inset:0;background:rgba(11,12,10,.72);z-index:95}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:28px 28px 0 0;padding:22px 20px 28px;z-index:96;color:var(--ink-soft)}
+@media(min-width:700px){.sheet{left:50%;transform:translateX(-50%);width:560px;bottom:24px;border-radius:28px}}
+.sheet h4{margin:18px 0 6px}
+.sheet p,.sheet li{font-size:16px}
+.sheet ol,.sheet ul{padding-left:22px;margin:0}
+.ob-nav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:6px 0 18px}
+@media(max-width:699px){.ob-nav{flex-direction:column-reverse}.ob-nav button{width:100%}}
+.progress-block{display:block}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top-bar">
-    <a class="logo" href="/">BEAST<span>COACH</span></a>
+<header class="top-bar">
+  <div class="top-bar-inner">
+    <a class="logo brand-mark" href="/" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-hdr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-hdr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
     <button class="btn-ghost btn-sm" id="signOutBtn" data-act="signOut" style="display:none">Sign out</button>
   </div>
+</header>
+<div class="wrap">
   <main id="app" aria-live="polite"><p class="muted">Loading your coaching…</p></main>
 </div>
 <div id="sheetRoot"></div>
@@ -148,7 +179,6 @@ const LOG_BACK_DAYS = 3;
 const PLAN_NAMES = { basic: 'Basic', essential: 'Essential', core: 'Core', beast: 'The Beast' };
 const NUT = ['calories', 'protein', 'carbs', 'fat', 'fibre'];
 const NUT_LABEL = { calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat', fibre: 'Fibre' };
-const MACRO_BAR = { calories: '#F59E0B', protein: '#2563EB', carbs: '#7C3AED', fat: '#E11D48', fibre: '#0891B2' };
 const SOURCES = { ai: 'Beast AI', plan: 'From plan', builder: 'Meal Builder', typed: 'Typed in' };
 const TIMEFRAMES = ['1 month', '3 months', '6 months', '12 months', 'No rush'];
 const DIETS = ['No restrictions','Vegetarian','Vegan','Pescatarian','Halal','Kosher','Dairy free','Gluten free','Other'];
@@ -587,7 +617,7 @@ function statusHeader() {
   return `<section class="hero"><div class="row"><div><div class="eyebrow">${first ? 'Hi ' + esc(first) : 'Hi'}</div>
       <h1>${esc(PLAN_NAMES[r.tier] || 'Coaching')} plan</h1></div><span class="pill">${esc(STATUS_LABEL[r.status] || r.status)}</span></div>
       ${week ? `<p class="muted" style="margin:10px 0 0">Week ${week} of 12.${r.end_date ? ' Ends ' + esc(fmtDate(r.end_date)) + '.' : ''} Weigh-in day: ${esc(weighDay)}.</p>` : ''}
-      ${showWa ? `<div style="margin-top:12px"><a class="btn btn-amber btn-sm" style="background:var(--amber);color:#1B1200;text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:800;display:inline-block" href="https://wa.me/${waDigits}" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>` : ''}
+      ${showWa ? `<div style="margin-top:12px"><a class="btn btn-primary" href="https://wa.me/${waDigits}" target="_blank" rel="noopener">Message Stefan on WhatsApp</a></div>` : ''}
     </section>`;
 }
 const STATUS_LABEL = { awaiting_onboarding: 'Onboarding', awaiting_activation: 'Awaiting activation', active: 'Active', paused: 'Paused', finished: 'Finished', cancelled: 'Cancelled' };
@@ -891,11 +921,11 @@ function stepsErrs(d) {
 function fmtTimeP(t) { const [h, m] = t.split(':').map(Number); return ((h + 11) % 12 + 1) + ':' + pad(m) + (h < 12 ? 'am' : 'pm'); }
 function showErrors(errs) {
   document.querySelectorAll('#onboardForm .err').forEach(el => { el.textContent = ''; });
-  document.querySelectorAll('#onboardForm .invalid').forEach(el => el.classList.remove('invalid'));
+  document.querySelectorAll('#onboardForm .invalid').forEach(el => el.classList.remove('invalid', 'field-error'));
   Object.keys(errs).forEach(k => {
     const box = document.getElementById('err-' + k);
     if (box) box.textContent = errs[k];
-    document.querySelectorAll(`[data-f="${k}"]`).forEach(el => { if (el.type !== 'radio') el.classList.add('invalid'); });
+    document.querySelectorAll(`[data-f="${k}"]`).forEach(el => { if (el.type !== 'radio') el.classList.add('invalid', 'field-error'); });
   });
   const firstBad = document.querySelector('#onboardForm .invalid'); if (firstBad) firstBad.scrollIntoView({ block: 'center' });
   const msg = document.getElementById('obMsg');
@@ -1075,8 +1105,8 @@ function stepsCard(editable) {
     : target ? `${fmtSteps(v)} of ${fmtSteps(target)} steps` : `${fmtSteps(v)} steps`;
   const note = target ? `Target: ${fmtSteps(target)} a day` : 'Stefan will set your steps target with your plan.';
   return `<div class="card"><h3>Steps</h3>
-    <div class="metric"><div class="top"><span><b>${S.day === clientToday(S.cur) ? 'Today' : esc(fmtDate(S.day))}</b></span><span style="color:${hit ? '#1b7a46' : 'inherit'}">${label}</span></div>
-      ${target ? `<div class="bar"><span style="width:${pct}%;background:${hit ? '#1b7a46' : STEPS_COLOUR}"></span></div>` : ''}</div>
+    <div class="metric"><div class="top"><span><b>${S.day === clientToday(S.cur) ? 'Today' : esc(fmtDate(S.day))}</b></span><span class="${hit ? 'c-green' : ''}">${label}</span></div>
+      ${target ? `<div class="bar"><span class="${v != null && pct < 90 ? 'is-off' : ''}" style="width:${pct}%"></span></div>` : ''}</div>
     <p class="mini" style="margin:6px 0 0">${esc(note)}</p>
     ${editable ? `<div class="row" style="flex-wrap:nowrap;margin-top:10px"><input id="st-val" type="number" inputmode="numeric" min="0" max="60000" value="${v == null ? '' : v}" placeholder="Steps" aria-label="Steps for the day" style="flex:1"><button data-act="saveSteps">Save steps</button></div>` : ''}</div>`;
 }
@@ -1152,8 +1182,6 @@ function planHtml() {
 }
 
 /* Progress: the demo's Progress tab on real data. Each plan is its own block. The current plan has the 7-day views. */
-const STEPS_COLOUR = '#2FA36B';
-const MACRO_OVER = { calories: '#B45309', protein: '#1E3A8A', carbs: '#4C1D95', fat: '#9F1239', fibre: '#155E75' };
 function unitVal(kg) { return S.unit === 'lb' ? kg * 2.20462 : kg; }
 function fmtSteps(n) { return Number(n).toLocaleString('en-AU'); }
 function fmtShortDate(s) { return pd(s).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }); }
@@ -1163,9 +1191,10 @@ function nutRow(k, val, target) {
   const over = !!target && val > target;
   const unit = k === 'calories' ? 'kcal' : 'g';
   const pct = target ? Math.min(100, Math.round(val / target * 100)) : 0;
+  const off = !!target && (val > target * 1.1 || val < target * 0.9);
   const status = !target ? `${val} ${unit}` : over ? `${val} of ${target} ${unit}, <b>${val - target} ${unit} over</b>` : `${val} of ${target} ${unit}, ${target - val} ${unit} left`;
-  return `<div class="metric"><div class="top"><span><b style="color:${MACRO_BAR[k]}">${NUT_LABEL[k]}</b></span><span style="color:${over ? MACRO_OVER[k] : 'inherit'}">${status}</span></div>
-    ${target ? `<div class="bar"><span style="width:${pct}%;background:${over ? MACRO_OVER[k] : MACRO_BAR[k]}"></span></div>` : ''}</div>`;
+  return `<div class="metric"><div class="top"><span><b>${NUT_LABEL[k]}</b></span><span>${status}</span></div>
+    ${target ? `<div class="bar"><span class="${off ? 'is-off' : ''}" style="width:${pct}%"></span></div>` : ''}</div>`;
 }
 function isCurrentRow(r) { return !!(S.cur && r.id === S.cur.id); }
 // Days counted for a plan: the current plan's last 7 days (from activation), or the whole of an earlier plan.
@@ -1195,25 +1224,24 @@ function weighTrend(pts) {
   const min = Math.min(...vals), max = Math.max(...vals), span = (max - min) || 1;
   const xy = vals.map((v, i) => [P + i * (W - 2 * P) / (vals.length - 1), H - P - (v - min) / span * (H - 2 * P)]);
   const path = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
-  const dots = xy.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="#2D6A4F"/>`).join('');
+  const dots = xy.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="#C6F432"/>`).join('');
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weigh-in trend">
-    <line x1="${P}" y1="${H - P}" x2="${W - P}" y2="${H - P}" stroke="#e2e9e0"/>
-    <path d="${path}" fill="none" stroke="#52B788" stroke-width="3" stroke-linejoin="round"/>${dots}
-    <text x="${P}" y="${H - 4}" font-size="11" fill="#5b6b60">${esc(fmtShortDate(pts[0].date))}</text>
-    <text x="${W - P}" y="${H - 4}" font-size="11" fill="#5b6b60" text-anchor="end">${esc(fmtShortDate(pts[pts.length - 1].date))}</text>
-    <text x="${P}" y="12" font-size="11" fill="#5b6b60">High ${max.toFixed(1)} ${S.unit}</text>
-    <text x="${W - P}" y="12" font-size="11" fill="#5b6b60" text-anchor="end">Low ${min.toFixed(1)} ${S.unit}</text></svg>`;
+    <line x1="${P}" y1="${H - P}" x2="${W - P}" y2="${H - P}" stroke="#26281F"/>
+    <path d="${path}" fill="none" stroke="#C6F432" stroke-width="3" stroke-linejoin="round"/>${dots}
+    <text x="${P}" y="${H - 4}" font-size="16" fill="#A3A69A">${esc(fmtShortDate(pts[0].date))}</text>
+    <text x="${W - P}" y="${H - 4}" font-size="16" fill="#A3A69A" text-anchor="end">${esc(fmtShortDate(pts[pts.length - 1].date))}</text>
+    <text x="${P}" y="12" font-size="16" fill="#A3A69A">High ${max.toFixed(1)} ${S.unit}</text>
+    <text x="${W - P}" y="12" font-size="16" fill="#A3A69A" text-anchor="end">Low ${min.toFixed(1)} ${S.unit}</text></svg>`;
 }
 function weightCardHtml(pts) {
-  const big = "font-family:'Bebas Neue',Impact,sans-serif;font-size:30px;line-height:1.1";
   let stats = '<p class="muted">No weigh-ins yet.</p>';
   if (pts.length) {
     const first = pts[0].kg, last = pts[pts.length - 1].kg, prev = pts.length > 1 ? pts[pts.length - 2].kg : null;
     const change = last - first, pct = first ? change / first * 100 : 0;
     stats = `<div class="grid3">
-      <div class="note-box"><div class="mini">Latest weight</div><b style="${big}">${unitVal(last).toFixed(1)} ${S.unit}</b></div>
-      <div class="note-box"><div class="mini">Change since start</div><b class="${change <= 0 ? 'c-green' : 'c-red'}" style="${big}">${unitVal(change).toFixed(1)} ${S.unit} (${pct.toFixed(1)}%)</b></div>
-      <div class="note-box"><div class="mini">Change since last weigh-in</div><b style="${big}">${prev == null ? 'n/a' : unitVal(last - prev).toFixed(1) + ' ' + S.unit}</b></div></div>`;
+      <div class="note-box"><div class="mini">Latest weight</div><b class="big-num">${unitVal(last).toFixed(1)} ${S.unit}</b></div>
+      <div class="note-box"><div class="mini">Change since start</div><b class="big-num ${change <= 0 ? 'c-green' : 'c-red'}">${unitVal(change).toFixed(1)} ${S.unit} (${pct.toFixed(1)}%)</b></div>
+      <div class="note-box"><div class="mini">Change since last weigh-in</div><b class="big-num">${prev == null ? 'n/a' : unitVal(last - prev).toFixed(1) + ' ' + S.unit}</b></div></div>`;
   }
   return `<div class="card"><h3>Weight</h3><div style="margin-top:10px">${stats}</div>${weighTrend(pts)}</div>`;
 }
@@ -1233,7 +1261,7 @@ function progressBlock(r, current) {
   const stepAvg = stepVals.length ? Math.round(stepVals.reduce((a, b) => a + b, 0) / stepVals.length) : null;
   const target = r.targets && r.targets.steps;
   const stepsCard = `<div class="card"><h3>Steps</h3><div class="metric"><div class="top"><span>Average per day, ${window_}</span><span><b>${stepAvg == null ? 'Nothing logged yet' : fmtSteps(stepAvg) + ' steps'}</b></span></div>
-    ${target && stepAvg != null ? `<div class="bar"><span style="width:${Math.min(100, Math.round(stepAvg / target * 100))}%;background:${STEPS_COLOUR}"></span></div><p class="mini" style="margin:6px 0 0">Target ${fmtSteps(target)} steps a day, based on ${stepVals.length} logged day${stepVals.length === 1 ? '' : 's'}.</p>` : ''}</div></div>`;
+    ${target && stepAvg != null ? `<div class="bar"><span class="${stepAvg / target < 0.9 ? 'is-off' : ''}" style="width:${Math.min(100, Math.round(stepAvg / target * 100))}%"></span></div><p class="mini" style="margin:6px 0 0">Target ${fmtSteps(target)} steps a day, based on ${stepVals.length} logged day${stepVals.length === 1 ? '' : 's'}.</p>` : ''}</div></div>`;
   // Meals: averages over the days with something logged
   const byDay = {};
   S.mealsAll.filter(m => m.client_id === r.id && days.includes(m.log_date)).forEach(m => { (byDay[m.log_date] = byDay[m.log_date] || []).push(m); });
@@ -1254,7 +1282,7 @@ function progressBlock(r, current) {
   const title = r.start_date ? `${fmtDate(r.start_date)} to ${r.end_date ? fmtDate(r.end_date) : 'now'}` : 'Not started yet';
   return `<section class="progress-block" aria-label="${label}">
     <div class="eyebrow">${label} · ${esc(PLAN_NAMES[r.tier] || '')}</div>
-    <h2 style="font-size:18px;margin:4px 0 10px">${esc(title)}</h2>
+    <h2 class="block-title">${esc(title)}</h2>
     ${weightCardHtml(weighPointsFor(r))}${stepsCard}${macroCard}${workouts}</section>`;
 }
 // Past days, newest first, from activation. The last 7 days are open. The same day card as the coach sees.
@@ -1301,7 +1329,7 @@ function settingsHtml() {
   const basicCard = S.cur && S.cur.tier === 'basic' ? '<div class="card"><h3>Your Basic plan</h3><p class="mini" style="margin-top:0">Update your card, see your receipts, or cancel. Cancelling keeps your plan until the paid period ends.</p><button data-act="manageBasic">Manage or cancel Basic</button></div>' : '';
   return `${basicCard}<div class="card"><h3>Marketing emails: ${S.marketing === null ? 'Unknown' : (on ? 'On' : 'Off')}</h3>
       <p class="muted">News and offers from Beast Coach by email. You can change this any time, and each email has an unsubscribe link.</p>
-      ${S.marketingError ? '<p class="mini" style="margin:0 0 8px;color:#B42318">Could not load your setting. Please try again.</p>' : ''}
+      ${S.marketingError ? '<p class="mini error-text" style="margin:0 0 8px">Could not load your setting. Please try again.</p>' : ''}
       <div class="row" style="justify-content:flex-start"><button data-act="toggleMarketing" ${S.marketing === null ? 'disabled' : ''}>${on ? 'Turn marketing emails off' : 'Turn marketing emails on'}</button></div></div>
     <div class="card"><h3>Delete my coaching data</h3>
       <p class="muted">This deletes your plan, meals, workouts, steps, weigh-ins and check-ins from Beast Coach. Your purchase record is kept for tax, and your email choice is respected.</p>
@@ -1671,5 +1699,18 @@ async function boot() {
 }
 boot();
 </script>
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <a href="/" class="brand-mark" aria-label="Beast Coach home"><svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="logo-ftr" gradientUnits="userSpaceOnUse" x1="12" y1="88" x2="88" y2="12"><stop offset="0" stop-color="#C6F432"/><stop offset="0.55" stop-color="#FFC21F"/><stop offset="1" stop-color="#FF8A2A"/></linearGradient></defs><path d="M83.83 37.69 A36 36 0 1 1 56.25 14.55" fill="none" stroke="url(#logo-ftr)" stroke-width="14" stroke-linecap="round"/><circle cx="73.14" cy="22.42" r="7" fill="#FF8A2A"/></svg><span class="brand-word">BEAST <span class="text-gradient">COACH</span></span></a>
+    <nav class="site-footer-links" aria-label="Legal"><a href="/terms">Terms</a><a href="/privacy-policy">Privacy</a><a href="/coaching-terms">Coaching terms</a></nav>
+    <div class="site-footer-social">
+      <a href="https://www.instagram.com/beast.health.app" aria-label="Beast Coach on Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.25" fill="currentColor"/></svg></a>
+      <a href="https://www.tiktok.com/@beast_health_app" aria-label="Beast Coach on TikTok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M16.6 3h-3.3v12.6a2.7 2.7 0 1 1-2.7-2.7c.2 0 .4 0 .6.1V9.6a6 6 0 1 0 5.4 6V8.9a7.6 7.6 0 0 0 4.4 1.4V7a4.4 4.4 0 0 1-4.4-4z" fill="currentColor"/></svg></a>
+    </div>
+    <p class="site-footer-note">© 2026 Beast Coach</p>
+    <p class="site-footer-note">Online coaching. General fitness and nutrition guidance, not medical advice.</p>
+
+  </div>
+</footer>
 </body>
 </html>

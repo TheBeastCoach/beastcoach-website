@@ -154,7 +154,7 @@ test('dashboard: a signed-in user with no coaching plan sees the hire tile (dark
   const hire = await page.textContent('#hireCoachTile');
   assert.match(hire, /Hire me as your personal coach/);
   assert.match(hire, /4 options available/);
-  assert.equal(await page.evaluate(() => getComputedStyle(document.getElementById('hireCoachTile')).backgroundColor), 'rgb(45, 106, 79)', 'the same dark green as My Coach');
+  assert.equal(await page.evaluate(() => getComputedStyle(document.getElementById('hireCoachTile')).backgroundColor), 'rgb(20, 21, 17)', 'the same surface as My Coach');
   assert.equal(await page.evaluate(() => document.getElementById('myCoachTile').style.display), 'none');
   // Set SHOT_DIR to save the tiles as a screenshot (to check the layout by eye).
   if (process.env.SHOT_DIR) await page.screenshot({ path: path.join(process.env.SHOT_DIR, 'dashboard-hire-tile-' + (Number(process.env.PAGE_W) || 390) + '.png'), fullPage: true });

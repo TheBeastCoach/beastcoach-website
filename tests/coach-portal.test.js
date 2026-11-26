@@ -23,8 +23,10 @@ let browser, server, base;
 const MELB = 'Australia/Melbourne';
 const ymd = (d, zone) => new Intl.DateTimeFormat('en-CA', { timeZone: zone || MELB, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 const addDaysStr = (s, n) => { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
-const TODAY = () => ymd(new Date());
-const daysAgoIso = n => new Date(Date.now() - n * 86400000).toISOString();
+// A fixed clock, so the dates in the fixtures never depend on the day the tests run. Noon in Melbourne.
+const NOW_MS = Date.parse('2026-11-26T12:00:00+11:00');
+const TODAY = () => ymd(new Date(NOW_MS));
+const daysAgoIso = n => new Date(NOW_MS - n * 86400000).toISOString();
 
 /* ------------------------------------------------------------------ the fake supabase-js (runs in the page) */
 const FAKE_SUPABASE = `
@@ -179,7 +181,7 @@ function seed(over) {
     ],
     coaching_step_logs: [{ client_id: 3, log_date: today, steps: 7400 }],
     coaching_weigh_ins: [{ client_id: 3, weigh_date: addDaysStr(today, -7), kg: 89.1 }],
-    coaching_checkins: [{ id: 'k1', client_id: 2, type: 'Kick-off call', scheduled_at: new Date(Date.now() + 2 * 86400000).toISOString(), status: 'scheduled' }],
+    coaching_checkins: [{ id: 'k1', client_id: 2, type: 'Kick-off call', scheduled_at: new Date(NOW_MS + 2 * 86400000).toISOString(), status: 'scheduled' }],
     coaching_notes: [],
     coaching_settings: []
   };
@@ -209,6 +211,7 @@ test.after(async () => { if (browser) await browser.close(); if (server) server.
 async function open(stub, opts) {
   const o = opts || {};
   const ctx = await browser.newContext({ viewport: o.viewport || { width: 1280, height: 900 }, timezoneId: MELB, acceptDownloads: true });
+  await ctx.clock.setFixedTime(new Date(NOW_MS));
   const page = await ctx.newPage();
   page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));

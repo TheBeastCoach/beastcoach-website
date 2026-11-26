@@ -13,6 +13,7 @@
   --lime: #C6F432;
   --amber: #FFC21F;
   --orange: #FF8A2A;
+  --error: #FF5C5C;
   --on-accent: #0B0C0A;
   --brand-gradient: linear-gradient(90deg, #C6F432 0%, #FFC21F 55%, #FF8A2A 100%);
   --display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
@@ -73,7 +74,7 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .brand-word { font-family: var(--display); font-weight: 900; font-size: 22px; letter-spacing: .04em; text-transform: uppercase; line-height: 1; color: var(--ink); }
 .brand-word .text-gradient { font: inherit; }
 .site-nav-links { display: flex; align-items: center; gap: 22px; }
-.site-nav-links a { color: var(--ink-soft); text-decoration: none; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; min-height: 44px; }
+.site-nav-links a { color: var(--ink-soft); text-decoration: none; font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; min-height: 44px; }
 .site-nav-links a:hover, .site-nav-links a[aria-current] { color: var(--ink); }
 .site-nav-cta { background: var(--lime) !important; color: var(--on-accent) !important; padding: 0 18px; min-height: 44px; display: inline-flex; align-items: center; box-sizing: border-box; border-radius: 999px; font-weight: 700 !important; }
 .site-nav-toggle { display: none; background: none; border: 0; color: var(--ink); font-size: 24px; cursor: pointer; min-width: 44px; min-height: 44px; }
@@ -108,3 +109,35 @@ input:not([type=checkbox]):not([type=radio]):focus, select:focus, textarea:focus
 .site-footer-links a { color: var(--ink-soft); text-decoration: none; font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; min-height: 44px; }
 .site-footer-links a:hover { color: var(--lime); }
 .site-footer-note { margin: 0; font-size: 15px; color: var(--muted); }
+.site-footer-social { display: flex; gap: 12px; }
+.site-footer-social a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--ink-soft); }
+.site-footer-social a:hover { color: var(--lime); border-color: var(--lime); }
+
+/* Errors: the message text stays ink. A small error-coloured "!" sits in front of it, and a field in error
+   gets a 1px error border. Orange is never used for errors (orange means The Beast and real urgency). */
+.error-text, .form-msg--err, .msg, .buy-box .err { color: var(--ink); }
+.error-text::before, .form-msg--err::before, .msg:not(:empty)::before, .buy-box .err:not(:empty)::before {
+  content: "!"; display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: var(--error);
+  color: var(--ground); font: 800 13px/18px var(--body); text-align: center; margin-right: 8px; vertical-align: 1px;
+}
+.field-error { border-color: var(--error) !important; }
+
+/* ---- Logged-in side (portal, coach page, dashboard, programs). Add these classes; never rename existing ones. ---- */
+/* Tabs: lime underline on the active tab */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tab { flex: none; min-height: 44px; padding: 0 14px; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; color: var(--muted); font: 700 15px/1 var(--body); cursor: pointer; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"], .tab.is-active { color: var(--ink); border-bottom-color: var(--lime); }
+/* Tags: small pills */
+.tag-pill { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface-raised); color: var(--ink-soft); font: 700 13px/1 var(--body); }
+.tag-pill--lime { background: var(--lime); border-color: var(--lime); color: var(--on-accent); }
+/* Progress bars: lime when on target, amber when well over or under */
+.progress { height: 10px; border-radius: 999px; background: var(--surface-raised); overflow: hidden; }
+.progress__fill { height: 100%; border-radius: 999px; background: var(--lime); }
+.progress__fill.is-off { background: var(--amber); }
+/* Dashboard and portal tiles: surface with a 1px line; the feature tile gets the 2px gradient border */
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
+.tile--feature { border: 2px solid transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--brand-gradient) border-box; border-radius: 20px; padding: 24px; }
+.tile-label { font: 700 12px/1 var(--body); letter-spacing: 2px; text-transform: uppercase; color: var(--lime); }
+/* Portal inputs: raised surface, line-strong border, lime focus ring (the global focus style applies) */
+.portal-field, .portal-field:not([type=checkbox]):not([type=radio]) { background: var(--surface-raised); border: 1px solid var(--line-strong); color: var(--ink); }

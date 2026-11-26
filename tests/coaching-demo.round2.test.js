@@ -725,7 +725,8 @@ test('Agreements: each one links to its document in a new tab, and following a l
     assert.equal(await page.isChecked(`input[data-ob="${box}"]`), false, box + ' is not ticked by default');
   }
   for (const href of ['/coaching-terms', '/coaching-health', '/coaching-privacy']) {
-    const link = page.locator(`a[href="${href}"]`);
+    // The first match is the agreement's own link; the shared footer also links to /coaching-terms later on the page.
+    const link = page.locator(`a[href="${href}"]`).first();
     assert.equal(await link.getAttribute('target'), '_blank', 'opens in a new tab: ' + href);
     assert.equal(await link.getAttribute('rel'), 'noopener', 'noopener: ' + href);
   }
