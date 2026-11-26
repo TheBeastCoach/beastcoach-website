@@ -81,7 +81,7 @@ test('every public page has a unique title and a meta description', () => {
 });
 
 test('no gated recipe ingredient or method text appears on a public page', () => {
-  const RECIPES = require(path.join(ROOT, 'api/_recipes-full.js'));
+  const RECIPES = JSON.parse(fs.readFileSync(path.join(ROOT, 'private/recipes-full.json'), 'utf8'));
   const publicText = [...PUBLIC, ...TEASERS].map(read).join('\n');
   for (const r of RECIPES) {
     for (const key of ['ingredients', 'instructions']) {

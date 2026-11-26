@@ -11,6 +11,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Medium",
     "healthScore": 8,
     "dateAdded": "2026-10-13"
@@ -26,6 +27,7 @@ const RECIPES = [
     "basis": "per whole batch",
     "kcal": 190,
     "protein": 42,
+    "fibre": 0,
     "difficulty": "Medium",
     "healthScore": 3,
     "dateAdded": "2026-10-13"
@@ -41,6 +43,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Medium",
     "healthScore": 6,
     "dateAdded": "2026-10-13"
@@ -57,6 +60,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Easy",
     "healthScore": 7,
     "dateAdded": "2026-10-14"
@@ -72,6 +76,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Easy",
     "healthScore": 7,
     "dateAdded": "2026-10-14"
@@ -87,6 +92,7 @@ const RECIPES = [
     "basis": "per whole batch",
     "kcal": 45,
     "protein": 6,
+    "fibre": 1,
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-14"
@@ -102,6 +108,7 @@ const RECIPES = [
     "basis": "per 40g",
     "kcal": 50,
     "protein": 3,
+    "fibre": 4,
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-10-15"
@@ -117,6 +124,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Medium",
     "healthScore": 5,
     "dateAdded": "2026-10-15"
@@ -132,6 +140,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-15"
@@ -148,6 +157,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-16"
@@ -163,6 +173,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Medium",
     "healthScore": 9,
     "dateAdded": "2026-10-18"
@@ -178,6 +189,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Hard",
     "healthScore": 6,
     "dateAdded": "2026-10-20"
@@ -194,6 +206,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-21"
@@ -211,6 +224,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Medium",
     "healthScore": 10,
     "dateAdded": "2026-10-23"
@@ -227,6 +241,7 @@ const RECIPES = [
     "basis": "per container",
     "kcal": 540,
     "protein": 40.1,
+    "fibre": 17.7,
     "difficulty": "Easy",
     "healthScore": 10,
     "dateAdded": "2026-10-25"
@@ -243,6 +258,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-27"
@@ -260,6 +276,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Medium",
     "healthScore": 10,
     "dateAdded": "2026-10-27"
@@ -275,6 +292,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-10-27"
@@ -290,6 +308,7 @@ const RECIPES = [
     "basis": "per whole batch",
     "kcal": 146,
     "protein": 5,
+    "fibre": 10.3,
     "difficulty": "Medium",
     "healthScore": 10,
     "dateAdded": "2026-10-27"
@@ -305,6 +324,7 @@ const RECIPES = [
     "basis": "per brownie",
     "kcal": 108,
     "protein": 8,
+    "fibre": 2,
     "difficulty": "Easy",
     "healthScore": 7,
     "dateAdded": "2026-10-27"
@@ -320,6 +340,7 @@ const RECIPES = [
     "basis": "per 45g scoop",
     "kcal": 205,
     "protein": 20,
+    "fibre": 3.5,
     "difficulty": "Medium",
     "healthScore": 9,
     "dateAdded": "2026-11-01"
@@ -336,6 +357,7 @@ const RECIPES = [
     "basis": "per whole batch",
     "kcal": 295,
     "protein": 6,
+    "fibre": 14,
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-11-03"
@@ -351,6 +373,7 @@ const RECIPES = [
     "basis": "per whole batch",
     "kcal": 515,
     "protein": 15,
+    "fibre": 13,
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-11-10"
@@ -366,6 +389,7 @@ const RECIPES = [
     "basis": "per portion",
     "kcal": 45,
     "protein": 2,
+    "fibre": 5,
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-11-19"
@@ -382,6 +406,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-11-23"
@@ -398,6 +423,7 @@ const RECIPES = [
     "basis": null,
     "kcal": null,
     "protein": null,
+    "fibre": null,
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-11-23"

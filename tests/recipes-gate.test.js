@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-const FULL = require(path.join(ROOT, 'api/_recipes-full.js'));
+const FULL = JSON.parse(fs.readFileSync(path.join(ROOT, 'private/recipes-full.json'), 'utf8'));
 const endpoint = require(path.join(ROOT, 'api/recipes.js'));
 
 function call(query, auth) {
@@ -18,13 +18,20 @@ function call(query, auth) {
   return endpoint(req, res).then(() => res);
 }
 
-// Stub Supabase's /auth/v1/user: only 'good-token' is a real signed-in account.
+// Stub Supabase: /auth/v1/user accepts only 'good-token'; the recipes table returns a row only for that token,
+// as row-level security does (anonymous or bad tokens see no rows).
 const realFetch = global.fetch;
 function stubSupabase() {
   global.fetch = async (url, opts) => {
     const auth = (opts && opts.headers && opts.headers.Authorization) || '';
-    if (String(url).includes('/auth/v1/user') && auth === 'Bearer good-token') {
+    const u = String(url);
+    if (u.includes('/auth/v1/user') && auth === 'Bearer good-token') {
       return { ok: true, json: async () => ({ id: 'user-1', email: 'member@example.com' }) };
+    }
+    if (u.includes('/rest/v1/recipes_full') && auth === 'Bearer good-token') {
+      const id = decodeURIComponent((u.match(/id=eq\.([^&]+)/) || [])[1] || '');
+      const row = FULL.find(r => r.id === id);
+      return { ok: true, json: async () => (row ? [{ data: row }] : []) };
     }
     return { ok: false, json: async () => ({}) };
   };
@@ -62,10 +69,17 @@ test('the endpoint returns 404 for an unknown recipe, and only to a signed-in us
   assert.equal((await call({ id: FULL[0].id }, 'Bearer bad')).statusCode, 401);
 });
 
-test('the full recipe data is not a static file: it lives in api/ with no handler', () => {
+test('the full recipe data is not in any deployed file: it is in Supabase, and the source folders are not deployed', () => {
   assert.equal(fs.existsSync(path.join(ROOT, 'recipes.js')), false, 'the public recipes.js is gone');
-  const src = fs.readFileSync(path.join(ROOT, 'api/_recipes-full.js'), 'utf8');
-  assert.doesNotMatch(src, /module\.exports\s*=\s*async|export default|function handler/, 'no handler in the data module');
+  assert.equal(fs.existsSync(path.join(ROOT, 'api/_recipes-full.js')), false, 'no full-recipe module under api/');
+  const ignore = fs.readFileSync(path.join(ROOT, '.vercelignore'), 'utf8').split('\n').map(l => l.trim());
+  assert.ok(ignore.includes('private/'), 'private/ (the source data) is not deployed');
+  assert.ok(ignore.includes('supabase/'), 'supabase/ (the table SQL) is not deployed');
+  assert.ok(fs.existsSync(path.join(ROOT, 'supabase/recipes-full.sql')), 'the table SQL exists for the owner to run');
+  const sql = fs.readFileSync(path.join(ROOT, 'supabase/recipes-full.sql'), 'utf8');
+  assert.match(sql, /enable row level security/);
+  assert.match(sql, /grant select on public\.recipes_full to authenticated/);
+  assert.doesNotMatch(sql, /grant select on public\.recipes_full to anon/, 'no anonymous read');
 });
 
 // A whole-phrase match: the text is not part of a longer number or word (so "50g Greek yoghurt" does not match "150g Greek yoghurt").

@@ -1,6 +1,4 @@
-// Full recipes (gated). Ingredients, quantities, method and notes. Never copy this into a public file.
-// Served only by api/recipes.js, after it checks the caller's Supabase sign-in. This module has no handler.
-module.exports = [
+[
   {
     "id": "ice-cream-sandwich",
     "meal": [
@@ -1433,4 +1431,4 @@ module.exports = [
     "dateAdded": "2026-11-23",
     "blurb": "My magnesium smoothie again, this time with cacao nibs for a chocolate hit and a bit of crunch."
   }
-];
+]

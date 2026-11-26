@@ -3,7 +3,7 @@
 //
 //   node scripts/build-recipe-teasers.js
 //
-// Reads the full recipes from api/_recipes-full.js (server-only) and writes the public fields to recipes-public.js.
+// Reads the full recipes from private/recipes-full.json (not deployed) and writes the public fields to recipes-public.js.
 // Writes recipes/<id>.html for every recipe, and replaces the block between
 // <!-- recipe-list:start --> and <!-- recipe-list:end --> in recipes.html.
 //
@@ -16,7 +16,7 @@ const path = require('path');
 const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
-const DATA_FILE = path.join(ROOT, 'api', '_recipes-full.js');
+const DATA_FILE = path.join(ROOT, 'private', 'recipes-full.json');
 const PUBLIC_FILE = path.join(ROOT, 'recipes-public.js');
 const LIST_FILE = path.join(ROOT, 'recipes.html');
 const OUT_DIR = path.join(ROOT, 'recipes');
@@ -33,9 +33,8 @@ function escapeHtml(s) {
 }
 
 function loadRecipes() {
-  delete require.cache[require.resolve(DATA_FILE)];
-  const recipes = require(DATA_FILE);
-  if (!Array.isArray(recipes)) throw new Error('api/_recipes-full.js does not export an array');
+  const recipes = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  if (!Array.isArray(recipes)) throw new Error('private/recipes-full.json is not an array');
   return recipes;
 }
 
@@ -52,6 +51,7 @@ function publicRecord(r) {
     basis,
     kcal: basis ? Math.round(Number(r.kcal)) : null,
     protein: basis ? Number(r.protein) : null,
+    fibre: basis && r.fibre != null ? Number(r.fibre) : null,
     difficulty: r.difficulty || null,
     healthScore: r.healthScore == null ? null : r.healthScore,
     dateAdded: r.dateAdded || null,
