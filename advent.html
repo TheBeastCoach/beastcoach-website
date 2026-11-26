@@ -77,8 +77,8 @@
   .modal { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 28px 24px 22px; max-width: 400px; width: 100%; display: flex; flex-direction: column; gap: 14px; }
   .modal h2 { font-family: var(--display); font-weight: 800; font-size: 32px; line-height: .92; text-transform: uppercase; color: var(--ink); margin: 0; }
   .modal p { font-size: 15px; color: var(--ink-soft); margin: 0; }
-  .modal .login { text-align: center; color: var(--muted); }
-  .modal .login a { color: var(--lime); font-weight: 700; }
+  .login-btn { display: flex; align-items: center; justify-content: center; min-height: 52px; box-sizing: border-box; text-align: center; border: 2px solid var(--line-strong); border-radius: 999px; padding: 14px 20px; font-weight: 700; font-size: 16px; color: var(--ink); text-decoration: none; }
+  .login-btn:hover { border-color: var(--lime); color: var(--lime); }
   .modal .later { background: none; border: none; font: inherit; font-size: 15px; color: var(--muted); text-decoration: underline; cursor: pointer; min-height: 44px; }
 </style>
 </head>
@@ -113,10 +113,10 @@
 
 <div class="scrim" id="scrim">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
-    <h2 id="m-title">Create a free account to open your door</h2>
-    <p>It takes a minute. You get the demo door straight away, then a new door every day from 1 December.</p>
+    <h2 id="m-title">Sign in to open your door</h2>
+    <p>New here? Create a free account in a minute. You get the demo door straight away, then a new door every day from 1 December.</p>
     <a class="cta btn-primary" id="m-go" href="/dashboard#advent">Create free account</a>
-    <p class="login">Already have an account? <a href="/dashboard#advent">Log in</a></p>
+    <a class="login-btn" href="/dashboard#advent">I already have an account. Log in</a>
     <button type="button" class="later" id="m-close">Not now</button>
   </div>
 </div>
@@ -150,6 +150,12 @@
   function close() { scrim.classList.remove("open"); if (last) last.focus(); }
   grid.addEventListener("click", function (e) { var d = e.target.closest(".door"); if (d) open({ currentTarget: d }); });
   document.getElementById("demo").addEventListener("click", open);
+  // Anywhere you press on the page asks you to sign in (links, the sign-up pop-up itself and the nav keep working).
+  document.addEventListener("click", function (e) {
+    if (signedIn || scrim.classList.contains("open")) return;
+    if (e.target.closest("a, .scrim, #demo, .door")) return;
+    open({ currentTarget: e.target });
+  });
   document.getElementById("m-close").addEventListener("click", close);
   scrim.addEventListener("click", function (e) { if (e.target === scrim) close(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
