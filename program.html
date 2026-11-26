@@ -240,7 +240,7 @@ html{font-size:18px}
 .pg .ch-ico{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center}
 .pg .ch-ico svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pg .ch-txt{flex:1;min-width:0}
-.pg .ch-name{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-weight:800;font-size:1.05rem}
+.pg .ch-name{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-weight:800;font-size:1.05rem;color:var(--ink)}
 .pg .ch-pill{font-size:15px;font-weight:800;border-radius:999px;padding:2px 10px}
 .pg .ch-meta{display:block;color:var(--muted2);font-size:.95rem;margin-top:2px;line-height:1.4;font-weight:500}
 .pg .ch-tick{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
@@ -473,7 +473,7 @@ html{font-size:18px}
 .pg .sheet-bar{background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;flex-wrap:wrap}
 .pg .sheet-bt{flex:1;min-width:200px}
 .pg .sheet-btns{display:flex;gap:8px;flex:none}
-.pg .soc-chev{flex:none;width:30px;height:30px;border-radius:50%;background:var(--surface-raised);color:var(--on-accent);display:grid;place-items:center;font-family:var(--body);font-weight:800;font-size:1.25rem;line-height:1;margin-left:8px}
+.pg .soc-chev{flex:none;width:30px;height:30px;border-radius:50%;background:var(--lime);color:var(--on-accent);display:grid;place-items:center;font-family:var(--body);font-weight:800;font-size:1.25rem;line-height:1;margin-left:8px}
 .pg .soc-head .env-badge,.pg .soc-head .mp-k{margin-left:auto}
 .pg .stp-top{gap:10px}
 .pg .stp-n{margin-left:auto}
@@ -969,7 +969,7 @@ html{font-size:18px}
 <sc-if value="{{rb.hasPlan}}" hint-placeholder-val="{{ false }}"><p class="ch-meta">Your training days are shared with your workout plan in Step 7. Change them in either place and both update.</p></sc-if>
 <sc-for list="{{rb.days}}" as="d" hint-placeholder-count="7">
 <div class="env-item" style="{{d.style}}">
-<button class="soc-head" onClick="{{d.toggle}}"><span class="soc-t">{{d.name}}</span><span class="env-badge" style="background:var(--surface-raised);color:var(--on-accent)">{{d.focus}}</span><span class="soc-chev">{{d.chev}}</span></button>
+<button class="soc-head" onClick="{{d.toggle}}"><span class="soc-t">{{d.name}}</span><span class="env-badge" style="background:var(--lime);color:var(--on-accent)">{{d.focus}}</span><span class="soc-chev">{{d.chev}}</span></button>
 <p class="ch-meta">{{d.sum}}</p>
 <sc-if value="{{d.isOpen}}" hint-placeholder-val="{{ false }}">
 <div class="env-chips"><button class="env-chip" style="{{d.trainStyle}}" onClick="{{d.setTrain}}">Training day</button><button class="env-chip" style="{{d.restStyle}}" onClick="{{d.setRest}}">Rest day</button></div>
@@ -1091,7 +1091,7 @@ html{font-size:18px}
 <p class="ch-meta">Tap a day to open it. Tap How to see what an exercise is, or Swap it for another. Your training days are the same as your routine in Step 5, so changing them here updates it. Finish each set with two or three reps left in the tank. When every set feels easy at the top of the range, add a little weight.</p>
 <sc-for list="{{wp.days}}" as="d" hint-placeholder-count="4">
 <div class="env-item" style="{{d.style}}">
-<button class="soc-head" onClick="{{d.toggle}}"><span class="soc-t">{{d.name}}</span><span class="env-badge" style="background:var(--surface-raised);color:var(--on-accent)">{{d.count}}</span><span class="soc-chev">{{d.chev}}</span></button>
+<button class="soc-head" onClick="{{d.toggle}}"><span class="soc-t">{{d.name}}</span><span class="env-badge" style="background:var(--lime);color:var(--on-accent)">{{d.count}}</span><span class="soc-chev">{{d.chev}}</span></button>
 <p class="ch-meta">{{d.title}}</p>
 <sc-if value="{{d.isOpen}}" hint-placeholder-val="{{ false }}">
 <sc-for list="{{d.ex}}" as="e" hint-placeholder-count="5"><div class="wp-ex"><div class="wp-exn"><b>{{e.name}}</b><span>{{e.rx}}</span><sc-if value="{{e.howOpen}}" hint-placeholder-val="{{ false }}"><p class="wp-how">{{e.desc}}</p></sc-if></div><div class="wp-btns"><button class="env-chip" onClick="{{e.toggleHow}}">{{e.howLabel}}</button><button class="env-chip" onClick="{{e.swap}}">Swap</button></div></div></sc-for>
@@ -1176,7 +1176,7 @@ html{font-size:18px}
 <div class="ch mp">
 <p class="ch-sub">Pick what you already eat or want to try. These are not a meal plan, just ideas built around what you pick.</p>
 <div class="env-item mp-favs">
-<button class="soc-head" onClick="{{mp.toggleFavs}}"><span class="soc-t">Meal favourites</span><span class="env-badge" style="background:var(--surface-raised);color:var(--on-accent)">{{mp.favLabel2}}</span></button>
+<button class="soc-head" onClick="{{mp.toggleFavs}}"><span class="soc-t">Meal favourites</span><span class="env-badge" style="background:var(--lime);color:var(--on-accent)">{{mp.favLabel2}}</span></button>
 <sc-if value="{{mp.favOpen}}" hint-placeholder-val="{{ true }}">
 <sc-if value="{{mp.noFavs}}" hint-placeholder-val="{{ true }}"><p class="ch-meta">Nothing here yet. Tap Add to favourites on any idea below and it is saved here.</p></sc-if>
 <sc-for list="{{mp.favRows}}" as="f" hint-placeholder-count="3"><div class="wp-ex"><div class="wp-exn"><b>{{f.name}}</b><span>{{f.cat}} · {{f.kcal}}</span><span>{{f.macros}}</span></div><button class="env-chip" onClick="{{f.remove}}">Remove</button></div></sc-for>
@@ -1184,7 +1184,7 @@ html{font-size:18px}
 </div>
 <div class="env-chips"><sc-for list="{{mp.cats}}" as="c" hint-placeholder-count="5"><button class="env-chip" style="{{c.style}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div>
 <sc-if value="{{mp.showFilter}}" hint-placeholder-val="{{ true }}"><div class="env-item">
-<button class="soc-head" onClick="{{mp.toggleIng}}"><span class="soc-t">What do you have?</span><span class="env-badge" style="background:var(--surface-raised);color:var(--on-accent)">{{mp.ingLabel}}</span></button>
+<button class="soc-head" onClick="{{mp.toggleIng}}"><span class="soc-t">What do you have?</span><span class="env-badge" style="background:var(--lime);color:var(--on-accent)">{{mp.ingLabel}}</span></button>
 <sc-if value="{{mp.ingOpen}}" hint-placeholder-val="{{ false }}">
 <p class="ch-meta">Tick anything you have or like. The list shows ideas that use at least one, best matches first.</p>
 <sc-for list="{{mp.groups}}" as="g" hint-placeholder-count="3"><div class="mp-g"><div class="mp-gt">{{g.title}}</div><div class="env-chips"><sc-for list="{{g.chips}}" as="c" hint-placeholder-count="8"><button class="env-chip" style="{{c.style}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div></div></sc-for>
@@ -1200,7 +1200,7 @@ html{font-size:18px}
 <p class="ch-meta">{{m.macros}}</p>
 <sc-if value="{{m.showCat}}" hint-placeholder-val="{{ false }}"><p class="ch-meta">{{m.cat}}</p></sc-if>
 <sc-if value="{{m.isOpen}}" hint-placeholder-val="{{ false }}"><p class="ch-meta">{{m.uses}}</p></sc-if>
-<sc-if value="{{m.hasMatch}}" hint-placeholder-val="{{ false }}"><span class="env-badge" style="background:var(--surface-raised);color:var(--on-accent);align-self:flex-start">Uses {{m.matchLine}}</span></sc-if>
+<sc-if value="{{m.hasMatch}}" hint-placeholder-val="{{ false }}"><span class="env-badge" style="background:var(--lime);color:var(--on-accent);align-self:flex-start">Uses {{m.matchLine}}</span></sc-if>
 <button class="env-chip mp-fav" style="{{m.favStyle}}" onClick="{{m.toggleFav}}">{{m.favLabel}}</button>
 </div>
 </sc-for>
@@ -1851,8 +1851,8 @@ class Component extends DCLogic {
             return {
               name: h[1], meta: h[2], path: h[3],
               style: on ? 'border-color:var(--lime);' : '',
-              ico: on ? 'background:var(--lime);color:var(--on-accent)' : 'background:var(--surface-raised);color:var(--on-accent)',
-              pill: on ? 'background:var(--surface-raised);color:var(--on-accent)' : 'background:var(--surface-raised);color:var(--ink)',
+              ico: on ? 'background:var(--lime);color:var(--on-accent)' : 'background:var(--lime);color:var(--on-accent)',
+              pill: on ? 'background:var(--lime);color:var(--on-accent)' : 'background:var(--surface-raised);color:var(--ink)',
               pillText: on ? 'Done' : 'To do',
               tick: on ? 'background:var(--lime);color:var(--on-accent)' : 'background:var(--surface-raised);color:var(--surface-raised)',
               toggle: () => this.setState({ done: { ...dn, [h[0]]: !dn[h[0]] }, doneDate: this.today() })
@@ -2159,7 +2159,7 @@ class Component extends DCLogic {
               title: c[1], situation: c[2], isOpen, domId: 'soc-' + id, chev: isOpen ? '-' : '+',
               toggle: () => { this.setState({ socOpen: isOpen ? '' : id }); if (!isOpen) toTop(id); },
               status: isNa ? 'Skipped' : (isPl ? 'Done' : (s ? 'In progress' : 'To do')),
-              statusStyle: isNa ? 'background:var(--surface-raised);color:var(--muted)' : (isPl ? 'background:var(--lime);color:var(--on-accent)' : (s ? 'background:var(--surface-raised);color:var(--on-accent)' : 'background:var(--surface-raised);color:var(--ink)')),
+              statusStyle: isNa ? 'background:var(--surface-raised);color:var(--muted)' : (isPl ? 'background:var(--lime);color:var(--on-accent)' : (s ? 'background:var(--lime);color:var(--on-accent)' : 'background:var(--surface-raised);color:var(--ink)')),
               style: isPl ? 'border-color:var(--lime)' : '',
               convs: c[3].map((x) => {
                 const on = cv[id] === x[0];
@@ -2521,7 +2521,7 @@ class Component extends DCLogic {
             const status = x.done ? 'Done' : (x.started ? 'In progress' : 'To do');
             return {
               n: x.n, title: x.title, detail: x.detail, status,
-              statusStyle: x.done ? 'background:var(--lime);color:var(--on-accent)' : (x.started ? 'background:var(--surface-raised);color:var(--on-accent)' : 'background:var(--surface-raised);color:var(--ink)'),
+              statusStyle: x.done ? 'background:var(--lime);color:var(--on-accent)' : (x.started ? 'background:var(--lime);color:var(--on-accent)' : 'background:var(--surface-raised);color:var(--ink)'),
               style: x.done ? 'border-color:var(--lime)' : '',
               btn: x.done ? 'Review' : (x.started ? 'Continue' : 'Start'),
               open: () => { this.setState({ view: x.go, ...(x.go === 'taste' ? { tasteSeen: true } : {}) }); try { window.scrollTo(0, 0); document.querySelector('main').scrollTop = 0; } catch (e) {} },
