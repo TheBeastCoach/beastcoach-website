@@ -85,8 +85,8 @@
   .modal { background: var(--white); border-radius: 18px; padding: 26px 22px 22px; max-width: 380px; width: 100%; display: flex; flex-direction: column; gap: 12px; }
   .modal h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: 32px; letter-spacing: .5px; line-height: 1.05; color: var(--green-dark); }
   .modal p { font-size: 14px; color: #4a5750; }
-  .modal .login { font-size: 13px; text-align: center; color: var(--muted); }
-  .modal .login a { color: var(--green); font-weight: 700; }
+  .login-btn { display: block; text-align: center; border: 1.5px solid var(--border); border-radius: 32px; padding: 13px 20px; font-weight: 800; font-size: 14px; color: var(--text); text-decoration: none; }
+  .login-btn:hover { border-color: var(--green-light); }
   .modal .later { background: none; border: none; font-family: 'Manrope', sans-serif; font-size: 13px; color: var(--muted); text-decoration: underline; cursor: pointer; padding: 6px; }
   button:focus-visible, a:focus-visible { outline: 3px solid var(--green-light); outline-offset: 2px; }
   footer { background: var(--footer-bg); color: rgba(255,255,255,0.7); text-align: center; padding: 28px 24px; font-size: 13px; }
@@ -119,10 +119,10 @@
 
 <div class="scrim" id="scrim">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
-    <h2 id="m-title">Create a free account to open your door</h2>
-    <p>It takes a minute. You get the demo door straight away, then a new door every day from 1 December.</p>
+    <h2 id="m-title">Sign in to open your door</h2>
+    <p>New here? Create a free account in a minute. You get the demo door straight away, then a new door every day from 1 December.</p>
     <a class="cta" id="m-go" href="/dashboard#advent">Create free account</a>
-    <p class="login">Already have an account? <a href="/dashboard#advent">Log in</a></p>
+    <a class="login-btn" href="/dashboard#advent">I already have an account. Log in</a>
     <button type="button" class="later" id="m-close">Not now</button>
   </div>
 </div>
@@ -155,6 +155,12 @@
   function close() { scrim.classList.remove("open"); if (last) last.focus(); }
   grid.addEventListener("click", function (e) { var d = e.target.closest(".door"); if (d) open({ currentTarget: d }); });
   document.getElementById("demo").addEventListener("click", open);
+  // Anywhere you press on the page asks you to sign in (links, the sign-up pop-up itself and the nav keep working).
+  document.addEventListener("click", function (e) {
+    if (signedIn || scrim.classList.contains("open")) return;
+    if (e.target.closest("a, .scrim, #demo, .door")) return;
+    open({ currentTarget: e.target });
+  });
   document.getElementById("m-close").addEventListener("click", close);
   scrim.addEventListener("click", function (e) { if (e.target === scrim) close(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
