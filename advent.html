@@ -137,7 +137,21 @@
     b.innerHTML = '<span class="n">' + n + '</span>' + lock;
     grid.appendChild(b);
   }
-  function open(e) { last = e.currentTarget; scrim.classList.add("open"); document.getElementById("m-go").focus(); }
+  // Already signed in? Skip the sign-up box and go straight to the calendar.
+  var signedIn = false;
+  try {
+    var raw = localStorage.getItem("sb-jgbcgbdbmqtsozwlllfj-auth-token");
+    var t = raw && JSON.parse(raw);
+    signedIn = !!(t && (t.refresh_token || (t.currentSession && t.currentSession.refresh_token)));
+  } catch (e) {}
+  if (signedIn) {
+    document.querySelector(".nav-cta").textContent = "Open my calendar";
+    document.querySelector("main .cta").textContent = "Open my calendar";
+  }
+  function open(e) {
+    if (signedIn) { window.location.href = "/dashboard#advent"; return; }
+    last = e.currentTarget; scrim.classList.add("open"); document.getElementById("m-go").focus();
+  }
   function close() { scrim.classList.remove("open"); if (last) last.focus(); }
   grid.addEventListener("click", function (e) { var d = e.target.closest(".door"); if (d) open({ currentTarget: d }); });
   document.getElementById("demo").addEventListener("click", open);
