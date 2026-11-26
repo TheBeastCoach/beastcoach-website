@@ -6,6 +6,8 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 User-agent: Googlebot
 Allow: /
@@ -15,6 +17,8 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 User-agent: Bingbot
 Allow: /
@@ -24,6 +28,8 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 User-agent: OAI-SearchBot
 Allow: /
@@ -33,6 +39,8 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 User-agent: ChatGPT-User
 Allow: /
@@ -42,6 +50,8 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 User-agent: GPTBot
 Allow: /
@@ -51,6 +61,8 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 User-agent: ClaudeBot
 Allow: /
@@ -60,6 +72,8 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 User-agent: Claude-Web
 Allow: /
@@ -69,6 +83,8 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 User-agent: PerplexityBot
 Allow: /
@@ -78,6 +94,8 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 User-agent: Google-Extended
 Allow: /
@@ -87,5 +105,7 @@ Disallow: /my-coach
 Disallow: /dashboard
 Disallow: /coaching-demo
 Disallow: /api/
+Disallow: /program
+Disallow: /program-classic
 
 Sitemap: https://www.beastcoach.fit/sitemap.xml

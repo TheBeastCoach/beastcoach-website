@@ -54,10 +54,28 @@ function formatNumber(n) {
 
 // Calories and protein as the dashboard labels them ("Kcal" and "Protein"). The data does
 // not say per serve (some entries are batch or per-40g values), so no serve wording is added.
+// The basis each calorie and protein figure is for, taken from the data's own labels or its text.
+// Recipes not listed here have no clear basis, so their numbers are hidden until the basis is confirmed.
+const BASIS = {
+  'protein-jellies': 'per whole batch',
+  'lamb-chimichurri': 'per whole batch',
+  'chia-seed-doritos': 'per whole batch',
+  'strawberry-date-chia-jam': 'per whole batch',
+  'magnesium-chocolate-bar': 'per whole batch',
+  'pb-replacement': 'per 40g',
+  'homemade-protein-powder': 'per 45g scoop',
+  'chia-oats-bowl': 'per container',
+  'thick-dreamy-hot-chocolate': 'per portion',
+  'microwave-brownie': 'per brownie',
+};
+
+// Calories and protein with their basis, or null when the basis is not clear.
 function statsText(r) {
+  const basis = BASIS[r.id];
+  if (!basis) return null;
   return {
-    calories: formatNumber(Math.round(Number(r.kcal))) + ' calories',
-    protein: formatNumber(Number(r.protein)) + 'g protein',
+    calories: formatNumber(Math.round(Number(r.kcal))) + ' calories ' + basis,
+    protein: formatNumber(Number(r.protein)) + 'g protein ' + basis,
   };
 }
 
@@ -175,7 +193,7 @@ ${site.header}
   <div class="wrap teaser">
     <h1 class="h-display teaser-title">${title}</h1>
     ${photo}
-    <p class="teaser-stats"><span>${escapeHtml(stats.calories)}</span><span>${escapeHtml(stats.protein)}</span></p>
+    ${stats ? `<p class="teaser-stats"><span>${escapeHtml(stats.calories)}</span><span>${escapeHtml(stats.protein)}</span></p>` : ''}
     <p class="lede teaser-desc">${escapeHtml(sentence)}</p>
     <div class="teaser-cta">
       <a class="btn-primary" href="/dashboard">Sign up free to get the full recipe</a>
@@ -201,7 +219,7 @@ function listCard(r) {
       <span class="lock" aria-hidden="true">&#128274;</span>
       <span class="thumb">${thumb}</span>
       <span class="name">${title}</span>
-      <span class="numbers">${escapeHtml(stats.calories)} &middot; ${escapeHtml(stats.protein)}</span>
+      ${stats ? `<span class="numbers">${escapeHtml(stats.calories)} &middot; ${escapeHtml(stats.protein)}</span>` : ''}
     </a>`;
 }
 

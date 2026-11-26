@@ -17,7 +17,7 @@ const BIO = 'Stefan Botha, founder of Beast Coach, is based in Melbourne. He los
 
 // Public pages: file, URL path, and whether they are in the sitemap. Logged-in and course pages are not listed.
 const PUBLIC = ['index', 'app', 'about', 'features', 'recipes', 'advent', 'challenge', 'beast-challenge', '30-day-challenge',
-  'walking-study', 'calculator', 'terms', 'privacy', 'privacy-policy', 'coaching-terms', 'coaching-health', 'coaching-privacy', 'discipline-path'];
+  'walking-study', 'calculator', 'terms', 'privacy', 'privacy-policy', 'coaching-terms', 'coaching-health', 'coaching-privacy', 'discipline-path', 'changes'];
 const SKIP_SITEMAP = ['coach', 'my-coach', 'dashboard', 'coaching-demo', 'program', 'program-classic'];
 
 const ORG_ID = SITE + '/#organization';

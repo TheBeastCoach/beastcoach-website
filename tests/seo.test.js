@@ -59,7 +59,8 @@ test('the sitemap lists only real public pages, with lastmod, and no logged-in p
     assert.ok(file, loc + ' maps to a page');
     assert.doesNotMatch(read(file), /<meta name="robots" content="noindex/, loc + ' is indexable');
   }
-  for (const hidden of ['/coach', '/my-coach', '/dashboard', '/coaching-demo', '/changes']) {
+  assert.ok(locs.includes('https://www.beastcoach.fit/changes'), '/changes is in the sitemap now it is published');
+  for (const hidden of ['/coach', '/my-coach', '/dashboard', '/coaching-demo', '/program', '/program-classic']) {
     assert.ok(!locs.includes('https://www.beastcoach.fit' + hidden), hidden + ' is not in the sitemap');
   }
 });
