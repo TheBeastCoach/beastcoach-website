@@ -4,7 +4,6 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const vm = require('vm');
 
 const ROOT = path.join(__dirname, '..');
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
@@ -82,11 +81,9 @@ test('every public page has a unique title and a meta description', () => {
 });
 
 test('no gated recipe ingredient or method text appears on a public page', () => {
-  const sandbox = {};
-  vm.createContext(sandbox);
-  vm.runInContext(read('recipes.js') + ';this.RECIPES = RECIPES;', sandbox);
+  const RECIPES = require(path.join(ROOT, 'api/_recipes-full.js'));
   const publicText = [...PUBLIC, ...TEASERS].map(read).join('\n');
-  for (const r of sandbox.RECIPES) {
+  for (const r of RECIPES) {
     for (const key of ['ingredients', 'instructions']) {
       for (const item of (r[key] || [])) {
         const text = typeof item === 'string' ? item : (item && (item.text || item.name || item.step)) || '';

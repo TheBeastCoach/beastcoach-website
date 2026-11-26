@@ -156,6 +156,7 @@
   .recipe-card .name { padding: 10px 12px 12px; font-weight: 700; font-size: 15px; line-height: 1.35; color: var(--ink); }
   .recipe-hero { width: 100%; max-height: 420px; object-fit: cover; border-radius: 20px; margin-bottom: 22px; display: block; }
   .recipe-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .recipe-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
   .recipe-macros { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0 24px; }
   .recipe-macro { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 12px 14px; text-align: center; flex: 1 1 100px; min-width: 100px; }
   .recipe-macro .val { font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1; color: var(--ink); white-space: nowrap; }
@@ -563,7 +564,7 @@
     <div class="card">
       <p style="margin-bottom:10px;">Here's what you can do here:</p>
       <ul class="freebies-list">
-        <li>Filter and search to find exactly what you're after, by meal type, difficulty, health rating, calories, protein, or fibre</li>
+        <li>Filter and search to find exactly what you're after, by meal type, difficulty, health rating, calories, or protein</li>
         <li>Tick a few recipes and grab a combined, printable shopping list</li>
         <li>Rate a recipe once you've tried it</li>
         <li>Got an idea for a healthy version of your favourite meal? Drop it in the suggestion box at the bottom, I'll have a look at every one</li>
@@ -589,7 +590,7 @@
         <button type="button" class="meal-pill" data-meal="protein powder">Protein powder</button>
       </div>
       <details>
-        <summary>More filters (calories, protein, fibre)</summary>
+        <summary>More filters (calories, protein)</summary>
         <div class="range-grid">
           <div>
             <label>Calories (kcal)</label>
@@ -598,10 +599,6 @@
           <div>
             <label>Protein (g)</label>
             <div class="range-pair"><input type="number" id="filter-protein-min" placeholder="Min"><input type="number" id="filter-protein-max" placeholder="Max"></div>
-          </div>
-          <div>
-            <label>Fibre (g)</label>
-            <div class="range-pair"><input type="number" id="filter-fibre-min" placeholder="Min"><input type="number" id="filter-fibre-max" placeholder="Max"></div>
           </div>
         </div>
       </details>
@@ -646,16 +643,17 @@
       <span class="rating-summary" id="rating-summary"></span>
     </div>
 
+    <div id="recipe-gate" hidden></div>
     <div class="stefan-blurb" id="stefan-blurb" hidden>
       <div class="lbl">A word from Stefan</div>
       <p id="stefan-blurb-text"></p>
     </div>
 
-    <div class="recipe-section">
+    <div class="recipe-section" id="recipe-ingredients-block" hidden>
       <h4>Ingredients</h4>
       <ul id="recipe-ingredients"></ul>
     </div>
-    <div class="recipe-section">
+    <div class="recipe-section" id="recipe-instructions-block" hidden>
       <h4>Instructions</h4>
       <ol id="recipe-instructions"></ol>
     </div>
@@ -692,7 +690,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="recipes.js"></script>
+<script src="/recipes-public.js"></script>
 <script>
 const SUPABASE_URL = "https://jgbcgbdbmqtsozwlllfj.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_3AdpZhYhif9JeP3rvmY2-Q_MuhFMGiw";
@@ -718,29 +716,33 @@ try {
 } catch (e) {}
 
 /* ---------- Recipes ---------- */
-// Recipes now live in recipes.js (loaded via <script src="recipes.js">) so you never edit this file to add a recipe.
+// Recipes live in recipes-public.js (public fields only). Full recipes are fetched on demand from /api/recipes.
 
 const DIFFICULTY_RANK = { "Easy": 1, "Medium": 2, "Hard": 3 };
 let currentRecipeId = null;
 
 const recipeFilter = { search: "", meal: "all" };
 
+// Public numeric filters. A recipe with no public number (null) is left out of any numeric filter that is set.
+const RECIPE_NUM_FILTERS = [
+  { field: "kcal", min: "filter-kcal-min", max: "filter-kcal-max" },
+  { field: "protein", min: "filter-protein-min", max: "filter-protein-max" }
+];
+const RECIPE_FILTER_INPUTS = RECIPE_NUM_FILTERS.flatMap(f => [f.min, f.max]);
+
 function matchesRecipeFilter(r) {
   if (recipeFilter.meal !== "all" && !(r.meal || []).includes(recipeFilter.meal)) return false;
   const s = recipeFilter.search.trim().toLowerCase();
-  if (s && !r.title.toLowerCase().includes(s) && !r.chip.toLowerCase().includes(s) && !r.desc.toLowerCase().includes(s)) return false;
-  const minKcal = parseFloat(document.getElementById("filter-kcal-min").value);
-  const maxKcal = parseFloat(document.getElementById("filter-kcal-max").value);
-  const minProtein = parseFloat(document.getElementById("filter-protein-min").value);
-  const maxProtein = parseFloat(document.getElementById("filter-protein-max").value);
-  const minFibre = parseFloat(document.getElementById("filter-fibre-min").value);
-  const maxFibre = parseFloat(document.getElementById("filter-fibre-max").value);
-  if (!isNaN(minKcal) && (r.kcal || 0) < minKcal) return false;
-  if (!isNaN(maxKcal) && (r.kcal || 0) > maxKcal) return false;
-  if (!isNaN(minProtein) && (r.protein || 0) < minProtein) return false;
-  if (!isNaN(maxProtein) && (r.protein || 0) > maxProtein) return false;
-  if (!isNaN(minFibre) && (r.fibre || 0) < minFibre) return false;
-  if (!isNaN(maxFibre) && (r.fibre || 0) > maxFibre) return false;
+  if (s && !r.title.toLowerCase().includes(s) && !(r.line || "").toLowerCase().includes(s)) return false;
+  for (const f of RECIPE_NUM_FILTERS) {
+    const min = parseFloat(document.getElementById(f.min).value);
+    const max = parseFloat(document.getElementById(f.max).value);
+    if (isNaN(min) && isNaN(max)) continue;
+    const v = r[f.field];
+    if (v === null || v === undefined) return false;
+    if (!isNaN(min) && v < min) return false;
+    if (!isNaN(max) && v > max) return false;
+  }
   return true;
 }
 
@@ -776,7 +778,7 @@ function renderRecipeChips() {
       <div class="select-check${checked ? " checked" : ""}" data-select="${r.id}">${checked ? "&check;" : "+"}</div>
       <div class="thumb">${thumb}</div>
       <div class="badge-row"><span class="mini-badge">${escapeHtml(r.difficulty || "")}</span><span class="mini-badge">Health ${r.healthScore || "-"}/10</span></div>
-      <div class="name">${escapeHtml(r.chip)}</div>
+      <div class="name">${escapeHtml(r.title)}</div>
     </div>`;
   }).join("");
   container.querySelectorAll("[data-recipe]").forEach(card => {
@@ -796,7 +798,7 @@ renderRecipeChips();
 
 document.getElementById("recipe-search").addEventListener("input", (e) => { recipeFilter.search = e.target.value; renderRecipeChips(); });
 document.getElementById("recipe-sort").addEventListener("change", renderRecipeChips);
-["filter-kcal-min","filter-kcal-max","filter-protein-min","filter-protein-max","filter-fibre-min","filter-fibre-max"].forEach(id => {
+RECIPE_FILTER_INPUTS.forEach(id => {
   document.getElementById(id).addEventListener("input", renderRecipeChips);
 });
 document.querySelectorAll("#recipe-meal-pills [data-meal]").forEach(btn => {
@@ -813,7 +815,7 @@ document.getElementById("recipe-filters-clear").addEventListener("click", () => 
   document.getElementById("recipe-sort").value = "latest";
   document.querySelectorAll("#recipe-meal-pills [data-meal]").forEach(b => b.classList.remove("active"));
   document.querySelector('#recipe-meal-pills [data-meal="all"]').classList.add("active");
-  ["filter-kcal-min","filter-kcal-max","filter-protein-min","filter-protein-max","filter-fibre-min","filter-fibre-max"].forEach(id => {
+  RECIPE_FILTER_INPUTS.forEach(id => {
     document.getElementById(id).value = "";
   });
   renderRecipeChips();
@@ -830,14 +832,14 @@ function recipeExtraHTML(r) {
   if (r.nutrients) h += `<div class="recipe-section"><h4>Nutrients per scoop</h4><table class="nutrient-table"><thead><tr><th>Nutrient</th><th>Per scoop</th><th>% daily</th></tr></thead><tbody>${r.nutrients.rows.map(x => `<tr><td>${escapeHtml(x[0])}</td><td>${escapeHtml(x[1])}</td><td>${escapeHtml(x[2])}</td></tr>`).join("")}</tbody></table><p class="nutrient-cap">${escapeHtml(r.nutrients.caption || "")}</p></div>`;
   return h;
 }
-function macroTilesHTML(r) {
-  const tiles = [
-    [fmtNum(r.kcal), "Kcal"],
-    [fmtNum(r.protein) + "g", "Protein"],
-    [fmtNum(r.carbs) + "g", "Carbs"],
-    [fmtNum(r.fibre) + "g", "Fibre"],
-    [fmtNum(r.fat) + "g", "Fat"]
-  ];
+// Public numbers only (kcal, protein) until the full recipe loads. Null numbers get no tile.
+function macroTilesHTML(r, full) {
+  const tiles = [];
+  if (r.kcal !== null && r.kcal !== undefined) tiles.push([fmtNum(r.kcal), "Kcal"]);
+  if (r.protein !== null && r.protein !== undefined) tiles.push([fmtNum(r.protein) + "g", "Protein"]);
+  if (full) {
+    tiles.push([fmtNum(r.carbs) + "g", "Carbs"], [fmtNum(r.fibre) + "g", "Fibre"], [fmtNum(r.fat) + "g", "Fat"]);
+  }
   return tiles.map(m => `<div class="recipe-macro"><div class="val">${m[0]}</div><div class="lbl">${m[1]}</div></div>`).join("");
 }
 function badgeRowHTML(r) {
@@ -845,6 +847,96 @@ function badgeRowHTML(r) {
     <span class="mini-badge">${escapeHtml(r.difficulty || "")}</span>
     <span class="mini-badge">Health ${r.healthScore || "-"}/10</span>
   </div>`;
+}
+
+/* ---------- Full recipes (signed in only): GET /api/recipes?id=<id> with the Supabase access token ---------- */
+const FULL_RECIPE_MSG_OUT = "Sign up free to see the full recipe, ingredients and method.";
+const FULL_RECIPE_MSG_ERR = "Could not load this recipe. Try again.";
+const fullRecipeCache = new Map();   // id -> full recipe, kept for this page visit only
+
+// The signed-in user's access token, from the same Supabase client the page uses to log in.
+async function getAccessToken() {
+  if (!sb) return "";
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    return session && session.access_token ? session.access_token : "";
+  } catch (e) {
+    return "";
+  }
+}
+
+// Resolves to {status:"ok", recipe}, {status:"signed-out"} or {status:"error"}. Never rejects.
+async function fetchFullRecipe(id) {
+  if (fullRecipeCache.has(id)) return { status: "ok", recipe: fullRecipeCache.get(id) };
+  const token = await getAccessToken();
+  if (!token) return { status: "signed-out" };
+  try {
+    const r = await fetch("/api/recipes?id=" + encodeURIComponent(id), {
+      headers: { Authorization: "Bearer " + token }, cache: "no-store"
+    });
+    if (r.status === 401) return { status: "signed-out" };
+    if (!r.ok) return { status: "error" };
+    const body = await r.json();
+    if (!body || !body.recipe) return { status: "error" };
+    fullRecipeCache.set(id, body.recipe);
+    return { status: "ok", recipe: body.recipe };
+  } catch (e) {
+    return { status: "error" };
+  }
+}
+
+// Shown in place of the full recipe. Signed out: a sign-up button. Any other failure: a retry button.
+function fullRecipeGateHTML(status) {
+  if (status === "signed-out") {
+    return `<div class="card"><p>${FULL_RECIPE_MSG_OUT}</p><button type="button" class="btn-primary" data-gate="signup">Sign up free</button></div>`;
+  }
+  return `<div class="card"><p>${FULL_RECIPE_MSG_ERR}</p><button type="button" class="btn-primary" data-gate="retry">Retry</button></div>`;
+}
+function bindGate(container, onRetry) {
+  const signup = container.querySelector('[data-gate="signup"]');
+  if (signup) signup.addEventListener("click", () => showView("auth"));
+  const retry = container.querySelector('[data-gate="retry"]');
+  if (retry) retry.addEventListener("click", () => onRetry());
+}
+
+// Ingredients, method, notes and the blurb are only drawn from the full recipe.
+function setDetailFullVisible(show) {
+  document.getElementById("recipe-ingredients-block").hidden = !show;
+  document.getElementById("recipe-instructions-block").hidden = !show;
+  document.getElementById("print-recipe-btn").disabled = !show;
+  if (!show) document.getElementById("stefan-blurb").hidden = true;
+  document.getElementById("recipe-extra").innerHTML = "";
+  if (!show) document.getElementById("recipe-ingredients").innerHTML = "";
+  if (!show) document.getElementById("recipe-instructions").innerHTML = "";
+}
+
+let detailRequestNo = 0;   // only the latest load for the open recipe may draw
+function loadFullRecipeDetail(id) {
+  const reqNo = ++detailRequestNo;
+  const gate = document.getElementById("recipe-gate");
+  gate.hidden = false;
+  gate.innerHTML = `<p class="empty-state">Loading the full recipe…</p>`;
+  fetchFullRecipe(id).then(res => {
+    if (reqNo !== detailRequestNo) return;
+    if (res.status !== "ok") {
+      gate.innerHTML = fullRecipeGateHTML(res.status);
+      bindGate(gate, () => loadFullRecipeDetail(id));
+      return;
+    }
+    gate.hidden = true;
+    gate.innerHTML = "";
+    renderFullRecipe(res.recipe);
+  });
+}
+function renderFullRecipe(full) {
+  document.getElementById("recipe-macros").innerHTML = macroTilesHTML(full, true);
+  document.getElementById("recipe-ingredients").innerHTML = (full.ingredients || []).map(i => `<li>${escapeHtml(i)}</li>`).join("");
+  document.getElementById("recipe-instructions").innerHTML = (full.instructions || []).map(i => `<li>${escapeHtml(i)}</li>`).join("");
+  document.getElementById("recipe-extra").innerHTML = recipeExtraHTML(full);
+  const blurbBox = document.getElementById("stefan-blurb");
+  if (full.blurb) { blurbBox.hidden = false; document.getElementById("stefan-blurb-text").textContent = full.blurb; }
+  else { blurbBox.hidden = true; }
+  setDetailFullVisible(true);
 }
 
 function openRecipe(id) {
@@ -856,18 +948,14 @@ function openRecipe(id) {
   if (r.image) { hero.src = r.image; hero.alt = r.title; hero.hidden = false; heroPlaceholder.hidden = true; }
   else { hero.removeAttribute("src"); hero.hidden = true; heroPlaceholder.hidden = false; }
   document.getElementById("recipe-title").textContent = r.title;
-  document.getElementById("recipe-desc").textContent = r.desc;
+  document.getElementById("recipe-desc").textContent = r.line || "";
   document.getElementById("recipe-badges").innerHTML = badgeRowHTML(r);
-  document.getElementById("recipe-macros").innerHTML = macroTilesHTML(r);
-  document.getElementById("recipe-ingredients").innerHTML = r.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("");
-  document.getElementById("recipe-instructions").innerHTML = r.instructions.map(i => `<li>${escapeHtml(i)}</li>`).join("");
-  document.getElementById("recipe-extra").innerHTML = recipeExtraHTML(r);
-  const blurbBox = document.getElementById("stefan-blurb");
-  if (r.blurb) { blurbBox.hidden = false; document.getElementById("stefan-blurb-text").textContent = r.blurb; }
-  else { blurbBox.hidden = true; }
+  document.getElementById("recipe-macros").innerHTML = macroTilesHTML(r, false);
+  setDetailFullVisible(false);
   updateAddToListBtn();
   loadRatingFor(id);
   showView("recipe-detail");
+  loadFullRecipeDetail(id);
 }
 
 document.getElementById("print-recipe-btn").addEventListener("click", () => window.print());
@@ -900,21 +988,33 @@ function renderShoppingBar() {
   bar.hidden = false;
   document.getElementById("shopping-bar-count").textContent = shoppingList.size + (shoppingList.size === 1 ? " recipe selected" : " recipes selected");
 }
-function renderShoppingListView() {
+let shopRequestNo = 0;
+async function renderShoppingListView() {
   const body = document.getElementById("shopping-list-body");
-  const ids = Array.from(shoppingList);
+  const reqNo = ++shopRequestNo;
+  const ids = Array.from(shoppingList).filter(id => RECIPES.some(x => x.id === id));
   if (ids.length === 0) {
     body.innerHTML = `<p class="empty-state">No recipes selected yet. Go back to Recipes and tap the + on any recipe to add it here.</p>`;
     return;
   }
+  // The list is built from ingredients, which only the full recipe has, so fetch every selected recipe first.
+  body.innerHTML = `<p class="empty-state">Loading your shopping list…</p>`;
+  const results = await Promise.all(ids.map(id => fetchFullRecipe(id)));
+  if (reqNo !== shopRequestNo) return;
+  const bad = results.find(x => x.status !== "ok");
+  if (bad) {
+    body.innerHTML = fullRecipeGateHTML(bad.status);
+    bindGate(body, () => renderShoppingListView());
+    return;
+  }
   let checkedState = {};
   try { checkedState = JSON.parse(localStorage.getItem("bc_shopping_checked") || "{}"); } catch (e) {}
-  body.innerHTML = ids.map(id => {
+  body.innerHTML = ids.map((id, n) => {
     const r = RECIPES.find(x => x.id === id);
-    if (!r) return "";
+    const full = results[n].recipe;
     return `<div class="shop-group">
-      <h4>${escapeHtml(r.chip)}</h4>
-      <ul>${r.ingredients.map((ing, i) => {
+      <h4>${escapeHtml(r.title)}</h4>
+      <ul>${(full.ingredients || []).map((ing, i) => {
         const key = id + "-" + i;
         const isChecked = !!checkedState[key];
         return `<li class="${isChecked ? "checked" : ""}" data-key="${key}"><input type="checkbox" ${isChecked ? "checked" : ""}><span>${escapeHtml(ing)}</span></li>`;
@@ -950,21 +1050,32 @@ document.getElementById("clear-shopping-btn").addEventListener("click", () => {
 renderShoppingBar();
 
 /* ---------- Recipe book ---------- */
-function renderRecipeBook() {
+let bookRequestNo = 0;
+async function renderRecipeBook() {
   const body = document.getElementById("recipe-book-body");
-  body.innerHTML = sortRecipes(RECIPES.slice()).map(r => `
+  const reqNo = ++bookRequestNo;
+  const list = sortRecipes(RECIPES.slice());
+  body.innerHTML = `<p class="empty-state">Loading the recipe book…</p>`;
+  const results = await Promise.all(list.map(r => fetchFullRecipe(r.id)));
+  if (reqNo !== bookRequestNo) return;
+  const bad = results.find(x => x.status !== "ok");
+  const gate = bad ? fullRecipeGateHTML(bad.status) : "";
+  body.innerHTML = gate + list.map((r, i) => {
+    const full = results[i].status === "ok" ? results[i].recipe : null;
+    return `
     <div class="book-recipe">
       ${r.image ? `<img class="recipe-hero" src="${escapeHtml(r.image)}" alt="${escapeHtml(r.title)}">` : `<div class="recipe-hero-placeholder">Image coming soon</div>`}
       <h2>${escapeHtml(r.title)}</h2>
-      <p class="page-sub">${escapeHtml(r.desc)}</p>
+      <p class="page-sub">${escapeHtml(r.line || "")}</p>
       ${badgeRowHTML(r)}
-      <div class="recipe-macros">${macroTilesHTML(r)}</div>
-      ${r.blurb ? `<div class="stefan-blurb"><div class="lbl">A word from Stefan</div><p>${escapeHtml(r.blurb)}</p></div>` : ""}
-      <div class="recipe-section"><h4>Ingredients</h4><ul>${r.ingredients.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ul></div>
-      <div class="recipe-section"><h4>Instructions</h4><ol>${r.instructions.map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ol></div>
-      ${recipeExtraHTML(r)}
-    </div>
-  `).join("");
+      <div class="recipe-macros">${macroTilesHTML(full || r, !!full)}</div>
+      ${full && full.blurb ? `<div class="stefan-blurb"><div class="lbl">A word from Stefan</div><p>${escapeHtml(full.blurb)}</p></div>` : ""}
+      ${full ? `<div class="recipe-section"><h4>Ingredients</h4><ul>${(full.ingredients || []).map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ul></div>
+      <div class="recipe-section"><h4>Instructions</h4><ol>${(full.instructions || []).map(i => `<li>${escapeHtml(i)}</li>`).join("")}</ol></div>
+      ${recipeExtraHTML(full)}` : ""}
+    </div>`;
+  }).join("");
+  bindGate(body, () => renderRecipeBook());
 }
 document.querySelectorAll('[data-nav="recipe-book"]').forEach(el => {
   el.addEventListener("click", renderRecipeBook);
