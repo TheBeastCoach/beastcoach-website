@@ -17,7 +17,7 @@ for (const f of PAGES) {
     assert.doesNotMatch(html, /<meta name="robots" content="noindex/, 'no noindex tag');
     assert.doesNotMatch(html, /draft|DRAFT|not yet reviewed/i, 'no draft wording');
     assert.doesNotMatch(html, /\u2014|\u2013/, 'no em or en dashes');
-    assert.match(html, /href="\/coaching"/, 'link back to the sales page');
+    assert.match(html, /href="\/"/, 'link back to the sales page (the homepage)');
   });
 }
 
@@ -78,7 +78,7 @@ test('the coaching onboarding links each agreement to its page, and the link ope
 });
 
 test('coaching.html: every price is written in Australian dollars, with the AUD note near the plans', () => {
-  const html = read('coaching.html');
+  const html = read('index.html');
   const t = text(html);
   assert.match(t, /Prices in Australian dollars\. Your bank converts at checkout\./);
   // A dollar amount must be followed by AUD (no bare prices), except the cents-free note "normally $37 AUD".
@@ -90,7 +90,7 @@ test('coaching.html: every price is written in Australian dollars, with the AUD 
 });
 
 test('The Beast: WhatsApp reply hours in Melbourne time, and overseas video calls are booked to suit both zones (sales page and terms)', () => {
-  const sales = text(read('coaching.html'));
+  const sales = text(read('index.html'));
   const terms = text(read('coaching-terms.html'));
   assert.match(sales, /Replies within 2 hours during Australian business hours, Melbourne time/);
   assert.match(sales, /Overseas\? Video calls are booked at a time that suits both time zones/);

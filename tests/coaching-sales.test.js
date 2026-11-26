@@ -57,7 +57,7 @@ async function openSales(width, opts) {
   await page.route('**/rest/v1/rpc/coaching_places', r => o.rpcFails
     ? r.fulfill({ status: 404, contentType: 'application/json', body: '{"code":"PGRST202"}' })
     : r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SPOTS) }));
-  await page.goto(base + '/coaching');
+  await page.goto(base + '/');
   await page.waitForLoadState('load');
   // Scroll through so the lazy images load
   // Lazy images load when they come into view, so bring each one into view in turn.

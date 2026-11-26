@@ -71,7 +71,8 @@ test.after(async () => {
 });
 
 async function openPage(urlPath, stub) {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, timezoneId: 'Australia/Melbourne' });
+  const W = Number(process.env.PAGE_W) || 390;   // set PAGE_W=1280 to check the desktop layout
+  const ctx = await browser.newContext({ viewport: { width: W, height: W > 500 ? 900 : 844 }, isMobile: W <= 500, hasTouch: W <= 500, timezoneId: 'Australia/Melbourne' });
   const page = await ctx.newPage();
   page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));
@@ -149,14 +150,14 @@ test('dashboard: a signed-in visitor who came from /my-coach is sent straight ba
 test('dashboard: a signed-in user with no coaching plan sees the hire tile (dark green, the 4 options) and not My Coach', SKIP, async () => {
   const { ctx, page } = await openPage('/dashboard', { session: SIGNED_IN, claim: { linked: false, reason: 'no_plan_for_this_email' } });
   await page.waitForFunction(() => document.getElementById('hireCoachTile').style.display !== 'none');
-  assert.equal(await page.getAttribute('#hireCoachTile', 'href'), '/coaching');
+  assert.equal(await page.getAttribute('#hireCoachTile', 'href'), '/');
   const hire = await page.textContent('#hireCoachTile');
   assert.match(hire, /Hire me as your personal coach/);
   assert.match(hire, /4 options available/);
   assert.equal(await page.evaluate(() => getComputedStyle(document.getElementById('hireCoachTile')).backgroundColor), 'rgb(45, 106, 79)', 'the same dark green as My Coach');
   assert.equal(await page.evaluate(() => document.getElementById('myCoachTile').style.display), 'none');
   // Set SHOT_DIR to save the tiles as a screenshot (to check the layout by eye).
-  if (process.env.SHOT_DIR) await page.screenshot({ path: path.join(process.env.SHOT_DIR, 'dashboard-hire-tile.png'), fullPage: true });
+  if (process.env.SHOT_DIR) await page.screenshot({ path: path.join(process.env.SHOT_DIR, 'dashboard-hire-tile-' + (Number(process.env.PAGE_W) || 390) + '.png'), fullPage: true });
   assert.equal(page.errors.length, 0, 'no page errors: ' + page.errors.join('; '));
   await ctx.close();
 });
@@ -165,6 +166,7 @@ test('dashboard: a client with a plan sees My Coach, and never the hire tile', S
   const { ctx, page } = await openPage('/dashboard', { session: SIGNED_IN, claim: { linked: true, status: 'active', tier: 'core' } });
   await page.waitForFunction(() => document.getElementById('myCoachTile').style.display !== 'none');
   assert.equal(await page.evaluate(() => document.getElementById('hireCoachTile').style.display), 'none');
+  if (process.env.SHOT_DIR) await page.screenshot({ path: path.join(process.env.SHOT_DIR, 'dashboard-my-coach-tile-' + (Number(process.env.PAGE_W) || 390) + '.png'), fullPage: true });
   await ctx.close();
 });
 

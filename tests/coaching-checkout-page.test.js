@@ -46,7 +46,7 @@ async function open(reply) {
     r.fulfill({ status: reply.status, contentType: 'application/json', body: JSON.stringify(reply.body) });
   });
   await page.route(/\/stub-stripe$/, r => r.fulfill({ status: 200, contentType: 'text/html', body: '<h1>Stripe test page</h1>' }));
-  await page.goto(base + '/coaching');
+  await page.goto(base + '/');
   await page.waitForLoadState('domcontentloaded');
   return { ctx, page };
 }
@@ -105,7 +105,7 @@ test('a good answer goes to the checkout page the server gives; the news box is 
 
 test('the cancel return says nothing was charged, and Escape closes the step', SKIP, async () => {
   const { ctx, page } = await open({ status: 200, body: { url: base + '/stub-stripe' } });
-  await page.goto(base + '/coaching?checkout=cancelled');
+  await page.goto(base + '/?checkout=cancelled');
   assert.match(await page.textContent('body'), /Checkout was cancelled\. Nothing has been charged\./);
   await page.click('button[data-buy="basic"]');
   await page.keyboard.press('Escape');

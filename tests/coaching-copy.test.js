@@ -7,7 +7,7 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
-const COPY_FILES = ['coaching.html', 'coaching-demo.html', 'coaching-terms.html', 'coaching-health.html', 'coaching-privacy.html', 'docs/COACHING-DEMO.md'];
+const COPY_FILES = ['index.html', 'coaching-demo.html', 'coaching-terms.html', 'coaching-health.html', 'coaching-privacy.html', 'docs/COACHING-DEMO.md'];
 const SCREENS = ['today', 'add-meal', 'meal-builder', 'my-plan', 'progress', 'workout'];
 
 for (const f of COPY_FILES) {
@@ -19,7 +19,7 @@ for (const f of COPY_FILES) {
 }
 
 test('the feature is called Meal Builder everywhere (no "Beast AI Meal Builder", no "Meal Log")', () => {
-  for (const f of ['coaching.html', 'coaching-demo.html', 'docs/COACHING-DEMO.md']) {
+  for (const f of ['index.html', 'coaching-demo.html', 'docs/COACHING-DEMO.md']) {
     const t = read(f);
     assert.doesNotMatch(t, /Beast AI Meal Builder/, f);
     assert.doesNotMatch(t, /Meal Log\b/, f);
@@ -27,7 +27,7 @@ test('the feature is called Meal Builder everywhere (no "Beast AI Meal Builder",
 });
 
 test('the sales page shows the six portal screens, each under 200KB, with width and height set', () => {
-  const html = read('coaching.html');
+  const html = read('index.html');
   for (const name of SCREENS) {
     const file = path.join(ROOT, 'coach-img', 'portal', name + '.jpg');
     assert.ok(fs.existsSync(file), name + '.jpg exists');
@@ -43,7 +43,7 @@ test('the sales page shows the six portal screens, each under 200KB, with width 
 test('the old Beast AI screenshots are gone from the site and the sales page', () => {
   assert.equal(fs.existsSync(path.join(ROOT, 'coach-img', 'ai-meal-builder.jpg')), false);
   assert.equal(fs.existsSync(path.join(ROOT, 'coach-img', 'ai-meal-log.jpg')), false);
-  assert.doesNotMatch(read('coaching.html'), /ai-meal-(builder|log)\.jpg/);
+  assert.doesNotMatch(read('index.html'), /ai-meal-(builder|log)\.jpg/);
 });
 
 test('the capture script and the package.json script are in place', () => {

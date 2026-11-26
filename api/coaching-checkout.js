@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
       : '12 weeks of coaching, paid up front',
     customer_email: email,
     success_url: site + '/my-coach?paid=1&session_id={CHECKOUT_SESSION_ID}',
-    cancel_url: site + '/coaching?checkout=cancelled#plans',
+    cancel_url: site + '/?checkout=cancelled#plans',
     'metadata[plan]': plan,
     'metadata[name]': name.slice(0, 80),
     'metadata[email]': email,
