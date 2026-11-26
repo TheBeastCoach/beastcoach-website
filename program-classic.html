@@ -41,8 +41,7 @@
   </script>
 <title>Beast Coach: The Discipline Path</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,7 +51,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --dark: var(--surface); --primary: var(--lime); --accent: var(--lime); --light-accent: var(--surface-raised);
-    --bg: var(--ground); --white: var(--surface); --muted: var(--muted); --border: var(--line); --text: var(--ink-soft);
+    --bg: var(--ground); --white: var(--surface); --border: var(--line); --text: var(--ink-soft);
     padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   html { scroll-behavior: smooth; scroll-padding-top: env(safe-area-inset-top, 0px); font-size: 17px; }
@@ -70,9 +69,9 @@
   .chapter-nav button { width: 100%; text-align: left; background: none; border: none; color: color-mix(in srgb, var(--ink) 55%, transparent); font-family: var(--body); font-size: 15px; font-weight: 600; padding: 10px 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
   .chapter-nav button:hover:not(:disabled) { background: color-mix(in srgb, var(--ink) 6%, transparent); color: var(--white); }
   .chapter-nav button.active { color: var(--on-accent); background: var(--accent); }
-  .chapter-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
-  .chapter-nav .num { font-family: var(--body); font-size:15px; opacity: 0.7; }
-  .chapter-nav .lock { margin-left: auto; font-size:15px; }
+  .chapter-nav button:disabled { opacity: 1; color: var(--muted); cursor: not-allowed; }
+  .chapter-nav .num { font-family: var(--body); font-size:15px; }
+  .chapter-nav .lock { margin-left: auto; display: inline-flex; flex-shrink: 0; }
   .nav-divider { border: none; border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); margin: 1.1rem 0; }
 
   .action-btn { width: 100%; background: var(--accent); color: var(--on-accent); border: none; font-family: var(--body); font-size:15px; font-weight: 700; padding: 13px 12px; border-radius: 20px; cursor: pointer; margin-top: 0.5rem; }
@@ -148,7 +147,7 @@
   .disclaimer-row input[type="checkbox"] { width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px; accent-color: var(--accent); }
   .disclaimer-row label { font-size: 0.98rem; line-height: 1.55; }
   .disclaimer-row a { color: var(--primary); font-weight: 700; cursor: pointer; text-decoration: underline; }
-  .disclaimer-row.disabled input[type="checkbox"] { opacity: 0.45; }
+  .disclaimer-row.disabled input[type="checkbox"] { accent-color: var(--muted); cursor: not-allowed; }
   .disclaimer-row .read-hint { display: block; font-size:15px; color: var(--primary); font-weight: 700; margin-top: 4px; }
   .disclaimer-row.disabled .read-hint { display: block; }
   .disclaimer-row:not(.disabled) .read-hint { display: none; }
@@ -156,10 +155,10 @@
   .chapter-footer { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--border); }
   .chapter-footer button { background: none; border: none; color: var(--muted); font-family: var(--body); font-weight: 700; font-size:15px; cursor: pointer; padding: 0.3rem 0; }
   .chapter-footer button:hover:not(:disabled) { color: var(--primary); }
-  .chapter-footer button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .chapter-footer button:disabled { opacity: 1; color: var(--muted); cursor: not-allowed; }
   .chapter-footer .primary-next { background: var(--accent); color: var(--on-accent); padding: 10px 20px; border-radius: 20px; }
   .chapter-footer .primary-next:hover { background: var(--light-accent); color: var(--ink); }
-  .chapter-footer .primary-next:disabled { opacity: 0.4; background: var(--border); color: var(--muted); }
+  .chapter-footer .primary-next:disabled { opacity: 1; background: var(--border); color: var(--muted); }
 
   /* Chips */
   .chip-group { margin-bottom: 1.4rem; }
@@ -168,7 +167,7 @@
   .chip { font-family: var(--body); font-size:15px; font-weight: 600; color: var(--primary); background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: 8px 14px; cursor: pointer; transition: all 0.15s; }
   .chip:hover { border-color: var(--accent); }
   .chip.selected { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-  .chip.added { opacity: 0.4; cursor: default; }
+  .chip.added { color: var(--muted); cursor: default; }
 
   .tab-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.4rem; align-items: center; }
   .tab-btn { font-family: var(--body); font-size:15px; font-weight: 700; color: var(--muted); background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: 9px 17px; cursor: pointer; }
@@ -204,8 +203,8 @@
   .check-row .check-text { flex: 1; font-size: 1.02rem; }
   .check-row .na-btn { font-family: var(--body); font-size:15px; font-weight: 700; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 14px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
   .check-row .na-btn.active { background: var(--border); color: var(--ink); }
-  .check-row.na .check-text { text-decoration: line-through; opacity: 0.5; }
-  .check-row.na input[type="checkbox"] { opacity: 0.3; pointer-events: none; }
+  .check-row.na .check-text { text-decoration: line-through; color: var(--muted); }
+  .check-row.na input[type="checkbox"] { accent-color: var(--muted); pointer-events: none; }
 
   .progress-bar-track { background: var(--border); border-radius: 20px; height: 10px; overflow: hidden; margin: 1rem 0 1.6rem; }
   .progress-bar-fill { background: var(--accent); height: 100%; border-radius: 20px; transition: width 0.3s; }
@@ -364,13 +363,13 @@ h3 { font-size: 24px; }
       <li><button data-target="profile" id="navProfile" disabled><span class="num">01</span>Your Profile</button></li>
       <li><button data-target="psychology" id="navPsychology" disabled><span class="num">02</span>The Psychology</button></li>
       <li><hr class="nav-divider"></li>
-      <li><button data-target="step1" id="navStep1" disabled><span class="num">1</span>Identity Reset<span class="lock">🔒</span></button></li>
-      <li><button data-target="step2" id="navStep2" disabled><span class="num">2</span>Environment Reset<span class="lock">🔒</span></button></li>
-      <li><button data-target="step3" id="navStep3" disabled><span class="num">3</span>Social Playbook<span class="lock">🔒</span></button></li>
-      <li><button data-target="step4" id="navStep4" disabled><span class="num">4</span>Routine Build<span class="lock">🔒</span></button></li>
-      <li><button data-target="step5" id="navStep5" disabled><span class="num">5</span>Reset Protocol<span class="lock">🔒</span></button></li>
-      <li><button data-target="step6" id="navStep6" disabled><span class="num">6</span>The Reminder<span class="lock">🔒</span></button></li>
-      <li><button data-target="step7" id="navStep7" disabled><span class="num">7</span>Full System<span class="lock">🔒</span></button></li>
+      <li><button data-target="step1" id="navStep1" disabled><span class="num">1</span>Identity Reset<span class="lock"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></button></li>
+      <li><button data-target="step2" id="navStep2" disabled><span class="num">2</span>Environment Reset<span class="lock"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></button></li>
+      <li><button data-target="step3" id="navStep3" disabled><span class="num">3</span>Social Playbook<span class="lock"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></button></li>
+      <li><button data-target="step4" id="navStep4" disabled><span class="num">4</span>Routine Build<span class="lock"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></button></li>
+      <li><button data-target="step5" id="navStep5" disabled><span class="num">5</span>Reset Protocol<span class="lock"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></button></li>
+      <li><button data-target="step6" id="navStep6" disabled><span class="num">6</span>The Reminder<span class="lock"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></button></li>
+      <li><button data-target="step7" id="navStep7" disabled><span class="num">7</span>Full System<span class="lock"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span></button></li>
       <li><button data-target="mealplan" id="navMealPlan" disabled><span class="num">🍽</span>Meal Plan Ideas</button></li>
       <li><button data-target="workout" id="navWorkout" disabled><span class="num">💪</span>Workout Sheet</button></li>
       <li><hr class="nav-divider"></li>
@@ -1001,6 +1000,7 @@ h3 { font-size: 24px; }
     for (let i = 1; i <= 7; i++) { if (load('step' + i + 'Complete', false)) idx = i + 1; else break; }
     return idx;
   }
+  const LOCK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
   function refreshNavLocks() {
     const done = unlockedThrough();
     document.getElementById('navProfile').disabled = !load('disclaimerAccepted', false);
@@ -1012,7 +1012,7 @@ h3 { font-size: 24px; }
       const lockSpan = btn.querySelector('.lock');
       if (load('step' + i + 'Complete', false)) { lockSpan.textContent = '✓'; }
       else if (reachable) { lockSpan.textContent = ''; }
-      else { lockSpan.textContent = '🔒'; }
+      else { lockSpan.innerHTML = LOCK_ICON; }
     }
     document.getElementById('navMealPlan').disabled = done < 7;
     document.getElementById('navWorkout').disabled = done < 7;

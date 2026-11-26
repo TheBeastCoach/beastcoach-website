@@ -15,6 +15,11 @@ const KINDS = CLIENT_KINDS.concat(OWNER_KINDS);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const planName = key => (PLANS[key] && PLANS[key].name) || 'Coaching';
 
+// Brand tokens (docs/BRAND.md). Email cannot read brand.css, so the values are repeated here.
+const GROUND = '#0B0C0A', SURFACE = '#141511', LINE = '#26281F', INK = '#F4F5EE', SOFT = '#C7C9BE', MUTED = '#A3A69A', LIME = '#C6F432', AMBER = '#FFC21F';
+const FONT = "'Hanken Grotesk',Arial,Helvetica,sans-serif";
+const LOGO_URL = 'https://www.beastcoach.fit/beastcoach-email-logo.png';
+
 // GST wording. Not registered: "No GST has been charged." Registered: a tax invoice, with GST included (1/11) and the ABN.
 function gstLine(settings, cents) {
   if (!settings || !settings.gst_registered) return { text: 'No GST has been charged.', tax: false };
@@ -22,20 +27,39 @@ function gstLine(settings, cents) {
   return { text: 'Tax invoice. The total includes GST of ' + money(gst) + ' (1/11 of the price). ABN ' + (settings.abn || 'not set') + '.', tax: true };
 }
 
-// Shared layout: the site's colours, one column, plain text version kept alongside.
+// Email building blocks. Tables for layout, inline styles only.
+const H = (html, size) => `<h1 style="margin:0 0 12px;font-family:${FONT};font-weight:700;font-size:${size}px;line-height:1.15;color:${INK};">${html}</h1>`;
+const P = (html, extra) => `<p style="margin:0 0 12px;font-family:${FONT};font-size:16px;line-height:1.55;color:${SOFT};${extra || ''}">${html}</p>`;
+const SMALL = (html, extra) => `<p style="margin:0 0 12px;font-family:${FONT};font-size:14px;line-height:1.55;color:${MUTED};${extra || ''}">${html}</p>`;
+const B = html => `<b style="color:${INK};">${html}</b>`;
+const A = (href, label) => `<a href="${esc(href)}" style="color:${LIME};text-decoration:underline;">${label}</a>`;
+
+// Shared layout: dark ground, one card, logo as a hosted PNG, footer in muted text. Max width 600px.
 function layout(title, bodyHtml) {
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${esc(title)}</title></head>
-<body style="margin:0;background:#F4F7F2;font-family:Manrope,Arial,sans-serif;color:#1B3022;">
-<div style="max-width:560px;margin:0 auto;padding:24px 20px;">
-<div style="font-weight:800;letter-spacing:.06em;font-size:18px;margin-bottom:18px;">BEAST<span style="color:#2D6A4F">COACH</span></div>
-<div style="background:#ffffff;border:1px solid #D5E0D8;border-radius:18px;padding:24px;">
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="dark"><title>${esc(title)}</title></head>
+<body style="margin:0;padding:0;background:${GROUND};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${GROUND}" style="background:${GROUND};width:100%;"><tr><td align="center" style="padding:24px 12px;">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+<tr><td style="padding:0 0 20px 0;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+<td style="vertical-align:middle;padding-right:12px;"><img src="${LOGO_URL}" width="44" height="44" alt="Beast Coach" style="display:block;border:0;width:44px;height:44px;"></td>
+<td style="vertical-align:middle;font-family:${FONT};font-weight:700;font-size:18px;letter-spacing:2px;color:${INK};white-space:nowrap;">BEAST <span style="color:${AMBER};">COACH</span></td>
+</tr></table>
+</td></tr>
+<tr><td style="background:${SURFACE};border:1px solid ${LINE};border-radius:20px;padding:32px 28px;">
 ${bodyHtml}
-</div>
-<p style="font-size:13px;color:#4c6354;margin:16px 0 0;">Beast Coach. Questions? Reply to this email.</p>
-</div></body></html>`;
+</td></tr>
+<tr><td style="padding:20px 0 0 0;font-family:${FONT};font-size:14px;line-height:1.55;color:${MUTED};">
+<p style="margin:0 0 8px;">Beast Coach online coaching. General fitness and nutrition guidance, not medical advice.</p>
+<p style="margin:0;">Beast Coach. Questions? Reply to this email.</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body></html>`;
 }
+// Primary button: a lime pill inside a table cell (no VML).
 function button(href, label) {
-  return `<p style="margin:20px 0 0;"><a href="${esc(href)}" style="display:inline-block;background:#F59E0B;color:#1B1200;font-weight:800;text-decoration:none;padding:13px 20px;border-radius:14px;">${esc(label)}</a></p>`;
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 0;"><tr><td align="center" style="border-radius:999px;background:${LIME};"><a href="${esc(href)}" style="display:inline-block;padding:14px 26px;border-radius:999px;background:${LIME};color:${GROUND};font-family:${FONT};font-size:16px;font-weight:700;line-height:1.2;text-decoration:none;">${esc(label)}</a></td></tr></table>`;
 }
 
 function welcome({ name, plan }) {
@@ -52,17 +76,17 @@ Thanks for joining ${planName(plan)} with Beast Coach. Here is what happens next
 Reply to this email if you have a question.
 
 Stefan`;
-  const html = layout('Welcome to Beast Coach', `
-<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:36px;margin:0 0 8px;">Welcome, ${first}</h1>
-<p style="margin:0 0 14px;">Thanks for joining <b>${esc(planName(plan))}</b>. Here is what happens next:</p>
-<ol style="padding-left:20px;margin:0 0 6px;">
-<li style="margin-bottom:8px;">Sign in or create your account at <a href="${esc(site)}/dashboard" style="color:#2D6A4F;">beastcoach.fit/dashboard</a> with <b>this email address</b>. Use exactly this email, so your plan is linked to you.</li>
-<li style="margin-bottom:8px;">Open My Coach and answer the onboarding questions. Stefan uses them to build your plan.</li>
-<li style="margin-bottom:8px;">Stefan builds your plan and sets your start date. Logging opens when your plan is active.</li>
-</ol>
-${button(site + '/dashboard', 'Sign in to Beast Coach')}
-<p style="margin:18px 0 0;">Reply to this email if you have a question.</p>
-<p style="margin:12px 0 0;">Stefan</p>`);
+  const html = layout('Welcome to Beast Coach',
+    H('Welcome, ' + first, 30)
+    + P('Thanks for joining ' + B(esc(planName(plan))) + '. Here is what happens next:')
+    + `<ol style="margin:0 0 6px;padding-left:20px;font-family:${FONT};font-size:16px;line-height:1.55;color:${SOFT};">
+<li style="margin:0 0 10px;">Sign in or create your account at ${A(site + '/dashboard', 'beastcoach.fit/dashboard')} with ${B('this email address')}. Use exactly this email, so your plan is linked to you.</li>
+<li style="margin:0 0 10px;">Open My Coach and answer the onboarding questions. Stefan uses them to build your plan.</li>
+<li style="margin:0 0 10px;">Stefan builds your plan and sets your start date. Logging opens when your plan is active.</li>
+</ol>`
+    + button(site + '/dashboard', 'Sign in to Beast Coach')
+    + P('Reply to this email if you have a question.', 'margin-top:20px;')
+    + P('Stefan', 'margin-bottom:0;'));
   return { subject: 'Welcome to Beast Coach: your next steps', html, text };
 }
 
@@ -79,16 +103,17 @@ ${what}
 ${gst.text}
 
 Questions? Reply to this email.`;
-  const html = layout('Your receipt', `
-<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:30px;margin:0 0 12px;">Your receipt</h1>
-<table role="presentation" style="width:100%;border-collapse:collapse;font-size:15px;">
-<tr><td style="padding:8px 0;border-bottom:1px solid #EEF3EF;color:#4c6354;">Plan</td><td style="padding:8px 0;border-bottom:1px solid #EEF3EF;text-align:right;"><b>${esc(planName(plan))}</b></td></tr>
-<tr><td style="padding:8px 0;border-bottom:1px solid #EEF3EF;color:#4c6354;">Amount</td><td style="padding:8px 0;border-bottom:1px solid #EEF3EF;text-align:right;"><b>${esc(money(amountCents))}</b></td></tr>
-<tr><td style="padding:8px 0;border-bottom:1px solid #EEF3EF;color:#4c6354;">Date</td><td style="padding:8px 0;border-bottom:1px solid #EEF3EF;text-align:right;">${esc(date)}</td></tr>
-</table>
-<p style="margin:14px 0 0;font-size:14px;color:#3B4F43;">${esc(what)}.</p>
-<p style="margin:10px 0 0;font-size:14px;color:#3B4F43;">${esc(gst.text)}</p>
-<p style="margin:12px 0 0;font-size:13px;color:#4c6354;">Hi ${esc(name || 'there')}, keep this for your records.</p>`);
+  const td = `padding:10px 0;border-bottom:1px solid ${LINE};font-family:${FONT};font-size:16px;`;
+  const html = layout('Your receipt',
+    H('Your receipt', 28)
+    + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+<tr><td style="${td}color:${MUTED};">Plan</td><td style="${td}text-align:right;color:${INK};font-weight:700;">${esc(planName(plan))}</td></tr>
+<tr><td style="${td}color:${MUTED};">Amount</td><td style="${td}text-align:right;color:${INK};font-weight:700;">${esc(money(amountCents))}</td></tr>
+<tr><td style="${td}color:${MUTED};">Date</td><td style="${td}text-align:right;color:${INK};">${esc(date)}</td></tr>
+</table>`
+    + SMALL(esc(what) + '.', 'margin-top:14px;')
+    + SMALL(esc(gst.text), 'margin-top:10px;')
+    + SMALL('Hi ' + esc(name || 'there') + ', keep this for your records.', 'margin-top:12px;margin-bottom:0;'));
   return { subject: 'Your Beast Coach receipt', html, text };
 }
 
@@ -100,12 +125,12 @@ Thank you for trying to join ${planName(plan)}. Sorry: that plan filled up in th
 If you would like another plan, or to be told when a place opens, reply to this email and we will sort it out.
 
 Stefan`;
-  const html = layout('Sorry, that plan just filled', `
-<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:30px;margin:0 0 12px;">Sorry, that plan just filled</h1>
-<p style="margin:0 0 12px;">Hi ${esc(name || 'there')}, thank you for trying to join <b>${esc(planName(plan))}</b>. The plan filled up in the moment between your payment and our confirmation.</p>
-<p style="margin:0 0 12px;">We have refunded your payment of <b>${esc(money(amountCents))}</b> in full. It goes back to your card and can take a few days to show.</p>
-<p style="margin:0 0 12px;">If you would like another plan, or to be told when a place opens, reply to this email.</p>
-<p style="margin:12px 0 0;">Stefan</p>`);
+  const html = layout('Sorry, that plan just filled',
+    H('Sorry, that plan just filled', 28)
+    + P('Hi ' + esc(name || 'there') + ', thank you for trying to join ' + B(esc(planName(plan))) + '. The plan filled up in the moment between your payment and our confirmation.')
+    + P('We have refunded your payment of ' + B(esc(money(amountCents))) + ' in full. It goes back to your card and can take a few days to show.')
+    + P('If you would like another plan, or to be told when a place opens, reply to this email.')
+    + P('Stefan', 'margin-bottom:0;'));
   return { subject: 'Sorry, that plan just filled: your payment is refunded', html, text };
 }
 
@@ -120,12 +145,12 @@ ${gst.text}
 Manage or cancel any time from My Coach, Settings.
 
 Stefan`;
-  const html = layout('Basic renewed', `
-<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:30px;margin:0 0 12px;">Basic has renewed</h1>
-<p style="margin:0 0 12px;">Hi ${esc(name || 'there')}, we took <b>${esc(money(amountCents))}</b> on ${esc(date)}. Your plan now runs to ${esc(endDate)}.</p>
-<p style="margin:0 0 12px;font-size:14px;color:#3B4F43;">${esc(gst.text)}</p>
-<p style="margin:0 0 12px;">You can manage or cancel any time from My Coach, Settings.</p>
-${button(siteUrl() + '/my-coach', 'Open My Coach')}`);
+  const html = layout('Basic renewed',
+    H('Basic has renewed', 28)
+    + P('Hi ' + esc(name || 'there') + ', we took ' + B(esc(money(amountCents))) + ' on ' + esc(date) + '. Your plan now runs to ' + esc(endDate) + '.')
+    + SMALL(esc(gst.text))
+    + P('You can manage or cancel any time from My Coach, Settings.')
+    + button(siteUrl() + '/my-coach', 'Open My Coach'));
   return { subject: 'Your Basic plan has renewed', html, text };
 }
 
@@ -139,11 +164,11 @@ Update it from My Coach, Settings: ${siteUrl()}/my-coach
 If you have already fixed it, you can ignore this email.
 
 Stefan`;
-  const html = layout('Please update your card', `
-<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:30px;margin:0 0 12px;">Please update your card</h1>
-<p style="margin:0 0 12px;">Hi ${esc(name || 'there')}, we could not take the latest payment for your Basic plan. Please update your card so your plan keeps running.</p>
-${button(siteUrl() + '/my-coach', 'Update my card')}
-<p style="margin:14px 0 0;font-size:13px;color:#4c6354;">If you have already fixed it, you can ignore this email.</p>`);
+  const html = layout('Please update your card',
+    H('Please update your card', 28)
+    + P('Hi ' + esc(name || 'there') + ', we could not take the latest payment for your Basic plan. Please update your card so your plan keeps running.')
+    + button(siteUrl() + '/my-coach', 'Update my card')
+    + SMALL('If you have already fixed it, you can ignore this email.', 'margin-top:14px;'));
   return { subject: 'Please update your card for Basic', html, text };
 }
 
@@ -155,11 +180,11 @@ Your Basic plan is cancelled. You can keep using it until ${endDate}. Your histo
 Thank you for training with Beast Coach. If you change your mind, you can start Basic again from the Work With Me page.
 
 Stefan`;
-  const html = layout('Basic is cancelled', `
-<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:30px;margin:0 0 12px;">Basic is cancelled</h1>
-<p style="margin:0 0 12px;">Hi ${esc(name || 'there')}, your Basic plan is cancelled. You can keep using it until ${esc(endDate)}. Your history stays in My Coach.</p>
-<p style="margin:0 0 12px;">Thank you for training with Beast Coach.</p>
-<p style="margin:12px 0 0;">Stefan</p>`);
+  const html = layout('Basic is cancelled',
+    H('Basic is cancelled', 28)
+    + P('Hi ' + esc(name || 'there') + ', your Basic plan is cancelled. You can keep using it until ' + esc(endDate) + '. Your history stays in My Coach.')
+    + P('Thank you for training with Beast Coach.')
+    + P('Stefan', 'margin-bottom:0;'));
   return { subject: 'Your Basic plan is cancelled', html, text };
 }
 
@@ -173,21 +198,22 @@ We have refunded your payment of ${money(amountCents)} for ${planName(plan)}. Yo
 If you are signed in already, you can see your plan at beastcoach.fit/dashboard. If you meant to change plans, reply to this email and tell us which plan you want. We will sort it out with you.
 
 Stefan`;
-  const html = layout('Your payment has been refunded', `
-<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:30px;margin:0 0 12px;">Your payment has been refunded</h1>
-<p style="margin:0 0 12px;">Hi ${esc(name || 'there')}, we have refunded your payment of <b>${esc(money(amountCents))}</b> for <b>${esc(planName(plan))}</b>. Your email already has an active <b>${esc(planName(existingPlan))}</b> plan with Beast Coach, so we did not open a second one.</p>
-<p style="margin:0 0 12px;">The refund goes back to your card and can take a few days to show.</p>
-<p style="margin:0 0 12px;">Sign in at beastcoach.fit/dashboard with this email to see your plan. If you meant to change plans, reply to this email and tell us which plan you want.</p>
-${button(site + '/dashboard', 'Sign in to Beast Coach')}
-<p style="margin:12px 0 0;">Stefan</p>`);
+  const html = layout('Your payment has been refunded',
+    H('Your payment has been refunded', 28)
+    + P('Hi ' + esc(name || 'there') + ', we have refunded your payment of ' + B(esc(money(amountCents))) + ' for ' + B(esc(planName(plan))) + '. Your email already has an active ' + B(esc(planName(existingPlan))) + ' plan with Beast Coach, so we did not open a second one.')
+    + P('The refund goes back to your card and can take a few days to show.')
+    + P('Sign in at beastcoach.fit/dashboard with this email to see your plan. If you meant to change plans, reply to this email and tell us which plan you want.')
+    + button(site + '/dashboard', 'Sign in to Beast Coach')
+    + P('Stefan', 'margin-top:14px;margin-bottom:0;'));
   return { subject: 'Your payment has been refunded: you already have a plan', html, text };
 }
 
 // ---------- owner alerts: plain and short, for Stefan only
 function ownerBox(title, rows, extra) {
-  const trs = rows.map(([k, v]) => `<tr><td style="padding:6px 10px 6px 0;color:#4c6354;vertical-align:top;">${esc(k)}</td><td style="padding:6px 0;"><b>${esc(v)}</b></td></tr>`).join('');
-  return `<h1 style="font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:28px;margin:0 0 10px;">${esc(title)}</h1>
-<table role="presentation" style="border-collapse:collapse;font-size:15px;">${trs}</table>${extra || ''}`;
+  const td = `padding:8px 0;border-bottom:1px solid ${LINE};font-family:${FONT};font-size:15px;`;
+  const trs = rows.map(([k, v]) => `<tr><td style="${td}padding-right:16px;color:${MUTED};vertical-align:top;">${esc(k)}</td><td style="${td}color:${INK};font-weight:700;word-wrap:break-word;">${esc(v)}</td></tr>`).join('');
+  return H(esc(title), 26)
+    + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">${trs}</table>${extra || ''}`;
 }
 function ownerText(title, rows, tail) {
   return title + '\n\n' + rows.map(([k, v]) => k + ': ' + v).join('\n') + (tail ? '\n\n' + tail : '');
@@ -198,7 +224,7 @@ function ownerPurchase({ name, email, plan, amountCents, marketing, kind }) {
     ['Marketing emails ticked', marketing ? 'Yes' : 'No']];
   const link = siteUrl() + '/coach';
   return { subject: 'New coaching purchase: ' + planName(plan) + ', ' + (name || email),
-    html: layout('New coaching purchase', ownerBox('New coaching purchase', rows, `<p style="margin:14px 0 0;"><a href="${esc(link)}" style="color:#2D6A4F;">Open the coach page</a></p>`)),
+    html: layout('New coaching purchase', ownerBox('New coaching purchase', rows, `<p style="margin:16px 0 0;font-family:${FONT};font-size:16px;">${A(link, 'Open the coach page')}</p>`)),
     text: ownerText('New coaching purchase', rows, 'Open the coach page: ' + link) };
 }
 function ownerDuplicate({ name, email, plan, existingPlan, amountCents }) {
