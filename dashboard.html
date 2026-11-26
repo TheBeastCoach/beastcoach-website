@@ -1208,16 +1208,28 @@ function enterPortal(user) {
   document.getElementById("dash-greeting").textContent = "Welcome back, " + name;
   advUser = user;
   showView("dashboard");
+  let advIntent = false;
+  try { advIntent = localStorage.getItem("bc_advent_intent") === "1"; localStorage.removeItem("bc_advent_intent"); } catch (e) {}
   const hash = window.location.hash.replace("#", "");
   if (hash === "calculator" || hash === "shop" || hash === "recipes" || hash === "study" || hash === "advent") {
     showView(hash);
     if (hash === "advent") loadAdvent();
+  } else if (advIntent) {
+    showView("advent");
+    loadAdvent();
   }
   checkDisciplinePurchase(user);
   checkDonation(user);
 }
 
 /* ---------- 25 Day Advent Health Calendar ---------- */
+/* Arrived from the public /advent page: say why they are being asked to sign up */
+if (window.location.hash === "#advent") {
+  try { localStorage.setItem("bc_advent_intent", "1"); } catch (e) {}
+  const advT = document.querySelector("#view-auth .page-title"), advS = document.querySelector("#view-auth .page-sub");
+  if (advT) advT.textContent = "Open your first door";
+  if (advS) advS.textContent = "Create a free account to open the demo door and get a new door every day from 1 December.";
+}
 const ADV_WHEN = ["Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"];
 let adv = null;            // { today, demo, days:[{day,text,why}] } from /api/advent
 let advSel = null;         // 0 = demo door
