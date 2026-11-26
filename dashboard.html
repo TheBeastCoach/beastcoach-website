@@ -322,6 +322,12 @@
   .adv-door.sel { box-shadow: 0 0 0 3px var(--green-light); }
   .adv-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 11px; font-weight: 600; color: #4a5750; margin-bottom: 18px; }
   .adv-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; vertical-align: -2px; margin-right: 5px; }
+  .adv-scrim { position: fixed; inset: 0; background: rgba(17,26,20,0.6); z-index: 150; display: flex; align-items: flex-end; justify-content: center; }
+  .adv-sheet { background: #fff; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; border-radius: 22px 22px 0 0; padding: 8px 4px 20px; box-shadow: 0 -10px 40px rgba(0,0,0,.25); }
+  .adv-sheet .adv-card { border: none; padding: 16px 20px 8px; }
+  .adv-sheet .grab { width: 44px; height: 5px; border-radius: 3px; background: var(--border); margin: 6px auto 0; }
+  .adv-sheet .adv-close { display: block; width: calc(100% - 40px); margin: 6px 20px 0; min-height: 48px; border-radius: 32px; border: 1.5px solid var(--border); background: #fff; font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 800; color: var(--text); cursor: pointer; }
+  @media (min-width: 600px) { .adv-scrim { align-items: center; } .adv-sheet { border-radius: 22px; } }
   .adv-card { background: #fff; border: 1.5px solid var(--border); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
   .adv-card .head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .adv-card .date { font-size: 11px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green); }
@@ -1122,6 +1128,7 @@ const resetForm = document.getElementById("reset-form");
 const resetStatus = document.getElementById("reset-status");
 let inPasswordRecovery = false;
 let advUser = null;
+let portalUserId = null;   // who is already inside the portal, so repeated auth events do not reset the screen
 
 function showStatus(el, msg, isError) {
   el.textContent = msg;
@@ -1172,6 +1179,7 @@ signinForm.addEventListener("submit", async (e) => {
 });
 
 signoutBtn.addEventListener("click", async () => {
+  portalUserId = null;
   await sb.auth.signOut();
   window.location.reload();
 });
@@ -1220,6 +1228,11 @@ function enterPortal(user) {
     window.location.replace("/my-coach");
     return;
   }
+  // Supabase repeats auth events (tab focus, token refresh, saving your ticks). Same person already in: keep them where they are.
+  const firstEntry = portalUserId !== user.id;
+  portalUserId = user.id;
+  advUser = user;
+  if (!firstEntry) return;
   const name = user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : user.email;
   document.getElementById("dash-greeting").textContent = "Welcome back, " + name;
   advUser = user;
@@ -1270,6 +1283,7 @@ if (window.location.hash === "#advent") {
 const ADV_WHEN = ["Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"];
 let adv = null;            // { today, demo, days:[{day,text,why}] } from /api/advent
 let advSel = null;         // 0 = demo door
+let advOpen = false;       // is a door open (shown as a pop-up over the calendar)?
 let advProg = { p: {}, d: {} };   // saved on the account (user_metadata.advent)
 let advDemo = { p: false, d: false };   // demo ticks are never saved or counted
 const advDate = (n) => ADV_WHEN[(n - 1) % 7] + " " + n + " Dec";
@@ -1288,13 +1302,14 @@ async function loadAdvent() {
     const r = await fetch("/api/advent" + (asOf ? "?asOf=" + encodeURIComponent(asOf) : ""), {
       headers: { Authorization: "Bearer " + (session ? session.access_token : "") }, cache: "no-store"
     });
-    if (!r.ok) throw new Error("status " + r.status);
+    if (!r.ok) throw new Error("error " + r.status);
     adv = await r.json();
   } catch (e) {
-    body.innerHTML = '<p class="page-sub">Couldn’t load the calendar. Check your connection and try again.</p>';
-    return;
+    // The demo door never depends on the server: if the daily doors can't load, still show it.
+    adv = { today: 0, demo: { text: "Tidy your bedroom today", why: "A calmer room is an easier place to sleep. Quick to do, and you will feel it tonight." }, days: [] };
+    advMsg.textContent = "The daily doors couldn’t load (" + (e && e.message ? e.message : "no connection") + "). The demo door still works. Log out, log back in, then try again.";
   }
-  if (advSel === null || advSel > adv.today) advSel = adv.today >= 1 ? adv.today : 0;
+  advOpen = false;
   renderAdvent();
 }
 
@@ -1319,20 +1334,22 @@ function renderAdvent() {
   let h = '<div class="adv-prog"><div><div class="big">' + done + ' <span>of ' + (today < 1 ? 25 : shown) + ' done</span></div><div class="sub">' + sub + '</div></div>' +
     '<div class="adv-ring" style="background:conic-gradient(#52B788 ' + pct + '%, #2f4a3a 0)"><div>' + pct + '%</div></div></div>';
 
-  h += '<button type="button" class="adv-demo' + (advSel === 0 ? " sel" : "") + '" data-door="0" aria-label="Demo door, try it now"><span><span class="t">Try a demo door</span><span class="s">See how it works. It doesn’t count toward your 25.</span></span><span class="go">Open</span></button>';
+  h += '<button type="button" class="adv-demo' + (advOpen && advSel === 0 ? " sel" : "") + '" data-door="0" aria-label="Demo door, try it now"><span><span class="t">Try a demo door</span><span class="s">See how it works. It doesn’t count toward your 25.</span></span><span class="go">Open</span></button>';
 
   h += '<div class="adv-grid">';
   for (let n = 1; n <= 25; n++) {
     const st = advStatus(n);
     const lock = st === "locked" ? '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' : '<span class="tag">' + LABEL[st] + '</span>';
-    h += '<button type="button" class="adv-door ' + st + (n === advSel ? " sel" : "") + '" data-door="' + n + '" aria-label="December ' + n + ', ' + (st === "locked" ? "locked" : LABEL[st].toLowerCase()) + '"><span class="n">' + n + '</span>' + lock + '</button>';
+    h += '<button type="button" class="adv-door ' + st + (advOpen && n === advSel ? " sel" : "") + '" data-door="' + n + '" aria-label="December ' + n + ', ' + (st === "locked" ? "locked" : LABEL[st].toLowerCase()) + '"><span class="n">' + n + '</span>' + lock + '</button>';
   }
   h += '</div>';
   h += '<div class="adv-legend"><span><i style="background:#2D6A4F"></i>Done</span><span><i style="background:#fff;border:2px solid #52B788"></i>Planned</span><span><i style="border:2px dashed #9aa39d"></i>Missed</span><span><i style="background:#E4E8E6"></i>Locked</span></div>';
 
   // opened door
-  let card;
-  if (advSel === 0) {
+  let card = "";
+  if (!advOpen) {
+    // nothing open: no pop-up to build
+  } else if (advSel === 0) {
     card = advCard("Demo door", "demo", "Demo", adv.demo.text, adv.demo.why, advDemo.p || advDemo.d, advDemo.d, { demo: true });
   } else {
     const st = advStatus(advSel);
@@ -1343,7 +1360,9 @@ function renderAdvent() {
       card = advCard(advDate(advSel), st, LABEL[st], it.text, it.why, !!(advProg.p[advSel] || advProg.d[advSel]), !!advProg.d[advSel], { missed: st === "missed", join: advSel === 2 });
     }
   }
-  body.innerHTML = h + card;
+  const sheet = advOpen ? '<div class="adv-scrim" id="adv-scrim"><div class="adv-sheet" role="dialog" aria-modal="true" aria-label="Opened door"><div class="grab"></div>' + card + '<button type="button" class="adv-close" data-close>Close</button></div></div>' : "";
+  body.innerHTML = h + sheet;
+  if (advOpen) { const c = body.querySelector(".adv-close"); if (c) c.focus({ preventScroll: true }); }
 }
 
 function advCard(date, cls, badge, text, why, planned, done, o) {
@@ -1364,11 +1383,15 @@ async function advSave() {
 }
 
 document.getElementById("view-advent").addEventListener("click", (e) => {
+  if (!adv) return;
+  if (e.target.id === "adv-scrim" || e.target.closest("[data-close]")) { advOpen = false; renderAdvent(); return; }
   const door = e.target.closest("[data-door]");
-  if (!door || !adv) return;
+  if (!door) return;
   advSel = Number(door.getAttribute("data-door"));
+  advOpen = true;
   renderAdvent();
 });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && advOpen && adv) { advOpen = false; renderAdvent(); } });
 document.getElementById("view-advent").addEventListener("change", (e) => {
   const t = e.target.getAttribute && e.target.getAttribute("data-tick");
   if (!t || !adv) return;
