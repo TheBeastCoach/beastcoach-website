@@ -1,0 +1,83 @@
+/* Beast Coach brand: tokens and shared classes. Every page uses these. See docs/BRAND.md. */
+
+:root {
+  --ground: #0B0C0A;
+  --ground-alt: #0F100D;
+  --surface: #141511;
+  --surface-raised: #17180F;
+  --line: #26281F;
+  --line-strong: #3A3D30;
+  --ink: #F4F5EE;
+  --ink-soft: #C7C9BE;
+  --muted: #A3A69A;
+  --lime: #C6F432;
+  --amber: #FFC21F;
+  --orange: #FF7A1A;
+  --on-accent: #0B0C0A;
+  --brand-gradient: linear-gradient(90deg, #C6F432 0%, #FFC21F 55%, #FF7A1A 100%);
+  --display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+  --body: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+}
+
+html { background: var(--ground); }
+body { margin: 0; background: var(--ground); color: var(--ink-soft); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+a { color: var(--lime); }
+a:hover { color: var(--ink); }
+:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+
+/* Headlines and big numbers */
+.disp { font-family: var(--display); font-weight: 800; text-transform: uppercase; line-height: .92; letter-spacing: 0; color: var(--ink); margin: 0; }
+
+/* Eyebrow */
+.eyebrow { font-family: var(--body); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--lime); }
+
+/* Gradient text: logos, a few key words, the Core price, step numbers */
+.text-gradient { background: var(--brand-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Buttons: pills, 44px and taller */
+.btn-primary, .btn-outline, .btn-beast {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 52px; padding: 14px 26px; border-radius: 999px; box-sizing: border-box;
+  font-family: var(--body); font-size: 16px; font-weight: 700; text-decoration: none; text-align: center; cursor: pointer;
+  border: 2px solid transparent; transition: background .15s, color .15s, border-color .15s;
+}
+.btn-primary { background: var(--lime); color: var(--on-accent); }
+.btn-primary:hover { background: #D6F76A; color: var(--on-accent); }
+.btn-outline { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+.btn-outline:hover { border-color: var(--lime); color: var(--lime); }
+.btn-beast { background: transparent; color: var(--orange); border-color: var(--orange); }
+.btn-beast:hover { background: var(--orange); color: var(--on-accent); }
+button.btn-primary, button.btn-outline, button.btn-beast { font: inherit; font-weight: 700; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Cards */
+.plan-card { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 28px 24px; display: flex; flex-direction: column; gap: 14px; }
+.plan-card--highlight {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--surface-raised), var(--surface-raised)) padding-box,
+    var(--brand-gradient) border-box;
+}
+
+/* Tick list: lime ticks (orange for The Beast) */
+.tick-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tick-list li { display: flex; gap: 10px; color: var(--ink-soft); }
+.tick-list svg { flex: none; margin-top: 3px; color: var(--lime); }
+.tick-list--beast svg { color: var(--orange); }
+
+/* The site header (the shared menu) */
+.site-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(11,12,10,.94); border-bottom: 1px solid var(--line); }
+.site-nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand-mark { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); min-height: 44px; }
+.brand-mark svg { width: 30px; height: 30px; flex: none; }
+.brand-word { font-family: var(--display); font-weight: 900; font-size: 22px; letter-spacing: .04em; text-transform: uppercase; line-height: 1; color: var(--ink); }
+.brand-word .text-gradient { font: inherit; }
+.site-nav-links { display: flex; align-items: center; gap: 22px; }
+.site-nav-links a { color: var(--ink-soft); text-decoration: none; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; min-height: 44px; }
+.site-nav-links a:hover, .site-nav-links a[aria-current] { color: var(--ink); }
+.site-nav-cta { background: var(--lime) !important; color: var(--on-accent) !important; padding: 0 18px; min-height: 44px; display: inline-flex; align-items: center; box-sizing: border-box; border-radius: 999px; font-weight: 700 !important; }
+.site-nav-toggle { display: none; background: none; border: 0; color: var(--ink); font-size: 24px; cursor: pointer; min-width: 44px; min-height: 44px; }
+.site-nav-mobile { display: none; flex-direction: column; padding: 8px 24px 16px; border-top: 1px solid var(--line); background: var(--ground); }
+.site-nav-mobile.active { display: flex; }
+.site-nav-mobile a { color: var(--ink-soft); text-decoration: none; padding: 12px 0; font-size: 15px; font-weight: 600; border-bottom: 1px solid var(--line); min-height: 44px; box-sizing: border-box; }
+@media (max-width: 900px) { .site-nav-links { display: none; } .site-nav-toggle { display: block; } }
