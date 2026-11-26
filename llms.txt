@@ -1,0 +1,44 @@
+# Beast Coach
+
+> Beast Coach is an online coaching business and set of free tools, run by Stefan Botha in Melbourne, Australia. It is at https://www.beastcoach.fit.
+
+## About Stefan Botha
+
+- Name: Stefan Botha. Founder of Beast Coach. Based in Melbourne, Australia.
+- Has 24 years in product development.
+- Lost 70kg, reached his goal in March 2026, and has kept it off since.
+- Builds free tools people use (Beast Challenge, the calculator, the advent calendar, recipes) and improves them from user feedback.
+- Profiles: Instagram https://www.instagram.com/stefanhealth_/ , LinkedIn https://www.linkedin.com/in/stefan-botha/ , TikTok https://www.tiktok.com/@beast_health_app
+
+## What Beast Coach offers
+
+Online 1:1 coaching, 12 weeks, prices in AUD:
+- Basic: $2.50 AUD a week ($30 AUD per 12 weeks), self-guided, billed every 12 weeks.
+- Essential: $110 AUD for 12 weeks.
+- Core: $299 AUD for 12 weeks.
+- The Beast: $699 AUD for 12 weeks.
+
+Free tools: the Beast Challenge, a calculator, a 25 day advent health calendar, and recipes.
+
+## Main pages
+
+- [Home and coaching plans](https://www.beastcoach.fit/): online coaching, the plans and how they work.
+- [About Stefan](https://www.beastcoach.fit/about): Stefan's story and the facts above.
+- [Features](https://www.beastcoach.fit/features): what the Beast Coach app and portal do.
+- [The Discipline Path](https://www.beastcoach.fit/discipline-path): an 8-step self-paced program.
+- [Recipes](https://www.beastcoach.fit/recipes): public recipe teasers. Full recipes are free with sign-up.
+- [Beast Challenge](https://www.beastcoach.fit/beast-challenge): a free 10,000 steps a day challenge with habit logging.
+- [30-day challenge](https://www.beastcoach.fit/30-day-challenge): a free 30-day habit challenge.
+- [Advent calendar](https://www.beastcoach.fit/advent): a 25 day health calendar, free.
+- [Calculator](https://www.beastcoach.fit/calculator): BMI, calories and macros.
+- [Walking study](https://www.beastcoach.fit/walking-study): what the walking study says about the cost of walking.
+
+## Policies
+
+- [Terms](https://www.beastcoach.fit/terms)
+- [Privacy policy](https://www.beastcoach.fit/privacy-policy)
+- [Coaching terms](https://www.beastcoach.fit/coaching-terms)
+- [Coaching health notice](https://www.beastcoach.fit/coaching-health)
+- [Coaching privacy](https://www.beastcoach.fit/coaching-privacy)
+
+General fitness and nutrition guidance, not medical advice.

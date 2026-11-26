@@ -62,7 +62,7 @@ test('the homepage (/) is the coaching sales page, with its own canonical and so
 test('the app page is at /app (app.html), with its canonical, and keeps its title', () => {
   const html = read('app.html');
   assert.match(html, /<link rel="canonical" href="https:\/\/www\.beastcoach\.fit\/app">/);
-  assert.match(html, /<title>Beast Coach: We All Have A Beast In Us<\/title>/);
+  assert.match(html, /<title>The Beast Coach app \| Beast Coach<\/title>/);
   assert.match(html, /id="early-access"/, 'the early access anchor still works on /app');
 });
 

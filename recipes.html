@@ -67,20 +67,44 @@
   .recipe-card .thumb { aspect-ratio: 1 / 1; width: 100%; background: var(--surface-raised); display: flex; align-items: center; justify-content: center; overflow: hidden; }
   .recipe-card .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .recipe-card .thumb .ph-text { font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; padding: 0 12px; text-transform: uppercase; letter-spacing: 2px; }
-  .recipe-card .badge-row { display: flex; gap: 6px; padding: 12px 12px 0; flex-wrap: wrap; }
-  .recipe-card .mini-badge { font-size: 12px; font-weight: 700; color: var(--ink-soft); background: var(--surface-raised); border: 1px solid var(--line-strong); border-radius: 999px; padding: 3px 9px; }
-  .recipe-card .name { padding: 10px 14px 16px; font-weight: 700; font-size: 16px; line-height: 1.35; color: var(--ink); }
+  .recipe-card[hidden] { display: none; }
+  .recipe-card:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+  .recipe-card .name { display: block; padding: 14px 14px 4px; font-weight: 700; font-size: 16px; line-height: 1.35; color: var(--ink); }
+  .recipe-card .numbers { display: block; padding: 0 14px 16px; font-size: 15px; line-height: 1.4; color: var(--muted); }
   .empty-state { font-size: 15px; color: var(--muted); padding: 40px 0; text-align: center; }
-
-  .overlay { position: fixed; inset: 0; background: rgba(11, 12, 10, .82); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 200; }
-  .overlay.visible { display: flex; }
-  .overlay-card { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; max-width: 400px; width: 100%; padding: 32px 24px 24px; text-align: center; }
-  .overlay-card .emoji { font-size: 32px; margin-bottom: 10px; }
-  .overlay-card h3 { font-family: var(--display); font-weight: 800; font-size: 30px; line-height: .92; text-transform: uppercase; color: var(--ink); margin-bottom: 12px; }
-  .overlay-card p { font-size: 15px; color: var(--ink-soft); margin-bottom: 22px; }
-  .overlay-card .btn-primary { width: 100%; margin-bottom: 10px; }
-  .overlay-card .btn-close { display: block; width: 100%; min-height: 44px; background: none; border: none; color: var(--muted); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
 </style>
+<script type="application/ld+json" id="seo-jsonld">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.beastcoach.fit/#organization",
+      "name": "Beast Coach",
+      "url": "https://www.beastcoach.fit/",
+      "logo": "https://www.beastcoach.fit/beastcoach-email-logo.png",
+      "founder": {
+        "@type": "Person",
+        "name": "Stefan Botha"
+      },
+      "sameAs": [
+        "https://www.instagram.com/stefanhealth_/",
+        "https://www.linkedin.com/in/stefan-botha/",
+        "https://www.tiktok.com/@beast_health_app"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.beastcoach.fit/#website",
+      "url": "https://www.beastcoach.fit/",
+      "name": "Beast Coach",
+      "publisher": {
+        "@id": "https://www.beastcoach.fit/#organization"
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <nav class="site-nav">
@@ -102,37 +126,181 @@
     </div>
 
     <div class="filters" id="filters" role="group" aria-label="Filter recipes"></div>
-    <p class="recipe-count" id="recipe-count"></p>
-    <div class="recipe-grid" id="recipe-grid"></div>
+    <p class="recipe-count" id="recipe-count">26 recipes</p>
+    <div class="recipe-grid" id="recipe-grid">
+    <!-- recipe-list:start -->
+    <a class="recipe-card" href="/recipes/ice-cream-sandwich" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/ice-cream-sandwich.jpg" alt="Sweet Potato Brownie Ice Cream Sandwich" loading="lazy"></span>
+      <span class="name">Sweet Potato Brownie Ice Cream Sandwich</span>
+      <span class="numbers">230 calories &middot; 13g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/protein-jellies" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/protein-jellies.jpg" alt="Monster Energy Protein Jellies" loading="lazy"></span>
+      <span class="name">Monster Energy Protein Jellies</span>
+      <span class="numbers">190 calories &middot; 42g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/creme-brulee" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/creme-brulee.jpg" alt="High-Protein Crème Brûlée (Gelato Option)" loading="lazy"></span>
+      <span class="name">High-Protein Crème Brûlée (Gelato Option)</span>
+      <span class="numbers">245 calories &middot; 34g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/cheeseburgers" data-meal="lunch,dinner">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/cheeseburgers.jpg" alt="Savory Rice Cake Cheeseburgers" loading="lazy"></span>
+      <span class="name">Savory Rice Cake Cheeseburgers</span>
+      <span class="numbers">330 calories &middot; 38g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/protein-waffles" data-meal="breakfast">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/protein-waffles.jpg" alt="Oat Flour Protein Waffles &amp; Pancakes" loading="lazy"></span>
+      <span class="name">Oat Flour Protein Waffles &amp; Pancakes</span>
+      <span class="numbers">310 calories &middot; 37g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/lamb-chimichurri" data-meal="dinner">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/lamb-chimichurri.jpg" alt="Lean Lamb Herb &amp; Yogurt Chimichurri Sauce" loading="lazy"></span>
+      <span class="name">Lean Lamb Herb &amp; Yogurt Chimichurri Sauce</span>
+      <span class="numbers">45 calories &middot; 6g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/pb-replacement" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/pb-replacement.jpg" alt="Sweet Potato Peanut Butter Replacement" loading="lazy"></span>
+      <span class="name">Sweet Potato Peanut Butter Replacement</span>
+      <span class="numbers">50 calories &middot; 3g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/choc-mousse" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/choc-mousse.jpg" alt="High-Protein Chocolate Mousse" loading="lazy"></span>
+      <span class="name">High-Protein Chocolate Mousse</span>
+      <span class="numbers">275 calories &middot; 49g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/chia-lemon-creatine-tonic" data-meal="smoothie">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/chia-lemon-creatine-tonic.jpg" alt="Chia, Lemon &amp; Honey Creatine Tonic" loading="lazy"></span>
+      <span class="name">Chia, Lemon &amp; Honey Creatine Tonic</span>
+      <span class="numbers">90 calories &middot; 2g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/cacao-chia-pumpkin-smoothie" data-meal="smoothie,breakfast">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/magnesium-smoothie.jpg" alt="Magnesium Smoothie" loading="lazy"></span>
+      <span class="name">Magnesium Smoothie</span>
+      <span class="numbers">500 calories &middot; 43g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/spiced-pumpkin-latte-creami" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/spiced-pumpkin-latte-creami.jpg" alt="Spiced Pumpkin Latte Creami" loading="lazy"></span>
+      <span class="name">Spiced Pumpkin Latte Creami</span>
+      <span class="numbers">235 calories &middot; 23.5g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/zooper-dooper-protein-pops" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/zooper-dooper-protein-pops.jpg" alt="Zooper Dooper Protein Pops" loading="lazy"></span>
+      <span class="name">Zooper Dooper Protein Pops</span>
+      <span class="numbers">58 calories &middot; 5.8g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/blackberry-magnesium-smoothie" data-meal="smoothie,breakfast">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/blackberry-magnesium-smoothie.jpg" alt="Blackberry Magnesium Smoothie" loading="lazy"></span>
+      <span class="name">Blackberry Magnesium Smoothie</span>
+      <span class="numbers">430 calories &middot; 35.7g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/quick-set-chia-seed-wraps" data-meal="lunch,dinner,snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/quick-set-chia-seed-wraps.jpg" alt="Quick-Set Chia Seed Wraps" loading="lazy"></span>
+      <span class="name">Quick-Set Chia Seed Wraps</span>
+      <span class="numbers">122 calories &middot; 4.2g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/chia-oats-bowl" data-meal="breakfast,snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/chia-oats-bowl.jpg" alt="Chia Oats Bowl" loading="lazy"></span>
+      <span class="name">Chia Oats Bowl</span>
+      <span class="numbers">540 calories &middot; 40.1g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/strawberry-chia-pudding" data-meal="breakfast,snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><span class="ph-text">Image coming soon</span></span>
+      <span class="name">Strawberry Chia Pudding with Greek Yoghurt</span>
+      <span class="numbers">267 calories &middot; 25g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/chia-pita-pocket" data-meal="lunch,dinner,snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><span class="ph-text">Image coming soon</span></span>
+      <span class="name">Chia Pita Pocket</span>
+      <span class="numbers">122 calories &middot; 4.1g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/pre-workout-rice-cake-banana" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><span class="ph-text">Image coming soon</span></span>
+      <span class="name">Pre-Workout Rice Cake and Banana</span>
+      <span class="numbers">144 calories &middot; 2g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/chia-seed-doritos" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><span class="ph-text">Image coming soon</span></span>
+      <span class="name">Chia Seed Doritos</span>
+      <span class="numbers">146 calories &middot; 5g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/microwave-brownie" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><span class="ph-text">Image coming soon</span></span>
+      <span class="name">Microwave Brownie</span>
+      <span class="numbers">108 calories &middot; 8g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/homemade-protein-powder" data-meal="protein powder">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/homemade-protein-powder.jpg" alt="Homemade Protein Powder" loading="lazy"></span>
+      <span class="name">Homemade Protein Powder</span>
+      <span class="numbers">205 calories &middot; 20g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/strawberry-date-chia-jam" data-meal="breakfast,snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/strawberry-date-chia-jam.jpg" alt="Strawberry Date Chia Jam" loading="lazy"></span>
+      <span class="name">Strawberry Date Chia Jam</span>
+      <span class="numbers">295 calories &middot; 6g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/magnesium-chocolate-bar" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/magnesium-chocolate-bar.jpg" alt="Magnesium Chocolate Bar" loading="lazy"></span>
+      <span class="name">Magnesium Chocolate Bar</span>
+      <span class="numbers">515 calories &middot; 15g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/thick-dreamy-hot-chocolate" data-meal="snack">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/thick-dreamy-hot-chocolate.jpg" alt="Thick Dreamy Hot Chocolate" loading="lazy"></span>
+      <span class="name">Thick Dreamy Hot Chocolate</span>
+      <span class="numbers">45 calories &middot; 2g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/chocolate-psyllium-mug-cake" data-meal="snack,breakfast">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/chocolate-psyllium-mug-cake.jpg" alt="Chocolate Mug Cake" loading="lazy"></span>
+      <span class="name">Chocolate Mug Cake</span>
+      <span class="numbers">150 calories &middot; 9g protein</span>
+    </a>
+    <a class="recipe-card" href="/recipes/magnesium-smoothie-cacao-nib" data-meal="smoothie,breakfast">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span class="thumb"><img src="/recipe-img/magnesium-smoothie-cacao-nib.jpg" alt="Cacao Nib Magnesium Smoothie" loading="lazy"></span>
+      <span class="name">Cacao Nib Magnesium Smoothie</span>
+      <span class="numbers">520 calories &middot; 30g protein</span>
+    </a>
+    <!-- recipe-list:end -->
+    </div>
+    <p class="empty-state" id="recipe-empty" hidden>No recipes in this category yet.</p>
   </div>
 </main>
 
-<div class="overlay" id="overlay">
-  <div class="overlay-card">
-    <div class="emoji">🔒</div>
-    <h3>Unlock this recipe</h3>
-    <p>Sign up free to open the full recipe, save it to your favourites and get instant access to every recipe on the site, plus shopping lists and ratings.</p>
-    <a class="btn-primary" href="/dashboard">Sign up free</a>
-    <button class="btn-close" id="overlay-close" type="button">Maybe later</button>
-  </div>
-</div>
-
-<script src="recipes.js"></script>
 <script>
-var yearEl = document.getElementById("year");
-if (yearEl) yearEl.textContent = new Date().getFullYear();
-
+// The recipe list is static HTML, generated by scripts/build-recipe-teasers.js.
+// The filters only show or hide those cards by their data-meal values.
 const FILTERS = [["all","All"],["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"],["snack","Snacks"],["smoothie","Smoothies"],["protein powder","Protein powder"]];
 let activeFilter = "all";
-
-function escapeHtml(s) {
-  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
 
 function renderFilters() {
   const el = document.getElementById("filters");
   el.innerHTML = FILTERS.map(([k, label]) =>
-    `<button type="button" data-filter="${k}" aria-pressed="${k === activeFilter}">${escapeHtml(label)}</button>`
+    `<button type="button" data-filter="${k}" aria-pressed="${k === activeFilter}">${label}</button>`
   ).join("");
   el.querySelectorAll("[data-filter]").forEach(btn => {
     btn.addEventListener("click", () => { activeFilter = btn.getAttribute("data-filter"); renderFilters(); renderGrid(); });
@@ -140,36 +308,17 @@ function renderFilters() {
 }
 
 function renderGrid() {
-  const all = (typeof RECIPES !== "undefined" ? RECIPES : []);
-  const list = activeFilter === "all" ? all : all.filter(r => (r.meal || []).includes(activeFilter));
-  document.getElementById("recipe-count").textContent = list.length + (list.length === 1 ? " recipe" : " recipes");
-  const grid = document.getElementById("recipe-grid");
-  if (!list.length) {
-    grid.innerHTML = `<p class="empty-state">No recipes in this category yet.</p>`;
-    return;
-  }
-  grid.innerHTML = list.map(r => {
-    const thumb = r.image
-      ? `<img src="${escapeHtml(r.image)}" alt="${escapeHtml(r.title)}" loading="lazy">`
-      : `<span class="ph-text">Image coming soon</span>`;
-    return `<div class="recipe-card" data-recipe="${escapeHtml(r.id)}">
-      <div class="lock">&#128274;</div>
-      <div class="thumb">${thumb}</div>
-      <div class="badge-row"><span class="mini-badge">${escapeHtml(r.difficulty || "")}</span><span class="mini-badge">Health ${r.healthScore || "-"}/10</span></div>
-      <div class="name">${escapeHtml(r.chip || r.title)}</div>
-    </div>`;
-  }).join("");
-  grid.querySelectorAll("[data-recipe]").forEach(card => {
-    card.addEventListener("click", () => { document.getElementById("overlay").classList.add("visible"); });
+  const cards = document.querySelectorAll("#recipe-grid .recipe-card");
+  let shown = 0;
+  cards.forEach(card => {
+    const meals = (card.getAttribute("data-meal") || "").split(",");
+    const on = activeFilter === "all" || meals.includes(activeFilter);
+    card.hidden = !on;
+    if (on) shown++;
   });
+  document.getElementById("recipe-count").textContent = shown + (shown === 1 ? " recipe" : " recipes");
+  document.getElementById("recipe-empty").hidden = shown > 0;
 }
-
-document.getElementById("overlay-close").addEventListener("click", () => {
-  document.getElementById("overlay").classList.remove("visible");
-});
-document.getElementById("overlay").addEventListener("click", (e) => {
-  if (e.target.id === "overlay") document.getElementById("overlay").classList.remove("visible");
-});
 
 renderFilters();
 renderGrid();
@@ -183,6 +332,7 @@ renderGrid();
       <a href="https://www.tiktok.com/@beast_health_app" aria-label="Beast Coach on TikTok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M16.6 3h-3.3v12.6a2.7 2.7 0 1 1-2.7-2.7c.2 0 .4 0 .6.1V9.6a6 6 0 1 0 5.4 6V8.9a7.6 7.6 0 0 0 4.4 1.4V7a4.4 4.4 0 0 1-4.4-4z" fill="currentColor"/></svg></a>
     </div>
     <p class="site-footer-note">© 2026 Beast Coach</p>
+    <p class="site-footer-note">Stefan Botha, founder of Beast Coach, is based in Melbourne. He lost 70kg, reached his goal in March 2026, and has kept it off since.</p>
     <p class="site-footer-note">Online coaching. General fitness and nutrition guidance, not medical advice.</p>
 
   </div>

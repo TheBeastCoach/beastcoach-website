@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Stefan Botha, founder of Beast Coach in Melbourne. 24 years in product development. Lost 70kg. Builds free tools and improves them from user feedback." />
   <script>
   (function () {
     // If this page is being restored from the browser's back/forward cache
@@ -39,7 +40,7 @@
     } catch (e) {}
   })();
   </script>
-  <title>Our Story: Beast Coach</title>
+  <title>About Stefan Botha | Beast Coach</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -50,8 +51,14 @@
   <style>
     h1, h2, h3, p, ul, blockquote, figure { margin: 0; }
     .page-hero { padding: 72px 0 0; }
-    .page-hero h1 { font-size: clamp(56px, 9vw, 112px); line-height: .88; margin-top: 16px; }
+    .page-hero h2 { font-size: clamp(56px, 9vw, 112px); line-height: .88; margin-top: 16px; }
     .page-hero .lede { margin-top: 24px; max-width: 58ch; }
+    .about-stefan { padding: 72px 0 0; }
+    .about-stefan h1 { font-size: clamp(56px, 9vw, 112px); line-height: .88; margin-top: 16px; }
+    .about-stefan .body-copy { max-width: 62ch; }
+    .about-stefan-copy { margin-top: 24px; }
+    .about-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .about-links .btn-outline { min-width: 180px; }
     .eyebrow { display: block; }
     .sec-title { font-family: var(--display); font-weight: 800; text-transform: uppercase; line-height: .92; color: var(--ink); font-size: clamp(36px, 5vw, 56px); margin: 14px 0 20px; }
     .sec-title--sm { font-size: clamp(32px, 4.2vw, 44px); }
@@ -101,6 +108,38 @@
     .cta-panel .btn-primary { margin-top: 24px; }
     @media (max-width: 759px) { .panel { padding: 28px 22px; } }
   </style>
+<script type="application/ld+json" id="seo-jsonld">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.beastcoach.fit/#organization",
+      "name": "Beast Coach",
+      "url": "https://www.beastcoach.fit/",
+      "logo": "https://www.beastcoach.fit/beastcoach-email-logo.png",
+      "founder": {
+        "@type": "Person",
+        "name": "Stefan Botha"
+      },
+      "sameAs": [
+        "https://www.instagram.com/stefanhealth_/",
+        "https://www.linkedin.com/in/stefan-botha/",
+        "https://www.tiktok.com/@beast_health_app"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.beastcoach.fit/#website",
+      "url": "https://www.beastcoach.fit/",
+      "name": "Beast Coach",
+      "publisher": {
+        "@id": "https://www.beastcoach.fit/#organization"
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body>
   <nav class="site-nav">
@@ -114,10 +153,28 @@
   <script>function toggleSiteMenu(b){var m=document.getElementById("siteMenu");var o=m.classList.toggle("active");b.setAttribute("aria-expanded",o?"true":"false");}</script>
 
   <main>
+    <section class="about-stefan">
+      <div class="wrap">
+        <span class="eyebrow">Founder of Beast Coach</span>
+        <h1 class="h-display">About <span class="text-gradient">Stefan</span></h1>
+        <div class="about-stefan-copy">
+          <p class="body-copy">I am Stefan Botha, the founder of Beast Coach. I am based in Melbourne, Australia.</p>
+          <p class="body-copy">I have spent 24 years in product development.</p>
+          <p class="body-copy">I lost 70kg. I reached my goal in March 2026, and I have kept it off since.</p>
+          <p class="body-copy">I build free tools that people use. These are Beast Challenge, the calculator, the advent calendar and recipes. I improve them based on feedback from the people who use them.</p>
+        </div>
+        <div class="about-links">
+          <a class="btn-outline" href="https://www.instagram.com/stefanhealth_/" target="_blank" rel="noopener" aria-label="Instagram: Stefan Botha (opens in a new tab)">Instagram</a>
+          <a class="btn-outline" href="https://www.linkedin.com/in/stefan-botha/" target="_blank" rel="noopener" aria-label="LinkedIn: Stefan Botha (opens in a new tab)">LinkedIn</a>
+          <a class="btn-outline" href="https://www.tiktok.com/@beast_health_app" target="_blank" rel="noopener" aria-label="TikTok: Beast Coach (opens in a new tab)">TikTok</a>
+        </div>
+      </div>
+    </section>
+
     <section class="page-hero">
       <div class="wrap">
         <span class="eyebrow">The Story</span>
-        <h1 class="h-display">Me the <span class="text-gradient">Beast</span></h1>
+        <h2 class="h-display">Me the <span class="text-gradient">Beast</span></h2>
         <p class="lede">Built by a software engineer who got fed up with fitness apps that charged a fortune and still did not do what he actually needed.</p>
       </div>
     </section>
@@ -149,11 +206,11 @@
 
           <h2 class="sec-title sec-title--sm">Built Around Real Life. Not Perfect Conditions.</h2>
 
-          <p class="body-copy">Every single person is different. Some have kids, full-time jobs, and barely a spare hour in the day. Time is the biggest obstacle standing between most people and their goals. That's why during onboarding, Beast Coach walks you through a comprehensive set of questions to fine-tune and build a meal plan and workout program built entirely around your life not someone else's. If you don't have hours to spend in the gym, we're not going to pretend you do. The goal is simple: start. Because once you do, progress takes care of itself.</p>
+          <p class="body-copy">Every single person is different. Some have kids, full-time jobs, and barely a spare hour in the day. Time is the biggest obstacle standing between most people and their goals. That's why during onboarding, Beast Coach walks you through a comprehensive set of questions to fine-tune and build a meal plan and workout program built entirely around your life, not someone else's. If you don't have hours to spend in the gym, we're not going to pretend you do. The goal is simple: start. Because once you do, progress takes care of itself.</p>
 
-          <p class="body-copy">I'm not an influencer pushing someone else's product. I built this, used it from the very first prototype, and kept refining it along the way. Through my own journey I discovered something I didn't expect I became genuinely motivated. I wanted to compete in every challenge I could, pushing my fitness and building my confidence at the same time. That drive is baked into Beast Coach. You'll find a range of challenges to take on, a leaderboard to climb, and real people to compete against.</p>
+          <p class="body-copy">I'm not an influencer pushing someone else's product. I built this, used it from the very first prototype, and kept refining it along the way. Through my own journey I discovered something I didn't expect. I became genuinely motivated. I wanted to compete in every challenge I could, pushing my fitness and building my confidence at the same time. That drive is baked into Beast Coach. You'll find a range of challenges to take on, a leaderboard to climb, and real people to compete against.</p>
 
-          <p class="body-copy block">Pricing was something I wrestled with during the build. I knew I wanted all the AI features in there, but I also wanted to create something genuinely free not a watered-down version designed to push you into paying. The free version has no feature limitations whatsoever, except for AI. The AI version is identical in every way, but lets you quickly log meals, ask questions and log exercise through AI. There is a real cost every time AI generates a meal plan or answers a question, but I'm not here to profit off that. I'm not going to charge what other fitness apps charge. An annual subscription costs the same as a good meal costs at a restaurant.</p>
+          <p class="body-copy block">Pricing was something I wrestled with during the build. I knew I wanted all the AI features in there, but I also wanted to create something genuinely free, not a watered-down version designed to push you into paying. The free version has no feature limitations whatsoever, except for AI. The AI version is identical in every way, but lets you quickly log meals, ask questions and log exercise through AI. There is a real cost every time AI generates a meal plan or answers a question, but I'm not here to profit off that. I'm not going to charge what other fitness apps charge. An annual subscription costs the same as a good meal costs at a restaurant.</p>
 
           <!-- MANIFEST QUOTE -->
           <div class="panel centre block">
@@ -278,6 +335,7 @@
       <a href="https://www.tiktok.com/@beast_health_app" aria-label="Beast Coach on TikTok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M16.6 3h-3.3v12.6a2.7 2.7 0 1 1-2.7-2.7c.2 0 .4 0 .6.1V9.6a6 6 0 1 0 5.4 6V8.9a7.6 7.6 0 0 0 4.4 1.4V7a4.4 4.4 0 0 1-4.4-4z" fill="currentColor"/></svg></a>
     </div>
     <p class="site-footer-note">© 2026 Beast Coach</p>
+    <p class="site-footer-note">Stefan Botha, founder of Beast Coach, is based in Melbourne. He lost 70kg, reached his goal in March 2026, and has kept it off since.</p>
     <p class="site-footer-note">Online coaching. General fitness and nutrition guidance, not medical advice.</p>
 
   </div>

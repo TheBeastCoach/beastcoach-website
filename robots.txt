@@ -1,0 +1,91 @@
+User-agent: *
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+User-agent: Googlebot
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /coach$
+Disallow: /coach.html
+Disallow: /my-coach
+Disallow: /dashboard
+Disallow: /coaching-demo
+Disallow: /api/
+
+Sitemap: https://www.beastcoach.fit/sitemap.xml
