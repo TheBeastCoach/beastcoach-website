@@ -431,7 +431,7 @@ const RECIPES = [
   {
     "id": "two-ingredient-protein-powder",
     "title": "Two Ingredient Protein Powder",
-    "image": null,
+    "image": "recipe-img/two-ingredient-protein-powder.jpg",
     "meal": [
       "protein powder"
     ],
