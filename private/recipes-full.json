@@ -49,7 +49,9 @@
     "difficulty": "Medium",
     "healthScore": 8,
     "dateAdded": "2026-10-13",
-    "blurb": "I do love my brownie, so I thought why not recreate this one as an ice cream. Honestly, it's really chocolatey and sweet from the natural sweet potato."
+    "blurb": "I do love my brownie, so I thought why not recreate this one as an ice cream. Honestly, it's really chocolatey and sweet from the natural sweet potato.",
+    "basis": null,
+    "teaser": "This is the one I reach for when I want something sweet at night and don't want to undo the day."
   },
   {
     "id": "protein-jellies",
@@ -98,7 +100,9 @@
     "difficulty": "Medium",
     "healthScore": 3,
     "dateAdded": "2026-10-13",
-    "blurb": "These jellies are a really good pre-workout snack. They've got sodium in them to help your muscles get a good pump, a hit of caffeine, and a little bit of protein."
+    "blurb": "These jellies are a really good pre-workout snack. They've got sodium in them to help your muscles get a good pump, a hit of caffeine, and a little bit of protein.",
+    "basis": "per whole batch",
+    "teaser": "I make these up before a late session when I want the caffeine hit without a drink sloshing around in my stomach."
   },
   {
     "id": "creme-brulee",
@@ -147,7 +151,9 @@
     "difficulty": "Medium",
     "healthScore": 6,
     "dateAdded": "2026-10-13",
-    "blurb": "This was one of the first recipes I ever posted. Creme brulee is my absolute favourite, and I was adamant to try and make a proper healthy version of it."
+    "blurb": "This was one of the first recipes I ever posted. Creme brulee is my absolute favourite, and I was adamant to try and make a proper healthy version of it.",
+    "basis": null,
+    "teaser": "This one tricked my own family into thinking I'd gone off my diet."
   },
   {
     "id": "cheeseburgers",
@@ -198,7 +204,9 @@
     "difficulty": "Easy",
     "healthScore": 7,
     "dateAdded": "2026-10-14",
-    "blurb": "My answer to a burger craving without derailing the week. Smash the patty thin, that's the secret."
+    "blurb": "My answer to a burger craving without derailing the week. Smash the patty thin, that's the secret.",
+    "basis": null,
+    "teaser": "My answer when a burger craving hits and I don't want to carry a brioche bun's worth of carbs for it."
   },
   {
     "id": "protein-waffles",
@@ -246,7 +254,9 @@
     "difficulty": "Easy",
     "healthScore": 7,
     "dateAdded": "2026-10-14",
-    "blurb": "Sunday staple in my house. Double the batch and freeze the extras for busy mornings."
+    "blurb": "Sunday staple in my house. Double the batch and freeze the extras for busy mornings.",
+    "basis": null,
+    "teaser": "A Sunday staple in my house."
   },
   {
     "id": "lamb-chimichurri",
@@ -295,7 +305,9 @@
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-14",
-    "blurb": "I put this on everything, not just lamb. It keeps in the fridge for a few days so make extra."
+    "blurb": "I put this on everything, not just lamb. It keeps in the fridge for a few days so make extra.",
+    "basis": "per whole batch",
+    "teaser": "I put this on everything, not just lamb."
   },
   {
     "id": "pb-replacement",
@@ -346,7 +358,9 @@
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-10-15",
-    "blurb": "Built this because I was going through peanut butter way too fast. Tastes richer than it has any right to."
+    "blurb": "Built this because I was going through peanut butter way too fast. Tastes richer than it has any right to.",
+    "basis": "per 40g",
+    "teaser": "I built this because I was going through real peanut butter way too fast."
   },
   {
     "id": "choc-mousse",
@@ -398,7 +412,9 @@
     "difficulty": "Medium",
     "healthScore": 5,
     "dateAdded": "2026-10-15",
-    "blurb": "Don't let the egg white step put you off, it's the whole trick to the texture and getting it to set. First time I made this I didn't believe it myself."
+    "blurb": "Don't let the egg white step put you off, it's the whole trick to the texture and getting it to set. First time I made this I didn't believe it myself.",
+    "basis": null,
+    "teaser": "First time I made this I didn't believe it myself."
   },
   {
     "id": "chia-lemon-creatine-tonic",
@@ -447,7 +463,9 @@
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-15",
-    "blurb": "I switch between this and the hot chocolate version of it all the time. Low calorie, and honestly it fills you up."
+    "blurb": "I switch between this and the hot chocolate version of it all the time. Low calorie, and honestly it fills you up.",
+    "basis": null,
+    "teaser": "This is how I get my creatine down every single day without thinking about it."
   },
   {
     "id": "cacao-chia-pumpkin-smoothie",
@@ -501,7 +519,9 @@
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-16",
-    "blurb": "I lean on this one on heavy training days when my legs feel like they need the magnesium more than anything else."
+    "blurb": "I lean on this one on heavy training days when my legs feel like they need the magnesium more than anything else.",
+    "basis": null,
+    "teaser": "I lean on this one on heavy training days when my legs want magnesium more than anything else."
   },
   {
     "id": "spiced-pumpkin-latte-creami",
@@ -555,7 +575,9 @@
     "difficulty": "Medium",
     "healthScore": 9,
     "dateAdded": "2026-10-18",
-    "blurb": "My spin on a pumpkin spice latte that actually fits the diet. Tastes like cheating."
+    "blurb": "My spin on a pumpkin spice latte that actually fits the diet. Tastes like cheating.",
+    "basis": null,
+    "teaser": "My spin on a pumpkin spice latte that actually fits the diet."
   },
   {
     "id": "zooper-dooper-protein-pops",
@@ -613,7 +635,9 @@
     "difficulty": "Hard",
     "healthScore": 6,
     "dateAdded": "2026-10-20",
-    "blurb": "A bit of a project but the kids (and the adults) go wild for these. Worth doing a big batch at once. A real easy, low cal treat."
+    "blurb": "A bit of a project but the kids (and the adults) go wild for these. Worth doing a big batch at once. A real easy, low cal treat.",
+    "basis": null,
+    "teaser": "A bit of a project but the kids, and the adults, go wild for these."
   },
   {
     "id": "blackberry-magnesium-smoothie",
@@ -666,7 +690,9 @@
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-21",
-    "blurb": "Same magnesium hit as the other smoothie, different berries, different mood. Also helps with inflammation."
+    "blurb": "Same magnesium hit as the other smoothie, different berries, different mood. Also helps with inflammation.",
+    "basis": null,
+    "teaser": "Same magnesium hit as my other smoothie, different berries, different mood."
   },
   {
     "id": "quick-set-chia-seed-wraps",
@@ -720,7 +746,9 @@
     "difficulty": "Medium",
     "healthScore": 10,
     "dateAdded": "2026-10-23",
-    "blurb": "One ingredient, practically zero carbs, just fibre. Once you've got a good filling inside it, it fills you up, let me tell you that."
+    "blurb": "One ingredient, practically zero carbs, just fibre. Once you've got a good filling inside it, it fills you up, let me tell you that.",
+    "basis": null,
+    "teaser": "Four ingredients, that's it."
   },
   {
     "id": "chia-oats-bowl",
@@ -774,7 +802,9 @@
     "difficulty": "Easy",
     "healthScore": 10,
     "dateAdded": "2026-10-25",
-    "blurb": "100% whole food, nothing fancy. I prep three at a time. Sometimes I switch out the blackberries for strawberries."
+    "blurb": "100% whole food, nothing fancy. I prep three at a time. Sometimes I switch out the blackberries for strawberries.",
+    "basis": "per container",
+    "teaser": "100% whole food, nothing fancy."
   },
   {
     "id": "strawberry-chia-pudding",
@@ -821,7 +851,9 @@
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-10-27",
-    "blurb": "One of the easiest things I make, it just sits in the fridge and does the work itself."
+    "blurb": "One of the easiest things I make, it just sits in the fridge and does the work itself.",
+    "basis": null,
+    "teaser": "Stir chia into Greek yoghurt, let it sit, and it turns into a thick, creamy pudding on its own."
   },
   {
     "id": "chia-pita-pocket",
@@ -870,7 +902,9 @@
     "difficulty": "Medium",
     "healthScore": 10,
     "dateAdded": "2026-10-27",
-    "blurb": "I wanted a version I could cook on the stove without turning the oven on, this is that one."
+    "blurb": "I wanted a version I could cook on the stove without turning the oven on, this is that one.",
+    "basis": null,
+    "teaser": "Same two ingredients as my chia wraps, chia seeds and water, but cooked in a pan instead of the oven so it puffs up thicker."
   },
   {
     "id": "pre-workout-rice-cake-banana",
@@ -917,7 +951,9 @@
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-10-27",
-    "blurb": "This is genuinely what I eat before I train, nothing fancy, it just works."
+    "blurb": "This is genuinely what I eat before I train, nothing fancy, it just works.",
+    "basis": null,
+    "teaser": "A quick pre-workout snack with a sweet, filling base."
   },
   {
     "id": "chia-seed-doritos",
@@ -966,7 +1002,9 @@
     "difficulty": "Medium",
     "healthScore": 10,
     "dateAdded": "2026-10-27",
-    "blurb": "Took a few goes to get the bake time right, but once it's crisp all the way through it genuinely scratches the chip craving."
+    "blurb": "Took a few goes to get the bake time right, but once it's crisp all the way through it genuinely scratches the chip craving.",
+    "basis": "per whole batch",
+    "teaser": "A crisp, savoury snack made from a simple seed base."
   },
   {
     "id": "microwave-brownie",
@@ -1013,7 +1051,9 @@
     "difficulty": "Easy",
     "healthScore": 7,
     "dateAdded": "2026-10-27",
-    "blurb": "My go to when I want something sweet right now and can't be bothered waiting on the oven."
+    "blurb": "My go to when I want something sweet right now and can't be bothered waiting on the oven.",
+    "basis": "per brownie",
+    "teaser": "A small, quick chocolate treat made in the microwave."
   },
   {
     "id": "homemade-protein-powder",
@@ -1141,7 +1181,9 @@
     "difficulty": "Medium",
     "healthScore": 9,
     "dateAdded": "2026-11-01",
-    "blurb": "I wanted a protein powder I could actually put a name to every ingredient in. This one is mostly cottage cheese, seeds and pumpkin flour, and one batch lasts a while. It's nutty, so sweeten it properly in a smoothie."
+    "blurb": "I wanted a protein powder I could actually put a name to every ingredient in. This one is mostly cottage cheese, seeds and pumpkin flour, and one batch lasts a while. It's nutty, so sweeten it properly in a smoothie.",
+    "basis": "per 45g scoop",
+    "teaser": "This is a great alternative, natural and you can make this from some staples in the cupboard or potentially a visit to the health shop."
   },
   {
     "id": "strawberry-date-chia-jam",
@@ -1199,7 +1241,9 @@
     "difficulty": "Easy",
     "healthScore": 9,
     "dateAdded": "2026-11-03",
-    "blurb": "It's jam, so a teaspoon does the job. No added sugar, just strawberries, dates and chia."
+    "blurb": "It's jam, so a teaspoon does the job. No added sugar, just strawberries, dates and chia.",
+    "basis": "per whole batch",
+    "teaser": "A thick fruit jam with no added sugar."
   },
   {
     "id": "magnesium-chocolate-bar",
@@ -1255,7 +1299,9 @@
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-11-10",
-    "blurb": "Same idea as the magnesium reel, but you can pick it up and eat it. Dark chocolate, pepitas, chia, and it snaps."
+    "blurb": "Same idea as the magnesium reel, but you can pick it up and eat it. Dark chocolate, pepitas, chia, and it snaps.",
+    "basis": "per whole batch",
+    "teaser": "Dark chocolate, pepitas and chia, set into a bar that actually snaps."
   },
   {
     "id": "thick-dreamy-hot-chocolate",
@@ -1310,7 +1356,9 @@
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-11-19",
-    "blurb": "A mug of hot chocolate that eats like a pudding. Mix the dry ingredients, add the boiling water slowly and froth for two minutes."
+    "blurb": "A mug of hot chocolate that eats like a pudding. Mix the dry ingredients, add the boiling water slowly and froth for two minutes.",
+    "basis": "per portion",
+    "teaser": "Sugar-free hot chocolate with a spoon of psyllium husk, frothed into something thick and creamy."
   },
   {
     "id": "chocolate-psyllium-mug-cake",
@@ -1369,7 +1417,9 @@
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-11-23",
-    "blurb": "A chocolate mug cake that's mostly fibre. One egg, some psyllium and a minute in the microwave."
+    "blurb": "A chocolate mug cake that's mostly fibre. One egg, some psyllium and a minute in the microwave.",
+    "basis": null,
+    "teaser": "A soft chocolate mug cake that cooks in about a minute."
   },
   {
     "id": "magnesium-smoothie-cacao-nib",
@@ -1429,6 +1479,8 @@
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-11-23",
-    "blurb": "My magnesium smoothie again, this time with cacao nibs for a chocolate hit and a bit of crunch."
+    "blurb": "My magnesium smoothie again, this time with cacao nibs for a chocolate hit and a bit of crunch.",
+    "basis": null,
+    "teaser": "A smoothie built around a magnesium-rich seed base."
   }
 ]

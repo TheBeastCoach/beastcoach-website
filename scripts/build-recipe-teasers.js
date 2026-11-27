@@ -41,7 +41,7 @@ function loadRecipes() {
 // The public fields only. No ingredients, method, quantities, notes, blurb or description.
 function publicRecord(r) {
   const stats = statsText(r);
-  const basis = BASIS[r.id] || null;
+  const basis = r.basis || null;
   return {
     id: r.id,
     title: r.title,
@@ -58,19 +58,8 @@ function publicRecord(r) {
   };
 }
 
-// The first sentence of some recipe descriptions lists ingredients or method. Those get a plain teaser line
-// written here instead, so no ingredient or method text reaches a public page.
-const TEASER_LINES = {
-  'pre-workout-rice-cake-banana': 'A quick pre-workout snack with a sweet, filling base.',
-  'chia-seed-doritos': 'A crisp, savoury snack made from a simple seed base.',
-  'microwave-brownie': 'A small, quick chocolate treat made in the microwave.',
-  'strawberry-date-chia-jam': 'A thick fruit jam with no added sugar.',
-  'chocolate-psyllium-mug-cake': 'A soft chocolate mug cake that cooks in about a minute.',
-  'magnesium-smoothie-cacao-nib': 'A smoothie built around a magnesium-rich seed base.',
-};
-
 function teaserLine(r) {
-  return TEASER_LINES[r.id] || firstSentence(r.desc);
+  return r.teaser || firstSentence(r.desc);
 }
 
 // First sentence of desc, whitespace collapsed to one line. Nothing is added to it.
@@ -86,24 +75,9 @@ function formatNumber(n) {
 
 // Calories and protein as the dashboard labels them ("Kcal" and "Protein"). The data does
 // not say per serve (some entries are batch or per-40g values), so no serve wording is added.
-// The basis each calorie and protein figure is for, taken from the data's own labels or its text.
-// Recipes not listed here have no clear basis, so their numbers are hidden until the basis is confirmed.
-const BASIS = {
-  'protein-jellies': 'per whole batch',
-  'lamb-chimichurri': 'per whole batch',
-  'chia-seed-doritos': 'per whole batch',
-  'strawberry-date-chia-jam': 'per whole batch',
-  'magnesium-chocolate-bar': 'per whole batch',
-  'pb-replacement': 'per 40g',
-  'homemade-protein-powder': 'per 45g scoop',
-  'chia-oats-bowl': 'per container',
-  'thick-dreamy-hot-chocolate': 'per portion',
-  'microwave-brownie': 'per brownie',
-};
-
 // Calories and protein with their basis, or null when the basis is not clear.
 function statsText(r) {
-  const basis = BASIS[r.id];
+  const basis = r.basis;
   if (!basis) return null;
   return {
     calories: formatNumber(Math.round(Number(r.kcal))) + ' calories ' + basis,
