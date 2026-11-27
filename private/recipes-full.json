@@ -1482,5 +1482,60 @@
     "blurb": "My magnesium smoothie again, this time with cacao nibs for a chocolate hit and a bit of crunch.",
     "basis": null,
     "teaser": "A smoothie built around a magnesium-rich seed base."
+  },
+  {
+    "id": "two-ingredient-protein-powder",
+    "meal": [
+      "protein powder"
+    ],
+    "chip": "Two Ingredient Protein Powder",
+    "title": "Two Ingredient Protein Powder",
+    "desc": "A simple protein powder you make at home from just two ingredients. No tub, no long label.",
+    "ingredients": [
+      "500 grams cottage cheese",
+      "20 grams cacao"
+    ],
+    "instructions": [
+      "Blend: Blend 500 grams cottage cheese and 20 grams cacao until smooth. Scrape down the sides and blend again.",
+      "Spread: Spread it thin on a baking dish lined with baking paper. You may need two baking dishes.",
+      "Dry (about 45m): Dry in the oven at 60°C for about 45 minutes, depending on your oven. It has to be brittle and snap cleanly. If it bends or feels soft, keep drying.",
+      "Powder: Break it up and blend it into a powder again.",
+      "Store cold: Keep it airtight in the fridge."
+    ],
+    "notes": [
+      "One portion is the amount that gives you 20g of protein. A batch makes about 3 portions.",
+      "Sweetness: if you want it sweeter, stir in powdered sweetener afterwards. Or use a tablespoon of honey in your smoothie.",
+      "The numbers are approximate. They change with the brand of cottage cheese, so check your tub."
+    ],
+    "macros": [
+      [
+        "~140",
+        "kcal"
+      ],
+      [
+        "~20g",
+        "Protein"
+      ],
+      [
+        "~9g",
+        "Carbs (2g fibre)"
+      ],
+      [
+        "~4g",
+        "Fat"
+      ]
+    ],
+    "kcal": 140,
+    "protein": 20,
+    "fibre": 2,
+    "carbs": 9,
+    "fat": 4,
+    "difficulty": "Easy",
+    "healthScore": 9,
+    "dateAdded": "2026-11-27",
+    "blurb": "Two ingredients, a blender and an oven. One portion gives you 20g of protein.",
+    "basis": "per portion",
+    "teaser": "A simple protein powder you make at home from just two ingredients.",
+    "image": "recipe-img/two-ingredient-protein-powder.jpg"
   }
 ]

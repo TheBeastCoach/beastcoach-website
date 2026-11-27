@@ -427,5 +427,21 @@ const RECIPES = [
     "difficulty": "Easy",
     "healthScore": 8,
     "dateAdded": "2026-11-23"
+  },
+  {
+    "id": "two-ingredient-protein-powder",
+    "title": "Two Ingredient Protein Powder",
+    "image": "recipe-img/two-ingredient-protein-powder.jpg",
+    "meal": [
+      "protein powder"
+    ],
+    "line": "A simple protein powder you make at home from just two ingredients.",
+    "basis": "per portion",
+    "kcal": 140,
+    "protein": 20,
+    "fibre": 2,
+    "difficulty": "Easy",
+    "healthScore": 9,
+    "dateAdded": "2026-11-27"
   }
 ];
